@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import UserService from "../services/user.service";
 const Home = () => {
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState([]);
   useEffect(() => {
     UserService.getPublicContent().then(
       (response) => {
-        // setContent(response.data);
+        setContent(response.data);
         console.log(response.data)
       },
       (error) => {
@@ -20,7 +20,11 @@ const Home = () => {
   return (
     <div className="container">
       <header className="jumbotron">
-        <h3>{content}</h3>
+        {!content && content.map((person) => (
+          <h3 key={person.id} >
+            {person.id}.{person.name}{" "}
+          </h3>
+        ))}
       </header>
     </div>
   );
