@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import AuthService from './services/auth.service';
 import { publicRoutes } from '@/routes';
-import { DefaultLayout } from '@/components/Layout';
+import { DefaultLayout } from '@/components/Layout/NotFound';
 import Login from './components/Login';
 import Register from './components/Register';
 import Home from './components/Home';

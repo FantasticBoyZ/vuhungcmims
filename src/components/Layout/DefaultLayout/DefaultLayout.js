@@ -1,5 +1,5 @@
-import Header from './Header';
-import Sidebar from './Sidebar';
+import Header from './Header/Header';
+import Sidebar from './Sidebar/SideBar';
 import { Box, CssBaseline, Stack } from '@mui/material';
 
 function DefaultLayout({ children }) {

@@ -10,12 +10,52 @@ import {
   ListItemText,
   styled,
   Typography,
-  useTheme
+  useTheme,
 } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { ChevronRight, Home, Inbox, Info, Mail, Menu } from '@mui/icons-material';
+import { Link, useLocation } from 'react-router-dom';
+import { privateRoutes } from '@/routes/index';
+import { color } from '@mui/system';
 
 const drawerWidth = 240;
+
+
+
+let CustomListItem = ({ to, text, icon, open, location, link }) => (
+  <ListItem
+    to={to}
+    component={link}
+    selected={to === location.pathname}
+    key={text}
+    disablePadding
+    sx={{ display: 'block' }}
+  >
+    
+      <ListItemButton
+        sx={{
+          minHeight: 48,
+          justifyContent: open ? 'initial' : 'center',
+          px: 2.5,
+        }}
+      >
+        <ListItemIcon
+          sx={{
+            minWidth: 0,
+            mr: open ? 3 : 'auto',
+            justifyContent: 'center',
+          }}
+        >
+          {icon}
+        </ListItemIcon>
+        <ListItemText
+          primary={text}
+          sx={{ opacity: open ? 1 : 0 , color: '#333' }}
+        />
+      </ListItemButton>
+    
+  </ListItem>
+);
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -64,68 +104,56 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-const Sidebar = (props) => {
+const Sidebar = () => {
   const theme = useTheme();
+  const location = useLocation();
   const [open, setOpen] = useState(true);
-  const { history } = props;
-  const itemList = [
-    {
-      text: "Home",
-      icon: <Home/>,
-      onClick: () => history.push("/")
-    },
-    {
-      text: "About",
-      icon: <Info/>,
-      onClick: () => history.push("/about")
-    }
-  ]
+
 
   return (
     // <Box
     //   bgcolor="skyblue"
-    //   
+    //
     //   p={2}
     //   borderRight="10px solid rgb(230, 227, 227"
     //   minHeight="100vh"
     //   sx={{ display: { xs: 'none', sm: 'block' } }}
     // >
-       <Drawer variant="permanent" flex={1}  open={open}>
-        <DrawerHeader justifyContent='center'>
-          {open && <Typography variant='h6' fontSize={14} >
-          Vu Hung Company's CMIMS
-          </Typography>}
-          <IconButton onClick={e=>setOpen(!open)}>   
-            {theme.direction === 'rtl' ? <ChevronRight /> : <Menu />}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {['Home','Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {index % 2 === 0 ? <Inbox /> : <Mail />}
-                </ListItemIcon>
-                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-        
-      </Drawer>
+    <Drawer
+      variant="permanent"
+      flex={1}
+      open={open}
+    >
+      <DrawerHeader>
+        {open && (
+          <Link to={"/"} style={{ textDecoration: 'none', color: '#333' }}>
+          <Typography
+            variant="h6"
+            fontSize={14}
+          >
+            Vu Hung Company's CMIMS
+          </Typography>
+          </Link>
+        )}
+        <IconButton onClick={(e) => setOpen(!open)}>
+          {theme.direction === 'rtl' ? <ChevronRight /> : <Menu />}
+        </IconButton>
+      </DrawerHeader>
+      <Divider />
+      <List>
+        {privateRoutes.map((item, index) => (
+          <CustomListItem
+            key={item.primary}
+            to={item.path}
+            text={item.primary}
+            icon={item.icon}
+            open={open}
+            location={location}
+            link={Link}
+          />
+        ))}
+      </List>
+    </Drawer>
     // </Box>
   );
 };
