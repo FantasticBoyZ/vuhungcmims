@@ -1,7 +1,7 @@
 .flexContainer {
   display: flex;
   flex-direction: row;
-  text-align: left;
+  /* text-align: left; */
   background: #e5e5e5;
   height: 100vh;
   width: 100vw;
@@ -27,7 +27,7 @@
   width: 100%;
   background-color: #ffffff;
 }
-
+/* 
 .box-login {
   margin: 64px 32px;
   display: 'flex';
@@ -43,4 +43,4 @@
 .box-login h1 {
   text-align: center;
   margin-top: 10px;
-}
+} */

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Login.css';
 
 import Carousel from 'react-material-ui-carousel';
+import { Box, Stack } from '@mui/material';
 
 const LayoutLogin = ({ children }) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -37,9 +38,9 @@ const LayoutLogin = ({ children }) => {
   });
   return (
     <>
-      <main>
-        <div className="flexContainer">
-          <div className="flexItemLeft  my__carousel_main">
+      <Stack direction="row" >
+        <Box className="flexContainer">
+          <Box className="flexItemLeft  my__carousel_Stack" sx={{ display: { xs: 'none', md: 'block' } }}>
             <Carousel
               index={activeIndex}
               onChange={handleChange}
@@ -60,10 +61,10 @@ const LayoutLogin = ({ children }) => {
                 />;
               })} */}
             </Carousel>
-          </div>
-          <div className="flexItemRight">{children}</div>
-        </div>
-      </main>
+          </Box>
+          <Box className="flexItemRight">{children}</Box>
+        </Box>
+      </Stack>
     </>
   );
 };

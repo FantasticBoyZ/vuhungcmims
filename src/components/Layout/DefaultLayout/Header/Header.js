@@ -11,6 +11,8 @@ import {
 } from '@mui/material';
 import { Notifications, Warehouse } from '@mui/icons-material';
 import React, { useState } from 'react';
+import AuthService from '@/services/auth.service';
+import { useNavigate } from 'react-router-dom';
 
 const StyledToolbar = styled(Toolbar)({
   display: 'flex',
@@ -29,8 +31,16 @@ const UserBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
 }));
 
+
+
 const Header = () => {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const logOut = () => {
+    AuthService.logout();
+    navigate('/login')
+  };
   return (
     <AppBar position="sticky">
       <StyledToolbar>
@@ -76,7 +86,7 @@ const Header = () => {
       >
         <MenuItem>Profile</MenuItem>
         <MenuItem>My account</MenuItem>
-        <MenuItem>Logout</MenuItem>
+        <MenuItem onClick={logOut}>Logout</MenuItem>
       </Menu>
     </AppBar>
   );
