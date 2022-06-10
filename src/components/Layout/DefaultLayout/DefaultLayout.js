@@ -1,5 +1,5 @@
-import Header from './Header/Header';
-import Sidebar from './Sidebar/SideBar';
+import Header from './Header/header';
+import Sidebar from './Sidebar/sidebar';
 import { Box, CssBaseline, Stack } from '@mui/material';
 
 function DefaultLayout({ children }) {
@@ -10,7 +10,7 @@ function DefaultLayout({ children }) {
         <Sidebar />
         <Stack flex={6}>
           <Header />
-          <Box bgcolor="pink" p={2}>
+          <Box p={2}>
             {children}
           </Box>
         </Stack>

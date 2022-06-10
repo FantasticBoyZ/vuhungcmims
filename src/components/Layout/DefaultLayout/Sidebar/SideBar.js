@@ -4,58 +4,74 @@ import {
   Divider,
   IconButton,
   List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   styled,
   Typography,
   useTheme,
 } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
-import { ChevronRight, Home, Inbox, Info, Mail, Menu } from '@mui/icons-material';
-import { Link, useLocation } from 'react-router-dom';
-import { privateRoutes } from '@/routes/index';
-import { color } from '@mui/system';
+import {
+  AutoAwesomeMosaic,
+  CameraFront,
+  ChevronRight,
+  CurrencyExchange,
+  FactCheck,
+  Home,
+  LocalAtm,
+  Menu,
+  Person,
+  StackedBarChart,
+  ViewList,
+} from '@mui/icons-material';
+import { Link } from 'react-router-dom';
+import SidebarItem from './sidebarItem';
+import { makeStyles } from '@mui/styles';
 
-const drawerWidth = 240;
+const drawerWidth = 250;
 
+// let CustomListItem = ({ item, location, open, link }) => (
+//   <ListItem
+//     to={item.path}
+//     component={link}
+//     selected={item.path === location.pathname}
+//     key={item.text}
+//     disablePadding
+//     sx={{ display: 'block' }}
+//   >
+//     <ListItemButton
+//       sx={{
+//         minHeight: 48,
+//         justifyContent: open ? 'initial' : 'center',
+//         px: 2.5,
+//       }}
+//     >
+//       <ListItemIcon
+//         sx={{
+//           minWidth: 0,
+//           mr: open ? 3 : 'auto',
+//           justifyContent: 'center',
+//         }}
+//       >
+//         {item.icon}
+//       </ListItemIcon>
+//       <ListItemText
+//         primary={item.primary}
+//         sx={{ opacity: open ? 1 : 0, color: '#333' }}
+//       />
+//     </ListItemButton>
+//   </ListItem>
+// );
 
-
-let CustomListItem = ({ to, text, icon, open, location, link }) => (
-  <ListItem
-    to={to}
-    component={link}
-    selected={to === location.pathname}
-    key={text}
-    disablePadding
-    sx={{ display: 'block' }}
-  >
-    
-      <ListItemButton
-        sx={{
-          minHeight: 48,
-          justifyContent: open ? 'initial' : 'center',
-          px: 2.5,
-        }}
-      >
-        <ListItemIcon
-          sx={{
-            minWidth: 0,
-            mr: open ? 3 : 'auto',
-            justifyContent: 'center',
-          }}
-        >
-          {icon}
-        </ListItemIcon>
-        <ListItemText
-          primary={text}
-          sx={{ opacity: open ? 1 : 0 , color: '#333' }}
-        />
-      </ListItemButton>
-    
-  </ListItem>
-);
+const useStyles = makeStyles({
+  list: {
+    width: 250,
+  },
+  fullList: {
+    width: 'auto',
+  },
+  paper: {
+    background: 'blue',
+  },
+});
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -93,6 +109,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     flexShrink: 0,
     whiteSpace: 'nowrap',
     boxSizing: 'border-box',
+    backgroundColor: 'red',
     ...(open && {
       ...openedMixin(theme),
       '& .MuiDrawer-paper': openedMixin(theme),
@@ -106,55 +123,127 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const Sidebar = () => {
   const theme = useTheme();
-  const location = useLocation();
+  const classes = useStyles();
+
   const [open, setOpen] = useState(true);
 
+  const LIST_ITEM_SIDEBAR = [
+    {
+      primary: 'Tổng quan',
+      icon: <Home />,
+      path: '/',
+      children: [],
+      hasParent: false,
+    },
+    {
+      primary: 'Sản Phẩm',
+      icon: <AutoAwesomeMosaic />,
+      path: '/product',
+      children: [
+        {
+          primary: 'Danh sách sản phẩm',
+          icon: <ViewList />,
+          path: '/product',
+          children: [],
+          hasParent: true,
+        },
+        {
+          primary: 'Kiểm kho',
+          icon: <FactCheck />,
+          path: '/product/check',
+          children: [],
+          hasParent: true,
+        },
+      ],
+      hasParent: false,
+    },
+    {
+      primary: 'Giao dịch',
+      icon: <CurrencyExchange />,
+      path: '/transaction',
+      children: [],
+      hasParent: false,
+    },
+    {
+      primary: 'Khách hàng',
+      icon: <CameraFront />,
+      path: '/customer',
+      children: [],
+      hasParent: false,
+    },
+    {
+      primary: 'Nhân viên',
+      icon: <Person />,
+      path: '/staff',
+      children: [],
+      hasParent: false,
+    },
+    {
+      primary: 'Sổ quỹ',
+      icon: <LocalAtm />,
+      path: '/cash-book',
+      children: [],
+      hasParent: false,
+    },
+    {
+      primary: 'Báo cáo',
+      icon: <StackedBarChart />,
+      path: '/report',
+      children: [],
+      hasParent: false,
+    },
+  ];
 
   return (
-    // <Box
-    //   bgcolor="skyblue"
-    //
-    //   p={2}
-    //   borderRight="10px solid rgb(230, 227, 227"
-    //   minHeight="100vh"
-    //   sx={{ display: { xs: 'none', sm: 'block' } }}
-    // >
     <Drawer
+      // classes={{ paper: classes.paper }}
       variant="permanent"
       flex={1}
       open={open}
+      PaperProps={{
+        sx: {
+          backgroundColor: theme.palette.sidebar.main,
+          color: theme.palette.common.white,
+        }
+      }}
     >
       <DrawerHeader>
         {open && (
-          <Link to={"/"} style={{ textDecoration: 'none', color: '#333' }}>
-          <Typography
-            variant="h6"
-            fontSize={14}
+          <Link
+            to={'/'}
+            style={{ textDecoration: 'none', color: '#333' }}
           >
-            Vu Hung Company's CMIMS
-          </Typography>
+            <Typography
+              variant="h6"
+              fontSize={14}
+              sx={{color: 'white'}}
+            >
+              Vu Hung Company's CMIMS
+            </Typography>
           </Link>
         )}
-        <IconButton onClick={(e) => setOpen(!open)}>
+        <IconButton sx={{color: 'white'}} onClick={(e) => setOpen(!open)}>
           {theme.direction === 'rtl' ? <ChevronRight /> : <Menu />}
         </IconButton>
       </DrawerHeader>
       <Divider />
       <List>
-        {privateRoutes.map((item, index) => (
-          <CustomListItem
-            key={item.primary}
-            to={item.path}
-            text={item.primary}
-            icon={item.icon}
-            open={open}
-            location={location}
-            link={Link}
-          />
-        ))}
+        {LIST_ITEM_SIDEBAR.map((item, index) => {
+          // <CustomListItem
+          //   key={item.primary}
+          //   item={item}
+          //   open={open}
+          //   location={location}
+          //   link={Link}
+          // />
+          return (
+            <Box key={index}>
+              <SidebarItem option={item} />
+            </Box>
+          );
+        })}
       </List>
     </Drawer>
-    // </Box>
   );
 };
 

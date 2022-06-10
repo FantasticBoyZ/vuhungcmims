@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import UserService from "../services/user.service";
-const Home = () => {
+import UserService from "../services/userService";
+const BoardUser = () => {
   const [content, setContent] = useState([]);
   useEffect(() => {
-    UserService.getPublicContent().then(
+    UserService.getUserBoard().then(
       (response) => {
         setContent(response.data);
-        console.log(response.data)
+        console.log(response.data);
       },
       (error) => {
         const _content =
-          (error.response && error.response.data) ||
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
           error.message ||
           error.toString();
         setContent(_content);
@@ -20,7 +22,7 @@ const Home = () => {
   return (
     <div className="container">
       <header className="jumbotron">
-        {!content && content.map((person) => (
+        {content.map((person) => (
           <h3 key={person.id} >
             {person.id}.{person.name}{" "}
           </h3>
@@ -29,4 +31,4 @@ const Home = () => {
     </div>
   );
 };
-export default Home;
+export default BoardUser;

@@ -10,9 +10,9 @@ import {
   MenuItem,
 } from '@mui/material';
 import { Notifications, Warehouse } from '@mui/icons-material';
-import React, { useState } from 'react';
-import AuthService from '@/services/auth.service';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import AuthService from '@/services/authService';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const StyledToolbar = styled(Toolbar)({
   display: 'flex',
@@ -31,24 +31,36 @@ const UserBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
 }));
 
+const titles = {
+  "/": "Hệ thống quản lý kho vật liệu xây dựng",
+  "/product": "Danh sách sản phẩm"
+};
+
 
 
 const Header = () => {
   const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState('')
   const navigate = useNavigate();
+const location = useLocation();
+
 
   const logOut = () => {
     AuthService.logout();
     navigate('/login')
   };
+
+  useEffect(() => {
+    setTitle(titles[location.pathname])
+  }, [location.pathname])
   return (
-    <AppBar position="sticky">
+    <AppBar sx={{ backgroundColor: "white", color: 'black'}} position="sticky">
       <StyledToolbar>
         <Typography
           variant="h6"
           sx={{ display: { xs: 'none', sm: 'block' } }}
         >
-          CMIMS
+          {title}
         </Typography>
         <Warehouse sx={{ display: { xs: 'block', sm: 'none' } }} />
         <Icons>

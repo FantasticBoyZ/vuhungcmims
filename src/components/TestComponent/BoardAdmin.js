@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import UserService from "../services/user.service";
-const BoardUser = () => {
+import UserService from "../../services/userService";
+const BoardAdmin = () => {
   const [content, setContent] = useState("");
   useEffect(() => {
     UserService.getUserBoard().then(
@@ -26,4 +26,4 @@ const BoardUser = () => {
     </div>
   );
 };
-export default BoardUser;
+export default BoardAdmin;

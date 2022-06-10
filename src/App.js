@@ -1,18 +1,9 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css';
-import AuthService from './services/auth.service';
+import { DefaultLayout } from '@/components/Layout';
 import { privateRoutes, publicRoutes } from '@/routes';
-import { DefaultLayout } from '@/components/Layout/NotFound';
-import Login from './components/AuthComponent/Login';
-import Register from './components/Register';
-import Home from './components/Home';
-import Profile from './components/Profile';
-import BoardUser from './components/BoardUser';
-import BoardModerator from './components/BoardModerator';
-import BoardAdmin from './components/BoardAdmin';
+import React, { Fragment } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute';
+
 const App = () => {
 //   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
 //   const [showAdminBoard, setShowAdminBoard] = useState(false);

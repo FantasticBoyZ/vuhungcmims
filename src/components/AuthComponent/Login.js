@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthService from '@/services/auth.service';
+import AuthService from '@/services/authService';
 import LayoutLogin from '@/pages/Login/Login';
 import Checkbox from '@mui/material/Checkbox';
 import Avatar from '@mui/material/Avatar';
