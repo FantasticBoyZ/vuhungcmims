@@ -1,12 +1,18 @@
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Box, Collapse, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const SidebarItem = ({ option }) => {
+const SidebarItem = ({ option, openSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [openNested, setOpenNested] = useState(false);
+
+  useEffect(() => {
+    if (openSidebar === false) {
+      setOpenNested(false)
+    }
+  },[openSidebar])
 
   const handleClick = () => {
     setOpenNested(!openNested);
