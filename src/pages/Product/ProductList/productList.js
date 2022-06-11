@@ -17,10 +17,11 @@ import {
 import { makeStyles } from '@mui/styles';
 import { Form, Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
   searchField: {
-    width: '30%'
+    width: '30%',
   },
   toolbar: {
     padding: '10px',
@@ -28,9 +29,8 @@ const useStyles = makeStyles({
     justifyContent: 'space-between',
   },
   selectBox: {
-    width: '50%' ,
-    
-  }
+    width: '50%',
+  },
 });
 
 const headCells = [
@@ -61,6 +61,7 @@ const sortTypeList = {
 };
 
 const ProductList = () => {
+  const navigate = useNavigate();
   const [productList, setProductList] = useState([]);
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
@@ -72,6 +73,20 @@ const ProductList = () => {
 
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     CommonTable(productList, headCells, filterFn);
+
+  // const handleSearch = (e) => {
+  //   let target = e.target;
+  //   setFilterFn({
+  //     fn: (items) => {
+  //       if (target.value === '') return items;
+  //       else return items.filter((x) => x.name.toLowerCase().includes(target.value));
+  //     },
+  //   });
+  // };
+
+  const handleOnClickTableRow = (productId) => {
+    navigate(`/product/${productId}`);
+  };
 
   useEffect(() => {
     const fetchProductList = async () => {
@@ -115,52 +130,55 @@ const ProductList = () => {
             display="flex"
             justifyContent="space-between"
           > */}
-            <TextField
-              id="outlined-basic"
-              placeholder="Search"
-              label={null}
-              variant="outlined"
-              className={classes.searchField}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>
-                ),
+          <TextField
+            id="outlined-basic"
+            placeholder="Search"
+            label={null}
+            variant="outlined"
+            className={classes.searchField}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+            // onChange={handleSearch}
+          />
+          <Box className={classes.selectBox}>
+            <Formik
+              initialValues={{
+                category: '1',
+                manufacturer: '1',
+                sort: 'asc',
               }}
-            />
-            <Box className={classes.selectBox}>
-              <Formik
-                initialValues={{
-                  category: '1',
-                  manufacturer: '1',
-                  sort: 'asc',
-                }}
-                // validationSchema={FORM_VALIDATION}
-                // onSubmit={handleLogin}
-              >
-                <Form>
-                  <Stack direction="row" spacing={2}>
-                    <SelectWrapper
-                      label="Nhóm hàng"
-                      name="category"
-                      options={categoryList}
-                      
-                    />
-                    <SelectWrapper
-                      label="Nhà cung cáp"
-                      name="manufacturer"
-                      options={manufacturerList}
-                    />
-                    {/* <SelectWrapper label="Ngày khởi tạo" name="createdAt" options={categoryList}/> */}
-                    <SelectWrapper
-                      label="Sắp xếp"
-                      name="sort"
-                      options={sortTypeList}
-                    />
-                  </Stack>
-                </Form>
-              </Formik>
+              // validationSchema={FORM_VALIDATION}
+              // onSubmit={handleLogin}
+            >
+              <Form>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                >
+                  <SelectWrapper
+                    label="Nhóm hàng"
+                    name="category"
+                    options={categoryList}
+                  />
+                  <SelectWrapper
+                    label="Nhà cung cáp"
+                    name="manufacturer"
+                    options={manufacturerList}
+                  />
+                  {/* <SelectWrapper label="Ngày khởi tạo" name="createdAt" options={categoryList}/> */}
+                  <SelectWrapper
+                    label="Sắp xếp"
+                    name="sort"
+                    options={sortTypeList}
+                  />
+                </Stack>
+              </Form>
+            </Formik>
             {/* </Box> */}
           </Box>
         </Toolbar>
@@ -168,7 +186,10 @@ const ProductList = () => {
           <TblHead />
           <TableBody>
             {recordsAfterPagingAndSorting().map((item) => (
-              <TableRow key={item.id}>
+              <TableRow
+                key={item.id}
+                onClick={() => handleOnClickTableRow(item.id)}
+              >
                 <TableCell>{item.id}</TableCell>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.categoryId}</TableCell>
