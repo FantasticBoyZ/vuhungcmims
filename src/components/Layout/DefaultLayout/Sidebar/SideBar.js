@@ -135,7 +135,7 @@ const Sidebar = () => {
     {
       primary: 'Tổng quan',
       icon: <Home />,
-      path: '/',
+      path: '/dashboard',
       children: [],
       hasParent: false,
     },
@@ -271,7 +271,7 @@ const Sidebar = () => {
           // />
           return (
             <Box key={index}>
-              <SidebarItem option={item} />
+              <SidebarItem option={item} openSidebar={open} />
             </Box>
           );
         })}
