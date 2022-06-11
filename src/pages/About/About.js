@@ -1,7 +1,6 @@
 import SelectWrapper from '@/components/FormsUI/Select';
-import { Box, Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import { Form, Formik } from 'formik';
-import React from 'react';
 
 const About = () => {
   const categoryList = {
@@ -10,16 +9,16 @@ const About = () => {
     '3': 'Xi măng',
   };
   
-  const manufacturerList = {
-    '1': 'Hoàng Phát',
-    '2': 'Surplus',
-    '3': 'Toyota',
-  };
+  // const manufacturerList = {
+  //   '1': 'Hoàng Phát',
+  //   '2': 'Surplus',
+  //   '3': 'Toyota',
+  // };
   
-  const sortTypeList = {
-    'asc': 'tăng',
-    'desc': 'giảm',
-  };
+  // const sortTypeList = {
+  //   'asc': 'tăng',
+  //   'desc': 'giảm',
+  // };
   return (
     <Box>
       <Formik

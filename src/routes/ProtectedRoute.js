@@ -1,33 +1,45 @@
-import AuthService from '@/services/authService';
-import React from 'react';
-import { Navigate,  Outlet,  useLocation } from 'react-router-dom';
+import useAuth from '@/utils/useAuth';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
-const ProtectedRoute = ({ component: Component, layout:Layout, ...rest }) => {
-  const user = AuthService.getCurrentUser();
+
+
+const ProtectedRoute = (roleRequired) => {
+  const { auth, role } = useAuth();
   const location = useLocation();
-  return (
-    // <Route
-    //   {...rest}
-    //   render={(props) =>
-    //     !!user ? (
-    //     //   <Layout {...props}>
-    //     //     <Component {...props} />
-    //     //   </Layout>
-    //     <Outlet/>
-    //     ) : (
-    //       <Navigate to="/login"  state={{ from: location}} replace/>
-    //     )
-    //   }
-    // />
-    !!user ? (
-        //   <Layout {...props}>
-        //     <Component {...props} />
-        //   </Layout>
-        <Outlet/>
-        ) : (
-          <Navigate to="/login"  state={{ from: location}} replace/>
-        )
-  );
+  const roles = ['ROLE_ADMIN', 'ROLE_USER'];
+  // console.log(roleRequired?.roleRequired === role && roles.includes(role))
+  // console.log("26", roleRequired.roleRequired === role)
+  // console.log('27', roles.includes(role))
+  // console.log("28", roleRequired)
+  if (roleRequired.roleRequired !== undefined) {
+    return auth ? (
+      roleRequired.roleRequired === role && roles.includes(role) ? (
+        <Outlet />
+      ) : (
+        <Navigate
+          to="/denied"
+          state={{ from: location }}
+          replace
+        />
+      )
+    ) : (
+      <Navigate
+        to="/login"
+        state={{ from: location }}
+        replace
+      />
+    );
+  } else {
+    return { auth } ? (
+      <Outlet />
+    ) : (
+      <Navigate
+        to="/login"
+        state={{ from: location }}
+        replace
+      />
+    );
+  }
 };
 
 export default ProtectedRoute;

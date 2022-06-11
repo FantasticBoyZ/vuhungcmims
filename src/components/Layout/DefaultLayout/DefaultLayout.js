@@ -1,4 +1,4 @@
-import Header from '@/components/Layout/DefaultLayout//Header/Header';
+import Header from '@/components/Layout/DefaultLayout/Header/Header';
 import Sidebar from '@/components/Layout/DefaultLayout/Sidebar/SideBar';
 import { Box, CssBaseline, Stack } from '@mui/material';
 

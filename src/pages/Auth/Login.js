@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthService from '@/services/authService';
-import LayoutLogin from '@/pages/Login/Login';
+import LayoutLogin from '@/components/Layout/AuthLayout/Login';
 import Checkbox from '@mui/material/Checkbox';
 import Avatar from '@mui/material/Avatar';
 import Button from '@/components/FormsUI/Button';
-// import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import '@/pages/Login/Login.css';
+import '@/components/Layout/AuthLayout/Login.css';
 import { LockOutlined } from '@mui/icons-material';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
@@ -41,7 +40,7 @@ const Login = () => {
     console.log(e);
     AuthService.login(e.username, e.password).then(
       () => {
-        navigate('/');
+        navigate('/dashboard');
         window.location.reload();
       },
       (error) => {
