@@ -1,8 +1,8 @@
-import { DefaultLayout } from '@/components/Layout';
+import  DefaultLayout  from '@/components/Layout/DefaultLayout/DefaultLayout';
 import { privateRoutes, publicRoutes } from '@/routes';
 import React, { Fragment } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import ProtectedRoute from './routes/ProtectedRoute';
+import ProtectedRoute from '@/routes/ProtectedRoute';
 
 const App = () => {
 //   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
