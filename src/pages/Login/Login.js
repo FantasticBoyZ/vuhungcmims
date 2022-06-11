@@ -9,15 +9,15 @@ const LayoutLogin = ({ children }) => {
 
   const items = [
     {
-      src: 'src/assets/images/image1.png',
+      src: 'image1.png',
       altText: 'Slide 1',
     },
     {
-      src: 'src/assets/images/image2.png',
+      src: 'image2.png',
       altText: 'Slide 2',
     },
     {
-      src: 'src/assets/images/image3.png',
+      src: 'image3.png',
       altText: 'Slide 3',
     },
   ];
@@ -31,16 +31,19 @@ const LayoutLogin = ({ children }) => {
     return (
       <img
         key={i}
-        src={require('src/assets/images/image3.png')}
+        src={require(`src/assets/images/${item.src}`)}
         alt={item.altText}
       />
     );
   });
   return (
     <>
-      <Stack direction="row" >
+      <Stack direction="row">
         <Box className="flexContainer">
-          <Box className="flexItemLeft  my__carousel_Stack" sx={{ display: { xs: 'none', md: 'block' } }}>
+          <Box
+            className="flexItemLeft  my__carousel_Stack"
+            sx={{ display: { xs: 'none', md: 'block' } }}
+          >
             <Carousel
               index={activeIndex}
               onChange={handleChange}
