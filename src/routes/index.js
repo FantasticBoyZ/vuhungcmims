@@ -11,6 +11,7 @@ import SubProductList from '@/pages/Product/ProductList/SubProductList/SubProduc
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
+  { path: '/', component: Login, layout: null },
   // { path: '/', component: HomePage,  primary: 'Home', icon: <Home/>},
   // { path: '/about', component: About, primary: 'About', icon: <Info/>,},
   // { path: '/profile', component: Profile, primary: 'Profile', icon: <Info/>,},
