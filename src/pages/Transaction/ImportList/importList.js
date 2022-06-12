@@ -1,59 +1,114 @@
-import * as React from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
+import SelectWrapper from '@/components/FormsUI/Select';
+import ImportOrders from '@/pages/Transaction/ImportList/ImportOrders';
+import { Search } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  InputAdornment,
+  Stack,
+  TextField,
+  Toolbar,
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { Form, Formik } from 'formik';
 
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
+const useStyles = makeStyles({
+  searchField: {
+    width: '30%',
+  },
+  toolbar: {
+    padding: '10px',
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  selectBox: {
+    width: '50%',
+  },
+});
+
+const createrList = {
+  1: 'Vũ Tiến Khôi',
+  2: 'Trịnh Bá Minh Ninh',
+  3: 'Nguyễn Thị Hiền',
+  4: 'Nguyễn Đức Chính',
+  5: 'Dương Đức Trọng',
+};
+
 const ImportList = () => {
+  const classes = useStyles();
   return (
-    <TableContainer component={Paper}>
-      <Table
-        sx={{ minWidth: 650 }}
-        aria-label="simple table"
+    <Container maxWidth="xl">
+      <Stack
+        direction="row"
+        justifyContent="flex-end"
+        spacing={2}
+        p={2}
       >
-        <TableHead>
-          <TableRow>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.name}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell
-                component="th"
-                scope="row"
+        <Button
+          variant="contained"
+          color="secondary"
+        >
+          Thêm mới
+        </Button>
+        <Button variant="contained">Xuất file excel</Button>
+        <Button variant="contained">Nhập file excel</Button>
+      </Stack>
+      <Toolbar className={classes.toolbar}>
+        <TextField
+          id="outlined-basic"
+          placeholder="Search"
+          label={null}
+          variant="outlined"
+          className={classes.searchField}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+          // onChange={handleSearch}
+        />
+        <Box className={classes.selectBox}>
+          <Formik
+            initialValues={{
+              creater: '1',
+            }}
+            // validationSchema={FORM_VALIDATION}
+            // onSubmit={handleLogin}
+          >
+            <Form>
+              <Stack
+                direction="row"
+                spacing={2}
               >
-                {row.name}
-              </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                <SelectWrapper
+                  label="Người tạo"
+                  name="creater"
+                  options={createrList}
+                />
+              </Stack>
+            </Form>
+          </Formik>
+        </Box>
+      </Toolbar>
+      <Grid
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="stretch"
+        spacing={3}
+      >
+        <Grid
+          item
+          xs={12}
+        >
+          <ImportOrders />
+        </Grid>
+      </Grid>
+    </Container>
   );
 };
 

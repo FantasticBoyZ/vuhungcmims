@@ -9,11 +9,11 @@ const About = () => {
     '3': 'Xi măng',
   };
   
-  // const manufacturerList = {
-  //   '1': 'Hoàng Phát',
-  //   '2': 'Surplus',
-  //   '3': 'Toyota',
-  // };
+  const createrList = {
+    '1': 'Hoàng Phát',
+    '2': 'Surplus',
+    '3': 'Toyota',
+  };
   
   // const sortTypeList = {
   //   'asc': 'tăng',
@@ -24,6 +24,7 @@ const About = () => {
       <Formik
       initialValues={{
         category: '1',
+        creater: '1'
       }}
       // validationSchema={FORM_VALIDATION}
       // onSubmit={handleLogin}
@@ -36,7 +37,11 @@ const About = () => {
               name="category"
               options={categoryList}
             />
-            
+            <SelectWrapper
+              label="người tạo"
+              name="creater"
+              options={createrList}
+            />
           <pre>{JSON.stringify(values, null, 2)}</pre>
         </Form>
        )} 

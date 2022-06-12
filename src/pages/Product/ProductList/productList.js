@@ -36,11 +36,10 @@ const useStyles = makeStyles({
 const headCells = [
   { id: 'productCode', label: 'Mã sản phẩm' },
   { id: 'productName', label: 'Tên sản phẩm' },
-  { id: 'category', label: 'Nhóm hàng' },
+  { id: 'category', label: 'Danh mục' },
   { id: 'manufacturer', label: 'Nhà cung cấp' },
-  { id: 'unitPrice', label: 'Đơn giá' },
   { id: 'inStock', label: 'Tồn kho' },
-  { id: 'createdDate', label: 'Ngày khởi tạo' },
+  // { id: 'createdDate', label: 'Ngày khởi tạo' },
 ];
 
 const categoryList = {
@@ -92,12 +91,21 @@ const ProductList = () => {
     const fetchProductList = async () => {
       try {
         const params = {
-          _page: 1,
-          _limit: 10,
+          page: 1,
+          size: 10,
+          name: '',
+          categoryName: '',
+          productCode: '',
+          unitMeasure: '',
+          wrapUnitMeasure: '',
+          numberOfWrapUnitMeasure: '',
+          color: '',
+          description: '',
+          manufactorName: ''
         };
         const response = await productService.getAllProduct(params);
-        setProductList(response.data);
         console.log(response);
+        setProductList(response.data.product);
       } catch (error) {
         console.log('Failed to fetch product list: ', error);
       }
@@ -192,11 +200,10 @@ const ProductList = () => {
               >
                 <TableCell>{item.id}</TableCell>
                 <TableCell>{item.name}</TableCell>
-                <TableCell>{item.categoryId}</TableCell>
-                <TableCell>{item.name}</TableCell>
-                <TableCell>{item.salePrice}</TableCell>
-                <TableCell>100</TableCell>
-                <TableCell>{item.createdAt}</TableCell>
+                <TableCell>{item.categoryName}</TableCell>
+                <TableCell>{item.manufactorName}</TableCell>
+                <TableCell>Chưa trả về</TableCell>
+
               </TableRow>
             ))}
           </TableBody>

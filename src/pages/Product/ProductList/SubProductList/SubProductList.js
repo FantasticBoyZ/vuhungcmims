@@ -8,27 +8,27 @@ const SubProductList = () => {
   const [subProductList, setSubProductList] = useState();
 
   useEffect(() => {
-    const fetchSubProductList = async () => {
-      try {
-        // get list subProduct by productId
-        const response = await productService.getProductById(productId);
-        setSubProductList(response);
-        console.log('subProductList', response);
-      } catch (error) {
-        console.log('Failed to fetch product list: ', error);
-      }
-    };
-    fetchSubProductList();
+    // const fetchSubProductList = async () => {
+    //   try {
+    //     // get list subProduct by productId
+    //     const response = await productService.getProductById(productId);
+    //     setSubProductList(response);
+    //     console.log('subProductList', response);
+    //   } catch (error) {
+    //     console.log('Failed to fetch product list: ', error);
+    //   }
+    // };
+    // fetchSubProductList();
     console.log(subProductList);
   }, [productId]);
 
   return (
-    <div>
-      SubProductList by Product id: {productId}
+    <>
+      {/* SubProductList by Product id: {productId} */}
       <Box>
         {/* <Typography>{subProductList.name}</Typography> */}
       </Box>
-    </div>
+    </>
   );
 };
 

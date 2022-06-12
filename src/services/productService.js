@@ -3,7 +3,7 @@ import authHeader from "@/services/auth-header";
 
 const productService = {
     getAllProduct: (params) => {
-        const url = '/products';
+        const url = '/product';
         return axiosClient.get(url, {params, headers: authHeader()})
     },
 
