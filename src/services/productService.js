@@ -8,7 +8,7 @@ const productService = {
     },
 
     getProductById: (id) => {
-        const url = `/products/${id}`;
+        const url = `/product/${id}`;
         return axiosClient.get(url, { headers: authHeader() })
     }
 }

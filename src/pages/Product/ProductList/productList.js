@@ -18,6 +18,9 @@ import { makeStyles } from '@mui/styles';
 import { Form, Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { getProductList } from '@/slices/ProductSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const useStyles = makeStyles({
   searchField: {
@@ -62,13 +65,16 @@ const sortTypeList = {
 const ProductList = () => {
   const navigate = useNavigate();
   const [productList, setProductList] = useState([]);
+  const classes = useStyles();
+  const dispatch = useDispatch();
+
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
       return items;
     },
   });
 
-  const classes = useStyles();
+  const { loading, products } = useSelector((state) => ({ ...state.products }));
 
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     CommonTable(productList, headCells, filterFn);
@@ -87,129 +93,129 @@ const ProductList = () => {
     navigate(`/product/${productId}`);
   };
 
+  const fetchProductList = async () => {
+    try {
+      const params = {
+        page: 1,
+        size: 10,
+      };
+      const actionResult = await dispatch(getProductList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log(products);
+      console.log(dataResult.data.product);
+      setProductList(dataResult.data.product);
+    } catch (error) {
+      console.log('Failed to fetch product list: ', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchProductList = async () => {
-      try {
-        const params = {
-          page: 1,
-          size: 10,
-          name: '',
-          categoryName: '',
-          productCode: '',
-          unitMeasure: '',
-          wrapUnitMeasure: '',
-          numberOfWrapUnitMeasure: '',
-          color: '',
-          description: '',
-          manufactorName: ''
-        };
-        const response = await productService.getAllProduct(params);
-        console.log(response);
-        setProductList(response.data.product);
-      } catch (error) {
-        console.log('Failed to fetch product list: ', error);
-      }
-    };
     fetchProductList();
-    console.log('productList', productList);
+
+    // console.log(products.data.product);
+    // console.log(loading)
+    // console.log('productList', productList);
   }, []);
   return (
     <>
-      <Paper>
-        <Stack
-          direction="row"
-          justifyContent="flex-end"
-          spacing={2}
-          p={2}
-        >
-          <Button
-            variant="contained"
-            color="secondary"
+      {loading ? (
+        <> Loading ... </>
+      ) : (
+        <Paper>
+          <Stack
+            direction="row"
+            justifyContent="flex-end"
+            spacing={2}
+            p={2}
           >
-            Thêm mới
-          </Button>
-          <Button variant="contained">Xuất file excel</Button>
-          <Button variant="contained">Nhập file excel</Button>
-        </Stack>
-        <Toolbar className={classes.toolbar}>
-          {/* <Box
+            <Button
+              variant="contained"
+              color="secondary"
+            >
+              Thêm mới
+            </Button>
+            <Button variant="contained">Xuất file excel</Button>
+            <Button variant="contained">Nhập file excel</Button>
+          </Stack>
+          <Toolbar className={classes.toolbar}>
+            {/* <Box
             backgroundColor="green"
             fullWidth="true"
             display="flex"
             justifyContent="space-between"
           > */}
-          <TextField
-            id="outlined-basic"
-            placeholder="Search"
-            label={null}
-            variant="outlined"
-            className={classes.searchField}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
-            // onChange={handleSearch}
-          />
-          <Box className={classes.selectBox}>
-            <Formik
-              initialValues={{
-                category: '1',
-                manufacturer: '1',
-                sort: 'asc',
+            <TextField
+              id="outlined-basic"
+              placeholder="Search"
+              label={null}
+              variant="outlined"
+              className={classes.searchField}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
               }}
-              // validationSchema={FORM_VALIDATION}
-              // onSubmit={handleLogin}
-            >
-              <Form>
-                <Stack
-                  direction="row"
-                  spacing={2}
-                >
-                  <SelectWrapper
-                    label="Nhóm hàng"
-                    name="category"
-                    options={categoryList}
-                  />
-                  <SelectWrapper
-                    label="Nhà cung cáp"
-                    name="manufacturer"
-                    options={manufacturerList}
-                  />
-                  {/* <SelectWrapper label="Ngày khởi tạo" name="createdAt" options={categoryList}/> */}
-                  <SelectWrapper
-                    label="Sắp xếp"
-                    name="sort"
-                    options={sortTypeList}
-                  />
-                </Stack>
-              </Form>
-            </Formik>
-            {/* </Box> */}
-          </Box>
-        </Toolbar>
-        <TblContainer>
-          <TblHead />
-          <TableBody>
-            {recordsAfterPagingAndSorting().map((item) => (
-              <TableRow
-                key={item.id}
-                onClick={() => handleOnClickTableRow(item.id)}
+              // onChange={handleSearch}
+            />
+            <Box className={classes.selectBox}>
+              <Formik
+                initialValues={{
+                  category: '1',
+                  manufacturer: '1',
+                  sort: 'asc',
+                }}
+                // validationSchema={FORM_VALIDATION}
+                // onSubmit={handleLogin}
               >
-                <TableCell>{item.id}</TableCell>
-                <TableCell>{item.name}</TableCell>
-                <TableCell>{item.categoryName}</TableCell>
-                <TableCell>{item.manufactorName}</TableCell>
-                <TableCell>Chưa trả về</TableCell>
-
-              </TableRow>
-            ))}
-          </TableBody>
-        </TblContainer>
-        <TblPagination />
-      </Paper>
+                <Form>
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                  >
+                    <SelectWrapper
+                      label="Nhóm hàng"
+                      name="category"
+                      options={categoryList}
+                    />
+                    <SelectWrapper
+                      label="Nhà cung cáp"
+                      name="manufacturer"
+                      options={manufacturerList}
+                    />
+                    {/* <SelectWrapper label="Ngày khởi tạo" name="createdAt" options={categoryList}/> */}
+                    <SelectWrapper
+                      label="Sắp xếp"
+                      name="sort"
+                      options={sortTypeList}
+                    />
+                  </Stack>
+                </Form>
+              </Formik>
+              {/* </Box> */}
+            </Box>
+          </Toolbar>
+          <TblContainer>
+            <TblHead />
+            <TableBody>
+              {recordsAfterPagingAndSorting().map((item) => (
+                <TableRow
+                  key={item.id}
+                  onClick={() => handleOnClickTableRow(item.id)}
+                >
+                  <TableCell>{item.id}</TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.categoryName}</TableCell>
+                  <TableCell>{item.manufactorName}</TableCell>
+                  <TableCell>{item.quantity}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </TblContainer>
+          <TblPagination />
+        </Paper>
+      )}
     </>
   );
 };
