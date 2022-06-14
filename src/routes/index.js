@@ -1,14 +1,14 @@
-import HomePage from '@/pages/Home/Home';
-import Login from '@/pages/Auth/Login';
-import About from '@/pages/About/About';
 import NotFound from '@/components/Layout/NotFound/NotFound';
-import { Home, Info } from '@mui/icons-material';
 import Profile from '@/components/TestComponent/Profile';
-import TestPost from '@/pages/TestPost/testPost';
-import productList from '@/pages/Product/ProductList/productList';
-import ImportList from '@/pages/Transaction/ImportList/importList';
-import SubProductList from '@/pages/Product/ProductList/ProductDetail/SubProductList';
+import About from '@/pages/About/About';
+import Login from '@/pages/Auth/Login';
+import HomePage from '@/pages/Home/Home';
+import AddEditProductForm from '@/pages/Product/AddEditProduct/AddEditProductForm';
 import ProductDetail from '@/pages/Product/ProductList/ProductDetail/ProductDetail';
+import productList from '@/pages/Product/ProductList/productList';
+import TestPost from '@/pages/TestPost/testPost';
+import ImportList from '@/pages/Transaction/ImportList/importList';
+import { Home, Info } from '@mui/icons-material';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -27,6 +27,8 @@ const privateRoutes = [
   { path: 'post/:postId', component: TestPost },
   { path: 'product', component: productList },
   { path: 'product/:productId', component: ProductDetail },
+  { path: 'product/add', component: AddEditProductForm },
+  { path: 'product/edit/:productId', component: AddEditProductForm },
   { path: 'post/:postId', component: TestPost },
   { path: 'import', component: ImportList },
   { path: '/denied', component: Profile, layout: null },
@@ -34,3 +36,4 @@ const privateRoutes = [
 ];
 
 export { publicRoutes, privateRoutes };
+
