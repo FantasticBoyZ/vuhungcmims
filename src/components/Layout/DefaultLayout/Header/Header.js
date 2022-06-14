@@ -32,7 +32,7 @@ const UserBox = styled(Box)(({ theme }) => ({
 }));
 
 const titles = {
-  "/": "Hệ thống quản lý kho vật liệu xây dựng",
+  "/dashboard": "Hệ thống quản lý kho vật liệu xây dựng",
   "/product": "Danh sách sản phẩm"
 };
 
