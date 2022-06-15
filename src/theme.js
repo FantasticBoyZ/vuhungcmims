@@ -14,6 +14,9 @@ export const theme = createTheme({
     },
     otherColor: {
       main: '#999',
+      red: 'red',
+      blue: 'blue',
+      green: 'green'
     },
   },
 });

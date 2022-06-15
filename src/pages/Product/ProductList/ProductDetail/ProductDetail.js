@@ -1,16 +1,7 @@
 import SubProductList from '@/pages/Product/ProductList/ProductDetail/SubProductList';
 import { getProductDetail } from '@/slices/ProductSlice';
 import {
-  Box,
-  Button,
-  Card,
-  CardMedia,
-  Container,
-  Divider,
-  Grid,
-  Stack,
-  TextField,
-  Typography,
+  Box, Container, Grid
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -88,7 +79,7 @@ const ProductDetail = () => {
               xs={12}
             >
               {/* <Typography variant='h5'>Danh sách lô hàng </Typography> */}
-              {!!totalRecord && totalRecord > 0 ? (<SubProductList subProductList={subProductList} />) : (<Box> Sản phẩm chưa có lô hàng nào</Box>)}
+              {(!!totalRecord && totalRecord > 0 && !!subProductList) ? (<SubProductList subProductList={subProductList} />) : (<Box> Sản phẩm chưa có lô hàng nào</Box>)}
             </Grid>
           </Grid>
         </Container>

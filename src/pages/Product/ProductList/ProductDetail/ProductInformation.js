@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
   productInformation: {
@@ -23,6 +24,11 @@ const useStyles = makeStyles({
 
 const ProductInformation = ({ product }) => {
   const classes = useStyles();
+  const navigate = useNavigate()
+
+  const handleOnClickEdit= () => {
+    navigate(`/product/edit/${product.id}`)
+  }
   return (
     <Box className={classes.productInformation}>
       <Stack
@@ -36,7 +42,7 @@ const ProductInformation = ({ product }) => {
           direction="row"
           spacing={2}
         >
-          <Button variant="contained">Sửa sản phẩm</Button>
+          <Button onClick={() => handleOnClickEdit()} variant="contained">Sửa sản phẩm</Button>
           <Button variant="outlined">Thoát</Button>
         </Stack>
       </Stack>

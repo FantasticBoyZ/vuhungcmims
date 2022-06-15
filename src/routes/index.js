@@ -8,7 +8,6 @@ import ProductDetail from '@/pages/Product/ProductList/ProductDetail/ProductDeta
 import productList from '@/pages/Product/ProductList/productList';
 import TestPost from '@/pages/TestPost/testPost';
 import ImportList from '@/pages/Transaction/ImportList/importList';
-import { Home, Info } from '@mui/icons-material';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -20,15 +19,15 @@ const publicRoutes = [
 ];
 
 const privateRoutes = [
-  { path: '/dashboard', component: HomePage, primary: 'Home', icon: <Home /> },
-  { path: '/about', component: About, primary: 'About', icon: <Info /> },
-  { path: '/profile', component: Profile, primary: 'Profile', icon: <Info /> },
+  { path: '/dashboard', component: HomePage },
+  { path: '/about', component: About },
+  { path: '/profile', component: Profile },
   { path: 'post/add', component: TestPost },
   { path: 'post/:postId', component: TestPost },
   { path: 'product', component: productList },
   { path: 'product/:productId', component: ProductDetail },
   { path: 'product/add', component: AddEditProductForm },
-  { path: 'product/edit/:productId', component: AddEditProductForm },
+  { path: '/product/edit/:productId', component: AddEditProductForm },
   { path: 'post/:postId', component: TestPost },
   { path: 'import', component: ImportList },
   { path: '/denied', component: Profile, layout: null },

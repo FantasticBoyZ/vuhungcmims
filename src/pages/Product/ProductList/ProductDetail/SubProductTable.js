@@ -10,6 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { format } from 'date-fns';
 import React, { useState } from 'react';
 
 const useStyles = makeStyles((theme) => ({
@@ -40,6 +41,10 @@ const SubProductTable = ({ subProductList }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [selectedSubProductList, setSelectedSubProductList] = useState([]);
+
+  const formatDate = (date) => {
+    return format(new Date(date), 'dd/MM/yyyy')
+  }
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -84,12 +89,12 @@ const SubProductTable = ({ subProductList }) => {
         <Table className={classes.table}>
           <TableHead>
             <TableRow>
-              <TableCell>Ngày khởi tạo</TableCell>
-              <TableCell>Ngày hết hạn</TableCell>
-              <TableCell>Số lượng</TableCell>
-              <TableCell>Đơn giá</TableCell>
-              <TableCell>Kho</TableCell>
-              <TableCell>Địa chỉ kho</TableCell>
+              <TableCell align='center'>Ngày khởi tạo</TableCell>
+              <TableCell align='center'>Ngày hết hạn</TableCell>
+              <TableCell align='center'>Số lượng</TableCell>
+              <TableCell align='center'>Đơn giá</TableCell>
+              <TableCell align='center'>Kho</TableCell>
+              <TableCell align='center'>Địa chỉ kho</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -104,12 +109,12 @@ const SubProductTable = ({ subProductList }) => {
                   //   selected={isImportOrderSelected}
                   selected={false}
                 >
-                  <TableCell>{subProduct.importDate}</TableCell>
-                  <TableCell>{subProduct.expirationDate}</TableCell>
-                  <TableCell>{subProduct.quantity}</TableCell>
-                  <TableCell>{subProduct.unitPrice}</TableCell>
-                  <TableCell>{subProduct.inventoryName}</TableCell>
-                  <TableCell>{subProduct.addressInventory}</TableCell>
+                  <TableCell align='center'>{formatDate(subProduct.importDate)}</TableCell>
+                  <TableCell align='center'>{formatDate(subProduct.expirationDate)}</TableCell>
+                  <TableCell align='center'>{subProduct.quantity}</TableCell>
+                  <TableCell align='center'>{subProduct.unitPrice}</TableCell>
+                  <TableCell align='center'>{subProduct.inventoryName}</TableCell>
+                  <TableCell align='center'>{subProduct.addressInventory}</TableCell>
                 </TableRow>
               );
             })}
