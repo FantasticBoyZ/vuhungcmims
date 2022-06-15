@@ -53,11 +53,11 @@ const App = () => {
               );
             })}
             <Route
-              path="/admin"
-              element={<ProtectedRoute roleRequired="ROLE_ADMIN" />}
+              path="/owner"
+              element={<ProtectedRoute roleRequired="ROLE_OWNER" />}
             >
               <Route
-                path="/admin"
+                path="/owner"
                 element={<DefaultLayout />}
               ></Route>
             </Route>
