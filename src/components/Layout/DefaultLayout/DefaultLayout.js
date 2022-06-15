@@ -13,7 +13,7 @@ function DefaultLayout({ children }) {
         <Sidebar />
         <Stack flex={6}>
           <Header />
-          <Box p={2}>{children}</Box>
+          <Box sx={{ backgroundColor: '#e8e8e8', minHeight: '94vh'}} p={2}>{children}</Box>
         </Stack>
       </Stack>
     </Box>

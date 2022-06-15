@@ -16,7 +16,6 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import Textfield from '@/components/FormsUI/Textfield';
 
-
 const Login = () => {
   let navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -31,7 +30,6 @@ const Login = () => {
     username: Yup.string().required('Username is required'),
     password: Yup.string().required('Password is required.'),
   });
-
 
   const handleLogin = (e) => {
     // e.preventDefault();
@@ -52,7 +50,6 @@ const Login = () => {
         setMessage(resMessage);
       },
     );
-
   };
 
   return (
@@ -123,6 +120,7 @@ const Login = () => {
                   label="Lưu đăng nhập"
                 />
                 <Button
+                  fullWidth={true}
                   type="submit"
                   sx={{ mt: 3, mb: 2 }}
                 >
@@ -154,8 +152,6 @@ const Login = () => {
           </Box>
         </Box>
       </Grid>
-
-     
     </LayoutLogin>
   );
 };
