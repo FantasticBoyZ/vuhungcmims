@@ -1,6 +1,6 @@
 import CommonTable from '@/components/Common/CommonTable';
-import SelectWrapper from '@/components/FormsUI/Select';
 import TextfieldWrapper from '@/components/FormsUI/Textfield';
+import CategoryService from '@/services/categoryService';
 import { getProductList } from '@/slices/ProductSlice';
 import { Search } from '@mui/icons-material';
 import {
@@ -8,13 +8,14 @@ import {
   Button,
   InputAdornment,
   Paper,
+  Select,
   Stack,
   TableBody,
   TableCell,
   TablePagination,
   TableRow,
-  TextField,
   Toolbar,
+  Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -22,15 +23,14 @@ import { Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import  CategoryService  from '@/services/categoryService'
+import AsyncSelect from 'react-select/async';
 
 const useStyles = makeStyles({
   searchField: {
     width: '30%',
   },
   toolbar: {
-    
-    width:'100%'
+    width: '100%',
   },
   toolbarContainer: {
     display: 'flex',
@@ -45,11 +45,21 @@ const useStyles = makeStyles({
     // backgroundColor: 'red',
   },
   selectBox: {
-
-    // backgroundColor: 'green'
-    
-  }
+    // backgroundColor: 'green',
+    width: '200px',
+    height: '56px',
+    minHeight: '56px',
+  },
 });
+
+const customStyles = {
+  control: (base) => ({
+    ...base,
+    borderRadius: 5,
+    height: 56,
+    minHeight: 56,
+  }),
+};
 
 const headCells = [
   { id: 'productCode', label: 'Mã sản phẩm' },
@@ -80,7 +90,8 @@ const sortTypeList = {
 const ProductList = () => {
   const navigate = useNavigate();
   const [productList, setProductList] = useState([]);
-  const [categoryList, setCategoryList] = useState([]);
+  const [inputValueCategory, setInputValueCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchParams, setSearchParams] = useState({
     productName: '',
     productCode: '',
@@ -90,9 +101,9 @@ const ProductList = () => {
   const pages = [2, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
+  const [totalRecord, setTotalRecord] = useState(0);
   const classes = useStyles();
   const dispatch = useDispatch();
-
 
   const { loading, products } = useSelector((state) => ({ ...state.products }));
 
@@ -103,17 +114,9 @@ const ProductList = () => {
     if (e.keyCode === 13) {
       let target = e.target;
       console.log(e.target.value);
-      if (target.value === '') return;
-      else {
-        const search = {
-          productName: target.value,
-          productCode: '',
-          categoryId: '',
-          manufactorId: '',
-        };
-        setSearchParams({ search });
-        fetchProductList(page, rowsPerPage, search);
-      }
+      setSearchParams({ ...searchParams, productName: target.value });
+      setPage(0);
+      // fetchProductList();
     }
   };
 
@@ -127,68 +130,77 @@ const ProductList = () => {
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    fetchProductList(newPage, rowsPerPage, searchParams);
+    // fetchProductList(newPage, rowsPerPage, searchParams);
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    fetchProductList(page, parseInt(event.target.value, 10), searchParams);
+    // fetchProductList(page, parseInt(event.target.value, 10), searchParams);
   };
 
-  const handleChangeSelectCategory = (e, object) => {
-    console.log(e.target.value)
-    console.log('object 141', object)
-  }
+  const handleInputChangeCategory = (value) => {
+    setInputValueCategory(value);
+    console.log('inputValueCategory', value);
+  };
+
+  const handleChangeCategory = (value) => {
+    setSelectedCategory(value);
+    setSearchParams({ ...searchParams, categoryId: value.id });
+    console.log('changeCategory', value);
+  };
 
   const fetchCategoryList = async () => {
     try {
       const params = {
         categoryName: '',
-      }
-      const response = await CategoryService.getAllCategory(params)
-      console.log(response.data.product)
+      };
+      const response = await CategoryService.getAllCategory(params);
+      console.log('response', response.data.category);
       // Loại bỏ dư thừa description
-      const rawList = response.data.product;
-      const result = rawList.reduce((map, item) => {
-        map[item.id] = item.name
-        return map
-      })
-      console.log('mapCategoryList',result)
-      setCategoryList(result)
+      const rawList = response.data.category;
+      // return rawList
+      // const result = rawList.reduce((map, item) => {
+      //   map[item.id] = item.name
+      //   return map
+      // })
+      return rawList;
+      // console.log('mapCategoryList',result)
+      // setCategoryList(result)
     } catch (error) {
       console.log('Failed to fetch category list: ', error);
-    }
-  }
-
-  const fetchProductList = async (page, rowsPerPage, searchParams) => {
-    try {
-      const params = {
-        pageIndex: page + 1,
-        pageSize: rowsPerPage,
-        productName: searchParams.productName,
-        productCode: searchParams.productCode,
-        manufactorId: searchParams.manufactorId,
-        categoryId: searchParams.categoryId,
-      };
-      const actionResult = await dispatch(getProductList(params));
-      const dataResult = unwrapResult(actionResult);
-      console.log(products);
-      console.log(dataResult.data.product);
-      setProductList(dataResult.data.product);
-    } catch (error) {
-      console.log('Failed to fetch product list: ', error);
     }
   };
 
   useEffect(() => {
-    fetchCategoryList()
-    fetchProductList(page, rowsPerPage, searchParams);
-
+    fetchCategoryList();
+    const fetchProductList = async () => {
+      try {
+        const params = {
+          pageIndex: page + 1,
+          pageSize: rowsPerPage,
+          productName: searchParams.productName,
+          productCode: searchParams.productCode,
+          manufactorId: searchParams.manufactorId,
+          categoryId: searchParams.categoryId,
+        };
+        const actionResult = await dispatch(getProductList(params));
+        const dataResult = unwrapResult(actionResult);
+        console.log(products);
+        console.log('dataResult', dataResult);
+        if (dataResult.data) {
+          setTotalRecord(dataResult.data.totalRecord);
+          setProductList(dataResult.data.product);
+        }
+      } catch (error) {
+        console.log('Failed to fetch product list: ', error);
+      }
+    };
+    fetchProductList();
     // console.log(products.data.product);
     // console.log(loading)
     // console.log('productList', productList);
-  }, []);
+  }, [page, rowsPerPage, searchParams]);
   return (
     <>
       <Paper>
@@ -228,7 +240,7 @@ const ProductList = () => {
               // onSubmit={handleLogin}
             >
               <Form>
-                <Box className={classes.toolbarContainer} >
+                <Box className={classes.toolbarContainer}>
                   <Box className={classes.searchField}>
                     <TextfieldWrapper
                       id="outlined-basic"
@@ -236,7 +248,6 @@ const ProductList = () => {
                       placeholder="Search"
                       label={null}
                       variant="outlined"
-                      
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
@@ -248,27 +259,66 @@ const ProductList = () => {
                       // onChange={handleSearch}
                     />
                   </Box>
-                  <Box className={classes.selectBoxContainer} >
-                    <SelectWrapper
-                      label="Nhóm hàng"
-                      name="categoryId"
-                      options={categoryList}
+                  <Box className={classes.selectBoxContainer}>
+                    <AsyncSelect
                       className={classes.selectBox}
-                      onClick={(props) => console.log(props.values)}
+                      styles={customStyles}
+                      placeholder="Danh mục"
+                      cacheOptions
+                      defaultOptions
+                      isSearchable={false}
+                      components={<Select />}
+                      value={selectedCategory}
+                      getOptionLabel={(e) => e.name}
+                      getOptionValue={(e) => e.id}
+                      loadOptions={fetchCategoryList}
+                      onInputChange={handleInputChangeCategory}
+                      onChange={(e) => handleChangeCategory(e)}
                     />
-                    <SelectWrapper
+                    {/* TODO: Làm service call api nhà sản xuất */}
+                    <AsyncSelect
+                      className={classes.selectBox}
+                      styles={customStyles}
+                      placeholder="Nhà sản xuất"
+                      cacheOptions
+                      defaultOptions
+                      isSearchable={false}
+                      components={<Select />}
+                      value={selectedCategory}
+                      getOptionLabel={(e) => e.name}
+                      getOptionValue={(e) => e.id}
+                      loadOptions={fetchCategoryList}
+                      onInputChange={handleInputChangeCategory}
+                      onChange={(e) => handleChangeCategory(e)}
+                    />
+                    <AsyncSelect
+                      className={classes.selectBox}
+                      styles={customStyles}
+                      placeholder="Cái gì đó cần search"
+                      cacheOptions
+                      defaultOptions
+                      isSearchable={false}
+                      components={<Select />}
+                      value={selectedCategory}
+                      getOptionLabel={(e) => e.name}
+                      getOptionValue={(e) => e.id}
+                      loadOptions={fetchCategoryList}
+                      onInputChange={handleInputChangeCategory}
+                      onChange={(e) => handleChangeCategory(e)}
+                    />
+                    {/* <SelectWrapper
                       label="Nhà cung cáp"
                       name="manufactorId"
                       options={manufacturerList}
                       className={classes.selectBox}
-                    />
+                    /> */}
                     {/* <SelectWrapper label="Ngày khởi tạo" name="createdAt" options={categoryList}/> */}
-                    <SelectWrapper
+                    {/* <SelectWrapper
                       label="Sắp xếp"
                       name="sort"
                       options={sortTypeList}
                       className={classes.selectBox}
-                    />
+                    /> */}
                   </Box>
                 </Box>
               </Form>
@@ -281,7 +331,9 @@ const ProductList = () => {
           <> Loading ... </>
         ) : (
           <Box>
-            <TblContainer>
+            {totalRecord > 0 ? (
+              <Box>
+              <TblContainer>
               <TblHead />
               <TableBody>
                 {productList.map((item) => (
@@ -303,11 +355,13 @@ const ProductList = () => {
               page={page}
               rowsPerPageOptions={pages}
               rowsPerPage={rowsPerPage}
-              // TODO: trả về product.length
-              count={3}
+              
+              count={totalRecord}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+            /></Box>
+            ): (<Typography> Không tìm có kết quả phù hợp </Typography>)}
+            
           </Box>
         )}
       </Paper>

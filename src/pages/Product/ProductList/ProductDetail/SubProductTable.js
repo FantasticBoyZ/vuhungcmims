@@ -7,6 +7,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
@@ -27,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
       cursor: 'pointer',
     },
   },
+  cardStyle: {
+    padding: '12px'
+  }
 }));
 
 const SubProductTable = ({ subProductList }) => {
@@ -74,7 +78,8 @@ const SubProductTable = ({ subProductList }) => {
   //   const selectedAllSubProductList =
   //     selectedSubProductList.length === subProductList.length;
   return (
-    <Card>
+    <Card className={classes.cardStyle}>
+      <Typography variant='h5'>Danh sách lô hàng </Typography>
       <TableContainer>
         <Table className={classes.table}>
           <TableHead>
@@ -99,12 +104,12 @@ const SubProductTable = ({ subProductList }) => {
                   //   selected={isImportOrderSelected}
                   selected={false}
                 >
-                  <TableCell>{subProduct.createdDate}</TableCell>
-                  <TableCell>{subProduct.expiredDate}</TableCell>
+                  <TableCell>{subProduct.importDate}</TableCell>
+                  <TableCell>{subProduct.expirationDate}</TableCell>
                   <TableCell>{subProduct.quantity}</TableCell>
                   <TableCell>{subProduct.unitPrice}</TableCell>
-                  <TableCell>{subProduct.warehouseName}</TableCell>
-                  <TableCell>{subProduct.warehourseAddress}</TableCell>
+                  <TableCell>{subProduct.inventoryName}</TableCell>
+                  <TableCell>{subProduct.addressInventory}</TableCell>
                 </TableRow>
               );
             })}
