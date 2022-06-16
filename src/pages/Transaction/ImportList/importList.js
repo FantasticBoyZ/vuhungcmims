@@ -6,6 +6,8 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import AddIcon from '@mui/icons-material/Add';
+import { Card } from '@mui/material';
+
 import {
   Box,
   Button,
@@ -24,7 +26,6 @@ const useStyles = makeStyles({
     width: '30%',
   },
   toolbar: {
-    padding: '10px',
     display: 'flex',
     justifyContent: 'space-between',
   },
@@ -34,6 +35,9 @@ const useStyles = makeStyles({
   labelDateRange: {
     fontSize: '24px',
     margin: '24px'
+  },
+  panelFilter: {
+    padding: '24px 0'
   }
 });
 
@@ -76,80 +80,82 @@ const ImportList = () => {
           color="secondary"
         >Nhập file excel</Button>
       </Stack>
-      <Toolbar className={classes.toolbar}>
-        <TextField
-          id="outlined-basic"
-          placeholder="Tìm kiếm phiếu nhập kho"
-          label={null}
-          variant="outlined"
-          className={classes.searchField}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-        // onChange={handleSearch}
-        />
-        <Box className={classes.selectBox}>
-          <Formik
-            initialValues={{
-              creater: '1',
+      <Card className={classes.panelFilter}>
+        <Toolbar className={classes.toolbar}>
+          <TextField
+            id="outlined-basic"
+            placeholder="Tìm kiếm phiếu nhập kho"
+            label={null}
+            variant="outlined"
+            className={classes.searchField}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
             }}
-          // validationSchema={FORM_VALIDATION}
-          // onSubmit={handleLogin}
-          >
-            <Form>
-              <Stack
-                direction="row"
-                spacing={2}
-              >
-                <SelectWrapper
-                  label="Người tạo"
-                  name="creater"
-                  options={createrList}
-                />
-              </Stack>
-            </Form>
-          </Formik>
-        </Box>
-      </Toolbar>
-      <div>
-        <div className={classes.labelDateRange}>Khoảng thời gian tạo đơn</div>
-        <Toolbar>
-          <LocalizationProvider dateAdapter={AdapterDateFns}
-          >
-            <DatePicker
-              id='startDate'
-              label="Ngày bắt đầu"
-              value={startDate}
-              onChange={(newValue) => {
-                setStartDate(newValue);
+          // onChange={handleSearch}
+          />
+          <Box className={classes.selectBox}>
+            <Formik
+              initialValues={{
+                creater: '1',
               }}
-              renderInput={(params) => <TextField {...params} />}
-            />
-            <Box sx={{ mx: 2 }}> Đến </Box>
-            <DatePicker
-              id='endDate'
-              label="Ngày kết thúc"
-              value={endDate}
-              onChange={(newValue) => {
-                setEndDate(newValue);
-              }}
-              renderInput={(params) => <TextField {...params} />}
-            />
-
-
-          </LocalizationProvider>
+            // validationSchema={FORM_VALIDATION}
+            // onSubmit={handleLogin}
+            >
+              <Form>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                >
+                  <SelectWrapper
+                    label="Người tạo"
+                    name="creater"
+                    options={createrList}
+                  />
+                </Stack>
+              </Form>
+            </Formik>
+          </Box>
         </Toolbar>
-      </div>
+        <div>
+          <div className={classes.labelDateRange}>Khoảng thời gian tạo đơn</div>
+          <Toolbar>
+            <LocalizationProvider dateAdapter={AdapterDateFns}
+            >
+              <DatePicker
+                id='startDate'
+                label="Ngày bắt đầu"
+                value={startDate}
+                onChange={(newValue) => {
+                  setStartDate(newValue);
+                }}
+                renderInput={(params) => <TextField {...params} />}
+              />
+              <Box sx={{ mx: 2 }}> Đến </Box>
+              <DatePicker
+                id='endDate'
+                label="Ngày kết thúc"
+                value={endDate}
+                onChange={(newValue) => {
+                  setEndDate(newValue);
+                }}
+                renderInput={(params) => <TextField {...params} />}
+              />
+
+
+            </LocalizationProvider>
+          </Toolbar>
+        </div>
+      </Card>
       <Grid
         container
         direction="row"
         justifyContent="center"
         alignItems="stretch"
-        marginTop={2}
+        marginTop={1}
         spacing={3}
       >
         <Grid
