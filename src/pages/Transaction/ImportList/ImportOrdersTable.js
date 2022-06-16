@@ -17,6 +17,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import { format } from 'date-fns';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
   failed: {
@@ -28,14 +29,18 @@ const useStyles = makeStyles({
   pending: {
     color: 'warning',
   },
+  tableRow: {
+    cursor: 'pointer'
+  }
 });
+
 
 const ImportOrdersTable = ({ importOrders }) => {
   const [selectedImportOrders, setSelectedImportOrders] = useState([]);
   const classes = useStyles();
   const theme = useTheme();
   const selectedBulkActions = selectedImportOrders.length > 0;
-
+  const navigate = useNavigate();
   const selectedSomeImportOrders =
     selectedImportOrders.length > 0 && selectedImportOrders.length < importOrders.length;
   const selectedAllImportOrders = selectedImportOrders.length === importOrders.length;
@@ -54,12 +59,15 @@ const ImportOrdersTable = ({ importOrders }) => {
       name: 'Đã hủy',
     },
   ];
+  const handleOnClickTableRow = (id) => {
+    navigate(`/import/detail/${id}`);
+  }
   return (
     <Card>
       <TableContainer>
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow >
               <TableCell padding="checkbox">
                 <Checkbox
                   color="primary"
@@ -81,8 +89,10 @@ const ImportOrdersTable = ({ importOrders }) => {
                 <TableRow
                   hover
                   key={importOrder.id}
+                  className={classes.tableRow}
                   //   selected={isImportOrderSelected}
                   selected={false}
+                  onClick={(value) => handleOnClickTableRow(importOrder.id)}
                 >
                   <TableCell padding="checkbox">
                     <Checkbox
