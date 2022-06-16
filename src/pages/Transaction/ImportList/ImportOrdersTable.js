@@ -42,20 +42,16 @@ const ImportOrdersTable = ({ importOrders }) => {
 
   const statusOptions = [
     {
-      id: 'all',
-      name: 'All',
+      id: 'pending',
+      name: 'Đang chờ xử lý',
     },
     {
       id: 'completed',
-      name: 'Completed',
+      name: 'Đã nhập kho',
     },
     {
-      id: 'pending',
-      name: 'Pending',
-    },
-    {
-      id: 'failed',
-      name: 'Failed',
+      id: 'canceled',
+      name: 'Đã hủy',
     },
   ];
   return (
@@ -71,12 +67,10 @@ const ImportOrdersTable = ({ importOrders }) => {
                   indeterminate={selectedSomeImportOrders}
                 />
               </TableCell>
-              <TableCell>Order Details</TableCell>
-              <TableCell>Order ID</TableCell>
-              <TableCell>Source</TableCell>
-              <TableCell align="right">Amount</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell>Mã nhập kho</TableCell>
+              <TableCell>Thời gian</TableCell>
+              <TableCell>Nhà cung cấp</TableCell>
+              <TableCell>Trạng thái</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -107,101 +101,39 @@ const ImportOrdersTable = ({ importOrders }) => {
                   <TableCell>
                     <Typography
                       variant="body1"
-                      fontWeight="bold"
                       color="text.primary"
                       gutterBottom
                       noWrap
                     >
-                      {importOrder.orderDetails}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      noWrap
-                    >
-                      {format(importOrder.orderDate, 'MMMM dd yyyy')}
+                      {/* lấy tạm id làm MÃ SỐ HÓA ĐƠN, sau này có cái này trong api thì thay  */}
+                      {importOrder.id}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography
                       variant="body1"
-                      fontWeight="bold"
                       color="text.primary"
                       gutterBottom
                       noWrap
                     >
-                      {importOrder.orderID}
+                      {format(importOrder.createDate, 'MMMM dd yyyy')}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography
                       variant="body1"
-                      fontWeight="bold"
                       color="text.primary"
                       gutterBottom
                       noWrap
                     >
-                      {importOrder.sourceName}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      noWrap
-                    >
-                      {importOrder.sourceDesc}
+                      {importOrder.manufactorName}
                     </Typography>
                   </TableCell>
-                  <TableCell align="right">
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {importOrder.amountCrypto}
-                      {importOrder.cryptoCurrency}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right">
+                  <TableCell>
                     {/* TODO: style status  */}
                     <Typography className={classes.completed}>
-                      {importOrder.status}
+                      {importOrder.statusName}
                     </Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <Tooltip
-                      title="Edit Order"
-                      arrow
-                    >
-                      <IconButton
-                        sx={{
-                          '&:hover': {
-                            background: theme.primary,
-                          },
-                          color: theme.palette.primary.main,
-                        }}
-                        color="inherit"
-                        size="small"
-                      >
-                        <EditTwoTone fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip
-                      title="Delete Order"
-                      arrow
-                    >
-                      <IconButton
-                        sx={{
-                          '&:hover': { background: theme.error },
-                          color: theme.palette.error.main,
-                        }}
-                        color="inherit"
-                        size="small"
-                      >
-                        <DeleteTwoTone fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
                   </TableCell>
                 </TableRow>
               );

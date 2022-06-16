@@ -1,6 +1,11 @@
+import * as React from 'react';
 import SelectWrapper from '@/components/FormsUI/Select';
 import ImportOrders from '@/pages/Transaction/ImportList/ImportOrders';
-import { Search } from '@mui/icons-material';
+import { CloseSharp, Search } from '@mui/icons-material';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import AddIcon from '@mui/icons-material/Add';
 import {
   Box,
   Button,
@@ -26,6 +31,10 @@ const useStyles = makeStyles({
   selectBox: {
     width: '50%',
   },
+  labelDateRange: {
+    fontSize: '24px',
+    margin: '24px'
+  }
 });
 
 const createrList = {
@@ -38,6 +47,14 @@ const createrList = {
 
 const ImportList = () => {
   const classes = useStyles();
+  const [startDate, setStartDate] = React.useState(null);
+  const [endDate, setEndDate] = React.useState(null);
+
+  // hook này để test biến thôi nha
+  React.useEffect(() => {
+    console.log(startDate + " " + endDate)
+  })
+
   return (
     <Container maxWidth="xl">
       <Stack
@@ -48,17 +65,21 @@ const ImportList = () => {
       >
         <Button
           variant="contained"
-          color="secondary"
+          startIcon={<AddIcon />}
         >
-          Thêm mới
+          Tạo phiếu nhập kho
         </Button>
-        <Button variant="contained">Xuất file excel</Button>
-        <Button variant="contained">Nhập file excel</Button>
+        <Button variant="contained"
+          color="secondary"
+        >Xuất file excel</Button>
+        <Button variant="contained"
+          color="secondary"
+        >Nhập file excel</Button>
       </Stack>
       <Toolbar className={classes.toolbar}>
         <TextField
           id="outlined-basic"
-          placeholder="Search"
+          placeholder="Tìm kiếm phiếu nhập kho"
           label={null}
           variant="outlined"
           className={classes.searchField}
@@ -69,15 +90,15 @@ const ImportList = () => {
               </InputAdornment>
             ),
           }}
-          // onChange={handleSearch}
+        // onChange={handleSearch}
         />
         <Box className={classes.selectBox}>
           <Formik
             initialValues={{
               creater: '1',
             }}
-            // validationSchema={FORM_VALIDATION}
-            // onSubmit={handleLogin}
+          // validationSchema={FORM_VALIDATION}
+          // onSubmit={handleLogin}
           >
             <Form>
               <Stack
@@ -94,11 +115,41 @@ const ImportList = () => {
           </Formik>
         </Box>
       </Toolbar>
+      <div>
+        <div className={classes.labelDateRange}>Khoảng thời gian tạo đơn</div>
+        <Toolbar>
+          <LocalizationProvider dateAdapter={AdapterDateFns}
+          >
+            <DatePicker
+              id='startDate'
+              label="Ngày bắt đầu"
+              value={startDate}
+              onChange={(newValue) => {
+                setStartDate(newValue);
+              }}
+              renderInput={(params) => <TextField {...params} />}
+            />
+            <Box sx={{ mx: 2 }}> Đến </Box>
+            <DatePicker
+              id='endDate'
+              label="Ngày kết thúc"
+              value={endDate}
+              onChange={(newValue) => {
+                setEndDate(newValue);
+              }}
+              renderInput={(params) => <TextField {...params} />}
+            />
+
+
+          </LocalizationProvider>
+        </Toolbar>
+      </div>
       <Grid
         container
         direction="row"
         justifyContent="center"
         alignItems="stretch"
+        marginTop={2}
         spacing={3}
       >
         <Grid
