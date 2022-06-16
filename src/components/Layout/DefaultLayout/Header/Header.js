@@ -33,7 +33,8 @@ const UserBox = styled(Box)(({ theme }) => ({
 
 const titles = {
   "/dashboard": "Hệ thống quản lý kho vật liệu xây dựng",
-  "/product": "Danh sách sản phẩm"
+  "/product": "Danh sách sản phẩm",
+  "/import": "Danh sách phiếu nhập kho"
 };
 
 
@@ -42,7 +43,7 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('')
   const navigate = useNavigate();
-const location = useLocation();
+  const location = useLocation();
 
 
   const logOut = () => {
@@ -54,7 +55,7 @@ const location = useLocation();
     setTitle(titles[location.pathname])
   }, [location.pathname])
   return (
-    <AppBar sx={{ backgroundColor: "white", color: 'black'}} position="sticky">
+    <AppBar sx={{ backgroundColor: "white", color: 'black' }} position="sticky">
       <StyledToolbar>
         <Typography
           variant="h6"
@@ -94,7 +95,7 @@ const location = useLocation();
           vertical: 'top',
           horizontal: 'right',
         }}
-        sx={{marginTop: '35px'}}
+        sx={{ marginTop: '35px' }}
       >
         <MenuItem>Profile</MenuItem>
         <MenuItem>My account</MenuItem>

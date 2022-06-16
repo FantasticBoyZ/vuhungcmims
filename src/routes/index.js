@@ -12,7 +12,7 @@ import ProductDetail from '@/pages/Product/ProductList/ProductDetail/ProductDeta
 import productList from '@/pages/Product/ProductList/productList';
 import TestPost from '@/pages/TestPost/testPost';
 import ImportList from '@/pages/Transaction/ImportList/importList';
-// import ImportOrderDetail from '@/pages/Transaction/ImportList/ImportOrderDetail/ImportOrderDetail';
+import ImportOrderDetail from '@/pages/Transaction/ImportList/ImportOrderDetail/ImportOrderDetail';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },

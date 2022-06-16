@@ -144,7 +144,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                         gutterBottom
                         noWrap
                       >
-                      
+
                         {importOrder.billRefernce}
                       </Typography>
                     </TableCell>
