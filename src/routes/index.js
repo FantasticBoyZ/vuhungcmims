@@ -8,6 +8,7 @@ import ProductDetail from '@/pages/Product/ProductList/ProductDetail/ProductDeta
 import productList from '@/pages/Product/ProductList/productList';
 import TestPost from '@/pages/TestPost/testPost';
 import ImportList from '@/pages/Transaction/ImportList/importList';
+import StaffList from '@/pages/Staff/staffList';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -32,7 +33,7 @@ const privateRoutes = [
   { path: 'import', component: ImportList },
   { path: '/denied', component: Profile, layout: null },
   { path: '*', component: NotFound, layout: null },
+  { path: 'staff', component: StaffList },
 ];
 
 export { publicRoutes, privateRoutes };
-
