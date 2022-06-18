@@ -1,6 +1,7 @@
 import CommonTable from '@/components/Common/CommonTable';
 import TextfieldWrapper from '@/components/FormsUI/Textfield';
 import CategoryService from '@/services/categoryService';
+import ManufactorService from '@/services/manufactorService';
 import { getProductList } from '@/slices/ProductSlice';
 import { Search } from '@mui/icons-material';
 import {
@@ -25,6 +26,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
+import { toast } from 'react-toastify';
 
 const useStyles = makeStyles({
   searchField: {
@@ -74,35 +76,39 @@ const headCells = [
   // { id: 'createdDate', label: 'Ngày khởi tạo' },
 ];
 
-const categoryList = {
-  1: 'Gạch',
-  2: 'Sơn',
-  3: 'Xi măng',
-};
+// mock data
 
-const manufacturerList = {
-  1: 'Hoàng Phát',
-  2: 'Surplus',
-  3: 'Toyota',
-};
+// const categoryList = {
+//   1: 'Gạch',
+//   2: 'Sơn',
+//   3: 'Xi măng',
+// };
 
-const sortTypeList = {
-  asc: 'tăng',
-  desc: 'giảm',
-};
+// const manufacturerList = {
+//   1: 'Hoàng Phát',
+//   2: 'Surplus',
+//   3: 'Toyota',
+// };
+
+// const sortTypeList = {
+//   asc: 'tăng',
+//   desc: 'giảm',
+// };
 
 const ProductList = () => {
   const navigate = useNavigate();
   const [productList, setProductList] = useState([]);
   const [inputValueCategory, setInputValueCategory] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [inputValueManufactor, setInputValueManufactor] = useState('');
+  const [selectedManufactor, setSelectedManufactor] = useState(null);
   const [searchParams, setSearchParams] = useState({
     productName: '',
     productCode: '',
     categoryId: '',
     manufactorId: '',
   });
-  const pages = [2, 20, 50];
+  const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
@@ -148,10 +154,22 @@ const ProductList = () => {
     console.log('inputValueCategory', value);
   };
 
+  const handleInputChangeManufactor = (value) => {
+    setInputValueCategory(value);
+    console.log('inputValueManufactor', value);
+  };
+
   const handleChangeCategory = (value) => {
     setSelectedCategory(value);
     setSearchParams({ ...searchParams, categoryId: value.id });
     console.log('changeCategory', value);
+  };
+  // TODO: searchParam không thay đổi ngay sau khi setSearchParam
+  const handleChangeManufactor = (value) => {
+    setSelectedManufactor(value);
+    setSearchParams({ ...searchParams, manufactorId: value.id });
+    console.log('171',searchParams)
+    console.log('changeManufactor', value);
   };
 
   const fetchCategoryList = async () => {
@@ -160,24 +178,36 @@ const ProductList = () => {
         categoryName: '',
       };
       const response = await CategoryService.getAllCategory(params);
-      console.log('response', response.data.category);
-      // Loại bỏ dư thừa description
+      console.log('response category', response.data.category);
+
       const rawList = response.data.category;
-      // return rawList
-      // const result = rawList.reduce((map, item) => {
-      //   map[item.id] = item.name
-      //   return map
-      // })
       return rawList;
       // console.log('mapCategoryList',result)
       // setCategoryList(result)
     } catch (error) {
+      toast.error('Failed to fetch category list: ', error)
       console.log('Failed to fetch category list: ', error);
     }
   };
 
+  const fetchManufactorList = async () => {
+    try {
+      const params = {
+        manufactorName: '',
+      };
+      const response = await ManufactorService.getManufactorList(params);
+      console.log('response manufactor', response.data.manufactor);
+
+      const rawList = response.data.manufactor;
+      return rawList;
+
+    } catch (error) {
+      toast.error('Failed to fetch manufactor list: ', error)
+      console.log('Failed to fetch manufactor list: ', error);
+    }
+  };
+
   useEffect(() => {
-    fetchCategoryList();
     const fetchProductList = async () => {
       try {
         const params = {
@@ -200,7 +230,11 @@ const ProductList = () => {
         console.log('Failed to fetch product list: ', error);
       }
     };
-    fetchProductList();
+    return () => {
+      // fetchCategoryList();
+      fetchProductList();
+    }
+    
     // console.log(products.data.product);
     // console.log(loading)
     // console.log('productList', productList);
@@ -275,11 +309,11 @@ const ProductList = () => {
                       value={selectedCategory}
                       getOptionLabel={(e) => e.name}
                       getOptionValue={(e) => e.id}
-                      loadOptions={fetchCategoryList}
+                      loadOptions={() => fetchCategoryList()}
                       onInputChange={handleInputChangeCategory}
                       onChange={(e) => handleChangeCategory(e)}
                     />
-                    {/* TODO: Làm service call api nhà sản xuất */}
+               
                     <AsyncSelect
                       className={classes.selectBox}
                       styles={customStyles}
@@ -288,12 +322,12 @@ const ProductList = () => {
                       defaultOptions
                       isSearchable={false}
                       components={<Select />}
-                      value={selectedCategory}
+                      value={selectedManufactor}
                       getOptionLabel={(e) => e.name}
                       getOptionValue={(e) => e.id}
-                      loadOptions={fetchCategoryList}
-                      onInputChange={handleInputChangeCategory}
-                      onChange={(e) => handleChangeCategory(e)}
+                      loadOptions={() => fetchManufactorList()}
+                      onInputChange={handleInputChangeManufactor}
+                      onChange={(e) => handleChangeManufactor(e)}
                     />
                     {/* <SelectWrapper
                       label="Nhà cung cáp"

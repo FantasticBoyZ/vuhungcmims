@@ -49,7 +49,7 @@ const ProductInformation = ({ product }) => {
             >
               Sửa sản phẩm
             </Button>
-            <Button variant="outlined">Thoát</Button>
+            <Button variant="outlined" onClick={() => navigate(-1)}>Thoát</Button>
           </Stack>
         </Stack>
         <Divider />
