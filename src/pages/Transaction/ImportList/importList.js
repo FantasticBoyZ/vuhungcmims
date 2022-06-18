@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 import SelectWrapper from '@/components/FormsUI/Select';
 import ImportOrders from '@/pages/Transaction/ImportList/ImportOrders';
 import { CloseSharp, Search } from '@mui/icons-material';
@@ -20,6 +20,9 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Form, Formik } from 'formik';
+import { useDispatch, useSelector } from 'react-redux';
+import { getImportOrderList } from '@/slices/ImportOrderSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const useStyles = makeStyles({
   searchField: {
@@ -51,12 +54,38 @@ const createrList = {
 
 const ImportList = () => {
   const classes = useStyles();
-  const [startDate, setStartDate] = React.useState(null);
-  const [endDate, setEndDate] = React.useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowserPage] = useState(10);
+  const [totalRecord, setTotalRecord] = useState();
+  const [importOrderList, setImportOrderList] = useState();
+
+  const dispatch = useDispatch();
+  // const { loading, importOrderList } = useSelector((state) => ({ ...state.importOrders }))
+
+  const fetchImportOrderList = async () => {
+    try {
+      const params = {
+        pageIndex: page + 1,
+        pageSize: rowsPerPage
+      };
+      const actionResult = await dispatch(getImportOrderList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        // setTotalRecord(dataResult.data.totalRecord);
+        // setImportOrderList(dataResult.data.product);
+      }
+    } catch (error) {
+      console.log('Failed to fetch product list: ', error);
+    }
+  }
 
   // hook này để test biến thôi nha
-  React.useEffect(() => {
+  useEffect(() => {
     console.log(startDate + " " + endDate)
+    fetchImportOrderList()
   })
 
   return (
