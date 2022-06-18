@@ -2,7 +2,7 @@ import ButtonWrapper from '@/components/FormsUI/Button';
 import SelectWrapper from '@/components/FormsUI/Select';
 import TextfieldWrapper from '@/components/FormsUI/Textfield';
 import CategoryService from '@/services/categoryService';
-import { getProductDetail } from '@/slices/ProductSlice';
+import { getProductDetail, saveProduct } from '@/slices/ProductSlice';
 import { Info } from '@mui/icons-material';
 import {
   alpha,
@@ -60,8 +60,8 @@ const AddEditProductForm = () => {
   const { initialFormValue, setInitialFormValue } = useState({
     productCode: '',
     name: '',
-    categoryId: 1,
-    subCategory: '',
+    categoryId: '',
+    subCategoryId: '',
     unitMeasure: '',
     quantity: '',
     color: '',
@@ -80,8 +80,36 @@ const AddEditProductForm = () => {
     name: Yup.string().required('Chưa nhập tên sản phẩm'),
   });
 
+  const saveProductDetail = async (product) => {
+    try {
+      const actionResult = await dispatch(saveProduct(product));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+    } catch (error) {
+      console.log('Failed to save product: ', error);
+    }
+  };
+
   const handleSubmit = (values) => {
-    console.log('ok', values);
+    const newProduct = {
+      id: productId,
+      name: values.name,
+      productCode: values.productCode,
+      unitMeasure: values.unitMeasure,
+      // wrapUnitMeasure: values.wrapUnitMeasure,
+      // numberOfWrapUnitMeasure: values.numberOfWrapUnitMeasure,
+      wrapUnitMeasure: 'hop',
+      numberOfWrapUnitMeasure: '2',
+      color: values.color,
+      description: values.description,
+      categoryId: values.categoryId,
+      // manufactorId: values.manufactorId,
+      manufactorId: '1',
+    };
+    console.log(values);
+    saveProductDetail(
+      newProduct
+    );
   };
 
   const fetchCategoryList = async () => {
@@ -92,10 +120,14 @@ const AddEditProductForm = () => {
       const response = await CategoryService.getAllCategory(params);
       console.log('response', response.data.category);
       const rawList = response.data.category;
-      const result = rawList.reduce((map, item) => {
-        map[item.id] = item.name;
-        return map;
-      });
+      const result = rawList.reduce((obj, item) => {
+        return {
+          ...obj,
+          [item.id]: item.name,
+        };
+      }, {});
+
+      console.log('result', result);
       setCategoryList(result);
     } catch (error) {
       console.log('Failed to fetch category list: ', error);
@@ -124,7 +156,7 @@ const AddEditProductForm = () => {
       fetchProductDetail();
     }
     fetchCategoryList();
-  }, [isAdd]);
+  }, [productId]);
   return (
     <Container maxWidth="xl">
       <Card className={classes.cardHeader}>

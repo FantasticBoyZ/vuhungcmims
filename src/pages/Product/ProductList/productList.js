@@ -6,6 +6,7 @@ import { Search } from '@mui/icons-material';
 import {
   Box,
   Button,
+  Card,
   InputAdornment,
   Paper,
   Select,
@@ -39,17 +40,20 @@ const useStyles = makeStyles({
     padding: '10px',
   },
   selectBoxContainer: {
-    width: '50%',
+    width: '40%',
     display: 'flex',
     justifyContent: 'space-around',
     // backgroundColor: 'red',
   },
   selectBox: {
     // backgroundColor: 'green',
-    width: '200px',
+    width: '250px',
     height: '56px',
     minHeight: '56px',
   },
+  tableStyle: {
+    padding: '20px'
+  }
 });
 
 const customStyles = {
@@ -279,22 +283,7 @@ const ProductList = () => {
                     <AsyncSelect
                       className={classes.selectBox}
                       styles={customStyles}
-                      placeholder="Nhà sản xuất"
-                      cacheOptions
-                      defaultOptions
-                      isSearchable={false}
-                      components={<Select />}
-                      value={selectedCategory}
-                      getOptionLabel={(e) => e.name}
-                      getOptionValue={(e) => e.id}
-                      loadOptions={fetchCategoryList}
-                      onInputChange={handleInputChangeCategory}
-                      onChange={(e) => handleChangeCategory(e)}
-                    />
-                    <AsyncSelect
-                      className={classes.selectBox}
-                      styles={customStyles}
-                      placeholder="Cái gì đó cần search"
+                      placeholder="Nhà cung cấp"
                       cacheOptions
                       defaultOptions
                       isSearchable={false}
@@ -330,7 +319,7 @@ const ProductList = () => {
         {loading ? (
           <> Loading ... </>
         ) : (
-          <Box>
+          <Card className={classes.tableStyle}>
             {totalRecord > 0 ? (
               <Box>
               <TblContainer>
@@ -362,7 +351,7 @@ const ProductList = () => {
             /></Box>
             ): (<Typography> Không tìm có kết quả phù hợp </Typography>)}
             
-          </Box>
+          </Card>
         )}
       </Paper>
     </>
