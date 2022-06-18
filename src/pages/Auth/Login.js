@@ -1,20 +1,21 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import AuthService from '@/services/authService';
-import LayoutLogin from '@/components/Layout/AuthLayout/Login';
-import Checkbox from '@mui/material/Checkbox';
-import Avatar from '@mui/material/Avatar';
 import Button from '@/components/FormsUI/Button';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Link from '@mui/material/Link';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import '@/components/Layout/AuthLayout/Login.css';
-import { LockOutlined } from '@mui/icons-material';
-import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
 import Textfield from '@/components/FormsUI/Textfield';
+import LayoutLogin from '@/components/Layout/AuthLayout/Login';
+import '@/components/Layout/AuthLayout/Login.css';
+import AuthService from '@/services/authService';
+import { LockOutlined } from '@mui/icons-material';
+import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Grid from '@mui/material/Grid';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import { Form, Formik } from 'formik';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import * as Yup from 'yup';
 
 const Login = () => {
   let navigate = useNavigate();
@@ -39,13 +40,15 @@ const Login = () => {
     AuthService.login(e.username, e.password).then(
       () => {
         navigate('/dashboard');
-        window.location.reload();
+        // window.location.reload();
+        toast.success('Đăng nhập thành công!');
       },
       (error) => {
         const resMessage =
           (error.response && error.response.data && error.response.data.message) ||
           error.message ||
           error.toString();
+        toast.error(resMessage);
         setLoading(false);
         setMessage(resMessage);
       },

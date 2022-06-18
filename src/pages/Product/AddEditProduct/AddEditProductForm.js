@@ -5,7 +5,6 @@ import CategoryService from '@/services/categoryService';
 import { getProductDetail, saveProduct } from '@/slices/ProductSlice';
 import { Info } from '@mui/icons-material';
 import {
-  alpha,
   Box,
   Button,
   Card,
@@ -18,10 +17,11 @@ import {
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Form, Formik } from 'formik';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as Yup from 'yup';
+import { toast } from 'react-toastify';
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
@@ -71,6 +71,7 @@ const AddEditProductForm = () => {
   const [categoryList, setCategoryList] = useState([]);
   const [isAdd, setIsAdd] = useState(true);
   const classes = useStyles();
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
   const { loading, products } = useSelector((state) => ({ ...state.products }));
@@ -107,34 +108,44 @@ const AddEditProductForm = () => {
       manufactorId: '1',
     };
     console.log(values);
-    saveProductDetail(
-      newProduct
-    );
-  };
-
-  const fetchCategoryList = async () => {
-    try {
-      const params = {
-        categoryName: '',
-      };
-      const response = await CategoryService.getAllCategory(params);
-      console.log('response', response.data.category);
-      const rawList = response.data.category;
-      const result = rawList.reduce((obj, item) => {
-        return {
-          ...obj,
-          [item.id]: item.name,
-        };
-      }, {});
-
-      console.log('result', result);
-      setCategoryList(result);
-    } catch (error) {
-      console.log('Failed to fetch category list: ', error);
+    saveProductDetail(newProduct);
+    
+    if(isAdd) {
+      toast.success("Thêm sản phẩm thành công!")
+      navigate("/product")
+    }else {
+      toast.success("Sửa sản phẩm thành công!")
+      navigate(`/product/${productId}`)
     }
   };
 
+  const handleOnClickExit = () => {
+    navigate(isAdd ? '/product' : `/product/${productId}`)
+  }
+
   useEffect(() => {
+    const fetchCategoryList = async () => {
+      try {
+        const params = {
+          categoryName: '',
+        };
+        const response = await CategoryService.getAllCategory(params);
+        console.log('response', response.data.category);
+        const rawList = response.data.category;
+        const result = rawList.reduce((obj, item) => {
+          return {
+            ...obj,
+            [item.id]: item.name,
+          };
+        }, {});
+
+        console.log('result', result);
+        setCategoryList(result);
+      } catch (error) {
+        console.log('Failed to fetch category list: ', error);
+      }
+    };
+
     const fetchProductDetail = async () => {
       try {
         const actionResult = await dispatch(getProductDetail(productId));
@@ -150,12 +161,14 @@ const AddEditProductForm = () => {
         console.log('Failed to fetch product detail: ', error);
       }
     };
-
-    if (!!productId) {
-      setIsAdd(false);
-      fetchProductDetail();
+    return () =>  {
+      if (!!productId) {
+        setIsAdd(false);
+        fetchProductDetail();
+      }
+      fetchCategoryList();
     }
-    fetchCategoryList();
+    
   }, [productId]);
   return (
     <Container maxWidth="xl">
@@ -319,7 +332,12 @@ const AddEditProductForm = () => {
                         >
                           Lưu
                         </ButtonWrapper>
-                        <Button variant="outlined">Thoát</Button>
+                        <Button
+                          variant="outlined"
+                          onClick={() => handleOnClickExit()}
+                        >
+                          Thoát
+                        </Button>
                       </Stack>
                     </Form>
                   </Formik>
