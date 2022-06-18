@@ -8,6 +8,7 @@ import ProductDetail from '@/pages/Product/ProductList/ProductDetail/ProductDeta
 import productList from '@/pages/Product/ProductList/productList';
 import TestPost from '@/pages/TestPost/testPost';
 import ImportList from '@/pages/Transaction/ImportList/importList';
+// import ImportOrderDetail from '@/pages/Transaction/ImportList/ImportOrderDetail/ImportOrderDetail';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -30,6 +31,7 @@ const privateRoutes = [
   { path: '/product/edit/:productId', component: AddEditProductForm },
   { path: 'post/:postId', component: TestPost },
   { path: 'import', component: ImportList },
+  // { path: '/import/detail/:importOrderId', component: ImportOrderDetail },
   { path: '/denied', component: Profile, layout: null },
   { path: '*', component: NotFound, layout: null },
 ];

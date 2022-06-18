@@ -9,7 +9,7 @@ export const getImportOrderList = createAsyncThunk('importOrderList', async (par
 
 
 const importOrderSlice = createSlice({
-  name: 'importOrderList',
+  name: 'importOrders',
   initialState: {
     importOrderList: [],
     loading: false,
