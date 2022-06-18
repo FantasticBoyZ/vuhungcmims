@@ -30,7 +30,7 @@ const ProtectedRoute = (roleRequired) => {
       />
     );
   } else {
-    return { auth } ? (
+    return  auth  ? (
       <Outlet />
     ) : (
       <Navigate
