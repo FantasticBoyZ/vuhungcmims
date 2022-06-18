@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 import SelectWrapper from '@/components/FormsUI/Select';
 import ImportOrders from '@/pages/Transaction/ImportList/ImportOrders';
 import { CloseSharp, Search } from '@mui/icons-material';
@@ -20,6 +20,9 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Form, Formik } from 'formik';
+import { useDispatch, useSelector } from 'react-redux';
+import { getImportOrderList } from '@/slices/ImportOrderSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const useStyles = makeStyles({
   searchField: {
@@ -34,11 +37,11 @@ const useStyles = makeStyles({
   },
   labelDateRange: {
     fontSize: '24px',
-    margin: '24px'
+    margin: '24px',
   },
   panelFilter: {
-    padding: '24px 0'
-  }
+    padding: '24px 0',
+  },
 });
 
 const createrList = {
@@ -51,13 +54,41 @@ const createrList = {
 
 const ImportList = () => {
   const classes = useStyles();
-  const [startDate, setStartDate] = React.useState(null);
-  const [endDate, setEndDate] = React.useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowserPage] = useState(10);
+  const [totalRecord, setTotalRecord] = useState();
+  const [importOrderList, setImportOrderList] = useState();
+
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => ({ ...state.importOrders }));
+
+  const fetchImportOrderList = async () => {
+    try {
+      const params = {
+        pageIndex: page,
+        pageSize: rowsPerPage,
+      };
+      const actionResult = await dispatch(getImportOrderList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        // setTotalRecord(dataResult.data.totalRecord);
+        setImportOrderList(dataResult.data.orderList);
+      }
+    } catch (error) {
+      console.log('Failed to fetch product list: ', error);
+    }
+  };
 
   // hook này để test biến thôi nha
-  React.useEffect(() => {
-    console.log(startDate + " " + endDate)
-  })
+  useEffect(() => {
+    console.log(startDate + ' ' + endDate);
+    return () => {
+      fetchImportOrderList();
+    };
+  }, []);
 
   return (
     <Container maxWidth="xl">
@@ -73,12 +104,18 @@ const ImportList = () => {
         >
           Tạo phiếu nhập kho
         </Button>
-        <Button variant="contained"
+        <Button
+          variant="contained"
           color="secondary"
-        >Xuất file excel</Button>
-        <Button variant="contained"
+        >
+          Xuất file excel
+        </Button>
+        <Button
+          variant="contained"
           color="secondary"
-        >Nhập file excel</Button>
+        >
+          Nhập file excel
+        </Button>
       </Stack>
       <Card className={classes.panelFilter}>
         <Toolbar className={classes.toolbar}>
@@ -95,15 +132,15 @@ const ImportList = () => {
                 </InputAdornment>
               ),
             }}
-          // onChange={handleSearch}
+            // onChange={handleSearch}
           />
           <Box className={classes.selectBox}>
             <Formik
               initialValues={{
                 creater: '1',
               }}
-            // validationSchema={FORM_VALIDATION}
-            // onSubmit={handleLogin}
+              // validationSchema={FORM_VALIDATION}
+              // onSubmit={handleLogin}
             >
               <Form>
                 <Stack
@@ -123,10 +160,9 @@ const ImportList = () => {
         <div>
           <div className={classes.labelDateRange}>Khoảng thời gian tạo đơn</div>
           <Toolbar>
-            <LocalizationProvider dateAdapter={AdapterDateFns}
-            >
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
-                id='startDate'
+                id="startDate"
                 label="Ngày bắt đầu"
                 value={startDate}
                 onChange={(newValue) => {
@@ -136,7 +172,7 @@ const ImportList = () => {
               />
               <Box sx={{ mx: 2 }}> Đến </Box>
               <DatePicker
-                id='endDate'
+                id="endDate"
                 label="Ngày kết thúc"
                 value={endDate}
                 onChange={(newValue) => {
@@ -144,12 +180,11 @@ const ImportList = () => {
                 }}
                 renderInput={(params) => <TextField {...params} />}
               />
-
-
             </LocalizationProvider>
           </Toolbar>
         </div>
       </Card>
+
       <Grid
         container
         direction="row"
@@ -162,7 +197,7 @@ const ImportList = () => {
           item
           xs={12}
         >
-          <ImportOrders />
+          {loading ? <>Loading...</> : <ImportOrders importOrders={importOrderList} />}
         </Grid>
       </Grid>
     </Container>
