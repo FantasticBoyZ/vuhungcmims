@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import SelectWrapper from '@/components/FormsUI/Select';
+import SelectWrapper from '@/components/Common/FormsUI/Select';
 import ImportOrders from '@/pages/Transaction/ImportList/ImportOrders';
 import { CloseSharp, Search } from '@mui/icons-material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -85,9 +85,7 @@ const ImportList = () => {
   // hook này để test biến thôi nha
   useEffect(() => {
     console.log(startDate + ' ' + endDate);
-    return () => {
-      fetchImportOrderList();
-    };
+    fetchImportOrderList();
   }, []);
 
   return (
