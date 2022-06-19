@@ -1,8 +1,8 @@
-import authHeader from '@/services/auth-header';
+import authHeader from '@/services/authHeader';
 import axiosClient from '@/utils/axiosCient';
 
 const CategoryService =  {
-    getAllCategory: (params) => {
+    getCategoryList: (params) => {
         const url = '/category';
         return axiosClient.get(url, {params, headers: authHeader()})
     }
