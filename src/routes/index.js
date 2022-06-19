@@ -2,6 +2,7 @@ import NotFound from '@/components/Layout/NotFound/NotFound';
 import Profile from '@/components/TestComponent/Profile';
 import About from '@/pages/About/About';
 import Login from '@/pages/Auth/Login';
+import CategoryList from '@/pages/Category/categoryList';
 import HomePage from '@/pages/Home/Home';
 import AddEditProductForm from '@/pages/Product/AddEditProduct/AddEditProductForm';
 import ProductDetail from '@/pages/Product/ProductList/ProductDetail/ProductDetail';
@@ -29,6 +30,7 @@ const privateRoutes = [
   { path: 'product/:productId', component: ProductDetail },
   { path: 'product/add', component: AddEditProductForm },
   { path: '/product/edit/:productId', component: AddEditProductForm },
+  { path: 'category', component: CategoryList },
   { path: 'post/:postId', component: TestPost },
   { path: 'import', component: ImportList },
   // { path: '/import/detail/:importOrderId', component: ImportOrderDetail },

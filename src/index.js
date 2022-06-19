@@ -7,7 +7,7 @@ import store from '@/store/Store';
 import App from '@/App';
 import reportWebVitals from './reportWebVitals';
 import { theme } from './theme';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

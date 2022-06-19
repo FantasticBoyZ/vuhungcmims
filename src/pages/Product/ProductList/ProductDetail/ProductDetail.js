@@ -56,7 +56,7 @@ const ProductDetail = () => {
     };
     // console.log('subProductList', subProductList);
     console.log('product', product);
-    return () => fetchProductDetail();
+    fetchProductDetail();
   }, []);
 
   return (

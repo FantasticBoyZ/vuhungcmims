@@ -1,4 +1,4 @@
-import authHeader from '@/services/auth-header';
+import authHeader from '@/services/authHeader';
 import axiosClient from '@/utils/axiosCient';
 
 const ManufactorService =  {

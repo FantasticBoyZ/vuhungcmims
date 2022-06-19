@@ -1,6 +1,6 @@
-import ButtonWrapper from '@/components/FormsUI/Button';
-import SelectWrapper from '@/components/FormsUI/Select';
-import TextfieldWrapper from '@/components/FormsUI/Textfield';
+import ButtonWrapper from '@/components/Common/FormsUI/Button';
+import SelectWrapper from '@/components/Common/FormsUI/Select';
+import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import CategoryService from '@/services/categoryService';
 import { getProductDetail, saveProduct } from '@/slices/ProductSlice';
 import { Info } from '@mui/icons-material';
@@ -120,6 +120,7 @@ const AddEditProductForm = () => {
   };
 
   const handleOnClickExit = () => {
+    // TODO: fix lỗi nút exit phần thêm mới
     navigate(isAdd ? '/product' : `/product/${productId}`)
   }
 
@@ -129,7 +130,7 @@ const AddEditProductForm = () => {
         const params = {
           categoryName: '',
         };
-        const response = await CategoryService.getAllCategory(params);
+        const response = await CategoryService.getCategoryList(params);
         console.log('response', response.data.category);
         const rawList = response.data.category;
         const result = rawList.reduce((obj, item) => {
@@ -161,13 +162,11 @@ const AddEditProductForm = () => {
         console.log('Failed to fetch product detail: ', error);
       }
     };
-    return () =>  {
-      if (!!productId) {
-        setIsAdd(false);
-        fetchProductDetail();
-      }
-      fetchCategoryList();
+    if (!!productId) {
+      setIsAdd(false);
+      fetchProductDetail();
     }
+    fetchCategoryList();
     
   }, [productId]);
   return (

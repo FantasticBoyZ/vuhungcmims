@@ -1,5 +1,5 @@
 import axiosClient from "@/utils/axiosCient";
-import authHeader from "@/services/auth-header";
+import authHeader from "@/services/authHeader";
 
 const importOrderService = {
   getImportOrderList: (params) => {
