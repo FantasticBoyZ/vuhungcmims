@@ -1,5 +1,5 @@
-import Button from '@/components/FormsUI/Button';
-import Textfield from '@/components/FormsUI/Textfield';
+import Button from '@/components/Common/FormsUI/Button';
+import Textfield from '@/components/Common/FormsUI/Textfield';
 import LayoutLogin from '@/components/Layout/AuthLayout/Login';
 import '@/components/Layout/AuthLayout/Login.css';
 import AuthService from '@/services/authService';
@@ -21,6 +21,7 @@ const Login = () => {
   let navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [disabled, setDisabled] = useState(false);
 
   const INITIAL_FORM_STATE = {
     username: '',
@@ -39,6 +40,7 @@ const Login = () => {
     console.log(e);
     AuthService.login(e.username, e.password).then(
       () => {
+        setDisabled(true);
         navigate('/dashboard');
         // window.location.reload();
         toast.success('Đăng nhập thành công!');
@@ -87,7 +89,7 @@ const Login = () => {
                 ...INITIAL_FORM_STATE,
               }}
               validationSchema={FORM_VALIDATION}
-              onSubmit={handleLogin}
+              onSubmit={(e) => handleLogin(e)}
             >
               <Form>
                 <Textfield
@@ -124,7 +126,7 @@ const Login = () => {
                 />
                 <Button
                   fullWidth={true}
-                  type="submit"
+                  disabled={disabled}
                   sx={{ mt: 3, mb: 2 }}
                 >
                   Đăng nhập
