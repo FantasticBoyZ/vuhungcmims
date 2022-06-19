@@ -12,6 +12,10 @@ export const getProductDetail = createAsyncThunk('product/get-one', async (id) =
   return product
 })
 
+export const saveProduct = createAsyncThunk('product/save', async (product) => {
+  return await productService.saveProduct(product)
+})
+
 const productSlice = createSlice({
   name: 'products',
   initialState: {
@@ -46,6 +50,17 @@ const productSlice = createSlice({
       state.error = action.payload;
     },
     [getProductDetail.fulfilled] :(state, action) => {
+      state.loading = false;
+      state.products = action.payload;
+    },
+    [saveProduct.pending] : (state) => {
+      state.loading = true;
+    },
+    [saveProduct.rejected] :(state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [saveProduct.fulfilled] :(state, action) => {
       state.loading = false;
       state.products = action.payload;
     },

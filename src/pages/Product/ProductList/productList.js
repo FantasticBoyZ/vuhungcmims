@@ -1,11 +1,13 @@
 import CommonTable from '@/components/Common/CommonTable';
-import TextfieldWrapper from '@/components/FormsUI/Textfield';
+import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import CategoryService from '@/services/categoryService';
+import ManufactorService from '@/services/manufactorService';
 import { getProductList } from '@/slices/ProductSlice';
 import { Search } from '@mui/icons-material';
 import {
   Box,
   Button,
+  Card,
   InputAdornment,
   Paper,
   Select,
@@ -24,6 +26,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
+import { toast } from 'react-toastify';
 
 const useStyles = makeStyles({
   searchField: {
@@ -39,17 +42,20 @@ const useStyles = makeStyles({
     padding: '10px',
   },
   selectBoxContainer: {
-    width: '50%',
+    width: '40%',
     display: 'flex',
     justifyContent: 'space-around',
     // backgroundColor: 'red',
   },
   selectBox: {
     // backgroundColor: 'green',
-    width: '200px',
+    width: '250px',
     height: '56px',
     minHeight: '56px',
   },
+  tableStyle: {
+    padding: '20px'
+  }
 });
 
 const customStyles = {
@@ -70,35 +76,39 @@ const headCells = [
   // { id: 'createdDate', label: 'Ngày khởi tạo' },
 ];
 
-const categoryList = {
-  1: 'Gạch',
-  2: 'Sơn',
-  3: 'Xi măng',
-};
+// mock data
 
-const manufacturerList = {
-  1: 'Hoàng Phát',
-  2: 'Surplus',
-  3: 'Toyota',
-};
+// const categoryList = {
+//   1: 'Gạch',
+//   2: 'Sơn',
+//   3: 'Xi măng',
+// };
 
-const sortTypeList = {
-  asc: 'tăng',
-  desc: 'giảm',
-};
+// const manufacturerList = {
+//   1: 'Hoàng Phát',
+//   2: 'Surplus',
+//   3: 'Toyota',
+// };
+
+// const sortTypeList = {
+//   asc: 'tăng',
+//   desc: 'giảm',
+// };
 
 const ProductList = () => {
   const navigate = useNavigate();
   const [productList, setProductList] = useState([]);
   const [inputValueCategory, setInputValueCategory] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [inputValueManufactor, setInputValueManufactor] = useState('');
+  const [selectedManufactor, setSelectedManufactor] = useState(null);
   const [searchParams, setSearchParams] = useState({
     productName: '',
     productCode: '',
     categoryId: '',
     manufactorId: '',
   });
-  const pages = [2, 20, 50];
+  const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
@@ -114,8 +124,8 @@ const ProductList = () => {
     if (e.keyCode === 13) {
       let target = e.target;
       console.log(e.target.value);
-      setSearchParams({ ...searchParams, productName: target.value });
       setPage(0);
+      searchProduct({ ...searchParams, productName: target.value })
       // fetchProductList();
     }
   };
@@ -144,10 +154,23 @@ const ProductList = () => {
     console.log('inputValueCategory', value);
   };
 
+  const handleInputChangeManufactor = (value) => {
+    setInputValueCategory(value);
+    console.log('inputValueManufactor', value);
+  };
+
   const handleChangeCategory = (value) => {
     setSelectedCategory(value);
-    setSearchParams({ ...searchParams, categoryId: value.id });
+    setSearchParams({ ...searchParams, categoryId: value.id })
+    searchProduct({ ...searchParams, categoryId: value.id })
     console.log('changeCategory', value);
+  };
+  // TODO: searchParam không thay đổi ngay sau khi setSearchParam
+  const handleChangeManufactor = (value) => {
+    setSelectedManufactor(value);
+    setSearchParams({ ...searchParams, manufactorId: value.id })
+    searchProduct({ ...searchParams, manufactorId: value.id })
+    console.log('changeManufactor', value);
   };
 
   const fetchCategoryList = async () => {
@@ -155,52 +178,93 @@ const ProductList = () => {
       const params = {
         categoryName: '',
       };
-      const response = await CategoryService.getAllCategory(params);
-      console.log('response', response.data.category);
-      // Loại bỏ dư thừa description
+      const response = await CategoryService.getCategoryList(params);
+      console.log('response category', response.data.category);
+
       const rawList = response.data.category;
-      // return rawList
-      // const result = rawList.reduce((map, item) => {
-      //   map[item.id] = item.name
-      //   return map
-      // })
       return rawList;
       // console.log('mapCategoryList',result)
       // setCategoryList(result)
     } catch (error) {
+      toast.error('Failed to fetch category list: ', error)
       console.log('Failed to fetch category list: ', error);
     }
   };
 
-  useEffect(() => {
-    fetchCategoryList();
-    const fetchProductList = async () => {
-      try {
-        const params = {
-          pageIndex: page + 1,
-          pageSize: rowsPerPage,
-          productName: searchParams.productName,
-          productCode: searchParams.productCode,
-          manufactorId: searchParams.manufactorId,
-          categoryId: searchParams.categoryId,
-        };
-        const actionResult = await dispatch(getProductList(params));
-        const dataResult = unwrapResult(actionResult);
-        console.log(products);
-        console.log('dataResult', dataResult);
-        if (dataResult.data) {
-          setTotalRecord(dataResult.data.totalRecord);
-          setProductList(dataResult.data.product);
-        }
-      } catch (error) {
-        console.log('Failed to fetch product list: ', error);
+  const fetchManufactorList = async () => {
+    try {
+      const params = {
+        manufactorName: '',
+      };
+      const response = await ManufactorService.getManufactorList(params);
+      console.log('response manufactor', response.data.manufactor);
+
+      const rawList = response.data.manufactor;
+      return rawList;
+
+    } catch (error) {
+      toast.error('Failed to fetch manufactor list: ', error)
+      console.log('Failed to fetch manufactor list: ', error);
+    }
+  };
+
+  const searchProduct = async (searchParams) => {
+    try {
+      const params = {
+        pageIndex: page + 1,
+        pageSize: rowsPerPage,
+        productName: searchParams.productName,
+        productCode: searchParams.productCode,
+        manufactorId: searchParams.manufactorId,
+        categoryId: searchParams.categoryId,
+      };
+      const actionResult = await dispatch(getProductList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('searchProduct', dataResult);
+      if (dataResult.data) {
+        setTotalRecord(dataResult.data.totalRecord);
+        setProductList(dataResult.data.product);
       }
-    };
+    } catch (error) {
+      console.log('Failed to fetch product list: ', error);
+    }
+  };
+
+  const fetchProductList = async () => {
+    try {
+      const params = {
+        pageIndex: page + 1,
+        pageSize: rowsPerPage,
+        ...searchParams
+        // productName: searchParams.productName,
+        // productCode: searchParams.productCode,
+        // manufactorId: searchParams.manufactorId,
+        // categoryId: searchParams.categoryId,
+      };
+      const actionResult = await dispatch(getProductList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log(products);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        setTotalRecord(dataResult.data.totalRecord);
+        setProductList(dataResult.data.product);
+      }
+    } catch (error) {
+      console.log('Failed to fetch product list: ', error);
+    }
+  };
+
+  useEffect(() => {
     fetchProductList();
+    // return () => {
+    //   // fetchCategoryList();
+      
+    // }
+    
     // console.log(products.data.product);
     // console.log(loading)
     // console.log('productList', productList);
-  }, [page, rowsPerPage, searchParams]);
+  }, [page, rowsPerPage]);
   return (
     <>
       <Paper>
@@ -212,13 +276,13 @@ const ProductList = () => {
         >
           <Button
             variant="contained"
-            color="secondary"
+            
             onClick={() => handleOnclickAddNewProduct()}
           >
             Thêm mới
           </Button>
-          <Button variant="contained">Xuất file excel</Button>
-          <Button variant="contained">Nhập file excel</Button>
+          <Button variant="contained" color="secondary">Xuất file excel</Button>
+          <Button variant="contained" color="secondary">Nhập file excel</Button>
         </Stack>
         <Toolbar>
           {/* <Box
@@ -242,6 +306,7 @@ const ProductList = () => {
               <Form>
                 <Box className={classes.toolbarContainer}>
                   <Box className={classes.searchField}>
+                    {/* TODO: handleChange search */}
                     <TextfieldWrapper
                       id="outlined-basic"
                       name="productName"
@@ -256,7 +321,7 @@ const ProductList = () => {
                         ),
                       }}
                       onKeyDown={handleSearch}
-                      // onChange={handleSearch}
+                      // onChange={handleSearchChange}
                     />
                   </Box>
                   <Box className={classes.selectBoxContainer}>
@@ -271,40 +336,25 @@ const ProductList = () => {
                       value={selectedCategory}
                       getOptionLabel={(e) => e.name}
                       getOptionValue={(e) => e.id}
-                      loadOptions={fetchCategoryList}
+                      loadOptions={() => fetchCategoryList()}
                       onInputChange={handleInputChangeCategory}
                       onChange={(e) => handleChangeCategory(e)}
                     />
-                    {/* TODO: Làm service call api nhà sản xuất */}
+               
                     <AsyncSelect
                       className={classes.selectBox}
                       styles={customStyles}
-                      placeholder="Nhà sản xuất"
+                      placeholder="Nhà cung cấp"
                       cacheOptions
                       defaultOptions
                       isSearchable={false}
                       components={<Select />}
-                      value={selectedCategory}
+                      value={selectedManufactor}
                       getOptionLabel={(e) => e.name}
                       getOptionValue={(e) => e.id}
-                      loadOptions={fetchCategoryList}
-                      onInputChange={handleInputChangeCategory}
-                      onChange={(e) => handleChangeCategory(e)}
-                    />
-                    <AsyncSelect
-                      className={classes.selectBox}
-                      styles={customStyles}
-                      placeholder="Cái gì đó cần search"
-                      cacheOptions
-                      defaultOptions
-                      isSearchable={false}
-                      components={<Select />}
-                      value={selectedCategory}
-                      getOptionLabel={(e) => e.name}
-                      getOptionValue={(e) => e.id}
-                      loadOptions={fetchCategoryList}
-                      onInputChange={handleInputChangeCategory}
-                      onChange={(e) => handleChangeCategory(e)}
+                      loadOptions={() => fetchManufactorList()}
+                      onInputChange={handleInputChangeManufactor}
+                      onChange={(e) => handleChangeManufactor(e)}
                     />
                     {/* <SelectWrapper
                       label="Nhà cung cáp"
@@ -330,7 +380,7 @@ const ProductList = () => {
         {loading ? (
           <> Loading ... </>
         ) : (
-          <Box>
+          <Card className={classes.tableStyle}>
             {totalRecord > 0 ? (
               <Box>
               <TblContainer>
@@ -362,7 +412,7 @@ const ProductList = () => {
             /></Box>
             ): (<Typography> Không tìm có kết quả phù hợp </Typography>)}
             
-          </Box>
+          </Card>
         )}
       </Paper>
     </>

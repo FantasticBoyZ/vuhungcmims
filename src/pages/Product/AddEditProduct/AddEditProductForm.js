@@ -1,11 +1,10 @@
-import ButtonWrapper from '@/components/FormsUI/Button';
-import SelectWrapper from '@/components/FormsUI/Select';
-import TextfieldWrapper from '@/components/FormsUI/Textfield';
+import ButtonWrapper from '@/components/Common/FormsUI/Button';
+import SelectWrapper from '@/components/Common/FormsUI/Select';
+import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import CategoryService from '@/services/categoryService';
-import { getProductDetail } from '@/slices/ProductSlice';
+import { getProductDetail, saveProduct } from '@/slices/ProductSlice';
 import { Info } from '@mui/icons-material';
 import {
-  alpha,
   Box,
   Button,
   Card,
@@ -18,10 +17,11 @@ import {
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Form, Formik } from 'formik';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as Yup from 'yup';
+import { toast } from 'react-toastify';
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
@@ -60,8 +60,8 @@ const AddEditProductForm = () => {
   const { initialFormValue, setInitialFormValue } = useState({
     productCode: '',
     name: '',
-    categoryId: 1,
-    subCategory: '',
+    categoryId: '',
+    subCategoryId: '',
     unitMeasure: '',
     quantity: '',
     color: '',
@@ -71,6 +71,7 @@ const AddEditProductForm = () => {
   const [categoryList, setCategoryList] = useState([]);
   const [isAdd, setIsAdd] = useState(true);
   const classes = useStyles();
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
   const { loading, products } = useSelector((state) => ({ ...state.products }));
@@ -80,29 +81,72 @@ const AddEditProductForm = () => {
     name: Yup.string().required('Chưa nhập tên sản phẩm'),
   });
 
-  const handleSubmit = (values) => {
-    console.log('ok', values);
-  };
-
-  const fetchCategoryList = async () => {
+  const saveProductDetail = async (product) => {
     try {
-      const params = {
-        categoryName: '',
-      };
-      const response = await CategoryService.getAllCategory(params);
-      console.log('response', response.data.category);
-      const rawList = response.data.category;
-      const result = rawList.reduce((map, item) => {
-        map[item.id] = item.name;
-        return map;
-      });
-      setCategoryList(result);
+      const actionResult = await dispatch(saveProduct(product));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
     } catch (error) {
-      console.log('Failed to fetch category list: ', error);
+      console.log('Failed to save product: ', error);
     }
   };
 
+  const handleSubmit = (values) => {
+    const newProduct = {
+      id: productId,
+      name: values.name,
+      productCode: values.productCode,
+      unitMeasure: values.unitMeasure,
+      // wrapUnitMeasure: values.wrapUnitMeasure,
+      // numberOfWrapUnitMeasure: values.numberOfWrapUnitMeasure,
+      wrapUnitMeasure: 'hop',
+      numberOfWrapUnitMeasure: '2',
+      color: values.color,
+      description: values.description,
+      categoryId: values.categoryId,
+      // manufactorId: values.manufactorId,
+      manufactorId: '1',
+    };
+    console.log(values);
+    saveProductDetail(newProduct);
+    
+    if(isAdd) {
+      toast.success("Thêm sản phẩm thành công!")
+      navigate("/product")
+    }else {
+      toast.success("Sửa sản phẩm thành công!")
+      navigate(`/product/${productId}`)
+    }
+  };
+
+  const handleOnClickExit = () => {
+    // TODO: fix lỗi nút exit phần thêm mới
+    navigate(isAdd ? '/product' : `/product/${productId}`)
+  }
+
   useEffect(() => {
+    const fetchCategoryList = async () => {
+      try {
+        const params = {
+          categoryName: '',
+        };
+        const response = await CategoryService.getCategoryList(params);
+        console.log('response', response.data.category);
+        const rawList = response.data.category;
+        const result = rawList.reduce((obj, item) => {
+          return {
+            ...obj,
+            [item.id]: item.name,
+          };
+        }, {});
+
+        console.log('result', result);
+        setCategoryList(result);
+      } catch (error) {
+        console.log('Failed to fetch category list: ', error);
+      }
+    };
+
     const fetchProductDetail = async () => {
       try {
         const actionResult = await dispatch(getProductDetail(productId));
@@ -118,13 +162,13 @@ const AddEditProductForm = () => {
         console.log('Failed to fetch product detail: ', error);
       }
     };
-
     if (!!productId) {
       setIsAdd(false);
       fetchProductDetail();
     }
     fetchCategoryList();
-  }, [isAdd]);
+    
+  }, [productId]);
   return (
     <Container maxWidth="xl">
       <Card className={classes.cardHeader}>
@@ -287,7 +331,12 @@ const AddEditProductForm = () => {
                         >
                           Lưu
                         </ButtonWrapper>
-                        <Button variant="outlined">Thoát</Button>
+                        <Button
+                          variant="outlined"
+                          onClick={() => handleOnClickExit()}
+                        >
+                          Thoát
+                        </Button>
                       </Stack>
                     </Form>
                   </Formik>

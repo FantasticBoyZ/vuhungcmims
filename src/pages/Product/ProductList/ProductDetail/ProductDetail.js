@@ -55,8 +55,8 @@ const ProductDetail = () => {
       }
     };
     // console.log('subProductList', subProductList);
-    // console.log('product', product);
-    return () => fetchProductDetail();
+    console.log('product', product);
+    fetchProductDetail();
   }, []);
 
   return (
@@ -79,7 +79,7 @@ const ProductDetail = () => {
               xs={12}
             >
               {/* <Typography variant='h5'>Danh sách lô hàng </Typography> */}
-              {(!!totalRecord && totalRecord > 0 && !!subProductList) ? (<SubProductList subProductList={subProductList} />) : (<Box> Sản phẩm chưa có lô hàng nào</Box>)}
+              {(!!totalRecord && totalRecord > 0) ? (<SubProductList subProductList={subProductList} />) : (<Box> Sản phẩm chưa có lô hàng nào</Box>)}
             </Grid>
           </Grid>
         </Container>

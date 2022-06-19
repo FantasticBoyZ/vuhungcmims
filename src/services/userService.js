@@ -1,5 +1,5 @@
 import axios from "axios";
-import authHeader from "./auth-header";
+import authHeader from "./authHeader";
 const API_URL = "http://localhost:8080/api/test/";
 const getPublicContent = () => {
   return axios.get("http://localhost:8080/api/people/get-people", { headers: authHeader() });

@@ -1,5 +1,5 @@
-import SelectWrapper from '@/components/FormsUI/Select';
-import TextfieldWrapper from '@/components/FormsUI/Textfield';
+import SelectWrapper from '@/components/Common/FormsUI/Select';
+import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import { Box, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { useState } from 'react';

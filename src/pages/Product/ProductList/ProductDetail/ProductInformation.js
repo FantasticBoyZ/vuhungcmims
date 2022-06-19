@@ -18,36 +18,41 @@ const useStyles = makeStyles({
     marginBottom: '32px',
   },
   cardStyle: {
-    padding: '12px'
-  }
+    padding: '12px',
+  },
 });
 
 const ProductInformation = ({ product }) => {
   const classes = useStyles();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const handleOnClickEdit= () => {
-    navigate(`/product/edit/${product.id}`)
-  }
+  const handleOnClickEdit = () => {
+    navigate(`/product/edit/${product.id}`);
+  };
   return (
     <Box className={classes.productInformation}>
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        spacing={2}
-        p={2}
-      >
-        <Typography variant="h3">{product.name}</Typography>
+      <Card className={classes.cardStyle}>
         <Stack
           direction="row"
+          justifyContent="space-between"
           spacing={2}
+          p={2}
         >
-          <Button onClick={() => handleOnClickEdit()} variant="contained">Sửa sản phẩm</Button>
-          <Button variant="outlined">Thoát</Button>
+          <Typography variant="h3">{product.name}</Typography>
+          <Stack
+            direction="row"
+            spacing={2}
+          >
+            <Button
+              onClick={() => handleOnClickEdit()}
+              variant="contained"
+            >
+              Sửa sản phẩm
+            </Button>
+            <Button variant="outlined" onClick={() => navigate("/product")}>Thoát</Button>
+          </Stack>
         </Stack>
-      </Stack>
-      <Divider />
-      <Card className={classes.cardStyle}>
+        <Divider />
         <Grid container>
           <Grid
             item
