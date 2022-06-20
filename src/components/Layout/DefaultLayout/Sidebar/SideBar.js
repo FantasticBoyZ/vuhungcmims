@@ -12,9 +12,12 @@ import MuiDrawer from '@mui/material/Drawer';
 import {
   AutoAwesomeMosaic,
   CameraFront,
+  Category,
   ChevronRight,
+  Class,
   CurrencyExchange,
   FactCheck,
+  Factory,
   Home,
   Input,
   LocalAtm,
@@ -159,6 +162,20 @@ const Sidebar = () => {
           hasParent: true,
         },
       ],
+      hasParent: false,
+    },
+    {
+      primary: 'Danh mục',
+      icon: <Class />,
+      path: '/category',
+      children: [],
+      hasParent: false,
+    },
+    {
+      primary: 'Nhà cung cấp',
+      icon: <Factory />,
+      path: '/manufacturer',
+      children: [],
       hasParent: false,
     },
     {
