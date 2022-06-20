@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -38,6 +39,12 @@ const useStyles = makeStyles((theme) => ({
 
 const CategoryTable = ({ categoryList }) => {
   const classes = useStyles();
+  const navigate = useNavigate();
+
+  const handleOnClickDetailCategory = (categoryId) => {
+    console.log(categoryId)
+    navigate(`/category/${categoryId}`)
+  }
   return (
     <TableContainer>
       <Table className={classes.table}>
@@ -107,7 +114,7 @@ const CategoryTable = ({ categoryList }) => {
                       title="info Category"
                       arrow
                     >
-                      <Info fontSize="small" />
+                      <Info fontSize="small" onClick={()=>handleOnClickDetailCategory(category.id)}/>
                     </Tooltip>
                     <Tooltip
                       title="Edit Category"

@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Container } from '@mui/system';
 import CustomTablePagination from '@/components/Common/TablePagination';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
   searchField: {
@@ -51,6 +52,7 @@ const CategoryList = () => {
   const [searchParams, setSearchParams] = useState({
     categoryName: '',
   });
+  const navigate = useNavigate()
   const classes = useStyles();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.categories }));
@@ -73,6 +75,10 @@ const CategoryList = () => {
       // fetchProductList();
     }
   };
+
+  const handleOnclickAddNewProduct = () =>{
+    navigate('/category/add')
+  }
 
   const searchCategory = async (searchParams) => {
     try {
@@ -117,7 +123,7 @@ const CategoryList = () => {
   }, [page, rowsPerPage]);
 
   return (
-    <Container>
+    <Container maxWidth="xl">
       <Box sx={{ marginBottom: '20px' }}>
         <Card className={classes.cardFilter}>
           <Stack
@@ -129,7 +135,7 @@ const CategoryList = () => {
             <Button
               variant="contained"
 
-              // onClick={() => handleOnclickAddNewProduct()}
+              onClick={() => handleOnclickAddNewProduct()}
             >
               Thêm mới
             </Button>
