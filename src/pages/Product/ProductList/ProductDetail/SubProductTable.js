@@ -4,14 +4,12 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography,
+  TableHead, TableRow,
+  Typography
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { format } from 'date-fns';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -24,10 +22,10 @@ const useStyles = makeStyles((theme) => ({
     '& tbody td': {
       fontWeight: '300',
     },
-    '& tbody tr:hover': {
-      backgroundColor: '#fffbf2',
-      cursor: 'pointer',
-    },
+    // '& tbody tr:hover': {
+    //   backgroundColor: '#fffbf2',
+    //   cursor: 'pointer',
+    // },
   },
   cardStyle: {
     padding: '12px'
@@ -46,14 +44,6 @@ const SubProductTable = ({ subProductList }) => {
     return format(new Date(date), 'dd/MM/yyyy')
   }
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
   // const selectedBulkActions = selectedSubProductList.length > 0;
 
   //     const handleSelectAllSubProductList = (event) => {
@@ -122,15 +112,6 @@ const SubProductTable = ({ subProductList }) => {
 
           {/* TODO: create table pagination */}
         </Table>
-        <TablePagination
-          component="div"
-          page={page}
-          rowsPerPageOptions={pages}
-          rowsPerPage={rowsPerPage}
-          count={subProductList.length}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
       </TableContainer>
     </Card>
   );

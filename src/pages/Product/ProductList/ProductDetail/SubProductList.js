@@ -1,6 +1,5 @@
-import { Card, Container, Grid } from '@mui/material';
-import { subDays } from 'date-fns';
 import SubProductTable from '@/pages/Product/ProductList/ProductDetail/SubProductTable';
+import { Box } from '@mui/material';
 
 // const subProductList = [
 //   {
@@ -167,9 +166,9 @@ import SubProductTable from '@/pages/Product/ProductList/ProductDetail/SubProduc
 
 const SubProductList = ({subProductList}) => {
   return (
-    <Card>
+    <>
       <SubProductTable subProductList={subProductList} />
-    </Card>
+    </>
   );
 };
 

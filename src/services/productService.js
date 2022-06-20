@@ -8,9 +8,9 @@ const productService = {
     return axiosClient.get(url, { params, headers: authHeader() });
   },
 
-  getProductById: (id) => {
-    const url = `/product/${id}`;
-    return axiosClient.get(url, { headers: authHeader() });
+  getProductById: (params) => {
+    const url = `/product/${params.productId}`;
+    return axiosClient.get(url, {params, headers: authHeader() });
   },
 
   saveProduct: (product) => {
@@ -40,6 +40,7 @@ const productService = {
       description: product.color,
       categoryId: product.categoryId,
       manufactorId: product.manufactorId,
+      description: product.description
     }).then((response) => {
     
       return response.data;

@@ -7,8 +7,8 @@ export const getProductList = createAsyncThunk('product' , async (params, thunkA
   return productList;
 })
 
-export const getProductDetail = createAsyncThunk('product/get-one', async (id) => {
-  const product = await productService.getProductById(id)
+export const getProductDetail = createAsyncThunk('product/get-one', async ( params) => {
+  const product = await productService.getProductById(params)
   return product
 })
 

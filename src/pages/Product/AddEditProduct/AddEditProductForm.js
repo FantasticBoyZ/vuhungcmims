@@ -109,20 +109,20 @@ const AddEditProductForm = () => {
     };
     console.log(values);
     saveProductDetail(newProduct);
-    
-    if(isAdd) {
-      toast.success("Thêm sản phẩm thành công!")
-      navigate("/product")
-    }else {
-      toast.success("Sửa sản phẩm thành công!")
-      navigate(`/product/${productId}`)
+
+    if (isAdd) {
+      toast.success('Thêm sản phẩm thành công!');
+      navigate('/product');
+    } else {
+      toast.success('Sửa sản phẩm thành công!');
+      navigate(`/product/${productId}`);
     }
   };
 
   const handleOnClickExit = () => {
     // TODO: fix lỗi nút exit phần thêm mới
-    navigate(isAdd ? '/product' : `/product/${productId}`)
-  }
+    navigate(isAdd ? '/product' : `/product/${productId}`);
+  };
 
   useEffect(() => {
     const fetchCategoryList = async () => {
@@ -149,7 +149,10 @@ const AddEditProductForm = () => {
 
     const fetchProductDetail = async () => {
       try {
-        const actionResult = await dispatch(getProductDetail(productId));
+        const params = {
+          productId: productId,
+        };
+        const actionResult = await dispatch(getProductDetail(params));
         const dataResult = unwrapResult(actionResult);
         if (dataResult.data) {
           setProduct(dataResult.data.product);
@@ -167,7 +170,6 @@ const AddEditProductForm = () => {
       fetchProductDetail();
     }
     fetchCategoryList();
-    
   }, [productId]);
   return (
     <Container maxWidth="xl">
@@ -325,12 +327,7 @@ const AddEditProductForm = () => {
                         justifyContent="flex-end"
                         padding="20px"
                       >
-                        <ButtonWrapper
-                          type="submit"
-                          variant="contained"
-                        >
-                          Lưu
-                        </ButtonWrapper>
+                        <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
                         <Button
                           variant="outlined"
                           onClick={() => handleOnClickExit()}
@@ -492,13 +489,13 @@ const AddEditProductForm = () => {
                     justifyContent="flex-end"
                     padding="20px"
                   >
-                    <ButtonWrapper
-                      type="submit"
-                      variant="contained"
+                    <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
+                    <Button
+                      onClick={() => handleOnClickExit()}
+                      variant="outlined"
                     >
-                      Lưu
-                    </ButtonWrapper>
-                    <Button variant="outlined">Thoát</Button>
+                      Thoát
+                    </Button>
                   </Stack>
                 </Form>
               </Formik>
