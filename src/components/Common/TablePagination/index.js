@@ -1,7 +1,14 @@
 import { TablePagination } from '@mui/material';
 import React from 'react';
 
-const CustomTablePagination = ({ page , pages, rowsPerPage, totalRecord, handleChangePage, handleChangeRowsPerPage}) => {
+const CustomTablePagination = ({
+  page,
+  pages,
+  rowsPerPage,
+  totalRecord,
+  handleChangePage,
+  handleChangeRowsPerPage,
+}) => {
   return (
     <TablePagination
       component="div"
