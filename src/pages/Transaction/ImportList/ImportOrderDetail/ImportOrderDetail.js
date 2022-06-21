@@ -168,7 +168,7 @@ const ImportOrderDetail = () => {
                         item
                         xs={12}
                       >
-                        {listConsignments ? (
+                        {!!listConsignments && listConsignments.length > 0 ? (
                           <Box>
                             <ConsignmentsTable listConsignments={listConsignments} />
                             <CustomTablePagination

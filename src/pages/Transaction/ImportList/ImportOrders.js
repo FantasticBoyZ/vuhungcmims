@@ -26,7 +26,7 @@ const ImportOrders = ({importOrders}) => {
   //     statusName: "pending"
   //   },
   // ];
-  console.log(importOrders)
+  // console.log(importOrders)
   return (
     <Box>
       <ImportOrdersTable importOrders={importOrders} />
