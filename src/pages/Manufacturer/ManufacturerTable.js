@@ -32,7 +32,7 @@ const ManufacturerTable = ({ manufacturerList }) => {
 
   const handleOnClickDetailManufacturer = (manufacturerId) => {
     console.log(manufacturerId)
-    navigate(`/category/${manufacturerId}`)
+    navigate(`/manufacturer/${manufacturerId}`)
   }
 
   return (

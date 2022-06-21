@@ -6,7 +6,9 @@ import AddEditCategoryForm from '@/pages/Category/AddEditCategory/AddEditCategor
 import CategoryDetail from '@/pages/Category/CategoryDetail/CategoryDetail';
 import CategoryList from '@/pages/Category/categoryList';
 import HomePage from '@/pages/Home/Home';
+import AddEditManufacturerForm from '@/pages/Manufacturer/AddEditManufacturer/AddEditManufacturerForm';
 import ManufactorList from '@/pages/Manufacturer/manufactorList';
+import ManufacturerDetail from '@/pages/Manufacturer/ManufacturerDetail/ManufacturerDetail';
 import AddEditProductForm from '@/pages/Product/AddEditProduct/AddEditProductForm';
 import ProductDetail from '@/pages/Product/ProductList/ProductDetail/ProductDetail';
 import productList from '@/pages/Product/ProductList/productList';
@@ -44,13 +46,13 @@ const privateRoutes = [
 
   // Manufactor route
   { path: '/manufacturer', component: ManufactorList },
-  // { path: '/manufacturer/:manufacturerId', component: CategoryDetail },
-  // { path: '/manufacturer/add', component: AddEditCategoryForm },
-  // { path: '/manufacturer/edit/:manufacturerId', component: AddEditCategoryForm },
+  { path: '/manufacturer/:manufacturerId', component: ManufacturerDetail },
+  { path: '/manufacturer/add', component: AddEditManufacturerForm },
+  { path: '/manufacturer/edit/:manufacturerId', component: AddEditManufacturerForm },
 
   // importOrder route
   { path: 'import', component: ImportList },
-  // { path: '/import/detail/:importOrderId', component: ImportOrderDetail },
+  { path: '/import/detail/:importOrderId', component: ImportOrderDetail },
   { path: '/denied', component: Profile, layout: null },
   { path: '*', component: NotFound, layout: null },
 ];

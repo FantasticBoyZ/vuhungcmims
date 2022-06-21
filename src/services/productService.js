@@ -13,6 +13,11 @@ const productService = {
     return axiosClient.get(url, {params, headers: authHeader() });
   },
 
+  getProductByImportOrderId: (params) => {
+    const url = `/import-order/list-product`;
+    return axiosClient.get(url, {params, headers: authHeader() });
+  },
+
   saveProduct: (product) => {
     // console.log(product)
 
@@ -37,7 +42,6 @@ const productService = {
       wrapUnitMeasure: product.wrapUnitMeasure,
       numberOfWrapUnitMeasure: product.numberOfWrapUnitMeasure,
       color: product.color,
-      description: product.color,
       categoryId: product.categoryId,
       manufactorId: product.manufactorId,
       description: product.description

@@ -16,36 +16,29 @@ const useStyles = makeStyles({
     
   },
 });
-const CategoryDetail = () => {
-  const categoryId = useParams();
+const ManufacturerDetail = () => {
+  const manufacturerId = useParams();
+  // TODO: call api get manufacturer detail
   const classes = useStyles();
-  const category = {
-    name: 'Gạch',
-    description: 'Sản phẩm bền đẹp đạt chuẩn chất lượng Châu Âu',
+  const manufacturer = {
+    name: 'Nguyễn Văn A',
+    email: 'callapi@gmail.com',
+    phone: '0982412342',
   };
   return (
     <Container>
       <Card className={classes.cardHeader} >
-        <Typography variant='h5'>Thông tin danh mục</Typography>
+        <Typography variant='h5' lineHeight={2}>Thông tin nhà cung cấp</Typography>
       </Card>
       <Card className={classes.infoContainer}>
         <Typography fontSize='20px' lineHeight={2}>
-          Danh mục: <strong>{category.name}</strong>
+          Tên nhà cung cấp: <strong>{manufacturer.name}</strong>
         </Typography>
-        <Typography fontSize='20px' lineHeight={2}>Mô tả:</Typography>
-        <TextField
-          defaultValue={category.description}
-          multiline
-          rows={4}
-          fontSize='20px'
-          sx={{ width: '100%' }}
-          InputProps={{
-            readOnly: true,
-          }}
-        />
+        <Typography fontSize='20px' lineHeight={2}>Email: <strong>{manufacturer.email}</strong></Typography>
+        <Typography fontSize='20px' lineHeight={2}>Số điện thoại: <strong>{manufacturer.email}</strong></Typography>
       </Card>
     </Container>
   );
 };
 
-export default CategoryDetail;
+export default ManufacturerDetail;
