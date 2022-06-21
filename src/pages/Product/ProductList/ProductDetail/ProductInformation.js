@@ -31,35 +31,35 @@ const ProductInformation = ({ product }) => {
   };
   return (
     <Box className={classes.productInformation}>
-      <Card className={classes.cardStyle}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        spacing={2}
+        p={2}
+      >
+        <Typography variant="h5">
+          Sản phẩm: <strong>{product.name}</strong>
+        </Typography>
         <Stack
           direction="row"
-          justifyContent="space-between"
           spacing={2}
-          p={2}
         >
-          <Typography variant="h5">
-            Sản phẩm: <strong>{product.name}</strong>
-          </Typography>
-          <Stack
-            direction="row"
-            spacing={2}
+          <Button
+            onClick={() => handleOnClickEdit()}
+            variant="contained"
           >
-            <Button
-              onClick={() => handleOnClickEdit()}
-              variant="contained"
-            >
-              Sửa sản phẩm
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/product')}
-            >
-              Thoát
-            </Button>
-          </Stack>
+            Sửa sản phẩm
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => navigate('/product')}
+          >
+            Thoát
+          </Button>
         </Stack>
-        <Divider />
+      </Stack>
+      <Divider />
+      <Card className={classes.cardStyle}>
         <Grid container>
           <Grid
             item

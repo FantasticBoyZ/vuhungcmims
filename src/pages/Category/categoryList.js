@@ -1,4 +1,4 @@
-import { Search } from '@mui/icons-material';
+import { Add, Search } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -52,7 +52,7 @@ const CategoryList = () => {
   const [searchParams, setSearchParams] = useState({
     categoryName: '',
   });
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const classes = useStyles();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.categories }));
@@ -71,14 +71,14 @@ const CategoryList = () => {
       let target = e.target;
       console.log(e.target.value);
       setPage(0);
-      searchCategory({ ...searchParams, categoryName: target.value })
+      searchCategory({ ...searchParams, categoryName: target.value });
       // fetchProductList();
     }
   };
 
-  const handleOnclickAddNewProduct = () =>{
-    navigate('/category/add')
-  }
+  const handleOnclickAddNewProduct = () => {
+    navigate('/category/add');
+  };
 
   const searchCategory = async (searchParams) => {
     try {
@@ -125,33 +125,33 @@ const CategoryList = () => {
   return (
     <Container maxWidth="xl">
       <Box sx={{ marginBottom: '20px' }}>
-        <Card className={classes.cardFilter}>
-          <Stack
-            direction="row"
-            justifyContent="flex-end"
-            spacing={2}
-            p={2}
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          spacing={2}
+          p={2}
+        >
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={() => handleOnclickAddNewProduct()}
           >
-            <Button
-              variant="contained"
-
-              onClick={() => handleOnclickAddNewProduct()}
-            >
-              Thêm mới
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-            >
-              Xuất file excel
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-            >
-              Nhập file excel
-            </Button>
-          </Stack>
+            Thêm mới
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+          >
+            Xuất file excel
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+          >
+            Nhập file excel
+          </Button>
+        </Stack>
+        <Card className={classes.cardFilter}>
           <Toolbar className={classes.toolbar}>
             <TextField
               id="outlined-basic"

@@ -25,8 +25,8 @@ import { toast } from 'react-toastify';
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
-    padding: '30px 20px',
-    marginBottom: '20px',
+    padding: '24px',
+    // marginBottom: '20px',
   },
   leftContainer: {
     padding: '20px',
@@ -173,9 +173,9 @@ const AddEditProductForm = () => {
   }, [productId]);
   return (
     <Container maxWidth="xl">
-      <Card className={classes.cardHeader}>
+      <Box className={classes.cardHeader}>
         <Typography variant="h4">{isAdd ? 'Thêm ' : 'Sửa '}sản phẩm</Typography>
-      </Card>
+      </Box>
       <Card>
         {loading && !isAdd ? (
           <>Loading...</>

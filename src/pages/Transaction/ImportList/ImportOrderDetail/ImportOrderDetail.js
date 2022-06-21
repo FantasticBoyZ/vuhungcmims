@@ -18,7 +18,7 @@ const ImportOrderDetail = () => {
   const [listConsignments, setListConsignments] = useState([]);
   const [createdDate] = useState(new Date().getTime());
   const [confirmedDate] = useState(new Date().getTime());
-  const pages = [2, 20, 50];
+  const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);

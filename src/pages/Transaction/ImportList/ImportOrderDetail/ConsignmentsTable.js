@@ -58,6 +58,7 @@ const ConsignmentsTable = ({ listConsignments }) => {
               //   selected={islistConsignmentselected}
               selected={false}
             >
+              {/* TODO: Sửa phần index khi phân trang */}
               <TableCell>{index}</TableCell>
               <TableCell>{consignment?.productCode}</TableCell>
               <TableCell>{consignment?.productName}</TableCell>

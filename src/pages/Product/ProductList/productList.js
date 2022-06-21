@@ -3,11 +3,12 @@ import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import CategoryService from '@/services/categoryService';
 import ManufactorService from '@/services/manufactorService';
 import { getProductList } from '@/slices/ProductSlice';
-import { Search } from '@mui/icons-material';
+import { Search, Add } from '@mui/icons-material';
 import {
   Box,
   Button,
   Card,
+  Container,
   InputAdornment,
   Paper,
   Select,
@@ -54,8 +55,15 @@ const useStyles = makeStyles({
     minHeight: '56px',
   },
   tableStyle: {
-    padding: '20px'
-  }
+    padding: '20px',
+  },
+  panelFilter: {
+    padding: '24px 0',
+    marginBottom: '24px'
+  },
+  cardStyle: {
+    padding: '12px',
+  },
 });
 
 const customStyles = {
@@ -125,7 +133,7 @@ const ProductList = () => {
       let target = e.target;
       console.log(e.target.value);
       setPage(0);
-      searchProduct({ ...searchParams, productName: target.value })
+      searchProduct({ ...searchParams, productName: target.value });
       // fetchProductList();
     }
   };
@@ -161,15 +169,15 @@ const ProductList = () => {
 
   const handleChangeCategory = (value) => {
     setSelectedCategory(value);
-    setSearchParams({ ...searchParams, categoryId: value.id })
-    searchProduct({ ...searchParams, categoryId: value.id })
+    setSearchParams({ ...searchParams, categoryId: value.id });
+    searchProduct({ ...searchParams, categoryId: value.id });
     console.log('changeCategory', value);
   };
   // TODO: searchParam không thay đổi ngay sau khi setSearchParam
   const handleChangeManufactor = (value) => {
     setSelectedManufactor(value);
-    setSearchParams({ ...searchParams, manufactorId: value.id })
-    searchProduct({ ...searchParams, manufactorId: value.id })
+    setSearchParams({ ...searchParams, manufactorId: value.id });
+    searchProduct({ ...searchParams, manufactorId: value.id });
     console.log('changeManufactor', value);
   };
 
@@ -186,7 +194,7 @@ const ProductList = () => {
       // console.log('mapCategoryList',result)
       // setCategoryList(result)
     } catch (error) {
-      toast.error('Failed to fetch category list: ', error)
+      toast.error('Failed to fetch category list: ', error);
       console.log('Failed to fetch category list: ', error);
     }
   };
@@ -201,9 +209,8 @@ const ProductList = () => {
 
       const rawList = response.data.manufactor;
       return rawList;
-
     } catch (error) {
-      toast.error('Failed to fetch manufactor list: ', error)
+      toast.error('Failed to fetch manufactor list: ', error);
       console.log('Failed to fetch manufactor list: ', error);
     }
   };
@@ -235,7 +242,7 @@ const ProductList = () => {
       const params = {
         pageIndex: page + 1,
         pageSize: rowsPerPage,
-        ...searchParams
+        ...searchParams,
         // productName: searchParams.productName,
         // productCode: searchParams.productCode,
         // manufactorId: searchParams.manufactorId,
@@ -258,16 +265,16 @@ const ProductList = () => {
     fetchProductList();
     // return () => {
     //   // fetchCategoryList();
-      
+
     // }
-    
+
     // console.log(products.data.product);
     // console.log(loading)
     // console.log('productList', productList);
   }, [page, rowsPerPage]);
   return (
     <>
-      <Paper>
+      <Container maxWidth='xl'>
         <Stack
           direction="row"
           justifyContent="flex-end"
@@ -276,106 +283,118 @@ const ProductList = () => {
         >
           <Button
             variant="contained"
-            
+            startIcon={<Add />}
             onClick={() => handleOnclickAddNewProduct()}
           >
             Thêm mới
           </Button>
-          <Button variant="contained" color="secondary">Xuất file excel</Button>
-          <Button variant="contained" color="secondary">Nhập file excel</Button>
+          <Button
+            variant="contained"
+            color="secondary"
+          >
+            Xuất file excel
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+          >
+            Nhập file excel
+          </Button>
         </Stack>
-        <Toolbar>
-          {/* <Box
+        <Card className={classes.panelFilter}>
+          <Toolbar>
+            {/* <Box
             backgroundColor="green"
             fullWidth="true"
             display="flex"
             justifyContent="space-between"
           > */}
 
-          <Box className={classes.toolbar}>
-            <Formik
-              initialValues={{
-                productName: '',
-                categoryId: '',
-                manufactorId: '1',
-                sort: 'asc',
-              }}
-              // validationSchema={FORM_VALIDATION}
-              // onSubmit={handleLogin}
-            >
-              <Form>
-                <Box className={classes.toolbarContainer}>
-                  <Box className={classes.searchField}>
-                    {/* TODO: handleChange search */}
-                    <TextfieldWrapper
-                      id="outlined-basic"
-                      name="productName"
-                      placeholder="Search"
-                      label={null}
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Search />
-                          </InputAdornment>
-                        ),
-                      }}
-                      onKeyDown={handleSearch}
-                      // onChange={handleSearchChange}
-                    />
-                  </Box>
-                  <Box className={classes.selectBoxContainer}>
-                    <AsyncSelect
-                      className={classes.selectBox}
-                      styles={customStyles}
-                      placeholder="Danh mục"
-                      cacheOptions
-                      defaultOptions
-                      isSearchable={false}
-                      components={<Select />}
-                      value={selectedCategory}
-                      getOptionLabel={(e) => e.name}
-                      getOptionValue={(e) => e.id}
-                      loadOptions={() => fetchCategoryList()}
-                      onInputChange={handleInputChangeCategory}
-                      onChange={(e) => handleChangeCategory(e)}
-                    />
-               
-                    <AsyncSelect
-                      className={classes.selectBox}
-                      styles={customStyles}
-                      placeholder="Nhà cung cấp"
-                      cacheOptions
-                      defaultOptions
-                      isSearchable={false}
-                      components={<Select />}
-                      value={selectedManufactor}
-                      getOptionLabel={(e) => e.name}
-                      getOptionValue={(e) => e.id}
-                      loadOptions={() => fetchManufactorList()}
-                      onInputChange={handleInputChangeManufactor}
-                      onChange={(e) => handleChangeManufactor(e)}
-                    />
-                    {/* <SelectWrapper
+            <Box className={classes.toolbar}>
+              <Formik
+                initialValues={{
+                  productName: '',
+                  categoryId: '',
+                  manufactorId: '1',
+                  sort: 'asc',
+                }}
+                // validationSchema={FORM_VALIDATION}
+                // onSubmit={handleLogin}
+              >
+                <Form>
+                  <Box className={classes.toolbarContainer}>
+                    <Box className={classes.searchField}>
+                      {/* TODO: handleChange search */}
+                      <TextfieldWrapper
+                        id="outlined-basic"
+                        name="productName"
+                        placeholder="Search"
+                        label={null}
+                        variant="outlined"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Search />
+                            </InputAdornment>
+                          ),
+                        }}
+                        onKeyDown={handleSearch}
+                        // onChange={handleSearchChange}
+                      />
+                    </Box>
+                    <Box className={classes.selectBoxContainer}>
+                      <AsyncSelect
+                        className={classes.selectBox}
+                        styles={customStyles}
+                        placeholder="Danh mục"
+                        cacheOptions
+                        defaultOptions
+                        isSearchable={false}
+                        components={<Select />}
+                        value={selectedCategory}
+                        getOptionLabel={(e) => e.name}
+                        getOptionValue={(e) => e.id}
+                        loadOptions={() => fetchCategoryList()}
+                        onInputChange={handleInputChangeCategory}
+                        onChange={(e) => handleChangeCategory(e)}
+                      />
+
+                      <AsyncSelect
+                        className={classes.selectBox}
+                        styles={customStyles}
+                        placeholder="Nhà cung cấp"
+                        cacheOptions
+                        defaultOptions
+                        isSearchable={false}
+                        components={<Select />}
+                        value={selectedManufactor}
+                        getOptionLabel={(e) => e.name}
+                        getOptionValue={(e) => e.id}
+                        loadOptions={() => fetchManufactorList()}
+                        onInputChange={handleInputChangeManufactor}
+                        onChange={(e) => handleChangeManufactor(e)}
+                      />
+                      {/* <SelectWrapper
                       label="Nhà cung cáp"
                       name="manufactorId"
                       options={manufacturerList}
                       className={classes.selectBox}
                     /> */}
-                    {/* <SelectWrapper label="Ngày khởi tạo" name="createdAt" options={categoryList}/> */}
-                    {/* <SelectWrapper
+                      {/* <SelectWrapper label="Ngày khởi tạo" name="createdAt" options={categoryList}/> */}
+                      {/* <SelectWrapper
                       label="Sắp xếp"
                       name="sort"
                       options={sortTypeList}
                       className={classes.selectBox}
                     /> */}
+                    </Box>
                   </Box>
-                </Box>
-              </Form>
-            </Formik>
-            {/* </Box> */}
-          </Box>
-        </Toolbar>
+                </Form>
+              </Formik>
+              {/* </Box> */}
+            </Box>
+          </Toolbar>
+        </Card>
 
         {loading ? (
           <> Loading ... </>
@@ -383,38 +402,39 @@ const ProductList = () => {
           <Card className={classes.tableStyle}>
             {totalRecord > 0 ? (
               <Box>
-              <TblContainer>
-              <TblHead />
-              <TableBody>
-                {productList.map((item) => (
-                  <TableRow
-                    key={item.id}
-                    onClick={() => handleOnClickTableRow(item.id)}
-                  >
-                    <TableCell>{item.id}</TableCell>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.categoryName}</TableCell>
-                    <TableCell>{item.manufactorName}</TableCell>
-                    <TableCell>{item.quantity}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </TblContainer>
-            <TablePagination
-              component="div"
-              page={page}
-              rowsPerPageOptions={pages}
-              rowsPerPage={rowsPerPage}
-              
-              count={totalRecord}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            /></Box>
-            ): (<Typography> Không tìm có kết quả phù hợp </Typography>)}
-            
+                <TblContainer>
+                  <TblHead />
+                  <TableBody>
+                    {productList.map((item) => (
+                      <TableRow
+                        key={item.id}
+                        onClick={() => handleOnClickTableRow(item.id)}
+                      >
+                        <TableCell>{item.productCode}</TableCell>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.categoryName}</TableCell>
+                        <TableCell>{item.manufactorName}</TableCell>
+                        <TableCell>{item.quantity}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </TblContainer>
+                <TablePagination
+                  component="div"
+                  page={page}
+                  rowsPerPageOptions={pages}
+                  rowsPerPage={rowsPerPage}
+                  count={totalRecord}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+              </Box>
+            ) : (
+              <Typography> Không tìm có kết quả phù hợp </Typography>
+            )}
           </Card>
         )}
-      </Paper>
+      </Container>
     </>
   );
 };

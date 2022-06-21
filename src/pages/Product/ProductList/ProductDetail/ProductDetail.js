@@ -105,7 +105,7 @@ const ProductDetail = () => {
                   />
                 </Card>
               ) : (
-                <Box> Sản phẩm chưa có lô hàng nào</Box>
+                <Card> Sản phẩm chưa có lô hàng nào</Card>
               )}
             </Grid>
           </Grid>

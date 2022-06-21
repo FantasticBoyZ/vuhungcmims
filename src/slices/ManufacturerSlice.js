@@ -7,7 +7,17 @@ export const getManufacturerList = createAsyncThunk('manufacturer/get-list' , as
   return manufacturerList;
 })
 
-const categorySlice = createSlice({
+export const getManufacturerById = createAsyncThunk('manufacturer/get-one' , async (id, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const manufacturerList = await manufactorService.getManufacturerById(id);
+  return manufacturerList;
+})
+
+export const saveManufacturer = createAsyncThunk('manufacturer/save', async (manufacturer) => {
+  return await manufactorService.saveManufacturer(manufacturer)
+})
+
+const manufacturerSlice = createSlice({
   name: 'manufacturers',
   initialState: {
     loading: false,
@@ -27,11 +37,29 @@ const categorySlice = createSlice({
     },
     [getManufacturerList.fulfilled] :(state, action) => {
       state.loading = false;
-      state.products = action.payload;
     },
-    
+    [getManufacturerById.pending] : (state) => {
+      state.loading = true;
+    },
+    [getManufacturerById.rejected] :(state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getManufacturerById.fulfilled] :(state, action) => {
+      state.loading = false;
+    },
+    [saveManufacturer.pending] : (state) => {
+      state.loading = true;
+    },
+    [saveManufacturer.rejected] :(state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [saveManufacturer.fulfilled] :(state, action) => {
+      state.loading = false;
+    },
   }
 });
 
-const { reducer: categoryReducer} = categorySlice;
-export default categoryReducer;
+const { reducer: manufacturerReducer} = manufacturerSlice;
+export default manufacturerReducer;
