@@ -21,26 +21,26 @@ const useStyles = makeStyles({
     color: 'warning',
   },
   tableRow: {
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  },
 });
 
-
-const ConsignmentsTable = ({ consignments }) => {
+const ConsignmentsTable = ({ listConsignments }) => {
   const dataTest = {
     id: 1,
     productCode: 'GACH23',
     productName: 'Gạch men 60x60',
     unitMeasure: 'Viên',
     quantity: 54,
-    unitPrice: 100000
-  }
-  const formatCurrency = (value) => value.toLocaleString('it-IT', { style: 'currency', currency: 'VND' });
+    unitPrice: 100000,
+  };
+  const formatCurrency = (value) =>
+    value.toLocaleString('it-IT', { style: 'currency', currency: 'VND' });
   return (
     <TableContainer>
       <Table>
         <TableHead>
-          <TableRow >
+          <TableRow>
             <TableCell>STT</TableCell>
             <TableCell>Mã sản phẩm</TableCell>
             <TableCell>Tên sản phẩm</TableCell>
@@ -51,20 +51,24 @@ const ConsignmentsTable = ({ consignments }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          <TableRow
-            hover
-            // key={consignment.id}
-            //   selected={isconsignmentselected}
-            selected={false}
-          >
-            <TableCell>{dataTest.id}</TableCell>
-            <TableCell>{dataTest.productCode}</TableCell>
-            <TableCell>{dataTest.productName}</TableCell>
-            <TableCell>{dataTest.unitMeasure}</TableCell>
-            <TableCell>{dataTest.quantity}</TableCell>
-            <TableCell>{formatCurrency(dataTest.unitPrice)}</TableCell>
-            <TableCell>{formatCurrency(dataTest.quantity * dataTest.unitPrice)}</TableCell>
-          </TableRow>
+          {listConsignments.map((consignment, index) => (
+            <TableRow
+              hover
+              key={index}
+              //   selected={islistConsignmentselected}
+              selected={false}
+            >
+              <TableCell>{index}</TableCell>
+              <TableCell>{consignment?.productCode}</TableCell>
+              <TableCell>{consignment?.productName}</TableCell>
+              <TableCell>{consignment?.unitMeasure}</TableCell>
+              <TableCell>{consignment?.quantity}</TableCell>
+              <TableCell>{formatCurrency(consignment?.price || '')}</TableCell>
+              <TableCell>
+                {formatCurrency(consignment?.quantity * consignment?.price)}
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </TableContainer>

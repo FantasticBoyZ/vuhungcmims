@@ -16,6 +16,12 @@ export const saveProduct = createAsyncThunk('product/save', async (product) => {
   return await productService.saveProduct(product)
 })
 
+export const getProductByImportOrderId = createAsyncThunk('product/get-by-import-order' , async (params, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const productList = await productService.getProductByImportOrderId(params);
+  return productList;
+})
+
 const productSlice = createSlice({
   name: 'products',
   initialState: {

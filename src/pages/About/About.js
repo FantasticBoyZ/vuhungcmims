@@ -1,6 +1,6 @@
 import SelectWrapper from '@/components/Common/FormsUI/Select';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
-import { Box, Typography } from '@mui/material';
+import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
@@ -29,20 +29,17 @@ const About = () => {
   const options = [
     { value: 'chocolate', label: 'Chocolate' },
     { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' }
-  ]
+    { value: 'vanilla', label: 'Vanilla' },
+  ];
   // const sortTypeList = {
   //   'asc': 'tăng',
   //   'desc': 'giảm',
   // };
 
-  const handleChange = (
-    newValue,
-    actionMeta
-  ) => {
+  const handleChange = (newValue, actionMeta) => {
     console.log(newValue);
-    setSelectedValue(newValue.value)
-    console.log('alo',selectedValue)
+    setSelectedValue(newValue.value);
+    console.log('alo', selectedValue);
     console.log(`action handleChange: ${actionMeta.action}`);
   };
   const handleInputChange = (inputValue, actionMeta) => {
@@ -50,6 +47,13 @@ const About = () => {
     console.log(inputValue);
     console.log(`action handleInputChange: ${actionMeta.action}`);
     console.groupEnd();
+  };
+
+  const [age, setAge] = useState('');
+
+  const handleAgeChange = (event) => {
+    console.log(event.target.value)
+    setAge(event.target.value);
   };
   return (
     <Box>
@@ -73,7 +77,9 @@ const About = () => {
               label="Nhóm hàng"
               name="category"
               options={categoryList}
-              onChange={(e) => {console.log(e.target.value)}}
+              onChange={(e) => {
+                console.log(e.target.value);
+              }}
             />
             <SelectWrapper
               label="người tạo"
@@ -84,7 +90,7 @@ const About = () => {
             <CreatableSelect
               isClearable
               onChange={(value, actionMeta) => handleChange(value, actionMeta)}
-              value={categorys.filter(({value}) => value === selectedValue)}
+              value={categorys.filter(({ value }) => value === selectedValue)}
               onInputChange={handleInputChange}
               options={categorys}
             />
@@ -92,6 +98,22 @@ const About = () => {
           </Form>
         )}
       </Formik>
+
+      <FormControl fullWidth>
+        <InputLabel id="demo-simple-select-label">Age</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={age}
+          label="Age"
+          onChange={handleAgeChange}
+        >
+          { categorys.map((item) => (
+            <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>
+            ))}
+          
+        </Select>
+      </FormControl>
     </Box>
   );
 };

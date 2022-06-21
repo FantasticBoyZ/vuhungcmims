@@ -1,9 +1,15 @@
 import importOrderService from '@/services/importOrderService';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-export const getImportOrderList = createAsyncThunk('importOrderList', async (params, thunkAPi) => {
+export const getImportOrderList = createAsyncThunk('importOrder/list', async (params, thunkAPi) => {
   // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
   const importOrder = await importOrderService.getImportOrderList(params);
+  return importOrder;
+})
+
+export const getImportOrderById = createAsyncThunk('importOrder/detail', async (params, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const importOrder = await importOrderService.getImportOrderById(params);
   return importOrder;
 })
 
@@ -32,7 +38,18 @@ const importOrderSlice = createSlice({
     },
     [getImportOrderList.fulfilled]: (state, action) => {
       state.loading = false;
-      state.importOrderList = action.payload;
+      // state.importOrderList = action.payload;
+    },
+    [getImportOrderById.pending]: (state) => {
+      state.loading = true;
+    },
+    [getImportOrderById.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getImportOrderById.fulfilled]: (state, action) => {
+      state.loading = false;
+      // state.importOrderList = action.payload;
     }
   }
 });

@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
 import SelectWrapper from '@/components/Common/FormsUI/Select';
 import ImportOrders from '@/pages/Transaction/ImportList/ImportOrders';
-import { CloseSharp, Search } from '@mui/icons-material';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { Search } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
-import { Card } from '@mui/material';
+import { Card, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { useEffect, useState } from 'react';
 
+import CustomTablePagination from '@/components/Common/TablePagination';
+import { getImportOrderList } from '@/slices/ImportOrderSlice';
 import {
   Box,
   Button,
@@ -19,10 +21,9 @@ import {
   Toolbar,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { Form, Formik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { getImportOrderList } from '@/slices/ImportOrderSlice';
-import { unwrapResult } from '@reduxjs/toolkit';
 
 const useStyles = makeStyles({
   searchField: {
@@ -42,27 +43,78 @@ const useStyles = makeStyles({
   panelFilter: {
     padding: '24px 0',
   },
+  cardStyle: {
+    padding: '12px',
+  },
 });
 
-const createrList = {
-  1: 'Vũ Tiến Khôi',
-  2: 'Trịnh Bá Minh Ninh',
-  3: 'Nguyễn Thị Hiền',
-  4: 'Nguyễn Đức Chính',
-  5: 'Dương Đức Trọng',
-};
+const createrList = [
+  { id:1,name: 'Vũ Tiến Khôi' },
+  { id:2,name: 'Trịnh Bá Minh Ninh' },
+  { id:3,name: 'Nguyễn Thị Hiền' },
+  { id:4,name: 'Nguyễn Đức Chính' },
+  { id:5,name: 'Dương Đức Trọng' },
+];
 
 const ImportList = () => {
   const classes = useStyles();
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [creatorId, setCreatorId] = useState('');
+  const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowserPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRecord, setTotalRecord] = useState();
   const [importOrderList, setImportOrderList] = useState();
+  const [searchParams, setSearchParams] = useState({
+    // billRefernce: '',
+    // statusName: '',
+  });
 
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.importOrders }));
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleSearch = (e) => {
+    if (e.keyCode === 13) {
+      let target = e.target;
+      console.log(e.target.value);
+      setPage(0);
+      searchImportOrder({ ...searchParams, billRefernce: target.value })
+      // fetchProductList();
+    }
+  };
+
+  const handleChangeCreator = (event) => {
+    setCreatorId(event.target.value);
+  };
+
+  const searchImportOrder = async (searchParams) => {
+    try {
+      const params = {
+        pageIndex: page,
+        pageSize: rowsPerPage,
+        ...searchParams
+      };
+      const actionResult = await dispatch(getImportOrderList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        setTotalRecord(dataResult.data.totalRecord);
+        setImportOrderList(dataResult.data.orderList);
+      }
+    } catch (error) {
+      console.log('Failed to fetch product list: ', error);
+    }
+  };
 
   const fetchImportOrderList = async () => {
     try {
@@ -74,7 +126,7 @@ const ImportList = () => {
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
       if (dataResult.data) {
-        // setTotalRecord(dataResult.data.totalRecord);
+        setTotalRecord(dataResult.data.totalRecord);
         setImportOrderList(dataResult.data.orderList);
       }
     } catch (error) {
@@ -86,7 +138,7 @@ const ImportList = () => {
   useEffect(() => {
     console.log(startDate + ' ' + endDate);
     fetchImportOrderList();
-  }, []);
+  }, [page, rowsPerPage]);
 
   return (
     <Container maxWidth="xl">
@@ -130,10 +182,11 @@ const ImportList = () => {
                 </InputAdornment>
               ),
             }}
+            onKeyDown={handleSearch}
             // onChange={handleSearch}
           />
           <Box className={classes.selectBox}>
-            <Formik
+            {/* <Formik
               initialValues={{
                 creater: '1',
               }}
@@ -152,7 +205,25 @@ const ImportList = () => {
                   />
                 </Stack>
               </Form>
-            </Formik>
+            </Formik> */}
+            <FormControl fullWidth>
+              <InputLabel id="select-creator">Người tạo</InputLabel>
+              <Select
+                id="creator"
+                value={creatorId}
+                label="Người tạo"
+                onChange={handleChangeCreator}
+              >
+                {createrList.map((item) => (
+                  <MenuItem
+                    key={item.id}
+                    value={item.id}
+                  >
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
         </Toolbar>
         <div>
@@ -195,7 +266,25 @@ const ImportList = () => {
           item
           xs={12}
         >
-          {loading ? <>Loading...</> : <ImportOrders importOrders={importOrderList} />}
+          <Card className={classes.cardStyle}>
+            {loading ? (
+              <>Loading...</>
+            ) : (
+              <Box>
+                <ImportOrders importOrders={importOrderList} />
+                {totalRecord && (
+                  <CustomTablePagination
+                    page={page}
+                    pages={pages}
+                    rowsPerPage={rowsPerPage}
+                    totalRecord={totalRecord}
+                    handleChangePage={handleChangePage}
+                    handleChangeRowsPerPage={handleChangeRowsPerPage}
+                  />
+                )}
+              </Box>
+            )}
+          </Card>
         </Grid>
       </Grid>
     </Container>
