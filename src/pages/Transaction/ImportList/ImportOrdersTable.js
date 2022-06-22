@@ -1,3 +1,4 @@
+import Label from '@/components/Common/Label';
 import {
   Box, Checkbox, Table,
   TableBody,
@@ -43,6 +44,27 @@ const useStyles = makeStyles((theme) => ({
   },
   
 }));
+
+const getStatusLabel = (importOrderStatus) => {
+  const map = {
+    failed: {
+      text: 'Đã huỷ',
+      color: 'error'
+    },
+    completed: {
+      text: 'Đã nhập kho',
+      color: 'success'
+    },
+    pending: {
+      text: 'Đang chờ xử lý',
+      color: 'warning'
+    }
+  };
+
+  const { text, color } = map[importOrderStatus];
+
+  return <Label color={color}>{text}</Label>;
+};
 
 const ImportOrdersTable = ({ importOrders }) => {
   const [selectedImportOrders, setSelectedImportOrders] = useState([]);
@@ -98,7 +120,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                 <TableCell>Mã nhập kho</TableCell>
                 <TableCell>Thời gian</TableCell>
                 <TableCell>Nhà cung cấp</TableCell>
-                <TableCell>Trạng thái</TableCell>
+                <TableCell align='center'>Trạng thái</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -158,10 +180,10 @@ const ImportOrdersTable = ({ importOrders }) => {
                         {importOrder.manufactorName}
                       </Typography>
                     </TableCell>
-                    <TableCell>
+                    <TableCell align='center'>
                       {/* TODO: style status  */}
                       <Typography className={classes.completed}>
-                        {importOrder.statusName}
+                      {getStatusLabel(importOrder.statusName)}
                       </Typography>
                     </TableCell>
                   </TableRow>

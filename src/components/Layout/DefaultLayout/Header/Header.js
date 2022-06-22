@@ -31,11 +31,25 @@ const UserBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
 }));
 
-const titles = {
-  "/dashboard": "Hệ thống quản lý kho vật liệu xây dựng",
-  "/product": "Danh sách sản phẩm",
-  "/import": "Danh sách phiếu nhập kho"
-};
+const titles = [
+  {url:"/dashboard", title: "Hệ thống quản lý kho vật liệu xây dựng"},
+  {url:"/product", title:  "Danh sách sản phẩm"},
+  {url:"/product/detail", title:  "Thông tin sản phẩm"},
+  {url:"/product/add", title:  "Thêm mới sản phẩm"},
+  {url:"/product/edit", title:  "Sửa sản phẩm"},
+  {url:"/category", title:  "Danh sách danh mục"},
+  {url:"/category/detail", title:  "Thông tin danh mục"},
+  {url:"/category/add", title:  "Thêm mới danh mục"},
+  {url:"/category/edit", title:  "Sửa danh mục"},
+  {url:"/manufacturer", title:  "Danh sách nhà cung cấp"},
+  {url:"/manufacturer/detail", title:  "Thông tin danh mục"},
+  {url:"/manufacturer/add", title:  "Thêm mới danh mục"},
+  {url:"/manufacturer/edit", title:  "Sửa danh mục"},
+  {url:"/import", title:  "Danh sách phiếu nhập kho"},
+  {url:"/import/detail", title:  "Thông tin phiếu nhập kho"},
+  {url:"/import/add", title:  "Thông tin phiếu nhập kho"},
+  {url:"/import/edit", title: "Thông tin phiếu nhập kho"},
+];
 
 
 
@@ -52,7 +66,11 @@ const Header = () => {
   };
 
   useEffect(() => {
-    setTitle(titles[location.pathname])
+    titles.forEach((item) => {
+      if(location.pathname.includes(item.url)){
+        setTitle(item.title)
+      }
+    })    
   }, [location.pathname])
   return (
     <AppBar sx={{ backgroundColor: "white", color: 'black' }} position="sticky">

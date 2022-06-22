@@ -7,9 +7,9 @@ const importOrderService = {
     return axiosClient.get(url, { params, headers: authHeader() })
   },
 
-  getImportOrderById: (params) => {
-    const url = '/import-order/infor-detail';
-    return axiosClient.get(url, { params, headers: authHeader() })
+  getImportOrderById: (orderId) => {
+    const url = `/import-order/detail/${orderId}`;
+    return axiosClient.get(url, {  headers: authHeader() })
   }
 }
 

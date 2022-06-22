@@ -7,9 +7,9 @@ export const getImportOrderList = createAsyncThunk('importOrder/list', async (pa
   return importOrder;
 })
 
-export const getImportOrderById = createAsyncThunk('importOrder/detail', async (params, thunkAPi) => {
+export const getImportOrderById = createAsyncThunk('importOrder/detail', async (id, thunkAPi) => {
   // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
-  const importOrder = await importOrderService.getImportOrderById(params);
+  const importOrder = await importOrderService.getImportOrderById(id);
   return importOrder;
 })
 

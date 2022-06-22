@@ -34,19 +34,19 @@ const privateRoutes = [
 
   // Product route
   { path: '/product', component: productList },
-  { path: '/product/:productId', component: ProductDetail },
+  { path: '/product/detail/:productId', component: ProductDetail },
   { path: '/product/add', component: AddEditProductForm },
   { path: '/product/edit/:productId', component: AddEditProductForm },
 
   // Category route
   { path: '/category', component: CategoryList },
-  { path: '/category/:categoryId', component: CategoryDetail },
+  { path: '/category/detail/:categoryId', component: CategoryDetail },
   { path: '/category/add', component: AddEditCategoryForm },
   { path: '/category/edit/:categoryId', component: AddEditCategoryForm },
 
   // Manufactor route
   { path: '/manufacturer', component: ManufactorList },
-  { path: '/manufacturer/:manufacturerId', component: ManufacturerDetail },
+  { path: '/manufacturer/detail/:manufacturerId', component: ManufacturerDetail },
   { path: '/manufacturer/add', component: AddEditManufacturerForm },
   { path: '/manufacturer/edit/:manufacturerId', component: AddEditManufacturerForm },
 

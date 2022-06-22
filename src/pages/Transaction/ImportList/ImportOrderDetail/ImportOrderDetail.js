@@ -1,3 +1,4 @@
+import Label from '@/components/Common/Label';
 import CustomTablePagination from '@/components/Common/TablePagination';
 import ConsignmentsTable from '@/pages/Transaction/ImportList/ImportOrderDetail/ConsignmentsTable';
 import { getImportOrderById } from '@/slices/ImportOrderSlice';
@@ -10,8 +11,30 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { vi } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import './style.css';
+
+const getStatusLabel = (importOrderStatus) => {
+  const map = {
+    failed: {
+      text: 'Đã huỷ',
+      color: 'error'
+    },
+    completed: {
+      text: 'Đã nhập kho',
+      color: 'success'
+    },
+    pending: {
+      text: 'Đang chờ xử lý',
+      color: 'warning'
+    }
+  };
+
+  const { text, color } = map[importOrderStatus];
+
+  return <Label color={color}>{text}</Label>;
+};
+
 const ImportOrderDetail = () => {
   const { importOrderId } = useParams();
   const [importOrder, setImportOrder] = useState();
@@ -22,6 +45,7 @@ const ImportOrderDetail = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
+  const navigate = useNavigate()
   const dataTest = {
     id: 1,
     orderCode: 'Test001',
@@ -70,13 +94,17 @@ const ImportOrderDetail = () => {
     setPage(0);
   };
 
+  const handleOnClickBack = () => {
+    navigate('/import')
+  }
+
   useEffect(() => {
     const fetchImportOrderDetail = async () => {
       try {
-        const params = {
-          orderId: importOrderId,
-        };
-        const actionResult = await dispatch(getImportOrderById(params));
+        // const params = {
+        //   orderId: importOrderId,
+        // };
+        const actionResult = await dispatch(getImportOrderById(importOrderId));
         const dataResult = unwrapResult(actionResult);
         if (dataResult.data) {
           setImportOrder(dataResult.data.inforDetail);
@@ -126,6 +154,7 @@ const ImportOrderDetail = () => {
                       variant="text"
                       startIcon={<ArrowBackIosNewIcon />}
                       color="inherit"
+                      onClick={handleOnClickBack}
                     >
                       Quay trở lại
                     </Button>
@@ -135,7 +164,7 @@ const ImportOrderDetail = () => {
                     {importOrder.billRefernce}{' '}
                   </Box>
                 </div>
-                <div className="status-oder">{importOrder.statusName}</div>
+                <div className="status-oder">{getStatusLabel(importOrder.statusName)}</div>
               </div>
               <div className="container">
                 <div className="left-panel">
