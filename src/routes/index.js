@@ -16,6 +16,8 @@ import productList from '@/pages/Product/ProductList/productList';
 import TestPost from '@/pages/TestPost/testPost';
 import ImportList from '@/pages/Transaction/ImportList/importList';
 import ImportOrderDetail from '@/pages/Transaction/ImportList/ImportOrderDetail/ImportOrderDetail';
+import StaffList from '@/pages/Staff/staffList';
+import StaffDetail from '@/pages/Staff/staffDetail';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -57,7 +59,8 @@ const privateRoutes = [
   { path: '/import/detail/:importOrderId', component: ImportOrderDetail },
   { path: '/denied', component: Profile, layout: null },
   { path: '*', component: NotFound, layout: null },
+  { path: 'staff', component: StaffList },
+  { path: 'staff/:staffId', component: StaffDetail },
 ];
 
 export { publicRoutes, privateRoutes };
-
