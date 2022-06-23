@@ -6,6 +6,7 @@ import AddEditCategoryForm from '@/pages/Category/AddEditCategory/AddEditCategor
 import CategoryDetail from '@/pages/Category/CategoryDetail/CategoryDetail';
 import CategoryList from '@/pages/Category/categoryList';
 import HomePage from '@/pages/Home/Home';
+import ImportGoods from '@/pages/Import/ImportGoods/ImportGoods';
 import AddEditManufacturerForm from '@/pages/Manufacturer/AddEditManufacturer/AddEditManufacturerForm';
 import ManufactorList from '@/pages/Manufacturer/manufactorList';
 import ManufacturerDetail from '@/pages/Manufacturer/ManufacturerDetail/ManufacturerDetail';
@@ -52,6 +53,7 @@ const privateRoutes = [
 
   // importOrder route
   { path: 'import', component: ImportList },
+  { path: 'import/importGoods', component: ImportGoods },
   { path: '/import/detail/:importOrderId', component: ImportOrderDetail },
   { path: '/denied', component: Profile, layout: null },
   { path: '*', component: NotFound, layout: null },
