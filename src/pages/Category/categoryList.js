@@ -1,23 +1,24 @@
+import Popup from '@/components/Common/Popup';
+import CustomTablePagination from '@/components/Common/TablePagination';
+import CategoryTable from '@/pages/Category/CategoryTable/CategoryTable';
+import { getCategoryList } from '@/slices/CategorySlice';
 import { Add, Search } from '@mui/icons-material';
 import {
   Box,
   Button,
   Card,
   InputAdornment,
-  Paper,
   Stack,
   TextField,
   Toolbar,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import React, { useEffect, useState } from 'react';
-import CategoryTable from '@/pages/Category/CategoryTable';
-import { getCategoryList } from '@/slices/CategorySlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { unwrapResult } from '@reduxjs/toolkit';
 import { Container } from '@mui/system';
-import CustomTablePagination from '@/components/Common/TablePagination';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import CategoryForm from './AddEditCategory/CategoryForm';
 
 const useStyles = makeStyles({
   searchField: {
@@ -49,6 +50,7 @@ const CategoryList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
   const [categoryList, setCategoryList] = useState([]);
+  const [openPopup, setOpenPopup] = useState(false);
   const [searchParams, setSearchParams] = useState({
     categoryName: '',
   });
@@ -77,8 +79,29 @@ const CategoryList = () => {
   };
 
   const handleOnclickAddNewProduct = () => {
-    navigate('/category/add');
+    // navigate('/category/add');
+    setOpenPopup(true);
   };
+
+  const closePopup = () => {
+    setOpenPopup(false);
+    searchCategory(searchParams);
+  };
+
+  const categoryListTest = [
+    {
+      id: 2,
+      name: 'son',
+      description: 'son dep',
+      subCategory: [
+        { id: 1, name: 'Son 365', description: 'son đẹp' },
+        { id: 2, name: 'Son 666', description: 'son đẹp' },
+      ],
+    },
+    { id: 3, name: 'Ngói', description: 'Ngói đẹp', subCategory: [] },
+    { id: 4, name: 'Ngói 2', description: 'Ngói đẹp 2', subCategory: [] },
+    { id: 5, name: 'Sắt', description: 'Sắt đẹp', subCategory: [] },
+  ];
 
   const searchCategory = async (searchParams) => {
     try {
@@ -178,7 +201,7 @@ const CategoryList = () => {
             <>Loading...</>
           ) : (
             <Box>
-              <CategoryTable categoryList={categoryList} />
+              <CategoryTable categoryList={categoryListTest} />
               <CustomTablePagination
                 page={page}
                 pages={pages}
@@ -191,6 +214,16 @@ const CategoryList = () => {
           )}
         </Card>
       </Box>
+      <Popup
+        title="Thêm danh mục"
+        openPopup={openPopup}
+        setOpenPopup={setOpenPopup}
+      >
+        <CategoryForm
+          closePopup={closePopup}
+          categoryId={null}
+        />
+      </Popup>
     </Container>
   );
 };

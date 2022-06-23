@@ -1,6 +1,7 @@
 import SelectWrapper from '@/components/Common/FormsUI/Select';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
-import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import axios from 'axios';
 import { Form, Formik } from 'formik';
 import { useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
@@ -35,6 +36,22 @@ const About = () => {
   //   'asc': 'tăng',
   //   'desc': 'giảm',
   // };
+ let formData = new FormData()
+
+  const onFileChange = (e) =>{
+    console.log("file", e.target.files[0])
+    if(e.target && e.target.files[0]) {
+      formData.append('file', e.target.files[0])
+    }
+  }
+
+  const submitFileData = () => {
+    axios.post('https://v2.convertapi.com/upload', { formData}).then(res => {
+      console.log(res)
+    }).catch(error => {
+      console.log(error)
+    })
+  }
 
   const handleChange = (newValue, actionMeta) => {
     console.log(newValue);
@@ -94,10 +111,12 @@ const About = () => {
               onInputChange={handleInputChange}
               options={categorys}
             />
+            <TextField type="file" name='file_upload' onChange={onFileChange}/>
             <pre>{JSON.stringify(values, null, 2)}</pre>
           </Form>
         )}
       </Formik>
+      <Button onClick={submitFileData}>Submit File</Button>
 
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">Age</InputLabel>

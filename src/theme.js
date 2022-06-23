@@ -9,7 +9,7 @@ const themeColors = {
   info: '#33C2FF',
   black: '#223354',
   white: '#ffffff',
-  primaryAlt: '#000C57'
+  primaryAlt: '#000C57',
 };
 
 const colors = {
@@ -29,7 +29,7 @@ const colors = {
     green1: 'linear-gradient(135deg, #FFF720 0%, #3CD500 100%)',
     green2: 'linear-gradient(to bottom, #00b09b, #96c93d)',
     black1: 'linear-gradient(100.66deg, #434343 6.56%, #000000 93.57%)',
-    black2: 'linear-gradient(60deg, #29323c 0%, #485563 100%)'
+    black2: 'linear-gradient(60deg, #29323c 0%, #485563 100%)',
   },
   shadows: {
     success:
@@ -42,14 +42,13 @@ const colors = {
     warning:
       '0px 1px 4px rgba(255, 163, 25, 0.25), 0px 3px 12px 2px rgba(255, 163, 25, 0.35)',
     card: '0px 9px 16px rgba(159, 162, 191, .18), 0px 2px 2px rgba(159, 162, 191, 0.32)',
-    cardSm:
-      '0px 2px 3px rgba(159, 162, 191, .18), 0px 1px 1px rgba(159, 162, 191, 0.32)',
+    cardSm: '0px 2px 3px rgba(159, 162, 191, .18), 0px 1px 1px rgba(159, 162, 191, 0.32)',
     cardLg:
-      '0 5rem 14rem 0 rgb(255 255 255 / 30%), 0 0.8rem 2.3rem rgb(0 0 0 / 60%), 0 0.2rem 0.3rem rgb(0 0 0 / 45%)'
+      '0 5rem 14rem 0 rgb(255 255 255 / 30%), 0 0.8rem 2.3rem rgb(0 0 0 / 60%), 0 0.2rem 0.3rem rgb(0 0 0 / 45%)',
   },
   layout: {
     general: {
-      bodyBg: '#f2f5f9'
+      bodyBg: '#f2f5f9',
     },
     sidebar: {
       background: themeColors.white,
@@ -61,8 +60,8 @@ const colors = {
       menuItemBgActive: '#f2f5f9',
       menuItemIconColor: lighten(themeColors.secondary, 0.3),
       menuItemIconColorActive: themeColors.primary,
-      menuItemHeadingColor: darken(themeColors.secondary, 0.3)
-    }
+      menuItemHeadingColor: darken(themeColors.secondary, 0.3),
+    },
   },
   alpha: {
     white: {
@@ -71,7 +70,7 @@ const colors = {
       30: alpha(themeColors.white, 0.3),
       50: alpha(themeColors.white, 0.5),
       70: alpha(themeColors.white, 0.7),
-      100: themeColors.white
+      100: themeColors.white,
     },
     trueWhite: {
       5: alpha(themeColors.white, 0.02),
@@ -79,7 +78,7 @@ const colors = {
       30: alpha(themeColors.white, 0.3),
       50: alpha(themeColors.white, 0.5),
       70: alpha(themeColors.white, 0.7),
-      100: themeColors.white
+      100: themeColors.white,
     },
     black: {
       5: alpha(themeColors.black, 0.02),
@@ -87,45 +86,45 @@ const colors = {
       30: alpha(themeColors.black, 0.3),
       50: alpha(themeColors.black, 0.5),
       70: alpha(themeColors.black, 0.7),
-      100: themeColors.black
-    }
+      100: themeColors.black,
+    },
   },
   secondary: {
     lighter: lighten(themeColors.secondary, 0.85),
     light: lighten(themeColors.secondary, 0.25),
     main: themeColors.secondary,
-    dark: darken(themeColors.secondary, 0.2)
+    dark: darken(themeColors.secondary, 0.2),
   },
   primary: {
     lighter: lighten(themeColors.primary, 0.85),
     light: lighten(themeColors.primary, 0.3),
     main: themeColors.primary,
-    dark: darken(themeColors.primary, 0.2)
+    dark: darken(themeColors.primary, 0.2),
   },
   success: {
     lighter: lighten(themeColors.success, 0.85),
     light: lighten(themeColors.success, 0.3),
     main: themeColors.success,
-    dark: darken(themeColors.success, 0.2)
+    dark: darken(themeColors.success, 0.2),
   },
   warning: {
     lighter: lighten(themeColors.warning, 0.85),
     light: lighten(themeColors.warning, 0.3),
     main: themeColors.warning,
-    dark: darken(themeColors.warning, 0.2)
+    dark: darken(themeColors.warning, 0.2),
   },
   error: {
     lighter: lighten(themeColors.error, 0.85),
     light: lighten(themeColors.error, 0.3),
     main: themeColors.error,
-    dark: darken(themeColors.error, 0.2)
+    dark: darken(themeColors.error, 0.2),
   },
   info: {
     lighter: lighten(themeColors.info, 0.85),
     light: lighten(themeColors.info, 0.3),
     main: themeColors.info,
-    dark: darken(themeColors.info, 0.2)
-  }
+    dark: darken(themeColors.info, 0.2),
+  },
 };
 
 export const theme = createTheme({
@@ -146,6 +145,24 @@ export const theme = createTheme({
       blue: 'blue',
       green: 'green',
     },
+    // success: {
+    //   main:'#57CA22'
+    // },
+    // warning: {
+    //   main:'#FFA319'
+    // },
+    // error: {
+    //   main: '#FF1943'
+    // },
+    // info: {
+    //   main: '#33C2FF'
+    // },
+    // black: {
+    //   main: '#223354'
+    // },
+    // white: {
+    //   main: '#ffffff'
+    // },
   },
   colors: {
     gradients: {
@@ -164,14 +181,14 @@ export const theme = createTheme({
       green1: colors.gradients.green1,
       green2: colors.gradients.green2,
       black1: colors.gradients.black1,
-      black2: colors.gradients.black2
+      black2: colors.gradients.black2,
     },
     shadows: {
       success: colors.shadows.success,
       error: colors.shadows.error,
       primary: colors.shadows.primary,
       info: colors.shadows.info,
-      warning: colors.shadows.warning
+      warning: colors.shadows.warning,
     },
     alpha: {
       white: {
@@ -180,7 +197,7 @@ export const theme = createTheme({
         30: alpha(themeColors.white, 0.3),
         50: alpha(themeColors.white, 0.5),
         70: alpha(themeColors.white, 0.7),
-        100: themeColors.white
+        100: themeColors.white,
       },
       trueWhite: {
         5: alpha(themeColors.white, 0.02),
@@ -188,7 +205,7 @@ export const theme = createTheme({
         30: alpha(themeColors.white, 0.3),
         50: alpha(themeColors.white, 0.5),
         70: alpha(themeColors.white, 0.7),
-        100: themeColors.white
+        100: themeColors.white,
       },
       black: {
         5: alpha(themeColors.black, 0.02),
@@ -196,51 +213,51 @@ export const theme = createTheme({
         30: alpha(themeColors.black, 0.3),
         50: alpha(themeColors.black, 0.5),
         70: alpha(themeColors.black, 0.7),
-        100: themeColors.black
-      }
+        100: themeColors.black,
+      },
     },
     secondary: {
       lighter: alpha(themeColors.secondary, 0.1),
       light: lighten(themeColors.secondary, 0.3),
       main: themeColors.secondary,
-      dark: darken(themeColors.secondary, 0.2)
+      dark: darken(themeColors.secondary, 0.2),
     },
     primary: {
       lighter: alpha(themeColors.primary, 0.1),
       light: lighten(themeColors.primary, 0.3),
       main: themeColors.primary,
-      dark: darken(themeColors.primary, 0.2)
+      dark: darken(themeColors.primary, 0.2),
     },
     success: {
       lighter: alpha(themeColors.success, 0.1),
       light: lighten(themeColors.success, 0.3),
       main: themeColors.success,
-      dark: darken(themeColors.success, 0.2)
+      dark: darken(themeColors.success, 0.2),
     },
     warning: {
       lighter: alpha(themeColors.warning, 0.1),
       light: lighten(themeColors.warning, 0.3),
       main: themeColors.warning,
-      dark: darken(themeColors.warning, 0.2)
+      dark: darken(themeColors.warning, 0.2),
     },
     error: {
       lighter: alpha(themeColors.error, 0.1),
       light: lighten(themeColors.error, 0.3),
       main: themeColors.error,
-      dark: darken(themeColors.error, 0.2)
+      dark: darken(themeColors.error, 0.2),
     },
     info: {
       lighter: alpha(themeColors.info, 0.1),
       light: lighten(themeColors.info, 0.3),
       main: themeColors.info,
-      dark: darken(themeColors.info, 0.2)
-    }
+      dark: darken(themeColors.info, 0.2),
+    },
   },
   general: {
     reactFrameworkColor: '#00D8FF',
     borderRadiusSm: '6px',
     borderRadius: '10px',
     borderRadiusLg: '12px',
-    borderRadiusXl: '16px'
+    borderRadiusXl: '16px',
   },
 });
