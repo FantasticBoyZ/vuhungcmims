@@ -20,6 +20,9 @@ const useStyles = makeStyles({
   cardStyle: {
     padding: '12px',
   },
+  infoStyle: {
+    fontSize: '16px',
+  },
 });
 
 const ProductInformation = ({ product }) => {
@@ -61,23 +64,11 @@ const ProductInformation = ({ product }) => {
       <Divider />
       <Card className={classes.cardStyle}>
         <Grid container>
-          <Grid
-            item
-            xs={4}
-            // sx={{ backgroundColor:"green" }}
-          >
-            <CardMedia
-              component="img"
-              height="200"
-              sx={{ width: 200 }}
-              alt="Product Detail"
-              src="https://i.picsum.photos/id/604/200/300.jpg?hmac=6ceMKS8u7easDoKzWSaIiSTpRlTPn1OUOdfSJWou3uQ"
-            />
-          </Grid>
+          
           <Grid
             container
             item
-            xs={8}
+            xs={9}
           >
             <Grid
               xs={6}
@@ -85,38 +76,108 @@ const ProductInformation = ({ product }) => {
               // sx={{ backgroundColor:"red" }}
             >
               <Typography
-                fontSize="20px"
+                component={'span'}
+                className={classes.infoStyle}
                 lineHeight={2}
               >
-                Mã sản phẩm: <strong>{product.productCode}</strong>
+                <Grid container>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    Mã sản phẩm{' '}
+                  </Grid>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    : <strong>{product.productCode}</strong>
+                  </Grid>
+                </Grid>
               </Typography>
 
               <Typography
-                fontSize="20px"
+                component={'span'}
+                className={classes.infoStyle}
                 lineHeight={2}
               >
-                Danh mục: <strong>{product.categoryName}</strong>
+                <Grid container>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    Danh mục{' '}
+                  </Grid>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    : <strong>{product.categoryName}</strong>
+                  </Grid>
+                </Grid>
               </Typography>
 
               <Typography
-                fontSize="20px"
+                component={'span'}
+                className={classes.infoStyle}
                 lineHeight={2}
               >
-                Danh mục phụ: <strong>{product.subCategoryName}</strong>
+                <Grid container>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    Danh mục phụ
+                  </Grid>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    : <strong>{product.subCategoryName}</strong>
+                  </Grid>
+                </Grid>
               </Typography>
 
               <Typography
-                fontSize="20px"
+                component={'span'}
+                className={classes.infoStyle}
                 lineHeight={2}
               >
-                Đơn vị tính: <strong>{product.unitMeasure}</strong>
+                <Grid container>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    Đơn vị tính
+                  </Grid>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    : <strong>{product.unitMeasure}</strong>
+                  </Grid>
+                </Grid>
               </Typography>
 
               <Typography
-                fontSize="20px"
+                component={'span'}
+                className={classes.infoStyle}
                 lineHeight={2}
               >
-                Tồn kho: <strong>{product.quantity}</strong>
+                <Grid container>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    Tồn kho
+                  </Grid>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    : <strong>{product.quantity}</strong>
+                  </Grid>
+                </Grid>
               </Typography>
             </Grid>
 
@@ -126,22 +187,37 @@ const ProductInformation = ({ product }) => {
               // sx={{ backgroundColor:"blue" }}
             >
               <Typography
-                fontSize="20px"
+                component={'span'}
+                className={classes.infoStyle}
                 lineHeight={2}
               >
-                Nhà cung cấp: <strong>{product.manufactorName}</strong>
+                <Grid container>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    Nhà cung cấp
+                  </Grid>
+                  <Grid
+                    xs={6}
+                    item
+                  >
+                    : <strong>{product.manufactorName}</strong>
+                  </Grid>
+                </Grid>
               </Typography>
               <Typography
-                fontSize="20px"
+                className={classes.infoStyle}
                 lineHeight={2}
               >
-                Mô tả:{' '}
+                Mô tả{' '}
               </Typography>
               <Box>
                 <TextField
                   defaultValue={product.description}
+                  variant='standard'
                   multiline
-                  rows={4}
+                  
                   sx={{ width: '80%' }}
                   InputProps={{
                     readOnly: true,
@@ -149,6 +225,19 @@ const ProductInformation = ({ product }) => {
                 />
               </Box>
             </Grid>
+          </Grid>
+          <Grid
+            item
+            xs={3}
+            // sx={{ backgroundColor:"green" }}
+          >
+            <CardMedia
+              component="img"
+              height="180"
+              sx={{ width: 180 }}
+              alt="Product Detail"
+              src="https://i.picsum.photos/id/604/200/300.jpg?hmac=6ceMKS8u7easDoKzWSaIiSTpRlTPn1OUOdfSJWou3uQ"
+            />
           </Grid>
         </Grid>
       </Card>

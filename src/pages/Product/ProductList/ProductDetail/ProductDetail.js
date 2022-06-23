@@ -15,7 +15,7 @@ const ProductDetail = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState();
   const [subProductList, setSubProductList] = useState([]);
-  const pages = [2, 20, 50];
+  const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
@@ -78,7 +78,7 @@ const ProductDetail = () => {
       {loading ? (
         <>Loading...</>
       ) : (
-        <Container maxWidth="xl">
+        <Container maxWidth="lg">
           {!!product && <ProductInformation product={product} />}
 
           <Grid

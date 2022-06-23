@@ -139,7 +139,7 @@ const ProductList = () => {
   };
 
   const handleOnClickTableRow = (productId) => {
-    navigate(`/product/${productId}`);
+    navigate(`/product/detail/${productId}`);
   };
 
   const handleOnclickAddNewProduct = () => {

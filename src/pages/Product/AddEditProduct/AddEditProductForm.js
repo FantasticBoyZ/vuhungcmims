@@ -3,7 +3,7 @@ import SelectWrapper from '@/components/Common/FormsUI/Select';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import CategoryService from '@/services/categoryService';
 import { getProductDetail, saveProduct } from '@/slices/ProductSlice';
-import { Info } from '@mui/icons-material';
+import { Info, InfoOutlined } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -51,6 +51,7 @@ const useStyles = makeStyles((theme) => ({
   iconStyle: {
     fontSize: 'small',
     margin: '0 10px ',
+    color: 'skyblue'
   },
 }));
 
@@ -115,13 +116,13 @@ const AddEditProductForm = () => {
       navigate('/product');
     } else {
       toast.success('Sửa sản phẩm thành công!');
-      navigate(`/product/${productId}`);
+      navigate(`/product/detail/${productId}`);
     }
   };
 
   const handleOnClickExit = () => {
     // TODO: fix lỗi nút exit phần thêm mới
-    navigate(isAdd ? '/product' : `/product/${productId}`);
+    navigate(isAdd ? '/product' : `/product/detail/${productId}`);
   };
 
   useEffect(() => {
@@ -213,7 +214,7 @@ const AddEditProductForm = () => {
                         >
                           <Box className={classes.infoContainer}>
                             <Typography className={classes.wrapIcon}>
-                              Mã sản phẩm <Info className={classes.iconStyle} />
+                              Mã sản phẩm <InfoOutlined className={classes.iconStyle} />
                             </Typography>
                             <TextfieldWrapper
                               name="productCode"
@@ -226,7 +227,7 @@ const AddEditProductForm = () => {
 
                           <Box className={classes.infoContainer}>
                             <Typography className={classes.wrapIcon}>
-                              Tên sản phẩm <Info className={classes.iconStyle} />
+                              Tên sản phẩm <InfoOutlined className={classes.iconStyle} />
                             </Typography>
                             <TextfieldWrapper
                               name="name"
@@ -238,7 +239,7 @@ const AddEditProductForm = () => {
                           </Box>
                           <Box className={classes.infoContainer}>
                             <Typography className={classes.wrapIcon}>
-                              Danh mục <Info className={classes.iconStyle} />
+                              Danh mục <InfoOutlined className={classes.iconStyle} />
                             </Typography>
                             {!!categoryList && (
                               <SelectWrapper
@@ -264,7 +265,7 @@ const AddEditProductForm = () => {
                   </Box> */}
                           <Box className={classes.infoContainer}>
                             <Typography className={classes.wrapIcon}>
-                              Đơn vị tính <Info className={classes.iconStyle} />
+                              Đơn vị tính <InfoOutlined className={classes.iconStyle} />
                             </Typography>
                             <TextfieldWrapper
                               name="unitMeasure"
@@ -283,7 +284,7 @@ const AddEditProductForm = () => {
                           {!isAdd && (
                             <Box className={classes.infoContainer}>
                               <Typography className={classes.wrapIcon}>
-                                Tồn kho <Info className={classes.iconStyle} />
+                                Tồn kho <InfoOutlined className={classes.iconStyle} />
                               </Typography>
                               <TextField
                                 defaultValue={product.quantity}
@@ -296,7 +297,7 @@ const AddEditProductForm = () => {
                           )}
                           <Box className={classes.infoContainer}>
                             <Typography className={classes.wrapIcon}>
-                              Màu sắc <Info className={classes.iconStyle} />
+                              Màu sắc <InfoOutlined className={classes.iconStyle} />
                             </Typography>
                             <TextfieldWrapper
                               name="color"
@@ -308,7 +309,7 @@ const AddEditProductForm = () => {
                           </Box>
                           <Box className={classes.infoContainer}>
                             <Typography className={classes.wrapIcon}>
-                              Mô tả <Info className={classes.iconStyle} />
+                              Mô tả <InfoOutlined className={classes.iconStyle} />
                             </Typography>
                             <TextfieldWrapper
                               name="description"

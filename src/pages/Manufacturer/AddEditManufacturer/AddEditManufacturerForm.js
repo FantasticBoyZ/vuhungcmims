@@ -93,8 +93,8 @@ const AddEditManufacturerForm = () => {
     const newManufacturer = {
       id: manufacturerId,
       name: values.name,
-      productCode: values.email,
-      unitMeasure: values.phone,
+      email: values.email,
+      phone: values.phone,
     };
     console.log(values);
     saveManufacturerDetail(newManufacturer);
@@ -109,7 +109,7 @@ const AddEditManufacturerForm = () => {
   };
 
   const handleOnClickExit = () => {
-    navigate(isAdd ? '/manufacturer' : `/manufacturer/${manufacturerId}`);
+    navigate(isAdd ? '/manufacturer' : `/manufacturer/detail/${manufacturerId}`);
   };
 
   useEffect(() => {
@@ -126,8 +126,9 @@ const AddEditManufacturerForm = () => {
       }
     };
     // console.log('subProductList', subProductList);
-
-    fetchManufacturerDetail();
+    if (!isAdd) {
+      fetchManufacturerDetail();
+    }
   }, []);
 
   return (
@@ -137,7 +138,7 @@ const AddEditManufacturerForm = () => {
         <Typography variant="h5">{isAdd ? 'Thêm' : 'Sửa'} nhà cung cấp</Typography>
       </Card>
       <Card>
-        {loading ? (
+        {!isAdd && loading ? (
           <>Loading...</>
         ) : (
           <Grid
@@ -225,6 +226,94 @@ const AddEditManufacturerForm = () => {
                   </Form>
                 </Formik>
               )}
+            </Grid>
+          </Grid>
+        )}
+
+        {isAdd && (
+          <Grid
+            container
+            direction="row"
+            justifyContent="center"
+            alignItems="stretch"
+          >
+            <Grid
+              xs={12}
+              item
+            >
+              <Formik
+                initialValues={{
+                  ...initialManufacturerValue,
+                }}
+                validationSchema={FORM_VALIDATION}
+                onSubmit={(values) => handleSubmit(values)}
+              >
+                <Form>
+                  <Grid
+                    container
+                    direction="row"
+                    justifyContent="center"
+                    alignItems="stretch"
+                  >
+                    <Grid
+                      xs={12}
+                      item
+                      // className={classes.leftContainer}
+                    >
+                      <Box className={classes.infoContainer}>
+                        <Typography className={classes.wrapIcon}>
+                          Tên nhà cung cấp <Info className={classes.iconStyle} />
+                        </Typography>
+                        <TextfieldWrapper
+                          name="name"
+                          fullWidth
+                          id="name"
+                          autoComplete="name"
+                          autoFocus
+                        />
+                      </Box>
+                      <Box className={classes.infoContainer}>
+                        <Typography className={classes.wrapIcon}>
+                          Email <Info className={classes.iconStyle} />
+                        </Typography>
+                        <TextfieldWrapper
+                          name="email"
+                          fullWidth
+                          id="email"
+                          autoComplete="email"
+                          // autoFocus
+                        />
+                      </Box>
+                      <Box className={classes.infoContainer}>
+                        <Typography className={classes.wrapIcon}>
+                          Số điện thoại <Info className={classes.iconStyle} />
+                        </Typography>
+                        <TextfieldWrapper
+                          name="phone"
+                          fullWidth
+                          id="phone"
+                          autoComplete="phone"
+                          // autoFocus
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    justifyContent="flex-end"
+                    padding="20px"
+                  >
+                    <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
+                    <Button
+                      onClick={() => handleOnClickExit()}
+                      variant="outlined"
+                    >
+                      Thoát
+                    </Button>
+                  </Stack>
+                </Form>
+              </Formik>
             </Grid>
           </Grid>
         )}

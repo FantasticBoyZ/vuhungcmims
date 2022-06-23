@@ -1,23 +1,20 @@
-import { Search } from '@mui/icons-material';
+import CustomTablePagination from '@/components/Common/TablePagination';
+import { getManufacturerList } from '@/slices/ManufacturerSlice';
+import { Add, Search } from '@mui/icons-material';
 import {
   Box,
   Button,
   Card,
-  InputAdornment,
-  Paper,
-  Stack,
+  InputAdornment, Stack,
   TextField,
-  Toolbar,
+  Toolbar
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import React, { useEffect, useState } from 'react';
-import CategoryTable from '@/pages/Category/CategoryTable';
-import { useDispatch, useSelector } from 'react-redux';
-import { unwrapResult } from '@reduxjs/toolkit';
 import { Container } from '@mui/system';
-import CustomTablePagination from '@/components/Common/TablePagination';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getManufacturerList } from '@/slices/ManufacturerSlice';
 import ManufacturerTable from './ManufacturerTable';
 
 const useStyles = makeStyles({
@@ -133,6 +130,7 @@ const ManufacturerList = () => {
         >
           <Button
             variant="contained"
+            startIcon={<Add />}
             onClick={() => handleOnclickAddNewManufacturer()}
           >
             Thêm mới

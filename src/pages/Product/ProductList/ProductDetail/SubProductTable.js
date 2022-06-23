@@ -35,9 +35,6 @@ const useStyles = makeStyles((theme) => ({
 const SubProductTable = ({ subProductList }) => {
   const classes = useStyles();
 
-  const pages = [10, 20, 50];
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [selectedSubProductList, setSelectedSubProductList] = useState([]);
 
   const formatDate = (date) => {
@@ -110,7 +107,6 @@ const SubProductTable = ({ subProductList }) => {
             })}
           </TableBody>
 
-          {/* TODO: create table pagination */}
         </Table>
       </TableContainer>
     </Card>
