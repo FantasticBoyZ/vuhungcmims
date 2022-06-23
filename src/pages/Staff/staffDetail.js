@@ -1,90 +1,211 @@
-import SubProductList from '@/pages/Product/ProductList/ProductDetail/SubProductList';
-import { getProductDetail } from '@/slices/ProductSlice';
-import { Box, Container, Grid } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import { unwrapResult } from '@reduxjs/toolkit';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import ProductInformation from './ProductInformation';
+import { makeStyles } from '@mui/styles';
+import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  Card,
+  CardMedia,
+  Divider,
+  Grid,
+  Stack,
+  Input,
+  Typography,
+  TextField,
+} from '@mui/material';
+import TextfieldWrapper from '@/components/FormsUI/Textfield';
+import { Form, Formik } from 'formik';
 
-const useStyles = makeStyles({});
+const useStyles = makeStyles({
+  staffInformation: {
+    marginBottom: '32px',
+  },
+  cardStyle: {
+    padding: '12px',
+  },
+  styleContainer: {
+    fontWeight: '400',
+    fontSize: '20px',
+  },
+  inputField: {
+    width: '30%',
+  }, styleBox: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '12px'
+  }
+});
 
-const ProductDetail = () => {
-  const { productId } = useParams();
-  const [product, setProduct] = useState();
-  const [subProductList, setSubProductList] = useState([]);
-  const [totalRecord, setTotalRecord] = useState(0);
+const StaffDetail = ({ staff }) => {
   const classes = useStyles();
 
-  const dispatch = useDispatch();
-  const { loading, products } = useSelector((state) => ({ ...state.products }));
+  const navigate = useNavigate();
 
-  const productClone = {
-    name: 'Thép cây Việt Nhật D16',
-    productCode: 'SP001',
-    categoryName: 'Vật liệu thô',
-    subCategoryName: 'Vật liệu thô 50x50',
-    unitMeasure: 'cái',
-    inStock: '100',
-    manufacturerName: 'Công ty Pharmedic',
-    description:
-      'Thép cây Việt Nhật D16 là sản phẩm  được sản xuất từ nguồn nguyên liệu ổn định chất lượng cao theo dây chuyền công nghệ tiên tiến của Tây..',
+  const { initialFormValue, setInitialFormValue } = useState({
+    // name: category?.name || '',
+    username: '',
+    role: '',
+    phone: '',
+    email: '',
+    address: ''
+  });
+
+  const handleOnClickEdit = () => {
+    navigate(`/staff/edit/${staff.id}`);
   };
-
-  useEffect(() => {
-    const fetchProductDetail = async () => {
-      try {
-        const actionResult = await dispatch(getProductDetail(productId));
-        const dataResult = unwrapResult(actionResult);
-        if (dataResult.data) {
-          setTotalRecord(dataResult.data.totalRecord);
-          setSubProductList(dataResult.data.subProduct);
-          setProduct(dataResult.data.product);
-        }
-        console.log('dataResult', dataResult);
-        console.log('product', dataResult.data.product);
-        console.log(dataResult);
-        console.log('products', products);
-      } catch (error) {
-        console.log('Failed to fetch product detail: ', error);
-      }
-    };
-    // console.log('subProductList', subProductList);
-    // console.log('product', product);
-    return () => fetchProductDetail();
-  }, []);
-
   return (
-    <>
-      {loading ? (
-        <>Loading...</>
-      ) : (
-        <Container maxWidth="xl">
-          {!!product && <ProductInformation product={product} />}
-
+    <Box className={classes.staffInformation}>
+      <Card className={classes.cardStyle}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          spacing={2}
+          p={2}
+        >
+          <Typography variant="h3"></Typography>
+          <Stack
+            direction="row"
+            spacing={2}
+          >
+            <Button
+              //   onClick={() => handleOnClickEdit()}
+              variant="contained"
+            >
+              Sửa
+            </Button>
+            <Button variant="outlined">Thoát</Button>
+          </Stack>
+        </Stack>
+        <Divider />
+        <Grid container>
+          <Grid
+            item
+            xs={4}
+          >
+            <CardMedia
+              component="img"
+              height="200"
+              sx={{ width: 200, margin: "15%" }}
+              alt="staff Detail"
+              src="https://www.w3schools.com/w3images/avatar2.png"
+            />
+          </Grid>
           <Grid
             container
-            direction="row"
-            justifyContent="center"
-            alignItems="stretch"
+            item
+            xs={8}
           >
             <Grid
-              item
               xs={12}
+              item
             >
-              {/* <Typography variant='h5'>Danh sách lô hàng </Typography> */}
-              {!!totalRecord && totalRecord > 0 && !!subProductList ? (
-                <SubProductList subProductList={subProductList} />
-              ) : (
-                <Box> Sản phẩm chưa có lô hàng nào</Box>
-              )}
+              <Formik
+                initialValues={{
+
+                }}
+              >
+                <Form>
+                  <Box className={classes.styleBox}>
+                    <Typography
+                      className={classes.inputField}
+                      fontSize="18px"
+                      lineHeight={2}
+                    >
+                      Tên nhân viên:{'  '}
+                    </Typography>
+                    <TextfieldWrapper
+                      defaultValue={'ABC'}
+                      name="username"
+                      fullWidth
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  </Box>
+
+                  <Box className={classes.styleBox}>
+                    <Typography
+                      className={classes.inputField}
+                      fontSize="18px"
+                      lineHeight={2}
+                    >
+                      Vị trí làm việc:{' '}
+                    </Typography>
+
+                    <TextfieldWrapper
+                      name="role"
+                      defaultValue={'Seller'}
+                      fullWidth
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  </Box>
+
+                  <Box className={classes.styleBox}>
+                    <Typography
+                      className={classes.inputField}
+                      fontSize="18px"
+                      lineHeight={2}
+                    >
+                      Số điện thoại:{' '}
+                    </Typography>
+
+                    <TextfieldWrapper
+                      name="phone"
+                      defaultValue={'0123456789'}
+                      fullWidth
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  </Box>
+
+                  <Box className={classes.styleBox}>
+                    <Typography
+                      className={classes.inputField}
+                      fontSize="18px"
+                      lineHeight={2}
+                    >
+                      Email:{' '}
+                    </Typography>
+
+                    <TextfieldWrapper
+                      name="email"
+                      defaultValue={'abc@gmail.com'}
+                      fullWidth
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  </Box>
+
+                  <Box className={classes.styleBox}>
+                    <Typography
+                      className={classes.inputField}
+                      fontSize="18px"
+                      lineHeight={2}
+                    >
+                      Địa chỉ:{' '}
+                    </Typography>
+
+                    <TextfieldWrapper
+                      name="address"
+                      defaultValue={'Thạch Thất - HN'}
+                      fullWidth
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  </Box>
+                </Form>
+              </Formik>
             </Grid>
           </Grid>
-        </Container>
-      )}
-    </>
+        </Grid>
+      </Card>
+    </Box>
   );
 };
 
-export default ProductDetail;
+export default StaffDetail;
