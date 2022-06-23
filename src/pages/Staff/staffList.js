@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import CommonTable from '@/components/Common/CommonTable';
-import SelectWrapper from '@/components/FormsUI/Select';
-import TextfieldWrapper from '@/components/FormsUI/Textfield';
+import SelectWrapper from '@/components/Common/FormsUI/Select';
 import { Search } from '@mui/icons-material';
 import {
   Box,

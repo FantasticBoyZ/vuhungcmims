@@ -13,7 +13,7 @@ import {
   Typography,
   TextField,
 } from '@mui/material';
-import TextfieldWrapper from '@/components/FormsUI/Textfield';
+import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import { Form, Formik } from 'formik';
 
 const useStyles = makeStyles({
