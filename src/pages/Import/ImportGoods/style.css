@@ -1,0 +1,68 @@
+.container {
+  display: flex;
+  padding: 16px;
+}
+.left-container {
+  width: 75%;
+  margin-right: 8px;
+}
+.right-container {
+  width: 25%;
+  margin-left: 8px;
+}
+.card-container {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.label {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+.label-field {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+hr {
+  margin: 16px;
+}
+.time {
+  color: #6c5f5f;
+  text-decoration: underline;
+  font-style: italic;
+  margin-bottom: 16px;
+}
+.selectbox-warehouse {
+  margin-bottom: 16px;
+}
+.text-area-note {
+  width: 100%;
+}
+.margin-bottom-16 {
+  margin-bottom: 16px;
+}
+.total-amount {
+  display: flex;
+  margin-top: 16px;
+  font-size: 24px;
+}
+.total-amount div {
+  width: 50%;
+}
+
+.total-amount div:last-child {
+  text-align: right;
+}
+.button-import {
+  margin: 16px;
+  display: flex;
+  justify-content: center;
+}
+.text-field-quantity {
+  width: 64px;
+}
+.text-field-unit-price {
+  width: 120px;
+}
+.date-picker {
+  width: 80px;
+}
