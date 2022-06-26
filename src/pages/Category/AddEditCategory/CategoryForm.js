@@ -1,14 +1,15 @@
 import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
-import { saveCategory } from '@/slices/CategorySlice';
-import { InfoOutlined } from '@mui/icons-material';
-import { Box, Button, Grid, Stack, Typography } from '@mui/material';
+import { getCategoryList, saveCategory } from '@/slices/CategorySlice';
+import FormatDataUtils from '@/utils/formatData';
+import { Box, Grid, Stack, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Form, Formik } from 'formik';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import Select from 'react-select';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 
@@ -28,26 +29,33 @@ const useStyles = makeStyles((theme) => ({
     verticalAlign: 'center',
     justifyContent: 'center',
     padding: '12px',
+    width: '450px',
   },
   wrapIcon: {
     verticalAlign: 'middle',
     display: 'inline-flex',
     width: '200px',
   },
-  textfieldStyle: {
-    flex: '5',
+  iconRequired: {
+    color: 'red',
   },
-  iconStyle: {
-    fontSize: 'small',
-    margin: '0 10px ',
+  selectContainer: {
+    width: '100%',
+    padding: '12px',
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  selectBox: {
+    width: '290px',
   },
 }));
 
 const CategoryForm = (props) => {
-    const { closePopup, category } = props
-//   const { categoryId } = useParams();
+  const { closePopup, category, allCategoryList } = props;
+  //   const { categoryId } = useParams();
   const navigate = useNavigate();
-  // const [category, setCategory] = useState();
+  const [categoryList, setCategoryList] = useState();
+  const [selectedCategory, setSelectedCategory] = useState();
   const classes = useStyles();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.categories }));
@@ -55,10 +63,12 @@ const CategoryForm = (props) => {
   const initialFormValue = isAdd
     ? {
         name: '',
+        categoryId: '',
         description: '',
       }
     : {
         name: category?.name,
+        categoryId: category?.categoryId || '',
         description: category?.description,
       };
 
@@ -68,9 +78,39 @@ const CategoryForm = (props) => {
       .required('Chưa nhập tên danh mục'),
   });
 
-  const saveCategoryDetail = async (product) => {
+  const getSelectedParent = () => {
+    const categoryList = FormatDataUtils.getOptionWithIdandName(allCategoryList);
+    setSelectedCategory(categoryList.find((item) => item.value == category?.categoryId));
+  };
+
+  // const searchCategory = async (keyword) => {
+  //   try {
+  //     const params = {
+  //       // pageIndex: page + 1,
+  //       // pageSize: rowsPerPage,
+  //       categoryName: keyword,
+  //     };
+  //     const actionResult = await dispatch(getCategoryList(params));
+  //     const dataResult = unwrapResult(actionResult);
+  //     console.log('dataResult', dataResult);
+  //     if (dataResult.data) {
+  //       setCategoryList(dataResult.data.category);
+  //     }
+  //   } catch (error) {
+  //     console.log('Failed to fetch category list: ', error);
+  //   }
+  // };
+
+  const saveCategoryDetail = async (category) => {
     try {
-      const actionResult = await dispatch(saveCategory(product));
+      let actionResult;
+      if(!!category.categoryId){
+        // TODO: call api create subCategory
+        // actionResult = await dispatch(saveSubCategory(category));
+      }else{
+        actionResult = await dispatch(saveCategory(category));
+      }
+      
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
       if (isAdd) {
@@ -90,21 +130,32 @@ const CategoryForm = (props) => {
     }
   };
 
+  const handleOnChangeCategory = (e) => {
+    console.log(e);
+  };
+
+  const handleInputChangeCategory = (e) => {
+    console.log(e);
+  };
+
   const handleSubmit = (values) => {
     const newCategory = {
-        id: category?.id,
-        name: values.name,
-        description: values.description,
-      };
-      console.log(values);
-      saveCategoryDetail(newCategory);
-      closePopup()
-      
+      id: category?.id,
+      name: values.name,
+      description: values.description,
+    };
+    console.log(values);
+    saveCategoryDetail(newCategory);
+    closePopup();
   };
 
   const handleOnClickExit = () => {
     // navigate(isAdd ? '/category' : `/category/detail/${categoryId}`);
   };
+
+  useEffect(() => {
+    getSelectedParent();
+  }, []);
   return (
     <Formik
       initialValues={{
@@ -113,110 +164,166 @@ const CategoryForm = (props) => {
       validationSchema={FORM_VALIDATION}
       onSubmit={(values) => handleSubmit(values)}
     >
-      <Form>
-        {loading && !isAdd ? (
-          <>Loading...</>
-        ) : (
-          <Grid
-            container
-            direction="row"
-            justifyContent="center"
-            alignItems="stretch"
-          >
+      {({ values, setFieldValue }) => (
+        <Form>
+          {loading && !isAdd ? (
+            <>Loading...</>
+          ) : (
             <Grid
-              xs={12}
-              item
-              // className={classes.leftContainer}
+              container
+              direction="row"
+              justifyContent="center"
+              alignItems="stretch"
             >
-              {!!category && (
-                <Box>
-                  <Box className={classes.infoContainer}>
-                    <Typography className={classes.wrapIcon}>
-                      Tên danh mục <InfoOutlined className={classes.iconStyle} />
-                    </Typography>
-                    <TextfieldWrapper
-                      name="name"
-                      fullWidth
-                      id="name"
-                      autoComplete="name"
-                      autoFocus
-                    />
-                  </Box>
-                  {console.log(category)}
-                  <Box className={classes.infoContainer}>
-                    <Typography className={classes.wrapIcon}>
-                      Mô tả <InfoOutlined className={classes.iconStyle} />
-                    </Typography>
-                    <TextfieldWrapper
-                      name="description"
-                      fullWidth
-                      multiline
-                      rows={4}
-                      id="description"
-                      autoFocus
-                    />
-                  </Box>
-                </Box>
-              )}
-            </Grid>
-          </Grid>
-        )}
-        {isAdd && (
-          <Grid
-            container
-            direction="row"
-            justifyContent="center"
-            alignItems="stretch"
-          >
-            <Grid
-              xs={12}
-              item
-              // className={classes.leftContainer}
-            >
-              <Box className={classes.infoContainer}>
-                <Typography className={classes.wrapIcon}>
-                  Tên danh mục <InfoOutlined className={classes.iconStyle} />
-                </Typography>
-                <TextfieldWrapper
-                  name="name"
-                  fullWidth
-                  id="name"
-                  autoComplete="name"
-                  autoFocus
-                />
-              </Box>
-              <Box className={classes.infoContainer}>
-                <Typography className={classes.wrapIcon}>
-                  Mô tả <InfoOutlined className={classes.iconStyle} />
-                </Typography>
-                <TextfieldWrapper
-                  name="description"
-                  fullWidth
-                  multiline
-                  rows={4}
-                  id="description"
-                  autoFocus
-                />
-              </Box>
-            </Grid>
-          </Grid>
-        )}
+              <Grid
+                xs={12}
+                item
+                // className={classes.leftContainer}
+              >
+                {!!category && (
+                  <Box>
+                    <Box className={classes.infoContainer}>
+                      <Typography
+                        variant="span"
+                        className={classes.wrapIcon}
+                      >
+                        Tên danh mục:<span className={classes.iconRequired}>*</span>
+                      </Typography>
+                      <TextfieldWrapper
+                        name="name"
+                        fullWidth
+                        id="name"
+                        autoComplete="name"
+                        autoFocus
+                      />
+                    </Box>
+                    {!!category.categoryId && (
+                      <Box className={classes.selectContainer}>
+                        <Typography variant="span">Danh mục cha:</Typography>
+                        {!!allCategoryList && (
+                          <Select
+                            // classNamePrefix="select"
+                            className={classes.selectBox}
+                            placeholder="Chọn danh mục cha"
+                            noOptionsMessage={() => <>Không có tìm thấy danh mục nào</>}
+                            isClearable={true}
+                            isSearchable={true}
+                            isLoading={loading}
+                            loadingMessage={() => <>Đang tìm kiếm danh mục cha...</>}
+                            name="category"
+                            value={selectedCategory}
+                            options={FormatDataUtils.getOptionWithIdandName(
+                              allCategoryList,
+                            )}
+                            menuPortalTarget={document.body}
+                            styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                            onChange={(e) => {
+                              setFieldValue('categoryId', e?.value);
+                            }}
+                            onInputChange={handleInputChangeCategory}
+                          />
+                        )}
+                      </Box>
+                    )}
 
-        <Stack
-          direction="row"
-          spacing={2}
-          justifyContent="flex-end"
-          padding="20px"
-        >
-          <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
-          {/* <Button
+                    <Box className={classes.infoContainer}>
+                      <Typography className={classes.wrapIcon}>Mô tả:</Typography>
+                      <TextfieldWrapper
+                        name="description"
+                        fullWidth
+                        multiline
+                        rows={4}
+                        id="description"
+                        autoFocus
+                      />
+                    </Box>
+                  </Box>
+                )}
+              </Grid>
+            </Grid>
+          )}
+          {isAdd && (
+            <Grid
+              container
+              direction="row"
+              justifyContent="center"
+              alignItems="stretch"
+            >
+              <Grid
+                xs={12}
+                item
+                // className={classes.leftContainer}
+              >
+                <Box className={classes.infoContainer}>
+                  <Typography
+                    variant="span"
+                    className={classes.wrapIcon}
+                  >
+                    Tên danh mục:<span className={classes.iconRequired}>*</span>
+                  </Typography>
+                  <TextfieldWrapper
+                    name="name"
+                    fullWidth
+                    id="name"
+                    autoComplete="name"
+                    autoFocus
+                  />
+                </Box>
+                <Box className={classes.selectContainer}>
+                  <Typography variant="span">Danh mục cha:</Typography>
+                  {!!allCategoryList && (
+                    <Select
+                      // classNamePrefix="select"
+                      className={classes.selectBox}
+                      placeholder="Chọn danh mục cha"
+                      noOptionsMessage={() => <>Không có tìm thấy danh mục nào</>}
+                      isClearable={true}
+                      isSearchable={true}
+                      isLoading={loading}
+                      loadingMessage={() => <>Đang tìm kiếm danh mục cha...</>}
+                      name="category"
+                      options={FormatDataUtils.getOption(allCategoryList)}
+                      menuPortalTarget={document.body}
+                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                      onChange={(e) => {
+                        setFieldValue('categoryId', e?.value.id);
+                      }}
+                      onInputChange={handleInputChangeCategory}
+                    />
+                  )}
+                </Box>
+                <Box className={classes.infoContainer}>
+                  <Typography className={classes.wrapIcon}>Mô tả:</Typography>
+                  <TextfieldWrapper
+                    name="description"
+                    fullWidth
+                    multiline
+                    rows={4}
+                    id="description"
+                    autoFocus
+                  />
+                </Box>
+              </Grid>
+            </Grid>
+          )}
+
+          <Stack
+            direction="row"
+            spacing={2}
+            justifyContent="flex-end"
+            padding="20px"
+          >
+            <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
+            {/* <Button
             onClick={() => handleOnClickExit()}
             variant="outlined"
           >
             Thoát
           </Button> */}
-        </Stack>
-      </Form>
+          </Stack>
+          <pre>{JSON.stringify(values, null, 2)}</pre>
+        </Form>
+      )}
     </Formik>
   );
 };

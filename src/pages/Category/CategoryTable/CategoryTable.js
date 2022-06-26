@@ -1,23 +1,10 @@
 import {
-  ArrowDropDownRounded,
-  ArrowRightRounded,
-  Edit,
-  EditTwoTone,
-  InfoTwoTone,
-} from '@mui/icons-material';
-import {
-  Box,
-  IconButton,
-  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
-  Tooltip,
-  Typography,
-  useTheme,
+  TableRow, useTheme
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
@@ -27,7 +14,7 @@ import CategoryRow from './CategoryRow';
 const useStyles = makeStyles((theme) => ({
   table: {
     textAlign: 'center',
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(2),
     '& thead th': {
       fontWeight: '600',
       color: theme.palette.primary.main,
@@ -37,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: '300',
     },
     '& tbody tr:hover': {
-      backgroundColor: '#fffbf2',
+      // backgroundColor: '#fffbf2',
       cursor: 'pointer',
     },
   },
@@ -49,7 +36,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CategoryTable = ({ categoryList }) => {
+const CategoryTable = (props) => {
+  const { categoryList,allCategoryList } = props
   const classes = useStyles();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -86,7 +74,7 @@ const CategoryTable = ({ categoryList }) => {
             // TODO: làm selectedImportOrders
             //   const isImportOrderSelected = selectedImportOrders.includes(importOrder.id);
             return (
-                <CategoryRow key={category.id} category={category} />
+                <CategoryRow key={category.id} category={category} allCategoryList={allCategoryList}/>
             );
           })}
         </TableBody>

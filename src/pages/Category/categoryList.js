@@ -50,6 +50,7 @@ const CategoryList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
   const [categoryList, setCategoryList] = useState([]);
+  const [allCategoryList, setAllCategoryList] = useState([])
   const [openPopup, setOpenPopup] = useState(false);
   const [searchParams, setSearchParams] = useState({
     categoryName: '',
@@ -88,21 +89,6 @@ const CategoryList = () => {
     searchCategory(searchParams);
   };
 
-  const categoryListTest = [
-    {
-      id: 2,
-      name: 'son',
-      description: 'son dep',
-      subCategory: [
-        { id: 1, name: 'Son 365', description: 'son đẹp' },
-        { id: 2, name: 'Son 666', description: 'son đẹp' },
-      ],
-    },
-    { id: 3, name: 'Ngói', description: 'Ngói đẹp', subCategory: [] },
-    { id: 4, name: 'Ngói 2', description: 'Ngói đẹp 2', subCategory: [] },
-    { id: 5, name: 'Sắt', description: 'Sắt đẹp', subCategory: [] },
-  ];
-
   const searchCategory = async (searchParams) => {
     try {
       const params = {
@@ -122,7 +108,25 @@ const CategoryList = () => {
     }
   };
 
-  const fetchCategoryList = async () => {
+  const getAllCategory = async (keyword) => {
+    try {
+      const params = {
+        // pageIndex: page + 1,
+        // pageSize: rowsPerPage,
+        categoryName: keyword,
+      };
+      const actionResult = await dispatch(getCategoryList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        setAllCategoryList(dataResult.data.category);
+      }
+    } catch (error) {
+      console.log('Failed to fetch category list: ', error);
+    }
+  };
+
+  const fetchCategoryList = async (params) => {
     try {
       const params = {
         pageIndex: page + 1,
@@ -143,6 +147,7 @@ const CategoryList = () => {
 
   useEffect(() => {
     fetchCategoryList();
+    getAllCategory();
   }, [page, rowsPerPage]);
 
   return (
@@ -201,7 +206,7 @@ const CategoryList = () => {
             <>Loading...</>
           ) : (
             <Box>
-              <CategoryTable categoryList={categoryListTest} />
+              <CategoryTable categoryList={categoryList} allCategoryList={allCategoryList} />
               <CustomTablePagination
                 page={page}
                 pages={pages}
@@ -221,7 +226,7 @@ const CategoryList = () => {
       >
         <CategoryForm
           closePopup={closePopup}
-          categoryId={null}
+          allCategoryList={allCategoryList}
         />
       </Popup>
     </Container>

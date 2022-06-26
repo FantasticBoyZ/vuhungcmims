@@ -1,35 +1,44 @@
 import Popup from '@/components/Common/Popup';
 import {
-    ArrowDropDownRounded,
-    ArrowRightRounded,
-    EditTwoTone,
-    InfoTwoTone
+  ArrowDropDownRounded,
+  ArrowRightRounded,
+  EditTwoTone,
+  InfoTwoTone,
 } from '@mui/icons-material';
 import {
-    Collapse,
-    IconButton,
-    Stack,
-    Table,
-    TableBody,
-    TableCell, TableRow,
-    Tooltip,
-    Typography
+  Collapse,
+  IconButton,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/styles';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CategoryForm from '@/pages/Category/AddEditCategory/CategoryForm';
 
-const CategoryRow = ({ category }) => {
+const CategoryRow = (props) => {
+  const { category, allCategoryList } = props;
   const [openNested, setOpenNested] = useState(false);
   const theme = useTheme();
   const navigate = useNavigate();
   const [openPopup, setOpenPopup] = useState(false);
+  const [editCategory, setEditCategory] = useState();
   //   const subCategory = [
   //     {id:1, name: 'gach men 6x6', description: 'data test'},
   //     {id:2, name: 'gach men 8x8', description: 'data test'},
   //   ]
-
+  const subCategoryTest = {
+    categoryName: 'Gach',
+    description: 'Hang đep',
+    id: 1,
+    name: 'Gach',
+    categoryId: 1
+  };
   const handleClick = () => {
     setOpenNested(!openNested);
   };
@@ -40,13 +49,14 @@ const CategoryRow = ({ category }) => {
   };
 
   const closePopup = () => {
-    setOpenPopup(false)
-  }
+    setOpenPopup(false);
+  };
 
-  const handleOnClickEditCategory = () => {
+  const handleOnClickEditCategory = (item) => {
     // navigate(`/category/edit/${categoryId}`);
-    setOpenPopup(true)
-    console.log(category)
+    setEditCategory(item);
+    setOpenPopup(true);
+    console.log(category);
   };
 
   const renderCategoryRow = (category, childOption) => {
@@ -55,26 +65,10 @@ const CategoryRow = ({ category }) => {
     // child option icon is padding left and also can navigate to the page
     const childOptionStyle = childOption ? { pl: 2 } : {};
 
-    // render subCategory
-    // if (!subCategory || !subCategory.length) {
-    //   return (
-    //     // <TableRow
-    //     //   sx={childOptionStyle}
-    //     //     onClick={childOptionOnClick}
-    //     // >
-    //     <>
-    //       <TableCell>{name}</TableCell>
-    //       <TableCell>{description}</TableCell>
-    //       <TableCell>Action</TableCell>
-    //     </>
-    //     // </TableRow>
-    //   );
-    // }
-
     // render parent option
     return (
       <>
-        <TableRow>
+        <TableRow hover>
           <TableCell>
             {!!subCategory && subCategory.length > 0 && (
               <>
@@ -142,7 +136,7 @@ const CategoryRow = ({ category }) => {
                   }}
                   color="inherit"
                   size="small"
-                  onClick={() => handleOnClickEditCategory(id)}
+                  onClick={() => handleOnClickEditCategory(category)}
                 >
                   <EditTwoTone fontSize="small" />
                 </IconButton>
@@ -174,14 +168,14 @@ const CategoryRow = ({ category }) => {
                         <TableBody>
                           {subCategory.map((item, index) => {
                             return (
-                              <TableRow key={index}>
+                              <TableRow hover key={index}>
                                 <TableCell>{item?.name}</TableCell>
                                 <TableCell>{item?.description}</TableCell>
-                                <TableCell >
+                                <TableCell>
                                   <Stack
                                     direction="row"
                                     spacing={2}
-                                    sx={{ width: "40px"}}
+                                    sx={{ width: '40px' }}
                                   >
                                     <Tooltip
                                       title="Chi tiết danh mục phụ"
@@ -214,7 +208,7 @@ const CategoryRow = ({ category }) => {
                                         }}
                                         color="inherit"
                                         size="small"
-                                        onClick={() => handleOnClickEditCategory(id)}
+                                        onClick={() => handleOnClickEditCategory(item)}
                                       >
                                         <EditTwoTone fontSize="small" />
                                       </IconButton>
@@ -234,15 +228,16 @@ const CategoryRow = ({ category }) => {
           </>
         )}
         <Popup
-        title="Sửa danh mục"
-        openPopup={openPopup}
-        setOpenPopup={setOpenPopup}
-      >
-        <CategoryForm
-          closePopup={closePopup}
-          category={category}
-        />
-      </Popup>
+          title="Sửa danh mục"
+          openPopup={openPopup}
+          setOpenPopup={setOpenPopup}
+        >
+          <CategoryForm
+            closePopup={closePopup}
+            category={editCategory}
+            allCategoryList={allCategoryList}
+          />
+        </Popup>
       </>
     );
   };
