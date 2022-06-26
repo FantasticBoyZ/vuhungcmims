@@ -59,7 +59,7 @@ const ConsignmentsTable = ({ listConsignments }) => {
               selected={false}
             >
               {/* TODO: Sửa phần index khi phân trang */}
-              <TableCell>{index}</TableCell>
+              <TableCell>{index+1}</TableCell>
               <TableCell>{consignment?.productCode}</TableCell>
               <TableCell>{consignment?.productName}</TableCell>
               <TableCell>{consignment?.unitMeasure}</TableCell>

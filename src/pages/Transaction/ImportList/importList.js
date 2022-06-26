@@ -24,6 +24,7 @@ import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Form, Formik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
   searchField: {
@@ -66,6 +67,7 @@ const ImportList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRecord, setTotalRecord] = useState();
   const [importOrderList, setImportOrderList] = useState();
+  const navigate= useNavigate()
   const [searchParams, setSearchParams] = useState({
     // billRefernce: '',
     // statusName: '',
@@ -95,7 +97,12 @@ const ImportList = () => {
 
   const handleChangeCreator = (event) => {
     setCreatorId(event.target.value);
+    searchImportOrder({ ...searchParams, creatorId: event.target.value })
   };
+
+  const handleOnClickCreateImportOrder = () => {
+    navigate('/import/importGoods')
+  }
 
   const searchImportOrder = async (searchParams) => {
     try {
@@ -133,7 +140,6 @@ const ImportList = () => {
       console.log('Failed to fetch product list: ', error);
     }
   };
-
   // hook này để test biến thôi nha
   useEffect(() => {
     console.log(startDate + ' ' + endDate);
@@ -151,6 +157,7 @@ const ImportList = () => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
+          onClick={handleOnClickCreateImportOrder}
         >
           Tạo phiếu nhập kho
         </Button>

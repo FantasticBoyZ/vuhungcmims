@@ -59,7 +59,7 @@ const useStyles = makeStyles({
   },
   panelFilter: {
     padding: '24px 0',
-    marginBottom: '24px'
+    marginBottom: '24px',
   },
   cardStyle: {
     padding: '12px',
@@ -72,6 +72,7 @@ const customStyles = {
     borderRadius: 5,
     height: 56,
     minHeight: 56,
+    zIndex: 9999,
   }),
 };
 
@@ -274,7 +275,7 @@ const ProductList = () => {
   }, [page, rowsPerPage]);
   return (
     <>
-      <Container maxWidth='xl'>
+      <Container maxWidth="xl">
         <Stack
           direction="row"
           justifyContent="flex-end"
@@ -352,6 +353,7 @@ const ProductList = () => {
                         isSearchable={false}
                         components={<Select />}
                         value={selectedCategory}
+                        menuPortalTarget={document.body}
                         getOptionLabel={(e) => e.name}
                         getOptionValue={(e) => e.id}
                         loadOptions={() => fetchCategoryList()}
@@ -368,6 +370,7 @@ const ProductList = () => {
                         isSearchable={false}
                         components={<Select />}
                         value={selectedManufactor}
+                        menuPortalTarget={document.body}
                         getOptionLabel={(e) => e.name}
                         getOptionValue={(e) => e.id}
                         loadOptions={() => fetchManufactorList()}
@@ -407,6 +410,7 @@ const ProductList = () => {
                   <TableBody>
                     {productList.map((item) => (
                       <TableRow
+                        hover
                         key={item.id}
                         onClick={() => handleOnClickTableRow(item.id)}
                       >

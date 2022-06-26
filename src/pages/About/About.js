@@ -1,8 +1,19 @@
+import DateTimePicker from '@/components/Common/FormsUI/DateTimePicker';
 import SelectWrapper from '@/components/Common/FormsUI/Select';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material';
 import axios from 'axios';
-import { Form, Formik } from 'formik';
+import { FieldArray, Form, Formik } from 'formik';
 import { useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
 
@@ -36,22 +47,25 @@ const About = () => {
   //   'asc': 'tăng',
   //   'desc': 'giảm',
   // };
- let formData = new FormData()
+  let formData = new FormData();
 
-  const onFileChange = (e) =>{
-    console.log("file", e.target.files[0])
-    if(e.target && e.target.files[0]) {
-      formData.append('file', e.target.files[0])
+  const onFileChange = (e) => {
+    console.log('file', e.target.files[0]);
+    if (e.target && e.target.files[0]) {
+      formData.append('file', e.target.files[0]);
     }
-  }
+  };
 
   const submitFileData = () => {
-    axios.post('https://v2.convertapi.com/upload', { formData}).then(res => {
-      console.log(res)
-    }).catch(error => {
-      console.log(error)
-    })
-  }
+    axios
+      .post('https://v2.convertapi.com/upload', { formData })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const handleChange = (newValue, actionMeta) => {
     console.log(newValue);
@@ -69,7 +83,7 @@ const About = () => {
   const [age, setAge] = useState('');
 
   const handleAgeChange = (event) => {
-    console.log(event.target.value)
+    console.log(event.target.value);
     setAge(event.target.value);
   };
   return (
@@ -80,6 +94,16 @@ const About = () => {
           creater: '1',
           productName: 'Thép Việt Á',
           testReactSelect: '',
+          productArray: [
+            {
+              id: '',
+              productCode: '',
+              name: '',
+              expiredDate: '',
+              quantity: '',
+              price: '',
+            },
+          ],
         }}
         // validationSchema={FORM_VALIDATION}
         // onSubmit={handleLogin}
@@ -111,7 +135,43 @@ const About = () => {
               onInputChange={handleInputChange}
               options={categorys}
             />
-            <TextField type="file" name='file_upload' onChange={onFileChange}/>
+            <TextField
+              type="file"
+              name="file_upload"
+              onChange={onFileChange}
+            />
+            <FieldArray name="productArray">
+              {({ push, remove }) => (
+                <>
+                  <Grid item>All your Products:</Grid>
+                  {values.productArray.map((_, index) => (
+                    <Grid
+                      container
+                      item
+                    >
+                      <Grid item>
+                        <TextfieldWrapper label="Mã sản phẩm" name={`productArray[${index}].productCode`} />
+                      </Grid>
+                      <Grid item>
+                        <TextfieldWrapper label="Tên sản phẩm" name={`productArray[${index}].name`} />
+                      </Grid>
+                      <Grid item>
+                        <DateTimePicker label="Ngày hết hạn" name={`productArray[${index}].expiredDate`} />
+                      </Grid>
+                      <Grid item>
+                        <TextfieldWrapper label="Số lượng" type="number" name={`productArray[${index}].quantity`} />
+                      </Grid>
+                      <Grid item>
+                        <Button onClick={() => remove(index)}>Delete</Button>
+                      </Grid>
+                    </Grid>
+                  ))}
+                  <Grid item>
+                    <Button onClick={() => push({productCode:'', name: '', expiredDate: '', quantity: ''})}>Add Product</Button>
+                  </Grid>
+                </>
+              )}
+            </FieldArray>
             <pre>{JSON.stringify(values, null, 2)}</pre>
           </Form>
         )}
@@ -127,10 +187,14 @@ const About = () => {
           label="Age"
           onChange={handleAgeChange}
         >
-          { categorys.map((item) => (
-            <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>
-            ))}
-          
+          {categorys.map((item) => (
+            <MenuItem
+              key={item.value}
+              value={item.value}
+            >
+              {item.label}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
     </Box>

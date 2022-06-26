@@ -144,6 +144,7 @@ export const theme = createTheme({
       red: 'red',
       blue: 'blue',
       green: 'green',
+      error: '#FF1943'
     },
     // success: {
     //   main:'#57CA22'

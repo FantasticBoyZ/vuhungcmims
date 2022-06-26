@@ -4,16 +4,16 @@ import axios from 'axios';
 
 const ManufactorService = {
   getManufactorList: (params) => {
-    const url = '/manufactor';
+    const url = '/manufacturer';
     return axiosClient.get(url, { params, headers: authHeader() });
   },
 
   getManufacturerById: (id) => {
-    const url = `/manufactor/${id}`;
+    const url = `/manufacturer/${id}`;
     return axiosClient.get(url, { headers: authHeader() });
   },
   saveManufacturer: (manufacturer) => {
-    const url = 'http://localhost:8080/api/manufactor/add';
+    const url = 'http://localhost:8080/api/manufacturer/add';
 
     axios
       .post(url, {

@@ -54,8 +54,8 @@ const privateRoutes = [
   { path: '/manufacturer/edit/:manufacturerId', component: AddEditManufacturerForm },
 
   // importOrder route
-  { path: 'import', component: ImportList },
-  { path: 'import/importGoods', component: ImportGoods },
+  { path: '/import', component: ImportList },
+  { path: '/import/importGoods', component: ImportGoods },
   { path: '/import/detail/:importOrderId', component: ImportOrderDetail },
   { path: '/denied', component: Profile, layout: null },
   { path: '*', component: NotFound, layout: null },
