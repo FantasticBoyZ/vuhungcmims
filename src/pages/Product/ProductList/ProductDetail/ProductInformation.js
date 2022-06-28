@@ -175,7 +175,7 @@ const ProductInformation = ({ product }) => {
                     xs={6}
                     item
                   >
-                    : <strong>{product.quantity}</strong>
+                    : <strong>{product.quantity || '0'}</strong>
                   </Grid>
                 </Grid>
               </Typography>

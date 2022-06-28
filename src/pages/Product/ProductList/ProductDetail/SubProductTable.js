@@ -13,19 +13,16 @@ import { useState } from 'react';
 
 const useStyles = makeStyles((theme) => ({
   table: {
-    marginTop: theme.spacing(3),
+    textAlign: 'center',
+    marginTop: theme.spacing(2),
     '& thead th': {
-      fontWeight: '600',
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.primary.light,
+      backgroundColor: '#DCF4FC',
     },
     '& tbody td': {
-      fontWeight: '300',
     },
-    // '& tbody tr:hover': {
-    //   backgroundColor: '#fffbf2',
-    //   cursor: 'pointer',
-    // },
+    '& tbody tr:hover': {
+      // cursor: 'pointer',
+    },
   },
   cardStyle: {
     padding: '12px'

@@ -10,11 +10,11 @@ import {
   Card,
   Container,
   InputAdornment,
-  Paper,
-  Select,
   Stack,
+  Table,
   TableBody,
   TableCell,
+  TableHead,
   TablePagination,
   TableRow,
   Toolbar,
@@ -27,7 +27,9 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
+import Select from 'react-select';
 import { toast } from 'react-toastify';
+import FormatDataUtils from '@/utils/formatData';
 
 const useStyles = makeStyles({
   searchField: {
@@ -63,6 +65,21 @@ const useStyles = makeStyles({
   },
   cardStyle: {
     padding: '12px',
+  },
+  table: {
+    // marginTop: theme.spacing(3),
+    '& thead th': {
+      // fontWeight: '600',
+      // color: theme.palette.primary.main,
+      backgroundColor: '#DCF4FC',
+    },
+    '& tbody td': {
+      // fontWeight: '300',
+    },
+    '& tbody tr:hover': {
+      // backgroundColor: '#fffbf2',
+      cursor: 'pointer',
+    },
   },
 });
 
@@ -107,15 +124,17 @@ const headCells = [
 const ProductList = () => {
   const navigate = useNavigate();
   const [productList, setProductList] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
+  const [manufacturerList, setManufacturerList] = useState([]);
   const [inputValueCategory, setInputValueCategory] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [inputValueManufactor, setInputValueManufactor] = useState('');
   const [selectedManufactor, setSelectedManufactor] = useState(null);
   const [searchParams, setSearchParams] = useState({
-    productName: '',
-    productCode: '',
-    categoryId: '',
-    manufactorId: '',
+    // productName: '',
+    // productCode: '',
+    // categoryId: '',
+    // manufactorId: '',
   });
   const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
@@ -134,10 +153,15 @@ const ProductList = () => {
       let target = e.target;
       console.log(e.target.value);
       setPage(0);
+      setSearchParams({ ...searchParams, productName: target.value });
       searchProduct({ ...searchParams, productName: target.value });
       // fetchProductList();
     }
   };
+
+  // const handleSearchChange = (e) => {
+  //   setSearchParams({ ...searchParams, productName: e.target.value });
+  // };
 
   const handleOnClickTableRow = (productId) => {
     navigate(`/product/detail/${productId}`);
@@ -170,15 +194,17 @@ const ProductList = () => {
 
   const handleChangeCategory = (value) => {
     setSelectedCategory(value);
-    setSearchParams({ ...searchParams, categoryId: value.id });
-    searchProduct({ ...searchParams, categoryId: value.id });
+    setPage(0);
+    setSearchParams({ ...searchParams, categoryId: value?.value });
+    searchProduct({ ...searchParams, categoryId: value?.value });
     console.log('changeCategory', value);
   };
   // TODO: searchParam không thay đổi ngay sau khi setSearchParam
   const handleChangeManufactor = (value) => {
     setSelectedManufactor(value);
-    setSearchParams({ ...searchParams, manufactorId: value.id });
-    searchProduct({ ...searchParams, manufactorId: value.id });
+    setPage(0);
+    setSearchParams({ ...searchParams, manufactorId: value?.value });
+    searchProduct({ ...searchParams, manufactorId: value?.value });
     console.log('changeManufactor', value);
   };
 
@@ -187,11 +213,18 @@ const ProductList = () => {
       const params = {
         categoryName: '',
       };
-      const response = await CategoryService.getCategoryList(params);
-      console.log('response category', response.data.category);
+      await CategoryService.getCategoryList(params).then(
+        (response) => {
+          setCategoryList(response.data.category);
+          console.log('response category', response.data.category);
+        },
+        (error) => {
+          toast.error('Failed to fetch category list: ', error);
+        },
+      );
 
-      const rawList = response.data.category;
-      return rawList;
+      // const rawList = response.data.category;
+      // return rawList;
       // console.log('mapCategoryList',result)
       // setCategoryList(result)
     } catch (error) {
@@ -203,15 +236,22 @@ const ProductList = () => {
   const fetchManufactorList = async () => {
     try {
       const params = {
-        manufactorName: '',
+        manufacturerName: '',
       };
-      const response = await ManufactorService.getManufactorList(params);
-      console.log('response manufactor', response.data.manufactor);
+      await ManufactorService.getManufactorList(params).then(
+        (response) => {
+          setManufacturerList(response.data.manufacturer);
+          console.log('response manufactor', response.data.manufacturer);
+        },
+        (error) => {
+          toast.error('Failed to fetch manufacturer list: ', error);
+        },
+      );
 
-      const rawList = response.data.manufactor;
-      return rawList;
+      // const rawList = response.data.manufacturer;
+      // return rawList;
     } catch (error) {
-      toast.error('Failed to fetch manufactor list: ', error);
+      toast.error('Failed to fetch manufacturer list: ', error);
       console.log('Failed to fetch manufactor list: ', error);
     }
   };
@@ -264,6 +304,8 @@ const ProductList = () => {
 
   useEffect(() => {
     fetchProductList();
+    fetchCategoryList();
+    fetchManufactorList();
     // return () => {
     //   // fetchCategoryList();
 
@@ -344,7 +386,7 @@ const ProductList = () => {
                       />
                     </Box>
                     <Box className={classes.selectBoxContainer}>
-                      <AsyncSelect
+                      {/* <AsyncSelect
                         className={classes.selectBox}
                         styles={customStyles}
                         placeholder="Danh mục"
@@ -359,16 +401,38 @@ const ProductList = () => {
                         loadOptions={() => fetchCategoryList()}
                         onInputChange={handleInputChangeCategory}
                         onChange={(e) => handleChangeCategory(e)}
-                      />
-
-                      <AsyncSelect
+                      /> */}
+                      {categoryList && (
+                        <Select
+                          classNamePrefix="select"
+                          className={classes.selectBox}
+                          placeholder="Danh mục"
+                          noOptionsMessage={() => <>Không có tìm thấy danh mục phù hợp</>}
+                          isClearable={true}
+                          isSearchable={true}
+                          name="categoryId"
+                          value={selectedCategory}
+                          options={FormatDataUtils.getOptionWithIdandName(categoryList)}
+                          menuPortalTarget={document.body}
+                          styles={{
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            control: (base) => ({
+                              ...base,
+                              height: 56,
+                              minHeight: 56,
+                            }),
+                          }}
+                          onChange={(e) => handleChangeCategory(e)}
+                        />
+                      )}
+                      {/* <AsyncSelect
                         className={classes.selectBox}
                         styles={customStyles}
                         placeholder="Nhà cung cấp"
                         cacheOptions
                         defaultOptions
                         isSearchable={false}
-                        components={<Select />}
+                        // components={<Select />}
                         value={selectedManufactor}
                         menuPortalTarget={document.body}
                         getOptionLabel={(e) => e.name}
@@ -376,20 +440,34 @@ const ProductList = () => {
                         loadOptions={() => fetchManufactorList()}
                         onInputChange={handleInputChangeManufactor}
                         onChange={(e) => handleChangeManufactor(e)}
-                      />
-                      {/* <SelectWrapper
-                      label="Nhà cung cáp"
-                      name="manufactorId"
-                      options={manufacturerList}
-                      className={classes.selectBox}
-                    /> */}
-                      {/* <SelectWrapper label="Ngày khởi tạo" name="createdAt" options={categoryList}/> */}
-                      {/* <SelectWrapper
-                      label="Sắp xếp"
-                      name="sort"
-                      options={sortTypeList}
-                      className={classes.selectBox}
-                    /> */}
+                      /> */}
+                      {manufacturerList && (
+                        <Select
+                          classNamePrefix="select"
+                          className={classes.selectBox}
+                          placeholder="Nhà cung cấp"
+                          noOptionsMessage={() => (
+                            <>Không có tìm thấy nhà cung cấp phù hợp</>
+                          )}
+                          isClearable={true}
+                          isSearchable={true}
+                          name="categoryId"
+                          value={selectedManufactor}
+                          options={FormatDataUtils.getOptionWithIdandName(
+                            manufacturerList,
+                          )}
+                          menuPortalTarget={document.body}
+                          styles={{
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            control: (base) => ({
+                              ...base,
+                              height: 56,
+                              minHeight: 56,
+                            }),
+                          }}
+                          onChange={(e) => handleChangeManufactor(e)}
+                        />
+                      )}
                     </Box>
                   </Box>
                 </Form>
@@ -405,8 +483,16 @@ const ProductList = () => {
           <Card className={classes.tableStyle}>
             {totalRecord > 0 ? (
               <Box>
-                <TblContainer>
-                  <TblHead />
+                <Table className={classes.table}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Mã sản phẩm</TableCell>
+                      <TableCell>Tên sản phẩm</TableCell>
+                      <TableCell align="center">Danh mục</TableCell>
+                      <TableCell align="center">Nhà cung cấp</TableCell>
+                      <TableCell align="center">Tồn kho</TableCell>
+                    </TableRow>
+                  </TableHead>
                   <TableBody>
                     {productList.map((item) => (
                       <TableRow
@@ -416,13 +502,13 @@ const ProductList = () => {
                       >
                         <TableCell>{item.productCode}</TableCell>
                         <TableCell>{item.name}</TableCell>
-                        <TableCell>{item.categoryName}</TableCell>
-                        <TableCell>{item.manufactorName}</TableCell>
-                        <TableCell>{item.quantity}</TableCell>
+                        <TableCell align="center">{item.categoryName}</TableCell>
+                        <TableCell align="center">{item.manufactorName}</TableCell>
+                        <TableCell align="center">{item.quantity || '0'}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
-                </TblContainer>
+                </Table>
                 <TablePagination
                   component="div"
                   page={page}

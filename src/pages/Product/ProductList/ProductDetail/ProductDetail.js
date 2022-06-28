@@ -57,7 +57,7 @@ const ProductDetail = () => {
         const dataResult = unwrapResult(actionResult);
         if (dataResult.data) {
           setTotalRecord(dataResult.data.totalRecord);
-          setSubProductList(dataResult.data.subProduct);
+          setSubProductList(dataResult.data.consignment);
           setProduct(dataResult.data.product);
         }
         console.log('dataResult', dataResult);
