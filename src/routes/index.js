@@ -18,6 +18,7 @@ import ImportList from '@/pages/Transaction/ImportList/importList';
 import ImportOrderDetail from '@/pages/Transaction/ImportList/ImportOrderDetail/ImportOrderDetail';
 import StaffList from '@/pages/Staff/staffList';
 import StaffDetail from '@/pages/Staff/staffDetail';
+import CommonForgotPass from '@/pages/Auth/CommonForgotPass';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -26,6 +27,7 @@ const publicRoutes = [
   // { path: '/about', component: About, primary: 'About', icon: <Info/>,},
   // { path: '/profile', component: Profile, primary: 'Profile', icon: <Info/>,},
   { path: '/register', component: Login, layout: null },
+  { path: '/forgotPassword', component: CommonForgotPass, layout: null },
 ];
 
 const privateRoutes = [
