@@ -25,6 +25,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { Form, Formik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
 const useStyles = makeStyles({
   searchField: {
@@ -50,11 +51,11 @@ const useStyles = makeStyles({
 });
 
 const createrList = [
-  { id:1,name: 'Vũ Tiến Khôi' },
-  { id:2,name: 'Trịnh Bá Minh Ninh' },
-  { id:3,name: 'Nguyễn Thị Hiền' },
-  { id:4,name: 'Nguyễn Đức Chính' },
-  { id:5,name: 'Dương Đức Trọng' },
+  { id: 1, name: 'Vũ Tiến Khôi' },
+  { id: 2, name: 'Trịnh Bá Minh Ninh' },
+  { id: 3, name: 'Nguyễn Thị Hiền' },
+  { id: 4, name: 'Nguyễn Đức Chính' },
+  { id: 5, name: 'Dương Đức Trọng' },
 ];
 
 const ImportList = () => {
@@ -67,10 +68,12 @@ const ImportList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRecord, setTotalRecord] = useState();
   const [importOrderList, setImportOrderList] = useState();
-  const navigate= useNavigate()
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useState({
-    // billRefernce: '',
-    // statusName: '',
+    billRefernceNumber: '',
+    userId: '',
+    startDate: '',
+    endDate: '',
   });
 
   const dispatch = useDispatch();
@@ -90,26 +93,48 @@ const ImportList = () => {
       let target = e.target;
       console.log(e.target.value);
       setPage(0);
-      searchImportOrder({ ...searchParams, billRefernce: target.value })
+      setSearchParams({ ...searchParams, billReferenceNumber: target.value });
+      searchImportOrder({ ...searchParams, billReferenceNumber: target.value });
       // fetchProductList();
     }
   };
 
   const handleChangeCreator = (event) => {
     setCreatorId(event.target.value);
-    searchImportOrder({ ...searchParams, creatorId: event.target.value })
+    setSearchParams({ ...searchParams, userId: event.target.value });
+    searchImportOrder({ ...searchParams, userId: event.target.value });
+  };
+
+  const handleChangeStartDate = (value) => {
+    setStartDate(value);
+    console.log('startDate', format(new Date(value), 'dd-MM-yyyy'));
+    setSearchParams({ ...searchParams, startDate: format(new Date(value), 'dd-MM-yyyy') });
+    searchImportOrder({
+      ...searchParams,
+      startDate: format(new Date(value), 'dd-MM-yyyy'),
+    });
+  };
+
+  const handleChangeEndDate = (value) => {
+    setEndDate(value);
+    console.log('endDate', format(new Date(value), 'dd-MM-yyyy'));
+    setSearchParams({ ...searchParams, endDate: format(new Date(value), 'dd-MM-yyyy') });
+    searchImportOrder({
+      ...searchParams,
+      endDate: format(new Date(value), 'dd-MM-yyyy'),
+    });
   };
 
   const handleOnClickCreateImportOrder = () => {
-    navigate('/import/importGoods')
-  }
+    navigate('/import/importGoods');
+  };
 
   const searchImportOrder = async (searchParams) => {
     try {
       const params = {
         pageIndex: page,
         pageSize: rowsPerPage,
-        ...searchParams
+        ...searchParams,
       };
       const actionResult = await dispatch(getImportOrderList(params));
       const dataResult = unwrapResult(actionResult);
@@ -241,8 +266,9 @@ const ImportList = () => {
                 id="startDate"
                 label="Ngày bắt đầu"
                 value={startDate}
+                inputFormat="dd/MM/yyyy"
                 onChange={(newValue) => {
-                  setStartDate(newValue);
+                  handleChangeStartDate(newValue);
                 }}
                 renderInput={(params) => <TextField {...params} />}
               />
@@ -250,9 +276,10 @@ const ImportList = () => {
               <DatePicker
                 id="endDate"
                 label="Ngày kết thúc"
+                inputFormat="dd/MM/yyyy"
                 value={endDate}
                 onChange={(newValue) => {
-                  setEndDate(newValue);
+                  handleChangeEndDate(newValue);
                 }}
                 renderInput={(params) => <TextField {...params} />}
               />
@@ -278,7 +305,11 @@ const ImportList = () => {
               <>Loading...</>
             ) : (
               <Box>
-                <ImportOrders importOrders={importOrderList} />
+                {totalRecord > 0 ? (
+                  <ImportOrders importOrders={importOrderList} />
+                ) : (
+                  <>Không tìm thấy phiếu nhập kho phù hợp</>
+                )}
                 {totalRecord && (
                   <CustomTablePagination
                     page={page}

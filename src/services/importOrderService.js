@@ -22,8 +22,8 @@ const importOrderService = {
       description: importOrder.description,
       userId: importOrder.userId,
       manufactorId: importOrder.manufactorId,
-      // warehourseId: '',
-      inventoryId: importOrder.inventoryId,
+      // wareHouseId: '',
+      wareHouseId: importOrder.wareHouseId,
       consignmentRequests: importOrder.consignmentRequests,
     });
   },

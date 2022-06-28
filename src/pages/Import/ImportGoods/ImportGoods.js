@@ -52,7 +52,7 @@ const ImportGoods = () => {
     description: '',
     userId: currentUser.id,
     manufactorId: '',
-    inventoryId: '',
+    wareHouseId: '',
     consignmentRequests: [
       // {
       //   productId: '',
@@ -68,7 +68,7 @@ const ImportGoods = () => {
 
   const FORM_VALIDATION = Yup.object().shape({
     manufactorId: Yup.string().required('Bạn chưa chọn nhà cung cấp'),
-    inventoryId: Yup.number().required('Bạn chưa chọn kho để nhập hàng'),
+    wareHouseId: Yup.number().required('Bạn chưa chọn kho để nhập hàng'),
   });
 
   const arrayHelpersRef = useRef(null);
@@ -208,11 +208,12 @@ const ImportGoods = () => {
 
   const handleOnChangeProduct = (e) => {
     setSelectedProduct(e);
-    // console.log(e.value);
+    // console.log('value 211',e.value);
     // console.log(valueFormik.current);
     // check selected Product
     const isSelected = valueFormik.current.consignmentRequests.some((element) => {
-      if (element.id === e.value.id) {
+      // console.log('element 215',element)
+      if (element.productId === e.value.id) {
         return true;
       }
 
@@ -249,6 +250,11 @@ const ImportGoods = () => {
     for (let index = 0; index < consignments.length; index++) {
       if (consignments[index]?.quantity === '' || consignments[index]?.unitPrice === '') {
         setErrorMessage('Bạn có sản phẩm chưa nhập số lượng hoặc đơn giá');
+        setOpenPopup(true);
+        return;
+      }
+      if (consignments[index]?.quantity === 0 ) {
+        setErrorMessage('Bạn không thể nhập sản phẩm với số lượng bằng 0');
         setOpenPopup(true);
         return;
       }
@@ -294,7 +300,7 @@ const ImportGoods = () => {
       console.log('dataResult', dataResult);
       if (dataResult.data) {
         // setTotalRecord(dataResult.data.totalRecord);
-        setManufacturerList(dataResult.data.manufactor);
+        setManufacturerList(dataResult.data.manufacturer);
       }
     } catch (error) {
       console.log('Failed to fetch manufacturer list: ', error);
@@ -419,7 +425,7 @@ const ImportGoods = () => {
                                         <DeleteIcon fontSize="inherit" />
                                       </IconButton>
                                     </TableCell>
-                                    <TableCell>{index}</TableCell>
+                                    <TableCell>{index+1}</TableCell>
                                     <TableCell>{item.productCode}</TableCell>
                                     <TableCell>{item.name}</TableCell>
                                     <TableCell>
@@ -560,14 +566,14 @@ const ImportGoods = () => {
                       menuPortalTarget={document.body}
                       styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                       onChange={(e) => {
-                        setFieldValue('inventoryId', e?.value.id);
+                        setFieldValue('wareHouseId', e?.value.id);
                       }}
                     />
                     <FormHelperText
                       error={true}
                       className="error-text-helper"
                     >
-                      {errors.inventoryId}
+                      {errors.wareHouseId}
                     </FormHelperText>
                   </Box>
                   <div className="label-field">Tham chiếu</div>

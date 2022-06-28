@@ -15,6 +15,7 @@ const login = (username, password) => {
     })
     .then((response) => {
       if (response.data.accessToken) {
+        // runLogoutTimer(response.data.timer)
         localStorage.setItem("user", JSON.stringify(response.data));
       }
       return response.data;
@@ -23,6 +24,12 @@ const login = (username, password) => {
 const logout = () => {
   localStorage.removeItem("user");
 };
+
+const runLogoutTimer = (timer) => {
+  setTimeout(() => {
+    logout()
+  }, timer)
+}
 const getCurrentUser = () => {
   return JSON.parse(localStorage.getItem("user"));
 };
