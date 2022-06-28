@@ -108,7 +108,7 @@ const ManufacturerList = () => {
       console.log('dataResult', dataResult);
       if (dataResult.data) {
         setTotalRecord(dataResult.data.totalRecord);
-        setManufacturerList(dataResult.data.manufactor);
+        setManufacturerList(dataResult.data.manufacturer);
       }
     } catch (error) {
       console.log('Failed to fetch category list: ', error);

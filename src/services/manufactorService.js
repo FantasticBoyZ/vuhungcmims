@@ -15,23 +15,17 @@ const ManufactorService = {
   saveManufacturer: (manufacturer) => {
     const url = 'http://localhost:8080/api/manufacturer/add';
 
-    axios
+    return axios
       .post(url, {
         id: manufacturer.id,
         name: manufacturer.name,
         email: manufacturer.email,
         phone: manufacturer.phone,
-        // TODO: sửa hardcode
-        addressId: '1'
+        provinceId: manufacturer.provinceId,
+        districtId: manufacturer.districtId,
+        wardId: manufacturer.wardId,
+        addressDetail: manufacturer.addressDetail
       })
-      .then(
-        (response) => {
-          return response.data;
-        },
-        (error) => {
-          console.log(error);
-        },
-      );
   },
 };
 

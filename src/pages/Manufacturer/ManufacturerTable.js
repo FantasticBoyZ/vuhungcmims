@@ -1,23 +1,34 @@
-import { Edit, Info } from '@mui/icons-material';
-import { Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import React from 'react'
+import { Edit, EditTwoTone, Info, InfoTwoTone } from '@mui/icons-material';
+import {
+  IconButton,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   table: {
     textAlign: 'center',
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(2),
     '& thead th': {
-      fontWeight: '600',
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.primary.light,
+      // fontWeight: '600',
+      // color: theme.palette.primary.main,
+      backgroundColor: '#DCF4FC',
     },
     '& tbody td': {
-      fontWeight: '300',
+      // fontWeight: '300',
     },
     '& tbody tr:hover': {
-      backgroundColor: '#fffbf2',
+      // backgroundColor: '#fffbf2',
       cursor: 'pointer',
     },
   },
@@ -29,10 +40,15 @@ const useStyles = makeStyles((theme) => ({
 const ManufacturerTable = ({ manufacturerList }) => {
   const classes = useStyles();
   const navigate = useNavigate();
+  const theme = useTheme()
 
   const handleOnClickDetailManufacturer = (manufacturerId) => {
-    console.log(manufacturerId)
-    navigate(`/manufacturer/detail/${manufacturerId}`)
+    console.log(manufacturerId);
+    navigate(`/manufacturer/detail/${manufacturerId}`);
+  };
+
+  const handleOnClickEditCategory = (manufacturerId) => {
+    navigate(`/manufacturer/edit/${manufacturerId}`);
   }
 
   return (
@@ -110,18 +126,46 @@ const ManufacturerTable = ({ manufacturerList }) => {
                   </Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <Stack direction='row' spacing={2} >
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{ width: '40px' }}
+                  >
                     <Tooltip
-                      title="Thông tin nhà cung cấp"
+                      title="Chi tiết nhà cung cấp"
                       arrow
                     >
-                      <Info fontSize="small" onClick={()=>handleOnClickDetailManufacturer(manufacturer.id)}/>
+                      <IconButton
+                        sx={{
+                          '&:hover': {
+                            background: theme.colors.info.lighter,
+                          },
+                          color: theme.palette.info.main,
+                        }}
+                        color="inherit"
+                        size="small"
+                        onClick={() => handleOnClickDetailManufacturer(manufacturer.id)}
+                      >
+                        <InfoTwoTone fontSize="small" />
+                      </IconButton>
                     </Tooltip>
                     <Tooltip
                       title="Sửa nhà cung cấp"
                       arrow
                     >
-                      <Edit fontSize="small" />
+                      <IconButton
+                        sx={{
+                          '&:hover': {
+                            background: theme.colors.primary.lighter,
+                          },
+                          color: theme.palette.primary.main,
+                        }}
+                        color="inherit"
+                        size="small"
+                        onClick={() => handleOnClickEditCategory(manufacturer.id)}
+                      >
+                        <EditTwoTone fontSize="small" />
+                      </IconButton>
                     </Tooltip>
                   </Stack>
                 </TableCell>
@@ -131,7 +175,7 @@ const ManufacturerTable = ({ manufacturerList }) => {
         </TableBody>
       </Table>
     </TableContainer>
-  )
-}
+  );
+};
 
-export default ManufacturerTable
+export default ManufacturerTable;

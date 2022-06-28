@@ -42,6 +42,11 @@ const getOptionWithIdandName = (listData) => {
     };
   });
 };
+
+const getSelectedOption = (array, value) => {
+  const arrayOption = getOptionWithIdandName(array);
+  return arrayOption.find((item) => item.value === value);
+};
 const FormatDataUtils = {
   formatCurrency,
   formatDateTime,
@@ -49,5 +54,6 @@ const FormatDataUtils = {
   convertUTCDateToLocalDate,
   getOption,
   getOptionWithIdandName,
+  getSelectedOption,
 };
 export default FormatDataUtils;
