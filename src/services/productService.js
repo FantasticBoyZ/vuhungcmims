@@ -33,7 +33,7 @@ const productService = {
     //   manufactorId: "1",
     // };
     // const url = 'http://localhost:8080/api/product/add';
-    const url = process.env.REACT_APP_API_URL + 'product/add';
+    const url = process.env.REACT_APP_API_URL + '/product/add';
 
     axios
       .post(url, {
