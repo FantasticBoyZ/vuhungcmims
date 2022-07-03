@@ -14,7 +14,7 @@ const ManufactorService = {
   },
   saveManufacturer: (manufacturer) => {
     // const url = 'http://localhost:8080/api/manufacturer/add';
-    const url = process.env.REACT_APP_API_URL + 'manufacturer/add'
+    const url = process.env.REACT_APP_API_URL + '/manufacturer/add'
 
     return axios
       .post(url, {
