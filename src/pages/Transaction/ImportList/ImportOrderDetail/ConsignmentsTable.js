@@ -10,22 +10,20 @@ import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const useStyles = makeStyles({
-  failed: {
-    color: 'error',
+const useStyles = makeStyles((theme) => ({
+  table: {
+    textAlign: 'center',
+    '& thead th': {
+      backgroundColor: '#DCF4FC',
+    },
+    '& tbody tr:hover': {
+      // cursor: 'pointer',
+    },
   },
-  completed: {
-    color: 'success',
-  },
-  pending: {
-    color: 'warning',
-  },
-  tableRow: {
-    cursor: 'pointer',
-  },
-});
+}));
 
 const ConsignmentsTable = ({ listConsignments }) => {
+  const classes = useStyles();
   const dataTest = {
     id: 1,
     productCode: 'GACH23',
@@ -38,7 +36,7 @@ const ConsignmentsTable = ({ listConsignments }) => {
     value.toLocaleString('it-IT', { style: 'currency', currency: 'VND' });
   return (
     <TableContainer>
-      <Table>
+      <Table className={classes.table}>
         <TableHead>
           <TableRow>
             <TableCell>STT</TableCell>
