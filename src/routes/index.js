@@ -18,6 +18,9 @@ import ImportList from '@/pages/Transaction/ImportList/importList';
 import ImportOrderDetail from '@/pages/Transaction/ImportList/ImportOrderDetail/ImportOrderDetail';
 import StaffList from '@/pages/Staff/staffList';
 import StaffDetail from '@/pages/Staff/staffDetail';
+import ExportList from '@/pages/Transaction/ExportList/ExportList';
+import ExportOrderDetail from '@/pages/Transaction/ExportList/ExportOrderDetail/ExportOrderDetail';
+import ExportGoods from '@/pages/Export/ExportGoods/ExportGoods';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -55,8 +58,14 @@ const privateRoutes = [
 
   // importOrder route
   { path: '/import', component: ImportList },
-  { path: '/import/importGoods', component: ImportGoods },
+  { path: '/import/create-order', component: ImportGoods },
   { path: '/import/detail/:importOrderId', component: ImportOrderDetail },
+
+  // exportOrder route
+  { path: '/export', component: ExportList },
+  { path: '/export/create-order', component: ExportGoods },
+  { path: '/export/detail/:exportOrderId', component: ExportOrderDetail },
+
   { path: '/denied', component: Profile, layout: null },
   { path: '*', component: NotFound, layout: null },
   { path: 'staff', component: StaffList },
