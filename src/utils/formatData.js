@@ -1,3 +1,4 @@
+import Label from '@/components/Common/Label';
 import { format } from 'date-fns';
 
 const formatCurrency = (value) =>
@@ -47,6 +48,27 @@ const getSelectedOption = (array, value) => {
   const arrayOption = getOptionWithIdandName(array);
   return arrayOption.find((item) => item.value === value);
 };
+
+const getStatusLabel = (exportOrderStatus) => {
+  const map = {
+    canceled: {
+      text: 'Đã huỷ',
+      color: 'error',
+    },
+    completed: {
+      text: 'Đã nhập kho',
+      color: 'success',
+    },
+    pending: {
+      text: 'Đang chờ xử lý',
+      color: 'warning',
+    },
+  };
+
+  const { text, color } = map[exportOrderStatus];
+
+  return <Label color={color}>{text}</Label>;
+};
 const FormatDataUtils = {
   formatCurrency,
   formatDateTime,
@@ -55,5 +77,6 @@ const FormatDataUtils = {
   getOption,
   getOptionWithIdandName,
   getSelectedOption,
+  getStatusLabel
 };
 export default FormatDataUtils;
