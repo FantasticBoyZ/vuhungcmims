@@ -1,6 +1,5 @@
-import { Card } from '@mui/material';
-import React from 'react'
 import ImportOrdersTable from '@/pages/Transaction/ImportList/ImportOrdersTable';
+import { Box } from '@mui/material';
 
 
 const ImportOrders = ({importOrders}) => {
@@ -27,11 +26,11 @@ const ImportOrders = ({importOrders}) => {
   //     statusName: "pending"
   //   },
   // ];
-  console.log(importOrders)
+  // console.log(importOrders)
   return (
-    <Card>
+    <Box>
       <ImportOrdersTable importOrders={importOrders} />
-    </Card>
+    </Box>
   )
 }
 

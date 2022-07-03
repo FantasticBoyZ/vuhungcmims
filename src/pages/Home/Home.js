@@ -1,6 +1,6 @@
 import { removePost } from '@/slices/PostSlice';
 import testAPI from '@/utils/testApi';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Card, Container, Paper, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
@@ -13,8 +13,8 @@ const HomePage = () => {
 
   const handleEditPost = (post) => {
     console.log('Edit ', post);
-    const editPostUrl = `/post/${post.id}`
-    navigate(editPostUrl)
+    const editPostUrl = `/post/${post.id}`;
+    navigate(editPostUrl);
   };
 
   const handleRemovePost = (post) => {
@@ -22,7 +22,6 @@ const HomePage = () => {
     const removePostId = post.id;
     const action = removePost(removePostId);
     dispatch(action);
-
   };
 
   // useEffect(() => {
@@ -44,8 +43,10 @@ const HomePage = () => {
   // }, []);
   return (
     <Box>
-      <Typography>HomePage</Typography>
-      <Button
+      <Container maxWidth='xl'>
+        {/* <Card>HomePage</Card> */}
+      </Container>
+      {/* <Button
         variant="contained"
         component={Link}
         to={'/post/add'}
@@ -74,7 +75,7 @@ const HomePage = () => {
               Delete
             </Button>
           </Box>
-        ))}
+        ))} */}
     </Box>
   );
 };

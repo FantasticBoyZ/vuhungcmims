@@ -7,6 +7,18 @@ export const getCategoryList = createAsyncThunk('category' , async (params, thun
   return categoryList;
 })
 
+export const getCategoryDetail = createAsyncThunk('category/get-one' , async (params, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const category = await categoryService.getCategoryDetail(params);
+  return category;
+})
+
+export const saveCategory = createAsyncThunk('category/save' , async (category, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const response = await categoryService.saveCategory(category);
+  return response;
+})
+
 const categorySlice = createSlice({
   name: 'categories',
   initialState: {
@@ -27,9 +39,17 @@ const categorySlice = createSlice({
     },
     [getCategoryList.fulfilled] :(state, action) => {
       state.loading = false;
-      state.products = action.payload;
     },
-    
+    [getCategoryDetail.pending] : (state) => {
+      state.loading = true;
+    },
+    [getCategoryDetail.rejected] :(state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getCategoryDetail.fulfilled] :(state, action) => {
+      state.loading = false;
+    },
   }
 });
 

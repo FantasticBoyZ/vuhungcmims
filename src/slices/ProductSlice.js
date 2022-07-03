@@ -7,13 +7,19 @@ export const getProductList = createAsyncThunk('product' , async (params, thunkA
   return productList;
 })
 
-export const getProductDetail = createAsyncThunk('product/get-one', async (id) => {
-  const product = await productService.getProductById(id)
+export const getProductDetail = createAsyncThunk('product/get-one', async ( params) => {
+  const product = await productService.getProductById(params)
   return product
 })
 
 export const saveProduct = createAsyncThunk('product/save', async (product) => {
   return await productService.saveProduct(product)
+})
+
+export const getProductByImportOrderId = createAsyncThunk('product/get-by-import-order' , async (params, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const productList = await productService.getProductByImportOrderId(params);
+  return productList;
 })
 
 const productSlice = createSlice({

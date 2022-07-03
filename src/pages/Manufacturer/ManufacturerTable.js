@@ -1,6 +1,6 @@
-import { Edit, Info } from '@mui/icons-material';
+import { Edit, EditTwoTone, Info, InfoTwoTone } from '@mui/icons-material';
 import {
-  Box,
+  IconButton,
   Stack,
   Table,
   TableBody,
@@ -11,23 +11,24 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   table: {
     textAlign: 'center',
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(2),
     '& thead th': {
-      fontWeight: '600',
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.primary.light,
+      // fontWeight: '600',
+      // color: theme.palette.primary.main,
+      backgroundColor: '#DCF4FC',
     },
     '& tbody td': {
-      fontWeight: '300',
+      // fontWeight: '300',
     },
     '& tbody tr:hover': {
-      backgroundColor: '#fffbf2',
+      // backgroundColor: '#fffbf2',
       cursor: 'pointer',
     },
   },
@@ -36,8 +37,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CategoryTable = ({ categoryList }) => {
+const ManufacturerTable = ({ manufacturerList }) => {
   const classes = useStyles();
+  const navigate = useNavigate();
+  const theme = useTheme()
+
+  const handleOnClickDetailManufacturer = (manufacturerId) => {
+    console.log(manufacturerId);
+    navigate(`/manufacturer/detail/${manufacturerId}`);
+  };
+
+  const handleOnClickEditCategory = (manufacturerId) => {
+    navigate(`/manufacturer/edit/${manufacturerId}`);
+  }
+
   return (
     <TableContainer>
       <Table className={classes.table}>
@@ -50,19 +63,20 @@ const CategoryTable = ({ categoryList }) => {
                 indeterminate={selectedSomeImportOrders}
               />
             </TableCell> */}
-            <TableCell>Tên danh mục</TableCell>
-            <TableCell>Mô tả</TableCell>
+            <TableCell>Tên nhà cung cấp</TableCell>
+            <TableCell>Email</TableCell>
+            <TableCell>Số điện thoại</TableCell>
             <TableCell align="left">Hành động</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {categoryList.map((category) => {
+          {manufacturerList.map((manufacturer) => {
             // TODO: làm selectedImportOrders
             //   const isImportOrderSelected = selectedImportOrders.includes(importOrder.id);
             return (
               <TableRow
                 hover
-                key={category.id}
+                key={manufacturer.id}
                 //   selected={isImportOrderSelected}
                 selected={false}
                 // onClick={(value) => handleOnClickTableRow(importOrder.orderId)}
@@ -88,7 +102,7 @@ const CategoryTable = ({ categoryList }) => {
                     gutterBottom
                     noWrap
                   >
-                    {category.name}
+                    {manufacturer.name}
                   </Typography>
                 </TableCell>
                 <TableCell>
@@ -98,22 +112,60 @@ const CategoryTable = ({ categoryList }) => {
                     gutterBottom
                     noWrap
                   >
-                    {category.description}
+                    {manufacturer.email}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography
+                    variant="body1"
+                    color="text.primary"
+                    gutterBottom
+                    noWrap
+                  >
+                    {manufacturer.phone}
                   </Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <Stack direction='row' spacing={2} >
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{ width: '40px' }}
+                  >
                     <Tooltip
-                      title="info Category"
+                      title="Chi tiết nhà cung cấp"
                       arrow
                     >
-                      <Info fontSize="small" />
+                      <IconButton
+                        sx={{
+                          '&:hover': {
+                            background: theme.colors.info.lighter,
+                          },
+                          color: theme.palette.info.main,
+                        }}
+                        color="inherit"
+                        size="small"
+                        onClick={() => handleOnClickDetailManufacturer(manufacturer.id)}
+                      >
+                        <InfoTwoTone fontSize="small" />
+                      </IconButton>
                     </Tooltip>
                     <Tooltip
-                      title="Edit Category"
+                      title="Sửa nhà cung cấp"
                       arrow
                     >
-                      <Edit fontSize="small" />
+                      <IconButton
+                        sx={{
+                          '&:hover': {
+                            background: theme.colors.primary.lighter,
+                          },
+                          color: theme.palette.primary.main,
+                        }}
+                        color="inherit"
+                        size="small"
+                        onClick={() => handleOnClickEditCategory(manufacturer.id)}
+                      >
+                        <EditTwoTone fontSize="small" />
+                      </IconButton>
                     </Tooltip>
                   </Stack>
                 </TableCell>
@@ -126,4 +178,4 @@ const CategoryTable = ({ categoryList }) => {
   );
 };
 
-export default CategoryTable;
+export default ManufacturerTable;

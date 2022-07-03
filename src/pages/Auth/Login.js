@@ -29,8 +29,12 @@ const Login = () => {
   };
 
   const FORM_VALIDATION = Yup.object().shape({
-    username: Yup.string().required('Username is required'),
-    password: Yup.string().required('Password is required.'),
+    username: Yup.string()
+      .required('Vui lòng nhập tên đăng nhập'),
+    password: Yup.string()
+      // .min(8, "Vui lòng nhập ít nhất 8 kí tự")
+      .max(50, "Vui lòng nhập không vượt quá 50 kí tự")
+      .required('Vui lòng nhập mật khẩu'),
   });
 
   const handleLogin = (e) => {
@@ -50,7 +54,7 @@ const Login = () => {
           (error.response && error.response.data && error.response.data.message) ||
           error.message ||
           error.toString();
-        toast.error(resMessage);
+        // toast.error(resMessage);
         setLoading(false);
         setMessage(resMessage);
       },
@@ -94,14 +98,14 @@ const Login = () => {
               <Form>
                 <Textfield
                   name="username"
-                  label="Email"
+                  label="Tên đăng nhập"
                   margin="normal"
                   fullWidth
-                  id="email"
-                  autoComplete="email"
-                  autoFocus
-                  // value={username}
-                  // onChange={onChangeUsername}
+                  id="username"
+                  autoComplete="username"
+                // autoFocus
+                // value={username}
+                // onChange={onChangeUsername}
                 />
 
                 <Textfield
@@ -112,8 +116,8 @@ const Login = () => {
                   type="password"
                   id="password"
                   autoComplete="current-password"
-                  // value={password}
-                  // onChange={onChangePassword}
+                // value={password}
+                // onChange={onChangePassword}
                 />
                 <FormControlLabel
                   control={
@@ -139,7 +143,7 @@ const Login = () => {
                 xs
               >
                 <Link
-                  href="#"
+                  href="/forgotPassword"
                   variant="body2"
                 >
                   Quên mật khẩu?

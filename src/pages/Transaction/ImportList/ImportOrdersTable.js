@@ -1,22 +1,16 @@
-import { DeleteTwoTone, EditTwoTone } from '@mui/icons-material';
+import Label from '@/components/Common/Label';
 import {
-  Box,
-  Card,
-  Checkbox,
-  IconButton,
-  Table,
+  Box, Checkbox, Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
-  Tooltip,
-  Typography,
-  useTheme,
+  TableRow, Typography,
+  useTheme
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { format } from 'date-fns';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -34,24 +28,43 @@ const useStyles = makeStyles((theme) => ({
   },
   table: {
     textAlign: 'center',
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(2),
     '& thead th': {
-      fontWeight: '600',
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.primary.light,
+      // fontWeight: '600',
+      // color: theme.palette.primary.main,
+      backgroundColor: '#DCF4FC',
     },
     '& tbody td': {
-      fontWeight: '300',
+      // fontWeight: '300',
     },
     '& tbody tr:hover': {
-      backgroundColor: '#fffbf2',
+      // backgroundColor: '#fffbf2',
       cursor: 'pointer',
     },
   },
-  cardStyle: {
-    padding: '12px'
-  }
+  
 }));
+
+const getStatusLabel = (importOrderStatus) => {
+  const map = {
+    failed: {
+      text: 'Đã huỷ',
+      color: 'error'
+    },
+    completed: {
+      text: 'Đã nhập kho',
+      color: 'success'
+    },
+    pending: {
+      text: 'Đang chờ xử lý',
+      color: 'warning'
+    }
+  };
+
+  const { text, color } = map[importOrderStatus];
+
+  return <Label color={color}>{text}</Label>;
+};
 
 const ImportOrdersTable = ({ importOrders }) => {
   const [selectedImportOrders, setSelectedImportOrders] = useState([]);
@@ -84,14 +97,14 @@ const ImportOrdersTable = ({ importOrders }) => {
   ];
 
   const formatDate = (date) => {
-    return format(new Date(date), 'dd/MM/yyyy')
-  }
+    return format(new Date(date), 'dd/MM/yyyy');
+  };
 
   const handleOnClickTableRow = (id) => {
     navigate(`/import/detail/${id}`);
   };
   return (
-    <Card className={classes.cardStyle}>
+    <Box>
       {!!importOrders && (
         <TableContainer>
           <Table className={classes.table}>
@@ -107,7 +120,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                 <TableCell>Mã nhập kho</TableCell>
                 <TableCell>Thời gian</TableCell>
                 <TableCell>Nhà cung cấp</TableCell>
-                <TableCell>Trạng thái</TableCell>
+                <TableCell align='center'>Trạng thái</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -144,7 +157,6 @@ const ImportOrdersTable = ({ importOrders }) => {
                         gutterBottom
                         noWrap
                       >
-                      
                         {importOrder.billRefernce}
                       </Typography>
                     </TableCell>
@@ -168,21 +180,21 @@ const ImportOrdersTable = ({ importOrders }) => {
                         {importOrder.manufactorName}
                       </Typography>
                     </TableCell>
-                    <TableCell>
+                    <TableCell align='center'>
                       {/* TODO: style status  */}
                       <Typography className={classes.completed}>
-                        {importOrder.statusName}
+                      {getStatusLabel(importOrder.statusName)}
                       </Typography>
                     </TableCell>
                   </TableRow>
                 );
               })}
             </TableBody>
-            {/* TODO: làm phân trang */}
+           
           </Table>
         </TableContainer>
       )}
-    </Card>
+    </Box>
   );
 };
 

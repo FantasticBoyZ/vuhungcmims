@@ -1,0 +1,47 @@
+.title-container {
+  margin-top: 16px;
+  display: flex;
+}
+.title-order {
+  width: 70%;
+}
+.status-order {
+  width: 30%;
+}
+.panel-information {
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.label-order-code {
+  font-size: 24px;
+  margin-bottom: 24px;
+  margin-left: 8px;
+}
+.button-back {
+  color: #637381;
+}
+.manufacturer-info {
+  color: #29a3e2;
+  cursor: pointer;
+}
+hr {
+  margin: 16px 0;
+}
+.container {
+  display: flex;
+}
+.left-panel {
+  margin: 8px;
+  width: 75%;
+}
+.right-panel {
+  margin: 8px;
+  width: 25%;
+}
+.panel-user-creates-order {
+  margin-bottom: 16px;
+}
+
+.panel-user-confirms-order {
+  margin-bottom: 16px;
+}

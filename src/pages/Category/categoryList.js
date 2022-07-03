@@ -1,22 +1,24 @@
-import { Search } from '@mui/icons-material';
+import Popup from '@/components/Common/Popup';
+import CustomTablePagination from '@/components/Common/TablePagination';
+import CategoryTable from '@/pages/Category/CategoryTable/CategoryTable';
+import { getCategoryList } from '@/slices/CategorySlice';
+import { Add, Search } from '@mui/icons-material';
 import {
   Box,
   Button,
   Card,
   InputAdornment,
-  Paper,
   Stack,
   TextField,
   Toolbar,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import React, { useEffect, useState } from 'react';
-import CategoryTable from '@/pages/Category/CategoryTable';
-import { getCategoryList } from '@/slices/CategorySlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { unwrapResult } from '@reduxjs/toolkit';
 import { Container } from '@mui/system';
-import CustomTablePagination from '@/components/Common/TablePagination';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import CategoryForm from './AddEditCategory/CategoryForm';
 
 const useStyles = makeStyles({
   searchField: {
@@ -48,9 +50,12 @@ const CategoryList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
   const [categoryList, setCategoryList] = useState([]);
+  const [allCategoryList, setAllCategoryList] = useState([])
+  const [openPopup, setOpenPopup] = useState(false);
   const [searchParams, setSearchParams] = useState({
     categoryName: '',
   });
+  const navigate = useNavigate();
   const classes = useStyles();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.categories }));
@@ -69,9 +74,19 @@ const CategoryList = () => {
       let target = e.target;
       console.log(e.target.value);
       setPage(0);
-      searchCategory({ ...searchParams, categoryName: target.value })
+      searchCategory({ ...searchParams, categoryName: target.value });
       // fetchProductList();
     }
+  };
+
+  const handleOnclickAddNewProduct = () => {
+    // navigate('/category/add');
+    setOpenPopup(true);
+  };
+
+  const closePopup = () => {
+    setOpenPopup(false);
+    searchCategory(searchParams);
   };
 
   const searchCategory = async (searchParams) => {
@@ -93,7 +108,25 @@ const CategoryList = () => {
     }
   };
 
-  const fetchCategoryList = async () => {
+  const getAllCategory = async (keyword) => {
+    try {
+      const params = {
+        // pageIndex: page + 1,
+        // pageSize: rowsPerPage,
+        categoryName: keyword,
+      };
+      const actionResult = await dispatch(getCategoryList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        setAllCategoryList(dataResult.data.category);
+      }
+    } catch (error) {
+      console.log('Failed to fetch category list: ', error);
+    }
+  };
+
+  const fetchCategoryList = async (params) => {
     try {
       const params = {
         pageIndex: page + 1,
@@ -114,38 +147,39 @@ const CategoryList = () => {
 
   useEffect(() => {
     fetchCategoryList();
+    getAllCategory();
   }, [page, rowsPerPage]);
 
   return (
-    <Container>
+    <Container maxWidth="xl">
       <Box sx={{ marginBottom: '20px' }}>
-        <Card className={classes.cardFilter}>
-          <Stack
-            direction="row"
-            justifyContent="flex-end"
-            spacing={2}
-            p={2}
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          spacing={2}
+          p={2}
+        >
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={() => handleOnclickAddNewProduct()}
           >
-            <Button
-              variant="contained"
-
-              // onClick={() => handleOnclickAddNewProduct()}
-            >
-              Thêm mới
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-            >
-              Xuất file excel
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-            >
-              Nhập file excel
-            </Button>
-          </Stack>
+            Thêm mới
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+          >
+            Xuất file excel
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+          >
+            Nhập file excel
+          </Button>
+        </Stack>
+        <Card className={classes.cardFilter}>
           <Toolbar className={classes.toolbar}>
             <TextField
               id="outlined-basic"
@@ -172,7 +206,7 @@ const CategoryList = () => {
             <>Loading...</>
           ) : (
             <Box>
-              <CategoryTable categoryList={categoryList} />
+              <CategoryTable categoryList={categoryList} allCategoryList={allCategoryList} />
               <CustomTablePagination
                 page={page}
                 pages={pages}
@@ -185,6 +219,16 @@ const CategoryList = () => {
           )}
         </Card>
       </Box>
+      <Popup
+        title="Thêm danh mục"
+        openPopup={openPopup}
+        setOpenPopup={setOpenPopup}
+      >
+        <CategoryForm
+          closePopup={closePopup}
+          allCategoryList={allCategoryList}
+        />
+      </Popup>
     </Container>
   );
 };
