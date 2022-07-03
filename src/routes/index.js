@@ -21,6 +21,7 @@ import StaffDetail from '@/pages/Staff/staffDetail';
 import ExportList from '@/pages/Transaction/ExportList/ExportList';
 import ExportOrderDetail from '@/pages/Transaction/ExportList/ExportOrderDetail/ExportOrderDetail';
 import ExportGoods from '@/pages/Export/ExportGoods/ExportGoods';
+import CommonForgotPass from '@/pages/Auth/CommonForgotPass';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -29,6 +30,7 @@ const publicRoutes = [
   // { path: '/about', component: About, primary: 'About', icon: <Info/>,},
   // { path: '/profile', component: Profile, primary: 'Profile', icon: <Info/>,},
   { path: '/register', component: Login, layout: null },
+  { path: '/forgotPassword', component: CommonForgotPass, layout: null },
 ];
 
 const privateRoutes = [
