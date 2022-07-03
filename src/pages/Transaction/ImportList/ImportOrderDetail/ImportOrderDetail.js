@@ -18,16 +18,16 @@ const getStatusLabel = (importOrderStatus) => {
   const map = {
     failed: {
       text: 'Đã huỷ',
-      color: 'error'
+      color: 'error',
     },
     completed: {
       text: 'Đã nhập kho',
-      color: 'success'
+      color: 'success',
     },
     pending: {
       text: 'Đang chờ xử lý',
-      color: 'warning'
-    }
+      color: 'warning',
+    },
   };
 
   const { text, color } = map[importOrderStatus];
@@ -45,7 +45,7 @@ const ImportOrderDetail = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const dataTest = {
     id: 1,
     orderCode: 'Test001',
@@ -95,8 +95,8 @@ const ImportOrderDetail = () => {
   };
 
   const handleOnClickBack = () => {
-    navigate('/import')
-  }
+    navigate('/import');
+  };
 
   useEffect(() => {
     const fetchImportOrderDetail = async () => {
@@ -164,7 +164,9 @@ const ImportOrderDetail = () => {
                     {importOrder.billRefernce}{' '}
                   </Box>
                 </div>
-                <div className="status-oder">{getStatusLabel(importOrder.statusName)}</div>
+                <div className="status-oder">
+                  {getStatusLabel(importOrder.statusName)}
+                </div>
               </div>
               <div className="container">
                 <div className="left-panel">
@@ -244,23 +246,25 @@ const ImportOrderDetail = () => {
                       <Box>
                         Người xác nhận: <i> {dataTest.confirmUser}</i>
                       </Box>
-                      <LocalizationProvider
-                        locale={vi}
-                        dateAdapter={AdapterDateFns}
-                      >
-                        <Typography>Ngày nhập kho</Typography>
-                        <DateTimePicker
-                          readOnly
-                          value={confirmedDate}
-                          renderInput={(params) => (
-                            <TextField
-                              variant="standard"
-                              {...params}
-                              helperText={null}
-                            />
-                          )}
-                        />
-                      </LocalizationProvider>
+                      {importOrder.confirmDate && (
+                        <LocalizationProvider
+                          locale={vi}
+                          dateAdapter={AdapterDateFns}
+                        >
+                          <Typography>Ngày nhập kho</Typography>
+                          <DateTimePicker
+                            readOnly
+                            value={importOrder.confirmDate}
+                            renderInput={(params) => (
+                              <TextField
+                                variant="standard"
+                                {...params}
+                                helperText={null}
+                              />
+                            )}
+                          />
+                        </LocalizationProvider>
+                      )}
                     </div>
                   </Card>
                   <Card className="panel-information">

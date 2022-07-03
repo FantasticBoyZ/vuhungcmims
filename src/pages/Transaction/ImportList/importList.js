@@ -126,7 +126,7 @@ const ImportList = () => {
   };
 
   const handleOnClickCreateImportOrder = () => {
-    navigate('/import/importGoods');
+    navigate('/import/create-order');
   };
 
   const searchImportOrder = async (searchParams) => {
@@ -162,7 +162,7 @@ const ImportList = () => {
         setImportOrderList(dataResult.data.orderList);
       }
     } catch (error) {
-      console.log('Failed to fetch product list: ', error);
+      console.log('Failed to fetch importOrder list: ', error);
     }
   };
   // hook này để test biến thôi nha
@@ -239,7 +239,7 @@ const ImportList = () => {
               </Form>
             </Formik> */}
             <FormControl fullWidth>
-              <InputLabel id="select-creator">Người tạo</InputLabel>
+              <InputLabel id="select-creator">Người tạo đơn</InputLabel>
               <Select
                 id="creator"
                 value={creatorId}

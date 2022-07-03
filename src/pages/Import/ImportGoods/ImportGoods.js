@@ -356,6 +356,7 @@ const ImportGoods = () => {
                       styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                       onChange={(e) => {
                         setFieldValue('manufactorId', e?.value.id || '');
+                        setFieldValue('consignmentRequests', []);
                         handleOnChangeManufacturer(e);
                       }}
                     />
