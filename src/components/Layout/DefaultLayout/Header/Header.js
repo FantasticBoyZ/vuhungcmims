@@ -50,8 +50,12 @@ const titles = [
   { url: '/manufacturer/edit', title: 'Sửa nhà cung cấp' },
   { url: '/import', title: 'Danh sách phiếu nhập kho' },
   { url: '/import/detail', title: 'Thông tin phiếu nhập kho' },
-  { url: '/import/add', title: 'Thông tin phiếu nhập kho' },
+  { url: '/import/create-order', title: 'Nhập kho' },
   { url: '/import/edit', title: 'Thông tin phiếu nhập kho' },
+  { url: '/export', title: 'Danh sách phiếu xuất kho' },
+  { url: '/export/detail', title: 'Thông tin phiếu xuất kho' },
+  { url: '/export/create-order', title: 'Xuất kho' },
+  { url: '/export/edit', title: 'Thông tin phiếu xuất kho' },
 ];
 
 const Header = () => {
