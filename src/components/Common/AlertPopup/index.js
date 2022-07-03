@@ -8,7 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 const AlertPopup = (props) => {
-  const { title, children, openPopup, setOpenPopup } = props;
+  const { maxWidth, title, children, openPopup, setOpenPopup, isConfirm, handleConfirm } = props;
 
   return (
     <div>
@@ -16,6 +16,8 @@ const AlertPopup = (props) => {
         open={openPopup}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        maxWidth={maxWidth ? maxWidth: 'xs'}
+        fullWidth
       >
         <DialogTitle id="alert-dialog-title">
           {title}
@@ -38,6 +40,15 @@ const AlertPopup = (props) => {
           <DialogContentText id="alert-dialog-description">{children}</DialogContentText>
         </DialogContent>
         <DialogActions>
+          {isConfirm && (
+            <Button
+              onClick={handleConfirm}
+              autoFocus
+              variant='contained'
+            >
+              Xác nhận
+            </Button>
+          )}
           <Button
             onClick={() => {
               setOpenPopup(false);

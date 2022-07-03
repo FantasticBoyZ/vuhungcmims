@@ -10,12 +10,12 @@ const productService = {
 
   getProductById: (params) => {
     const url = `/product/${params.productId}`;
-    return axiosClient.get(url, {params, headers: authHeader() });
+    return axiosClient.get(url, { params, headers: authHeader() });
   },
 
   getProductByImportOrderId: (params) => {
     const url = `/import-order/list-product`;
-    return axiosClient.get(url, {params, headers: authHeader() });
+    return axiosClient.get(url, { params, headers: authHeader() });
   },
 
   saveProduct: (product) => {
@@ -32,25 +32,30 @@ const productService = {
     //   categoryId: "1",
     //   manufactorId: "1",
     // };
-    const url = 'http://localhost:8080/api/product/add';
-    
-    axios.post(url,{
-      id: product.id,
-      name: product.name,
-      productCode: product.productCode,
-      unitMeasure: product.unitMeasure,
-      wrapUnitMeasure: product.wrapUnitMeasure,
-      numberOfWrapUnitMeasure: product.numberOfWrapUnitMeasure,
-      color: product.color,
-      categoryId: product.categoryId,
-      manufactorId: product.manufactorId,
-      description: product.description
-    }).then((response) => {
-    
-      return response.data;
-    }, (error) => {
-      console.log(error)
-    });;
+    // const url = 'http://localhost:8080/api/product/add';
+    const url = process.env.REACT_APP_API_URL + 'product/add';
+
+    axios
+      .post(url, {
+        id: product.id,
+        name: product.name,
+        productCode: product.productCode,
+        unitMeasure: product.unitMeasure,
+        wrapUnitMeasure: product.wrapUnitMeasure,
+        numberOfWrapUnitMeasure: product.numberOfWrapUnitMeasure,
+        color: product.color,
+        categoryId: product.categoryId,
+        manufactorId: product.manufactorId,
+        description: product.description,
+      })
+      .then(
+        (response) => {
+          return response.data;
+        },
+        (error) => {
+          console.log(error);
+        },
+      );
   },
 };
 
