@@ -14,8 +14,8 @@ const CategoryService = {
   },
 
   saveCategory: (category) => {
-    const url = 'http://localhost:8080/api/category/add';
-
+    // const url = 'http://localhost:8080/api/category/add';
+    const url = process.env.REACT_APP_API_URL + 'category/add'
     axios
       .post(url, {
         id: category.id,

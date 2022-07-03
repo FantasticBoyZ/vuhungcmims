@@ -5,7 +5,7 @@ const LOCAL_API_URL = 'http://localhost:8080/api/'
 
 const axiosClient = axios.create({
   baseURL: process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : LOCAL_API_URL,
-  // baseURL: process.env.REACT_APP_API_URL,
+  // baseURL: LOCAL_API_URL,
   headers: {
     'Content-Type': 'applicaion/json',
   },

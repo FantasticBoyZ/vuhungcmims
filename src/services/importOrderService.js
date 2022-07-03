@@ -14,8 +14,9 @@ const importOrderService = {
   },
 
   createImportOrder: (importOrder) => {
-    const url = 'http://localhost:8080/api/import-order/create';
-    console.log(importOrder);
+    // const url = 'http://localhost:8080/api/import-order/create';
+    const url = process.env.REACT_APP_API_URL + 'import-order/create';
+    // console.log(importOrder);
     return axios.post(url, {
       billReferenceNumber: importOrder.billReferenceNumber,
       createdDate: importOrder.createdDate,
