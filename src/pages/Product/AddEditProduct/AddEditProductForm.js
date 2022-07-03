@@ -1,21 +1,18 @@
 import ButtonWrapper from '@/components/Common/FormsUI/Button';
-import SelectWrapper from '@/components/Common/FormsUI/Select';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
+import IconRequired from '@/components/Common/IconRequired';
 import CategoryService from '@/services/categoryService';
+import { getManufacturerList } from '@/slices/ManufacturerSlice';
 import { getProductDetail, saveProduct } from '@/slices/ProductSlice';
-import { Info, InfoOutlined } from '@mui/icons-material';
+import FormatDataUtils from '@/utils/formatData';
 import {
   Box,
   Button,
   Card,
   CardContent,
-  CardHeader,
-  Container,
-  FormHelperText,
+  CardHeader, FormHelperText,
   Grid,
-  Stack,
-  TextField,
-  Typography,
+  Stack, Typography
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -23,12 +20,9 @@ import { Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import * as Yup from 'yup';
-import { toast } from 'react-toastify';
-import IconRequired from '@/components/Common/IconRequired';
-import FormatDataUtils from '@/utils/formatData';
 import Select from 'react-select';
-import { getManufacturerList } from '@/slices/ManufacturerSlice';
+import { toast } from 'react-toastify';
+import * as Yup from 'yup';
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
