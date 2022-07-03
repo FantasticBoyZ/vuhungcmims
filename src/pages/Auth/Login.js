@@ -50,7 +50,7 @@ const Login = () => {
           (error.response && error.response.data && error.response.data.message) ||
           error.message ||
           error.toString();
-        toast.error(resMessage);
+        // toast.error(resMessage);
         setLoading(false);
         setMessage(resMessage);
       },
@@ -94,7 +94,7 @@ const Login = () => {
               <Form>
                 <Textfield
                   name="username"
-                  label="Email"
+                  label="Tên đăng nhập"
                   margin="normal"
                   fullWidth
                   id="email"
