@@ -14,8 +14,8 @@ const importOrderService = {
   },
 
   createImportOrder: (importOrder) => {
-    // const url = 'http://localhost:8080/api/import-order/create';
-    const url = process.env.REACT_APP_API_URL + '/import-order/create';
+    const url = 'http://localhost:8080/api/import-order/create';
+    // const url = process.env.REACT_APP_API_URL + '/import-order/create';
     // console.log(importOrder);
     return axios.post(url, {
       billReferenceNumber: importOrder.billReferenceNumber,
@@ -28,6 +28,11 @@ const importOrderService = {
       consignmentRequests: importOrder.consignmentRequests,
     });
   },
+
+  confirmImportOrder: (importOrderId) => {
+    const url = `/import-order/confirm/${importOrderId}`;
+    return axiosClient.get(url, { headers: authHeader() });
+  }
 };
 
 export default importOrderService;

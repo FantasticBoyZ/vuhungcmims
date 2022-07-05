@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
-const LOCAL_API_URL = 'http://localhost:8080/api/';
-const API_URL = process.env.REACT_APP_API_URL + '/auth';
-// const API_URL = LOCAL_API_URL + '/api/auth/';
+const LOCAL_API_URL = 'http://localhost:8080';
+// const API_URL = process.env.REACT_APP_API_URL + '/auth';
+const API_URL = LOCAL_API_URL + '/api/auth';
 const register = (username, email, password) => {
   return axios.post(API_URL + '/signup', {
     username,

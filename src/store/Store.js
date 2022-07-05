@@ -5,6 +5,7 @@ import productReducer from '@/slices/ProductSlice';
 import importOrderReducer from '@/slices/ImportOrderSlice';
 import categoryReducer from '@/slices/CategorySlice';
 import manufacturerReducer from '@/slices/ManufacturerSlice';
+import exportOrderReducer from '@/slices/ExportOrderSlice';
 
 const rootReducer = {
     users: userReducer,
@@ -12,7 +13,8 @@ const rootReducer = {
     products: productReducer,
     categories: categoryReducer,
     manufacturers: manufacturerReducer,
-    importOrders: importOrderReducer
+    importOrders: importOrderReducer,
+    exportOrders: exportOrderReducer,
 }
 
 const store = configureStore({
