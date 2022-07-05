@@ -39,7 +39,6 @@ const SidebarItem = ({ option, openSidebar }) => {
   }, [openSidebar]);
 
   const handleClick = (option) => {
-    console.log(option)
     if( option?.children.length > 0) {
       setOpenNested(!openNested);
     }else {

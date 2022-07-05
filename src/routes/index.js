@@ -22,6 +22,7 @@ import ExportList from '@/pages/Transaction/ExportList/ExportList';
 import ExportOrderDetail from '@/pages/Transaction/ExportList/ExportOrderDetail/ExportOrderDetail';
 import ExportGoods from '@/pages/Export/ExportGoods/ExportGoods';
 import CommonForgotPass from '@/pages/Auth/CommonForgotPass';
+import UpdateImportOrderDetail from '@/pages/Transaction/ImportList/UpdateImportOrderDetail/UpdateImportOrderDetail';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -62,6 +63,7 @@ const privateRoutes = [
   { path: '/import', component: ImportList },
   { path: '/import/create-order', component: ImportGoods },
   { path: '/import/detail/:importOrderId', component: ImportOrderDetail },
+  { path: '/import/edit/:importOrderId', component: UpdateImportOrderDetail },
 
   // exportOrder route
   { path: '/export', component: ExportList },
