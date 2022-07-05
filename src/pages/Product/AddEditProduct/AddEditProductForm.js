@@ -1,18 +1,21 @@
-import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import IconRequired from '@/components/Common/IconRequired';
 import CategoryService from '@/services/categoryService';
 import { getManufacturerList } from '@/slices/ManufacturerSlice';
 import { getProductDetail, saveProduct } from '@/slices/ProductSlice';
 import FormatDataUtils from '@/utils/formatData';
+import { Save } from '@mui/icons-material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import {
   Box,
   Button,
   Card,
   CardContent,
-  CardHeader, FormHelperText,
+  CardHeader,
+  FormHelperText,
   Grid,
-  Stack, Typography
+  Stack,
+  Typography
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -65,6 +68,7 @@ const AddEditProductForm = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [selectedManufacuter, setSelectedManufacturer] = useState('');
+  const [loadingButton, setLoadingButton] = useState(false);
   const initialFormValue = {
     productCode: '',
     name: '',
@@ -100,12 +104,28 @@ const AddEditProductForm = () => {
       const actionResult = await dispatch(saveProduct(product));
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
+
+      if (isAdd) {
+        toast.success('Thêm sản phẩm thành công!');
+        navigate('/product');
+      } else {
+        toast.success('Sửa sản phẩm thành công!');
+        navigate(`/product/detail/${productId}`);
+      }
     } catch (error) {
       console.log('Failed to save product: ', error);
+      if (isAdd) {
+        toast.error(error);
+      } else {
+        toast.error(error);
+      }
+    } finally {
+      setLoadingButton(false);
     }
   };
 
   const handleSubmit = (values) => {
+    setLoadingButton(true);
     const newProduct = {
       id: productId,
       name: values.name,
@@ -120,14 +140,6 @@ const AddEditProductForm = () => {
     };
     console.log(values);
     saveProductDetail(newProduct);
-
-    if (isAdd) {
-      toast.success('Thêm sản phẩm thành công!');
-      navigate('/product');
-    } else {
-      toast.success('Sửa sản phẩm thành công!');
-      navigate(`/product/detail/${productId}`);
-    }
   };
 
   const handleOnClickExit = () => {
@@ -201,14 +213,13 @@ const AddEditProductForm = () => {
     fetchManufacturerList();
     if (!!productId) {
       setIsAdd(false);
-      if(!!categoryList && !!manufacturerList) {
+      if (!!categoryList && !!manufacturerList) {
         fetchProductDetail();
       }
     }
   }, [productId]);
   return (
-    
-    <Box padding='20px'>
+    <Box padding="20px">
       {/* Update Product */}
       {loading && !isAdd ? (
         <>Loading...</>
@@ -446,7 +457,7 @@ const AddEditProductForm = () => {
                               item
                             >
                               <Typography className={classes.wrapIcon}>
-                                Nhà cung cấp: <IconRequired/>
+                                Nhà cung cấp: <IconRequired />
                               </Typography>
                               {/* {selectedManufacturer && ( */}
                               <Select
@@ -502,7 +513,15 @@ const AddEditProductForm = () => {
                         justifyContent="flex-end"
                         padding="20px"
                       >
-                        <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
+                        <LoadingButton
+                          loading={loadingButton}
+                          type="submit"
+                          variant="contained"
+                          loadingPosition="start"
+                          startIcon={<Save />}
+                        >
+                          Lưu
+                        </LoadingButton>
                         <Button
                           onClick={() => handleOnClickExit()}
                           variant="outlined"
@@ -748,7 +767,7 @@ const AddEditProductForm = () => {
                           item
                         >
                           <Typography className={classes.wrapIcon}>
-                            Nhà cung cấp: <IconRequired/>
+                            Nhà cung cấp: <IconRequired />
                           </Typography>
                           {/* {selectedManufacturer && ( */}
                           <Select
@@ -804,7 +823,16 @@ const AddEditProductForm = () => {
                     justifyContent="flex-end"
                     padding="20px"
                   >
-                    <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
+                    {/* <ButtonWrapper variant="contained">Lưu</ButtonWrapper> */}
+                    <LoadingButton
+                      loading={loadingButton}
+                      type="submit"
+                      variant="contained"
+                      loadingPosition="start"
+                      startIcon={<Save />}
+                    >
+                      Lưu
+                    </LoadingButton>
                     <Button
                       onClick={() => handleOnClickExit()}
                       variant="outlined"
@@ -983,178 +1011,177 @@ export default AddEditProductForm;
 //   </Grid>
 // )}
 
-
 // <Container maxWidth="xl">
-    //   <Box className={classes.cardHeader}>
-    //     <Typography variant="h4">{isAdd ? 'Thêm ' : 'Sửa '}sản phẩm</Typography>
-    //   </Box>
-    //   <Card>
-    //     {loading && !isAdd ? (
-    //       <>Loading...</>
-    //     ) : (
-    //       <>
-    //         <Grid
-    //           container
-    //           direction="row"
-    //           justifyContent="center"
-    //           alignItems="stretch"
-    //         >
-    //           {product && (
-    //             <Grid
-    //               xs={12}
-    //               item
-    //             >
-    //               <Formik
-    //                 initialValues={{
-    //                   ...product,
-    //                 }}
-    //                 validationSchema={FORM_VALIDATION}
-    //                 onSubmit={(values) => handleSubmit(values)}
-    //               >
-    //                 <Form>
-    //                   <Grid
-    //                     container
-    //                     direction="row"
-    //                     justifyContent="center"
-    //                     alignItems="stretch"
-    //                   >
-    //                     <Grid
-    //                       xs={6}
-    //                       item
-    //                       className={classes.leftContainer}
-    //                     >
-    //                       <Box className={classes.infoContainer}>
-    //                         <Typography className={classes.wrapIcon}>
-    //                           Mã sản phẩm <InfoOutlined className={classes.iconStyle} />
-    //                         </Typography>
-    //                         <TextfieldWrapper
-    //                           name="productCode"
-    //                           fullWidth
-    //                           id="productCode"
-    //                           autoComplete="productCode"
-    //                           autoFocus
-    //                         />
-    //                       </Box>
+//   <Box className={classes.cardHeader}>
+//     <Typography variant="h4">{isAdd ? 'Thêm ' : 'Sửa '}sản phẩm</Typography>
+//   </Box>
+//   <Card>
+//     {loading && !isAdd ? (
+//       <>Loading...</>
+//     ) : (
+//       <>
+//         <Grid
+//           container
+//           direction="row"
+//           justifyContent="center"
+//           alignItems="stretch"
+//         >
+//           {product && (
+//             <Grid
+//               xs={12}
+//               item
+//             >
+//               <Formik
+//                 initialValues={{
+//                   ...product,
+//                 }}
+//                 validationSchema={FORM_VALIDATION}
+//                 onSubmit={(values) => handleSubmit(values)}
+//               >
+//                 <Form>
+//                   <Grid
+//                     container
+//                     direction="row"
+//                     justifyContent="center"
+//                     alignItems="stretch"
+//                   >
+//                     <Grid
+//                       xs={6}
+//                       item
+//                       className={classes.leftContainer}
+//                     >
+//                       <Box className={classes.infoContainer}>
+//                         <Typography className={classes.wrapIcon}>
+//                           Mã sản phẩm <InfoOutlined className={classes.iconStyle} />
+//                         </Typography>
+//                         <TextfieldWrapper
+//                           name="productCode"
+//                           fullWidth
+//                           id="productCode"
+//                           autoComplete="productCode"
+//                           autoFocus
+//                         />
+//                       </Box>
 
-    //                       <Box className={classes.infoContainer}>
-    //                         <Typography className={classes.wrapIcon}>
-    //                           Tên sản phẩm <InfoOutlined className={classes.iconStyle} />
-    //                         </Typography>
-    //                         <TextfieldWrapper
-    //                           name="name"
-    //                           fullWidth
-    //                           id="name"
-    //                           autoComplete="name"
-    //                           autoFocus
-    //                         />
-    //                       </Box>
-    //                       <Box className={classes.infoContainer}>
-    //                         <Typography className={classes.wrapIcon}>
-    //                           Danh mục <InfoOutlined className={classes.iconStyle} />
-    //                         </Typography>
-    //                         {!!categoryList && (
-    //                           <SelectWrapper
-    //                             name="categoryId"
-    //                             fullWidth
-    //                             options={categoryList}
-    //                             id="categoryId"
-    //                             autoFocus
-    //                           />
-    //                         )}
-    //                       </Box>
-    //                       {/* <Box sx={{ display: 'flex', width: '100%' }}>
-    //                 <Typography>Danh mục phụ</Typography>
-    //                 {!!categoryList && (
-    //                   <SelectWrapper
-    //                     name="subCategoryId"
-    //                     margin="normal"
-    //                     fullWidth
-    //                     options={categoryList}
-    //                     id="subCategoryId"
-    //                   />
-    //                 )}
-    //               </Box> */}
-    //                       <Box className={classes.infoContainer}>
-    //                         <Typography className={classes.wrapIcon}>
-    //                           Đơn vị tính <InfoOutlined className={classes.iconStyle} />
-    //                         </Typography>
-    //                         <TextfieldWrapper
-    //                           name="unitMeasure"
-    //                           fullWidth
-    //                           id="unitMeasure"
-    //                           autoComplete="unitMeasure"
-    //                           autoFocus
-    //                         />
-    //                       </Box>
-    //                     </Grid>
-    //                     <Grid
-    //                       xs={6}
-    //                       item
-    //                       className={classes.rightContainer}
-    //                     >
-    //                       {!isAdd && (
-    //                         <Box className={classes.infoContainer}>
-    //                           <Typography className={classes.wrapIcon}>
-    //                             Tồn kho <InfoOutlined className={classes.iconStyle} />
-    //                           </Typography>
-    //                           <TextField
-    //                             defaultValue={product.quantity}
-    //                             fullWidth
-    //                             InputProps={{
-    //                               readOnly: true,
-    //                             }}
-    //                           />
-    //                         </Box>
-    //                       )}
-    //                       <Box className={classes.infoContainer}>
-    //                         <Typography className={classes.wrapIcon}>
-    //                           Màu sắc <InfoOutlined className={classes.iconStyle} />
-    //                         </Typography>
-    //                         <TextfieldWrapper
-    //                           name="color"
-    //                           fullWidth
-    //                           id="color"
-    //                           autoComplete="color"
-    //                           autoFocus
-    //                         />
-    //                       </Box>
-    //                       <Box className={classes.infoContainer}>
-    //                         <Typography className={classes.wrapIcon}>
-    //                           Mô tả <InfoOutlined className={classes.iconStyle} />
-    //                         </Typography>
-    //                         <TextfieldWrapper
-    //                           name="description"
-    //                           fullWidth
-    //                           multiline
-    //                           rows={4}
-    //                           id="description"
-    //                           autoFocus
-    //                         />
-    //                       </Box>
-    //                     </Grid>
-    //                   </Grid>
-    //                   <Stack
-    //                     direction="row"
-    //                     spacing={2}
-    //                     justifyContent="flex-end"
-    //                     padding="20px"
-    //                   >
-    //                     <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
-    //                     <Button
-    //                       variant="outlined"
-    //                       onClick={() => handleOnClickExit()}
-    //                     >
-    //                       Thoát
-    //                     </Button>
-    //                   </Stack>
-    //                 </Form>
-    //               </Formik>
-    //             </Grid>
-    //           )}
-    //         </Grid>
-    //       </>
-    //     )}
-    //   </Card>
-    //   {/* TODO: tối ưu code */}
+//                       <Box className={classes.infoContainer}>
+//                         <Typography className={classes.wrapIcon}>
+//                           Tên sản phẩm <InfoOutlined className={classes.iconStyle} />
+//                         </Typography>
+//                         <TextfieldWrapper
+//                           name="name"
+//                           fullWidth
+//                           id="name"
+//                           autoComplete="name"
+//                           autoFocus
+//                         />
+//                       </Box>
+//                       <Box className={classes.infoContainer}>
+//                         <Typography className={classes.wrapIcon}>
+//                           Danh mục <InfoOutlined className={classes.iconStyle} />
+//                         </Typography>
+//                         {!!categoryList && (
+//                           <SelectWrapper
+//                             name="categoryId"
+//                             fullWidth
+//                             options={categoryList}
+//                             id="categoryId"
+//                             autoFocus
+//                           />
+//                         )}
+//                       </Box>
+//                       {/* <Box sx={{ display: 'flex', width: '100%' }}>
+//                 <Typography>Danh mục phụ</Typography>
+//                 {!!categoryList && (
+//                   <SelectWrapper
+//                     name="subCategoryId"
+//                     margin="normal"
+//                     fullWidth
+//                     options={categoryList}
+//                     id="subCategoryId"
+//                   />
+//                 )}
+//               </Box> */}
+//                       <Box className={classes.infoContainer}>
+//                         <Typography className={classes.wrapIcon}>
+//                           Đơn vị tính <InfoOutlined className={classes.iconStyle} />
+//                         </Typography>
+//                         <TextfieldWrapper
+//                           name="unitMeasure"
+//                           fullWidth
+//                           id="unitMeasure"
+//                           autoComplete="unitMeasure"
+//                           autoFocus
+//                         />
+//                       </Box>
+//                     </Grid>
+//                     <Grid
+//                       xs={6}
+//                       item
+//                       className={classes.rightContainer}
+//                     >
+//                       {!isAdd && (
+//                         <Box className={classes.infoContainer}>
+//                           <Typography className={classes.wrapIcon}>
+//                             Tồn kho <InfoOutlined className={classes.iconStyle} />
+//                           </Typography>
+//                           <TextField
+//                             defaultValue={product.quantity}
+//                             fullWidth
+//                             InputProps={{
+//                               readOnly: true,
+//                             }}
+//                           />
+//                         </Box>
+//                       )}
+//                       <Box className={classes.infoContainer}>
+//                         <Typography className={classes.wrapIcon}>
+//                           Màu sắc <InfoOutlined className={classes.iconStyle} />
+//                         </Typography>
+//                         <TextfieldWrapper
+//                           name="color"
+//                           fullWidth
+//                           id="color"
+//                           autoComplete="color"
+//                           autoFocus
+//                         />
+//                       </Box>
+//                       <Box className={classes.infoContainer}>
+//                         <Typography className={classes.wrapIcon}>
+//                           Mô tả <InfoOutlined className={classes.iconStyle} />
+//                         </Typography>
+//                         <TextfieldWrapper
+//                           name="description"
+//                           fullWidth
+//                           multiline
+//                           rows={4}
+//                           id="description"
+//                           autoFocus
+//                         />
+//                       </Box>
+//                     </Grid>
+//                   </Grid>
+//                   <Stack
+//                     direction="row"
+//                     spacing={2}
+//                     justifyContent="flex-end"
+//                     padding="20px"
+//                   >
+//                     <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
+//                     <Button
+//                       variant="outlined"
+//                       onClick={() => handleOnClickExit()}
+//                     >
+//                       Thoát
+//                     </Button>
+//                   </Stack>
+//                 </Form>
+//               </Formik>
+//             </Grid>
+//           )}
+//         </Grid>
+//       </>
+//     )}
+//   </Card>
+//   {/* TODO: tối ưu code */}
 
-    // </Container>
+// </Container>

@@ -1,6 +1,8 @@
 import AlertPopup from '@/components/Common/AlertPopup';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
-import { getImportOrderById } from '@/slices/ImportOrderSlice';
+import importOrderService from '@/services/importOrderService';
+import { confirmImportOrder, getImportOrderById } from '@/slices/ImportOrderSlice';
 import { getProductByImportOrderId } from '@/slices/ProductSlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Close, Done, Edit, KeyboardReturn } from '@mui/icons-material';
@@ -19,6 +21,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import ConsignmentsTable from './ConsignmentsTable';
 import './style.css';
 
@@ -128,63 +131,79 @@ const ImportOrderDetail = () => {
   const handleOnClickConfirm = () => {
     setTitle('Bạn có chắc chắn muốn xác nhận rằng nhập kho thành công?');
     setMessage('Hãy kiểm tra kỹ hàng hóa trước khi xác nhận.');
-    setIsConfirm(true)
+    setIsConfirm(true);
     setOpenPopup(true);
   };
 
   const handleOnClickCancel = () => {
     setTitle('Bạn có chắc chắn muốn hủy phiếu nhập này không?');
     setMessage('');
-    setIsConfirm(false)
+    setIsConfirm(false);
     setOpenPopup(true);
   };
 
-  const handleConfirm = () => {
-    if(isConfirm) {
+
+  const handleConfirm = async () => {  
+    if (isConfirm) {
       console.log('Xác nhận');
-    }else {
+      try {
+        const actionResult = await dispatch(confirmImportOrder(importOrderId));
+        const result = unwrapResult(actionResult);
+        if (!!result) {
+          if (!!result.message) {
+            toast.success(result.message);
+          } else {
+            toast.success('Xác nhận nhập kho thành công!');
+          }
+          fetchImportOrderDetail();
+          fetchProductListByImportOrderId();
+          setOpenPopup(false);
+        }
+      } catch (error) {
+        console.log('Failed to confirm importOder: ', error);
+      }
+    } else {
       console.log('Huỷ');
     }
-    setOpenPopup(false);
+  };
+
+  const fetchImportOrderDetail = async () => {
+    try {
+      // const params = {
+      //   orderId: importOrderId,
+      // };
+      const actionResult = await dispatch(getImportOrderById(importOrderId));
+      const dataResult = unwrapResult(actionResult);
+      if (dataResult.data) {
+        setImportOrder(dataResult.data.inforDetail);
+      }
+      console.log('Import Order Detail', dataResult);
+    } catch (error) {
+      console.log('Failed to fetch importOrder detail: ', error);
+    }
+  };
+
+  const fetchProductListByImportOrderId = async () => {
+    try {
+      const params = {
+        pageIndex: page,
+        pageSize: rowsPerPage,
+        orderId: importOrderId,
+      };
+      const actionResult = await dispatch(getProductByImportOrderId(params));
+      const dataResult = unwrapResult(actionResult);
+      if (dataResult.data) {
+        setListConsignments(dataResult.data.listProduct);
+        setTotalRecord(dataResult.data.totalRecord);
+        console.log('totalRecord', dataResult.data.totalRecord);
+      }
+      console.log('Product List', dataResult);
+    } catch (error) {
+      console.log('Failed to fetch product list by importOder: ', error);
+    }
   };
 
   useEffect(() => {
-    const fetchImportOrderDetail = async () => {
-      try {
-        // const params = {
-        //   orderId: importOrderId,
-        // };
-        const actionResult = await dispatch(getImportOrderById(importOrderId));
-        const dataResult = unwrapResult(actionResult);
-        if (dataResult.data) {
-          setImportOrder(dataResult.data.inforDetail);
-        }
-        console.log('Import Order Detail', dataResult);
-      } catch (error) {
-        console.log('Failed to fetch importOrder detail: ', error);
-      }
-    };
-
-    const fetchProductListByImportOrderId = async () => {
-      try {
-        const params = {
-          pageIndex: page,
-          pageSize: rowsPerPage,
-          orderId: importOrderId,
-        };
-        const actionResult = await dispatch(getProductByImportOrderId(params));
-        const dataResult = unwrapResult(actionResult);
-        if (dataResult.data) {
-          setListConsignments(dataResult.data.listProduct);
-          setTotalRecord(dataResult.data.totalRecord);
-          console.log('totalRecord', dataResult.data.totalRecord);
-        }
-        console.log('Product List', dataResult);
-      } catch (error) {
-        console.log('Failed to fetch product list by importOder: ', error);
-      }
-    };
-
     fetchImportOrderDetail();
     fetchProductListByImportOrderId();
   }, [page, rowsPerPage]);
@@ -192,7 +211,7 @@ const ImportOrderDetail = () => {
   return (
     <>
       {loading ? (
-        <>Loading...</>
+        <ProgressCircleLoading/>
       ) : (
         <>
           {importOrder && (
@@ -340,6 +359,7 @@ const ImportOrderDetail = () => {
                     <Card>
                       <CardContent className={classes.confirmInfo}>
                         <Typography variant="h6">Thông tin xác nhận</Typography>
+                        <br />
                         <Typography>
                           Người tạo đơn: <i>{importOrder.createBy}</i>
                         </Typography>
@@ -347,6 +367,7 @@ const ImportOrderDetail = () => {
                         <Typography>
                           {FormatDataUtils.formatDateTime(importOrder.createDate)}
                         </Typography>
+                        <br />
                         {importOrder.confirmDate && (
                           <Box>
                             <Typography>
@@ -397,7 +418,7 @@ const ImportOrderDetail = () => {
                 </Grid>
               </Grid>
               <AlertPopup
-                maxWidth='sm'
+                maxWidth="sm"
                 title={title}
                 openPopup={openPopup}
                 setOpenPopup={setOpenPopup}

@@ -42,7 +42,8 @@ const ConsignmentsTable = ({ listConsignments }) => {
             <TableCell>STT</TableCell>
             <TableCell>Mã sản phẩm</TableCell>
             <TableCell>Tên sản phẩm</TableCell>
-            <TableCell>Đơn vị tính</TableCell>
+            <TableCell>Hạn lưu kho</TableCell>
+            <TableCell>Đơn vị</TableCell>
             <TableCell>Số lượng</TableCell>
             <TableCell>Đơn giá</TableCell>
             <TableCell>Thành tiền</TableCell>
@@ -60,6 +61,7 @@ const ConsignmentsTable = ({ listConsignments }) => {
               <TableCell>{index+1}</TableCell>
               <TableCell>{consignment?.productCode}</TableCell>
               <TableCell>{consignment?.productName}</TableCell>
+              <TableCell>{consignment?.expirationDate}</TableCell>
               <TableCell>{consignment?.unitMeasure}</TableCell>
               <TableCell>{consignment?.quantity}</TableCell>
               <TableCell>{formatCurrency(consignment?.price || '')}</TableCell>

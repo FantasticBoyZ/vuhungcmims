@@ -152,7 +152,8 @@ const ExportOrderTable = ({ exportOrders }) => {
                         gutterBottom
                         noWrap
                       >
-                        {FormatDataUtils.formatDateTime(exportOrder.createdDate)}
+                        {FormatDataUtils.formatDateTime(exportOrder.createDate)}
+                        {/* {exportOrder.createDate} */}
                       </Typography>
                     </TableCell>
                     <TableCell align="center">

@@ -66,6 +66,56 @@ const useStyles = makeStyles({
   },
 });
 
+const productListDataTest = [
+  {
+    id: 1,
+    productCode: 'GACH23',
+    name: 'Gạch men 60x60',
+    unitMeasure: 'Viên',
+    quantity: 0,
+    unitPrice: 100000,
+    consignments: [
+      {
+        id: 1,
+        warehouseId: 1,
+        warehourseName: 'Kho 1',
+        importDate: '16/07/2022',
+        expirationDate: '30/12/2022',
+        quantity: '0',
+        quantityInstock: '500',
+      },
+      {
+        id: 2,
+        warehouseId: 1,
+        warehourseName: 'Kho 1',
+        importDate: '20/07/2022',
+        expirationDate: '30/12/2022',
+        quantity: '0',
+        quantityInstock: '1000',
+      },
+    ],
+  },
+  {
+    id: 2,
+    productCode: 'GACH33',
+    name: 'Gạch men 30x30',
+    unitMeasure: 'Viên',
+    quantity: 0,
+    unitPrice: 100000,
+    consignments: [
+      {
+        id: 1,
+        warehouseId: 1,
+        warehourseName: 'Kho 1',
+        importDate: '16/07/2022',
+        expirationDate: '30/12/2022',
+        quantity: '0',
+        quantityInstock: '500',
+      },
+    ],
+  },
+];
+
 const ExportGoods = () => {
   const initialExportOrder = {
     billReferenceNumber: '',
@@ -102,6 +152,25 @@ const ExportGoods = () => {
           },
         ],
       },
+      {
+        id: 2,
+        productCode: 'GACH23',
+        productName: 'Gạch men 60x60',
+        unitMeasure: 'Viên',
+        quantity: 0,
+        unitPrice: 100000,
+        consignments: [
+          {
+            id: 1,
+            warehouseId: 1,
+            warehourseName: 'Kho 1',
+            importDate: '16/07/2022',
+            expirationDate: '30/12/2022',
+            quantity: '0',
+            quantityInstock: '500',
+          },
+        ],
+      },
     ],
   };
   const FORM_VALIDATION = Yup.object().shape({
@@ -114,10 +183,39 @@ const ExportGoods = () => {
 
   const classes = useStyles();
 
+  const handleOnChangeProduct = (e) => {
+    const isSelected = valueFormik.current.productList.some((element) => {
+      // console.log('element 215',element)
+      if (element.id === e.value.id) {
+        return true;
+      }
+
+      return false;
+    });
+
+    const productSelected = {
+      id: e.value.id,
+      name: e.value.name,
+      productCode: e.value.productCode,
+      unitMeasure: e.value.unitMeasure,
+      wrapUnitMeasure: e.value.wrapUnitMeasure,
+      numberOfWrapUnitMeasure: e.value.numberOfWrapUnitMeasure,
+      expirationDate: null,
+      quantity: '',
+      unitPrice: '',
+    };
+    if (isSelected) {
+      return;
+    } else {
+      arrayHelpersRef.current.push(productSelected);
+      // console.log('productList', valueFormik.current);
+    }
+  };
+
   const calculateTotalQuantityOfProduct = (product) => {
     console.log(product);
     let totalQuantity = 0;
-    {
+    if (product.consignments !== undefined && product.consignments?.length > 0) {
       product?.consignments.forEach((consignment) => {
         totalQuantity = +totalQuantity + +consignment.quantity;
       });
@@ -133,9 +231,11 @@ const ExportGoods = () => {
       if (productList?.length > 0) {
         productList.forEach((product) => {
           let totalQuantity = 0;
-          product.consignments.forEach((consignment) => {
-            totalQuantity = +totalQuantity + +consignment.quantity;
-          });
+          if (product.consignments !== undefined && product.consignments?.length > 0) {
+            product.consignments?.forEach((consignment) => {
+              totalQuantity = +totalQuantity + +consignment.quantity;
+            });
+          }
           totalAmount = totalAmount + totalQuantity * product.unitPrice;
         });
       }
@@ -165,7 +265,7 @@ const ExportGoods = () => {
                 <Card className={classes.cardTable}>
                   <CardHeader title="Thông tin các sản phẩm" />
                   <CardContent>
-                    {/* {!!productList && !!values.manufactorId && ( */}
+                    {/* {!!productList && ( */}
                     <Select
                       classNamePrefix="select"
                       placeholder="Chọn sản phẩm của nhà cung cấp phía trên..."
@@ -177,9 +277,10 @@ const ExportGoods = () => {
                       name="product"
                       //   value={selectedProduct}
                       //   options={FormatDataUtils.getOption(productList)}
+                      options={FormatDataUtils.getOption(productListDataTest)}
                       menuPortalTarget={document.body}
                       styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                      //   onChange={(e) => handleOnChangeProduct(e)}
+                      onChange={(e) => handleOnChangeProduct(e)}
                     />
                     {/* )} */}
                     <br />
@@ -316,7 +417,7 @@ const ExportGoods = () => {
                                                   Tồn kho
                                                 </TableCell>
                                               </TableRow>
-                                              {product?.consignments.map(
+                                              {product?.consignments?.map(
                                                 (consignment, indexConsignment) => (
                                                   <TableRow key={indexConsignment}>
                                                     <TableCell>

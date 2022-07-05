@@ -144,7 +144,7 @@ const ImportList = () => {
         setImportOrderList(dataResult.data.orderList);
       }
     } catch (error) {
-      console.log('Failed to fetch product list: ', error);
+      console.log('Failed to search export order list: ', error);
     }
   };
 

@@ -8,6 +8,8 @@ import {
   Box,
   Button,
   Card,
+  CardContent,
+  CircularProgress,
   Container,
   InputAdornment,
   Stack,
@@ -30,6 +32,7 @@ import AsyncSelect from 'react-select/async';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 import FormatDataUtils from '@/utils/formatData';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 
 const useStyles = makeStyles({
   searchField: {
@@ -57,7 +60,8 @@ const useStyles = makeStyles({
     minHeight: '56px',
   },
   tableStyle: {
-    padding: '20px',
+    textAlign: 'center',
+    // minHeight: '60vh'
   },
   panelFilter: {
     padding: '24px 0',
@@ -476,54 +480,57 @@ const ProductList = () => {
             </Box>
           </Toolbar>
         </Card>
-
-        {loading ? (
-          <> Loading ... </>
-        ) : (
-          <Card className={classes.tableStyle}>
-            {totalRecord > 0 ? (
-              <Box>
-                <Table className={classes.table}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Mã sản phẩm</TableCell>
-                      <TableCell>Tên sản phẩm</TableCell>
-                      <TableCell align="center">Danh mục</TableCell>
-                      <TableCell align="center">Nhà cung cấp</TableCell>
-                      <TableCell align="center">Tồn kho</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {productList.map((item) => (
-                      <TableRow
-                        hover
-                        key={item.id}
-                        onClick={() => handleOnClickTableRow(item.id)}
-                      >
-                        <TableCell>{item.productCode}</TableCell>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell align="center">{item.categoryName}</TableCell>
-                        <TableCell align="center">{item.manufactorName}</TableCell>
-                        <TableCell align="center">{item.quantity || '0'}</TableCell>
+        <Card className={classes.tableStyle}>
+          {loading ? (
+              <CardContent>
+                <ProgressCircleLoading/>
+              </CardContent>
+          ) : (
+            <CardContent>
+              {totalRecord > 0 ? (
+                <Box>
+                  <Table className={classes.table}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Mã sản phẩm</TableCell>
+                        <TableCell>Tên sản phẩm</TableCell>
+                        <TableCell align="center">Danh mục</TableCell>
+                        <TableCell align="center">Nhà cung cấp</TableCell>
+                        <TableCell align="center">Tồn kho</TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <TablePagination
-                  component="div"
-                  page={page}
-                  rowsPerPageOptions={pages}
-                  rowsPerPage={rowsPerPage}
-                  count={totalRecord}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </Box>
-            ) : (
-              <Typography> Không tìm có kết quả phù hợp </Typography>
-            )}
-          </Card>
-        )}
+                    </TableHead>
+                    <TableBody>
+                      {productList.map((item) => (
+                        <TableRow
+                          hover
+                          key={item.id}
+                          onClick={() => handleOnClickTableRow(item.id)}
+                        >
+                          <TableCell>{item.productCode}</TableCell>
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell align="center">{item.categoryName}</TableCell>
+                          <TableCell align="center">{item.manufactorName}</TableCell>
+                          <TableCell align="center">{item.quantity || '0'}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  <TablePagination
+                    component="div"
+                    page={page}
+                    rowsPerPageOptions={pages}
+                    rowsPerPage={rowsPerPage}
+                    count={totalRecord}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </Box>
+              ) : (
+                <Typography> Không tìm thấy kết quả phù hợp </Typography>
+              )}
+            </CardContent>
+          )}
+        </Card>
       </Container>
     </>
   );
