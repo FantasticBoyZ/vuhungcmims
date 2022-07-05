@@ -1,4 +1,6 @@
 import CustomTablePagination from '@/components/Common/TablePagination';
+import exportOrderService from '@/services/exportOrderService';
+import { getExportOrderList } from '@/slices/ExportOrderSlice';
 import { Add, Search } from '@mui/icons-material';
 import {
   Box,
@@ -18,6 +20,8 @@ import {
 import { makeStyles } from '@mui/styles';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -87,17 +91,18 @@ const ExportList = () => {
   const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalRecord, setTotalRecord] = useState(3);
-  const [exportOrderList, setExportOrderList] = useState(dataTest);
+  const [totalRecord, setTotalRecord] = useState();
+  const [creatorId, setCreatorId] = useState('');
+  const [exportOrderList, setExportOrderList] = useState();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useState({
-    billRefernceNumber: '',
-    startDate: '',
-    endDate: '',
+    // billRefernceNumber: '',
+    // startDate: '',
+    // endDate: '',
   });
 
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => ({ ...state.importOrders }));
+  const { loading } = useSelector((state) => ({ ...state.exportOrders }));
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -111,11 +116,64 @@ const ExportList = () => {
     navigate('/export/create-order');
   };
 
-  const handleSearch = () => {};
+  const handleSearch = (e) => {
+    if (e.keyCode === 13) {
+      let target = e.target;
+      console.log(e.target.value);
+      setPage(0);
+      setSearchParams({ ...searchParams, billReferenceNumber: target.value });
+      searchExportOrder({ ...searchParams, billReferenceNumber: target.value });
+      // fetchProductList();
+    }
+  };
 
-  const handleChangeStartDate = (value) => {};
+  const handleChangeCreator = (event) => {
+    setCreatorId(event.target.value);
+    setSearchParams({ ...searchParams, userId: event.target.value });
+    searchExportOrder({ ...searchParams, userId: event.target.value });
+  };
 
-  const handleChangeEndDate = (value) => {};
+  const handleChangeStartDate = (value) => {
+    setStartDate(value);
+    console.log('startDate', format(new Date(value), 'dd-MM-yyyy'));
+    setSearchParams({
+      ...searchParams,
+      startDate: format(new Date(value), 'dd-MM-yyyy'),
+    });
+    searchExportOrder({
+      ...searchParams,
+      startDate: format(new Date(value), 'dd-MM-yyyy'),
+    });
+  };
+
+  const handleChangeEndDate = (value) => {
+    setEndDate(value);
+    console.log('endDate', format(new Date(value), 'dd-MM-yyyy'));
+    setSearchParams({ ...searchParams, endDate: format(new Date(value), 'dd-MM-yyyy') });
+    searchExportOrder({
+      ...searchParams,
+      endDate: format(new Date(value), 'dd-MM-yyyy'),
+    });
+  };
+
+  const searchExportOrder = async (searchParams) => {
+    try {
+      const params = {
+        pageIndex: page,
+        pageSize: rowsPerPage,
+        ...searchParams,
+      };
+      const actionResult = await dispatch(getExportOrderList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        setTotalRecord(dataResult.data.totalRecord);
+        setExportOrderList(dataResult.data.orderList);
+      }
+    } catch (error) {
+      console.log('Failed to search export order list: ', error);
+    }
+  };
 
   const fetchExportOrderList = async () => {
     try {
@@ -123,21 +181,20 @@ const ExportList = () => {
         pageIndex: page,
         pageSize: rowsPerPage,
       };
-      // const actionResult = await dispatch(getExportOrderList(params));
-      // const dataResult = unwrapResult(actionResult);
-      // console.log('dataResult', dataResult);
-      // if (dataResult.data) {
-      //   setTotalRecord(dataResult.data.totalRecord);
-      //   setExportOrderList(dataResult.data.orderList);
-      // }
+      const actionResult = await dispatch(getExportOrderList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        setTotalRecord(dataResult.data.totalRecord);
+        setExportOrderList(dataResult.data.orderList);
+      }
     } catch (error) {
-      console.log('Failed to fetch importOrder list: ', error);
+      console.log('Failed to fetch exportOrder list: ', error);
     }
   };
   useEffect(() => {
     fetchExportOrderList();
-    console.log(new Date().toJSON());
-  }, [pages, rowsPerPage]);
+  }, [page, rowsPerPage]);
   return (
     <Container maxWidth="xl">
       <Stack
@@ -192,7 +249,7 @@ const ExportList = () => {
                 id="creator"
                 value={1}
                 label="Người tạo"
-                // onChange={handleChangeCreator}
+                onChange={handleChangeCreator}
               >
                 {/* TODO: call api trả về list creator */}
                 {createrList.map((item) => (
@@ -256,7 +313,7 @@ const ExportList = () => {
                 {totalRecord > 0 ? (
                   <ExportOrderTable exportOrders={exportOrderList} />
                 ) : (
-                  <>Không tìm thấy phiếu nhập kho phù hợp</>
+                  <>Không tìm thấy phiếu xuất kho phù hợp</>
                 )}
                 {totalRecord && (
                   <CustomTablePagination
