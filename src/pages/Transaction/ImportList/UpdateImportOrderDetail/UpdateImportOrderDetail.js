@@ -1,6 +1,10 @@
 import AlertPopup from '@/components/Common/AlertPopup';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
-import { confirmImportOrder, getImportOrderById } from '@/slices/ImportOrderSlice';
+import {
+  confirmImportOrder,
+  getImportOrderById,
+  updateImportOrder,
+} from '@/slices/ImportOrderSlice';
 import { getProductByImportOrderId } from '@/slices/ProductSlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Close, Done, Edit, KeyboardReturn } from '@mui/icons-material';
@@ -35,6 +39,7 @@ import { vi } from 'date-fns/locale';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import { FieldArray, Form, Formik } from 'formik';
 import * as Yup from 'yup';
+import ButtonWrapper from '@/components/Common/FormsUI/Button';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -106,7 +111,7 @@ const UpdateImportOrderDetail = () => {
   const valueFormik = useRef();
 
   const FORM_VALIDATION = Yup.object().shape({
-    manufactorId: Yup.string().required('Bạn chưa chọn nhà cung cấp'),
+    // manufactorId: Yup.string().required('Bạn chưa chọn nhà cung cấp'),
     wareHouseId: Yup.number().required('Bạn chưa chọn kho để nhập hàng'),
   });
 
@@ -141,45 +146,57 @@ const UpdateImportOrderDetail = () => {
   };
 
   const handleOnClickConfirm = () => {
-    setTitle('Bạn có chắc chắn muốn xác nhận rằng nhập kho thành công?');
-    setMessage('Hãy kiểm tra kỹ hàng hóa trước khi xác nhận.');
+    setTitle('Bạn có chắc chắn muốn lưu lại chỉnh sửa không?');
+    setMessage('Hãy kiểm tra kỹ thông tin trước khi xác nhận.');
     setIsConfirm(true);
     setOpenPopup(true);
   };
 
   const handleOnClickCancel = () => {
-    setTitle('Bạn có chắc chắn muốn hủy phiếu nhập này không?');
+    setTitle('Bạn có chắc chắn muốn hủy tất cả những chỉnh sửa không?');
     setMessage('');
     setIsConfirm(false);
     setOpenPopup(true);
   };
 
   const handleConfirm = async () => {
+
     if (isConfirm) {
+      const values = valueFormik.current
       console.log('Xác nhận');
+      const editedImportOrder = {
+        orderId: importOrderId,
+        billReferenceNumber: values.billRefernce,
+        createDate: values.createDate,
+        description: values.description,
+        userId: values.userId,
+        manufactorId: values.manufactorId,
+        wareHouseId: values.wareHouseId,
+        consignmentRequests: values.consignments,
+      };
+      console.log(editedImportOrder);
       try {
-        const actionResult = await dispatch(confirmImportOrder(importOrderId));
+        const actionResult = await dispatch(updateImportOrder(editedImportOrder));
         const result = unwrapResult(actionResult);
         if (!!result) {
           if (!!result.message) {
             toast.success(result.message);
           } else {
-            toast.success('Xác nhận nhập kho thành công!');
+            toast.success('Sửa đơn nhập kho thành công!');
           }
-          fetchImportOrderDetail();
-          fetchProductListByImportOrderId();
+          // fetchImportOrderDetail();
+          // fetchProductListByImportOrderId();
           setOpenPopup(false);
+          navigate(`/import/detail/${importOrderId}`);
         }
       } catch (error) {
-        console.log('Failed to confirm importOder: ', error);
+        console.log('Failed to update importOder: ', error);
+        toast.error(error)
       }
     } else {
       console.log('Huỷ');
+      navigate(`/import/detail/${importOrderId}`);
     }
-  };
-
-  const handleSubmit = (values) => {
-    console.log('submit');
   };
 
   const fetchImportOrderDetail = async () => {
@@ -209,9 +226,9 @@ const UpdateImportOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setListConsignments(dataResult.data.listProduct);
-        dataResult.data.listProduct?.forEach((consignment) => {
-          arrayHelpersRef.current?.push(consignment);
-        });
+        // dataResult.data.listProduct?.forEach((consignment) => {
+        //   arrayHelpersRef.current?.push(consignment);
+        // });
 
         // setTotalRecord(dataResult.data.totalRecord);
         // console.log('totalRecord', dataResult.data.totalRecord);
@@ -233,12 +250,12 @@ const UpdateImportOrderDetail = () => {
         <ProgressCircleLoading />
       ) : (
         <>
-          {importOrder && (
+          {importOrder && listConsignments && (
             <Formik
               enableReinitialize={true}
-              initialValues={{ ...importOrder, consignments: [] }}
+              initialValues={{ ...importOrder, consignments: [...listConsignments] }}
               validationSchema={FORM_VALIDATION}
-              onSubmit={(values) => handleSubmit(values)}
+              onSubmit={(values) => handleConfirm(values)}
             >
               {({ values, errors, setFieldValue }) => (
                 <Form>
@@ -276,6 +293,7 @@ const UpdateImportOrderDetail = () => {
                                 variant="contained"
                                 startIcon={<Edit />}
                                 color="warning"
+                                onClick={() => handleOnClickConfirm()}
                               >
                                 Lưu chỉnh sửa
                               </Button>
@@ -332,14 +350,14 @@ const UpdateImportOrderDetail = () => {
                                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                                     }}
                                     onChange={(e) => {
-                                      //   setFieldValue('wareHouseId', e?.value.id);
+                                      setFieldValue('wareHouseId', e?.value.id);
                                     }}
                                   />
                                   <FormHelperText
                                     error={true}
                                     className="error-text-helper"
                                   >
-                                    {/* {errors.wareHouseId} */}
+                                    {errors.wareHouseId}
                                   </FormHelperText>
                                 </Box>
                               )}
@@ -399,7 +417,7 @@ const UpdateImportOrderDetail = () => {
                                                         <DatePicker
                                                           onChange={(value) => {
                                                             setFieldValue(
-                                                              `consignment[${index}].expirationDate`,
+                                                              `consignments[${index}].expirationDate`,
                                                               value,
                                                               false,
                                                             );
@@ -570,16 +588,15 @@ const UpdateImportOrderDetail = () => {
                           <Card>
                             <CardContent className={classes.orderNote}>
                               <Typography variant="h6">Ghi chú</Typography>
-                              <Typography>
-                                <TextfieldWrapper
-                                  id="description"
-                                  className="text-area-note"
-                                  name="description"
-                                  variant="outlined"
-                                  rows={6}
-                                  multiline
-                                />
-                              </Typography>
+                              <TextfieldWrapper
+                                id="description"
+                                className="text-area-note"
+                                name="description"
+                                variant="outlined"
+                                rows={6}
+                                // maxRows={6}
+                                multiline
+                              />
                             </CardContent>
                           </Card>
                         </Grid>

@@ -135,6 +135,10 @@ const ImportOrderDetail = () => {
     setOpenPopup(true);
   };
 
+  const handleOnClickEdit = () => {
+    navigate(`/import/edit/${importOrderId}`)
+  }
+
   const handleOnClickCancel = () => {
     setTitle('Bạn có chắc chắn muốn hủy phiếu nhập này không?');
     setMessage('');
@@ -256,6 +260,7 @@ const ImportOrderDetail = () => {
                           variant="contained"
                           startIcon={<Edit />}
                           color="warning"
+                          onClick={() => handleOnClickEdit()}
                         >
                           Chỉnh sửa
                         </Button>

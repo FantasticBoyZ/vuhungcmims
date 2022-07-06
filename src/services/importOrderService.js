@@ -32,7 +32,13 @@ const importOrderService = {
   confirmImportOrder: (importOrderId) => {
     const url = `/import-order/confirm/${importOrderId}`;
     return axiosClient.get(url, { headers: authHeader() });
-  }
+  },
+
+  updateImportOrder: (importOrder) => {
+    const url = `http://localhost:8080/api/import-order/update`;
+    // const url = process.env.REACT_APP_API_URL + '/import-order/update';
+    return axios.put(url, importOrder)
+  },
 };
 
 export default importOrderService;
