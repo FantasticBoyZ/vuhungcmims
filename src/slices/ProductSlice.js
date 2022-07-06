@@ -16,6 +16,10 @@ export const saveProduct = createAsyncThunk('product/save', async (product) => {
   return await productService.saveProduct(product)
 })
 
+export const uploadNewImageProduct = createAsyncThunk('product/upload-new-image', async (formData) => {
+  return await productService.uploadNewImage(formData)
+})
+
 export const getProductByImportOrderId = createAsyncThunk('product/get-by-import-order' , async (params, thunkAPi) => {
   // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
   const productList = await productService.getProductByImportOrderId(params);
@@ -57,7 +61,6 @@ const productSlice = createSlice({
     },
     [getProductDetail.fulfilled] :(state, action) => {
       state.loading = false;
-      state.products = action.payload;
     },
     [saveProduct.pending] : (state) => {
       state.loading = true;
@@ -68,7 +71,17 @@ const productSlice = createSlice({
     },
     [saveProduct.fulfilled] :(state, action) => {
       state.loading = false;
-      state.products = action.payload;
+    },
+    [uploadNewImageProduct.pending] : (state) => {
+      state.loading = true;
+    },
+    [uploadNewImageProduct.rejected] :(state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [uploadNewImageProduct.fulfilled] :(state, action) => {
+      state.loading = false;
+
     },
   }
 });

@@ -18,6 +18,11 @@ export const confirmImportOrder = createAsyncThunk('importOrder/confirm', async 
   return await importOrderService.confirmImportOrder(id);
 })
 
+export const updateImportOrder = createAsyncThunk('importOrder/update', async (importOrder, thunkAPi) => {
+
+  return await importOrderService.updateImportOrder(importOrder);
+})
+
 const importOrderSlice = createSlice({
   name: 'importOrders',
   initialState: {
@@ -63,6 +68,16 @@ const importOrderSlice = createSlice({
       state.error = action.payload;
     },
     [confirmImportOrder.fulfilled]: (state, action) => {
+      state.loading = false;
+    },
+    [updateImportOrder.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateImportOrder.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [updateImportOrder.fulfilled]: (state, action) => {
       state.loading = false;
     }
   }

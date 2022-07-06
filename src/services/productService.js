@@ -57,6 +57,22 @@ const productService = {
         },
       );
   },
+
+  uploadNewImage: (formData) => {
+    const url = 'http://localhost:8080/api/product/add/image';
+    // const url = process.env.REACT_APP_API_URL + '/product/add/image';
+
+    axios
+      .post(url, formData)
+      .then(
+        (response) => {
+          return response.data;
+        },
+        (error) => {
+          console.log(error);
+        },
+      );
+  }
 };
 
 export default productService;
