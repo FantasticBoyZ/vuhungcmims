@@ -27,6 +27,8 @@ import {
   Person,
   ReplyAll,
   StackedBarChart,
+  TableView,
+  TurnLeft,
   ViewList,
 } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
@@ -68,7 +70,7 @@ const drawerWidth = 250;
 //   </ListItem>
 // );
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   list: {
     width: 250,
   },
@@ -78,7 +80,18 @@ const useStyles = makeStyles({
   paper: {
     background: 'blue',
   },
-});
+  drawerPaper: {
+    width: 250,
+    // overflow: "auto",
+    height: "100%",
+    [theme.breakpoints.up("md")]: {
+      overflow: "auto",
+      width: drawerWidth,
+      position: "relative",
+      height: "100%"
+    }
+  }
+}));
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -117,6 +130,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     whiteSpace: 'nowrap',
     boxSizing: 'border-box',
     backgroundColor: 'red',
+    overflow: "auto",
+    height: "100%",
     ...(open && {
       ...openedMixin(theme),
       '& .MuiDrawer-paper': openedMixin(theme),
@@ -136,28 +151,42 @@ const Sidebar = () => {
 
   const LIST_ITEM_SIDEBAR = [
     {
-      primary: 'Tổng quan',
+      primary: 'Trang chủ',
       icon: <Home />,
       path: '/dashboard',
       children: [],
       hasParent: false,
     },
     {
-      primary: 'Sản Phẩm',
+      primary: 'Quản lý kho hàng',
       icon: <AutoAwesomeMosaic />,
-      path: '/product',
+      path: '/warehourse-management',
       children: [
         {
-          primary: 'Danh sách sản phẩm',
-          icon: <ViewList />,
+          primary: 'Sản phẩm',
+          icon: '',
           path: '/product',
           children: [],
           hasParent: true,
         },
         {
-          primary: 'Kiểm kho',
-          icon: <FactCheck />,
-          path: '/product/check',
+          primary: 'Nhà sản xuất',
+          icon: '',
+          path: '/manufacturer',
+          children: [],
+          hasParent: true,
+        },
+        {
+          primary: 'Danh mục',
+          icon: '',
+          path: '/category',
+          children: [],
+          hasParent: true,
+        },
+        {
+          primary: 'Nhà kho',
+          icon: '',
+          path: '/warehourse',
           children: [],
           hasParent: true,
         },
@@ -165,49 +194,50 @@ const Sidebar = () => {
       hasParent: false,
     },
     {
-      primary: 'Danh mục',
-      icon: <Class />,
-      path: '/category',
-      children: [],
-      hasParent: false,
-    },
-    {
-      primary: 'Nhà cung cấp',
-      icon: <Factory />,
-      path: '/manufacturer',
-      children: [],
-      hasParent: false,
-    },
-    {
-      primary: 'Giao dịch',
-      icon: <CurrencyExchange />,
-      path: '/transaction',
+      primary: 'Quản lý nhập hàng',
+      icon: <Input />,
+      path: '/import-order',
       children: [
         {
-          primary: 'Nhập kho',
-          icon: <Input />,
-          path: '/import',
+          primary: 'Tạo phiếu nhập hàng',
+          icon: '',
+          path: '/import/create-order',
           children: [],
           hasParent: true,
         },
         {
-          primary: 'Xuất kho',
-          icon: <Output />,
+          primary: 'Danh sách nhập hàng',
+          icon: '',
+          path: '/import',
+          children: [],
+          hasParent: true,
+        },
+      ],
+      hasParent: false,
+    },
+    {
+      primary: 'Quản lý xuất hàng',
+      icon: <Output />,
+      path: '/export-order',
+      children: [
+        {
+          primary: 'Tạo phiếu xuất hàng',
+          icon: '',
+          path: '/export/create-order',
+          children: [],
+          hasParent: true,
+        },
+        {
+          primary: 'Danh sách xuất hàng',
+          icon: '',
           path: '/export',
           children: [],
           hasParent: true,
         },
         {
-          primary: 'Trả hàng',
-          icon: <ReplyAll />,
-          path: '/return-goods',
-          children: [],
-          hasParent: true,
-        },
-        {
-          primary: 'Trả hàng lưu kho',
-          icon: <Loop />,
-          path: '/return-to-manufacturer',
+          primary: 'Danh sách trả hàng',
+          icon: '',
+          path: '/export/return',
           children: [],
           hasParent: true,
         },
@@ -215,38 +245,76 @@ const Sidebar = () => {
       hasParent: false,
     },
     {
-      primary: 'Khách hàng',
-      icon: <CameraFront />,
+      primary: 'Trả hàng lưu kho',
+      icon: <TurnLeft />,
+      path: '/transaction',
+      children: [
+        {
+          primary: 'Tạo phiếu lưu kho',
+          icon: '',
+          path: '/storage/create',
+          children: [],
+          hasParent: true,
+        },
+        {
+          primary: 'Danh sách lưu kho',
+          icon: '',
+          path: '/storage/list',
+          children: [],
+          hasParent: true,
+        },
+      ],
+      hasParent: false,
+    },
+    {
+      primary: 'Kiểm hàng',
+      icon: <TableView />,
       path: '/customer',
-      children: [],
+      children: [
+        {
+          primary: 'Tạo phiếu kiểm hàng',
+          icon: '',
+          path: '/warehoure-check/create',
+          children: [],
+          hasParent: true,
+        },
+        {
+          primary: 'Lịch sử kiểm hàng',
+          icon: '',
+          path: '/warehoure-check/list',
+          children: [],
+          hasParent: true,
+        },
+      ],
       hasParent: false,
     },
     {
       primary: 'Nhân viên',
       icon: <Person />,
-      path: '/staff',
-      children: [],
-      hasParent: false,
-    },
-    {
-      primary: 'Sổ quỹ',
-      icon: <LocalAtm />,
-      path: '/cash-book',
-      children: [],
-      hasParent: false,
-    },
-    {
-      primary: 'Báo cáo',
-      icon: <StackedBarChart />,
-      path: '/report',
-      children: [],
+      path: '/staff-management',
+      children: [
+        {
+          primary: 'Đăng ký nhân viên mới',
+          icon: '',
+          path: '/staff/register',
+          children: [],
+          hasParent: true,
+        },
+        {
+          primary: 'Đăng ký nhân viên mới',
+          icon: '',
+          path: '/staff/list',
+          children: [],
+          hasParent: true,
+        },
+      ],
       hasParent: false,
     },
   ];
 
   return (
     <Drawer
-      // classes={{ paper: classes.paper }}
+      classes={{ paper: classes.drawerPaper }}
       variant="permanent"
       flex={1}
       open={open}
