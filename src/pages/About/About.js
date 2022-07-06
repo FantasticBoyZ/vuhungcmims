@@ -64,7 +64,7 @@ const useStyles = makeStyles({
 
 const UserProfiles = () => {
   const [userProfiles, setUserProfiles] = useState([]);
-  const classes = useStyles()
+  const classes = useStyles();
   const fetchUserProfiles = () => {
     axios.get('http://localhost:8080/api/v1/user-profile').then((res) => {
       console.log(res);
@@ -75,6 +75,7 @@ const UserProfiles = () => {
     fetchUserProfiles();
   }, []);
   return userProfiles.map((userProfile, index) => {
+    console.log(`http://localhost:8080/api/v1/user-profile/${userProfile.userProfileId}/image/download`)
     return (
       <Box key={index}>
         {userProfile.userProfileId ? (
@@ -117,15 +118,39 @@ function Dropzone({ userProfileId }) {
       });
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
-
+  const classes = useStyles();
+  const imageProduct = axios.get(`http://localhost:8080/api/v1/user-profile/82f2cd6a-2af3-4d18-a6c3-f8efb06160de/image/download`)
   return (
-    <div {...getRootProps({className: 'dropzone'})}>
+    <div {...getRootProps({ className: 'dropzone' })}>
       <input {...getInputProps()} />
-      {isDragActive ? (
-        <p>Drop the files here ...</p>
-      ) : (
-        <p>Drag 'n' drop some files here, or click to select files</p>
-      )}
+
+      <label className={classes.preview}>
+        <CloudUpload
+          fontSize="large"
+          className={classes.iconUpload}
+        />
+        
+        {isDragActive ? <span>Thả ảnh vào đây</span> : <span>Tải ảnh lên</span>}
+        {/* {baseImage && (
+            <img
+              className={classes.imgPreview}
+              src={baseImage}
+            />
+          )} */}
+        {/* Đang lỗi xoá ảnh đi */}
+        {/* {baseImage && (
+            <Box className={classes.iconRemoveImg}>
+              <IconButton
+                onClick={(e) => {
+                  setBaseImage('');
+                  return;
+                }}
+              >
+                <CloseRounded />
+              </IconButton>
+            </Box>
+          )} */}
+      </label>
     </div>
   );
 }
