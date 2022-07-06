@@ -1,11 +1,13 @@
 import {
+  Box,
   Card,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableHead, TableRow,
-  Typography
+  TableHead,
+  TableRow,
+  Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { format } from 'date-fns';
@@ -18,15 +20,11 @@ const useStyles = makeStyles((theme) => ({
     '& thead th': {
       backgroundColor: '#DCF4FC',
     },
-    '& tbody td': {
-    },
+    '& tbody td': {},
     '& tbody tr:hover': {
       // cursor: 'pointer',
     },
   },
-  cardStyle: {
-    padding: '12px'
-  }
 }));
 
 const SubProductTable = ({ subProductList }) => {
@@ -35,8 +33,8 @@ const SubProductTable = ({ subProductList }) => {
   const [selectedSubProductList, setSelectedSubProductList] = useState([]);
 
   const formatDate = (date) => {
-    return format(new Date(date), 'dd/MM/yyyy')
-  }
+    return format(new Date(date), 'dd/MM/yyyy');
+  };
 
   // const selectedBulkActions = selectedSubProductList.length > 0;
 
@@ -67,18 +65,16 @@ const SubProductTable = ({ subProductList }) => {
   //   const selectedAllSubProductList =
   //     selectedSubProductList.length === subProductList.length;
   return (
-    <Card className={classes.cardStyle}>
-      <Typography variant='h5'>Danh sách lô hàng </Typography>
+    <Box>
       <TableContainer>
         <Table className={classes.table}>
           <TableHead>
             <TableRow>
-              <TableCell align='center'>Ngày khởi tạo</TableCell>
-              <TableCell align='center'>Ngày hết hạn</TableCell>
-              <TableCell align='center'>Số lượng</TableCell>
-              <TableCell align='center'>Đơn giá</TableCell>
-              <TableCell align='center'>Kho</TableCell>
-              <TableCell align='center'>Địa chỉ kho</TableCell>
+              <TableCell align="center">Ngày nhập</TableCell>
+              <TableCell align="center">Hạn lưu kho</TableCell>
+              <TableCell align="center">Số lượng</TableCell>
+              <TableCell align="center">Kho</TableCell>
+              <TableCell align="center">Địa chỉ kho</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -93,20 +89,22 @@ const SubProductTable = ({ subProductList }) => {
                   //   selected={isImportOrderSelected}
                   selected={false}
                 >
-                  <TableCell align='center'>{formatDate(subProduct.importDate)}</TableCell>
-                  <TableCell align='center'>{formatDate(subProduct.expirationDate)}</TableCell>
-                  <TableCell align='center'>{subProduct.quantity}</TableCell>
-                  <TableCell align='center'>{subProduct.unitPrice}</TableCell>
-                  <TableCell align='center'>{subProduct.inventoryName}</TableCell>
-                  <TableCell align='center'>{subProduct.addressInventory}</TableCell>
+                  <TableCell align="center">
+                    {formatDate(subProduct.importDate)}
+                  </TableCell>
+                  <TableCell align="center">
+                    {formatDate(subProduct.expirationDate)}
+                  </TableCell>
+                  <TableCell align="center">{subProduct.quantity}</TableCell>
+                  <TableCell align="center">{subProduct.inventoryName}</TableCell>
+                  <TableCell align="center">{subProduct.addressInventory}</TableCell>
                 </TableRow>
               );
             })}
           </TableBody>
-
         </Table>
       </TableContainer>
-    </Card>
+    </Box>
   );
 };
 
