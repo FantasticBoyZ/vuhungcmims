@@ -28,7 +28,6 @@ import { Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import AsyncSelect from 'react-select/async';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 import FormatDataUtils from '@/utils/formatData';
@@ -482,9 +481,9 @@ const ProductList = () => {
         </Card>
         <Card className={classes.tableStyle}>
           {loading ? (
-              <CardContent>
-                <ProgressCircleLoading/>
-              </CardContent>
+            <CardContent>
+              <ProgressCircleLoading />
+            </CardContent>
           ) : (
             <CardContent>
               {totalRecord > 0 ? (
@@ -496,23 +495,79 @@ const ProductList = () => {
                         <TableCell>Tên sản phẩm</TableCell>
                         <TableCell align="center">Danh mục</TableCell>
                         <TableCell align="center">Nhà cung cấp</TableCell>
+                        <TableCell align="center">Đơn vị tính</TableCell>
                         <TableCell align="center">Tồn kho</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {productList.map((item) => (
-                        <TableRow
-                          hover
-                          key={item.id}
-                          onClick={() => handleOnClickTableRow(item.id)}
-                        >
-                          <TableCell>{item.productCode}</TableCell>
-                          <TableCell>{item.name}</TableCell>
-                          <TableCell align="center">{item.categoryName}</TableCell>
-                          <TableCell align="center">{item.manufactorName}</TableCell>
-                          <TableCell align="center">{item.quantity || '0'}</TableCell>
-                        </TableRow>
-                      ))}
+                      {productList.map((item) => {
+                        let productQuantity = item.quantity;
+                        return (
+                          <TableRow
+                            hover
+                            key={item.id}
+                            onClick={() => handleOnClickTableRow(item.id)}
+                          >
+                            <TableCell>{item.productCode}</TableCell>
+                            <TableCell>{item.name}</TableCell>
+                            <TableCell align="center">{item.categoryName}</TableCell>
+                            <TableCell align="center">{item.manufactorName}</TableCell>
+                            <TableCell
+                              align="center"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              {item.wrapUnitMeasure == null ? (
+                                item.unitMeasure
+                              ) : (
+                                <Select
+                                  classNamePrefix="select"
+                                  defaultValue={
+                                    FormatDataUtils.getOption([
+                                      {
+                                        number: 1,
+                                        name: item.unitMeasure,
+                                      },
+                                      {
+                                        number: item.numberOfWrapUnitMeasure,
+                                        name: item.wrapUnitMeasure,
+                                      },
+                                    ])[0]
+                                  }
+                                  options={FormatDataUtils.getOption([
+                                    {
+                                      number: 1,
+                                      name: item.unitMeasure,
+                                    },
+                                    {
+                                      number: item.numberOfWrapUnitMeasure,
+                                      name: item.wrapUnitMeasure,
+                                    },
+                                  ])}
+                                  menuPortalTarget={document.body}
+                                  styles={{
+                                    menuPortal: (base) => ({
+                                      ...base,
+                                      zIndex: 9999,
+                                    }),
+                                  }}
+                                  onChange={(e) => {
+                                    console.log(e.value.number);
+                                    if (e.value.number === item.numberOfWrapUnitMeasure) {
+                                      productQuantity = productQuantity / e.value.number;
+                                    } else {
+                                      productQuantity = item.quantity;
+                                    }
+                                    console.log(productQuantity);
+                                  }}
+                                />
+                              )}
+                            </TableCell>
+                            <TableCell align="center">{productQuantity || '0'}</TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                   <TablePagination
