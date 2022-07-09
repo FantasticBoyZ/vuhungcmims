@@ -13,6 +13,24 @@ export const getExportOrderById = createAsyncThunk('exportOrder/detail', async (
   return exportOrder;
 })
 
+export const getConsignmentsByExportOrderId = createAsyncThunk('exportOrder/list-consignment', async (params, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const consignments = await exportOrderService.getListConsignmentByExportOrderId(params);
+  return consignments;
+})
+
+export const getListProductInStock = createAsyncThunk('exportOrder/list-product-instock', async (params, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const productInstock = await exportOrderService.getListProductInStock(params);
+  return productInstock;
+})
+
+export const getListConsiggnmentOfProductInStock = createAsyncThunk('exportOrder/list-consignment-of-product-instock', async (params, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const consignmenttInstock = await exportOrderService.getListConsignmentOfProductInStock(params);
+  return consignmenttInstock;
+})
+
 
 const exportOrderSlice = createSlice({
   name: 'exportOrders',
@@ -43,6 +61,39 @@ const exportOrderSlice = createSlice({
       state.error = action.payload;
     },
     [getExportOrderById.fulfilled]: (state, action) => {
+      state.loading = false;
+
+    },
+    [getConsignmentsByExportOrderId.pending]: (state) => {
+      state.loading = true;
+    },
+    [getConsignmentsByExportOrderId.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getConsignmentsByExportOrderId.fulfilled]: (state, action) => {
+      state.loading = false;
+
+    },
+    [getListProductInStock.pending]: (state) => {
+      state.loading = true;
+    },
+    [getListProductInStock.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getListProductInStock.fulfilled]: (state, action) => {
+      state.loading = false;
+
+    },
+    [getListConsiggnmentOfProductInStock.pending]: (state) => {
+      state.loading = true;
+    },
+    [getListConsiggnmentOfProductInStock.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getListConsiggnmentOfProductInStock.fulfilled]: (state, action) => {
       state.loading = false;
 
     }

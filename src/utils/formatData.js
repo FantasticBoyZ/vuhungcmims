@@ -44,6 +44,15 @@ const getOptionWithIdandName = (listData) => {
   });
 };
 
+const getOptionProduct = (listData) => {
+  return listData.map((data) => {
+    return {
+      value: data,
+      label: data.productName,
+    };
+  });
+};
+
 const getSelectedOption = (array, value) => {
   const arrayOption = getOptionWithIdandName(array);
   return arrayOption.find((item) => item.value === value);
@@ -77,6 +86,7 @@ const FormatDataUtils = {
   getOption,
   getOptionWithIdandName,
   getSelectedOption,
-  getStatusLabel
+  getStatusLabel,
+  getOptionProduct
 };
 export default FormatDataUtils;

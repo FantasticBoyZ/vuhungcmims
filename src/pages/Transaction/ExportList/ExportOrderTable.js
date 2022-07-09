@@ -168,7 +168,7 @@ const ExportOrderTable = ({ exportOrders }) => {
                         gutterBottom
                         noWrap
                       >
-                        {exportOrder.totalAmount}
+                        {FormatDataUtils.formatCurrency(exportOrder.totalPrice || 0)}
                       </Typography>
                     </TableCell>
                   </TableRow>

@@ -44,8 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
-const ExportProductTable = ({productList}) => {
+const ExportProductTable = ({ productList }) => {
   const classes = useStyles();
   return (
     <TableContainer>
@@ -56,9 +55,9 @@ const ExportProductTable = ({productList}) => {
             <TableCell>Mã sản phẩm</TableCell>
             <TableCell>Tên sản phẩm</TableCell>
             <TableCell>Đơn vị</TableCell>
-            <TableCell align='center'>Số lượng</TableCell>
-            <TableCell align='center'>Đơn giá</TableCell>
-            <TableCell align='center'>Thành tiền</TableCell>
+            <TableCell align="center">Số lượng</TableCell>
+            <TableCell align="center">Đơn giá</TableCell>
+            <TableCell align="center">Thành tiền</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -74,11 +73,11 @@ const ExportProductTable = ({productList}) => {
                 <TableCell>{product?.productCode}</TableCell>
                 <TableCell>{product?.productName}</TableCell>
                 <TableCell>{product?.unitMeasure}</TableCell>
-                <TableCell align='center'>{product?.quantity}</TableCell>
-                <TableCell align='center'>
+                <TableCell align="center">{product?.quantity}</TableCell>
+                <TableCell align="center">
                   {FormatDataUtils.formatCurrency(product?.unitPrice || '0')}
                 </TableCell>
-                <TableCell align='center'>
+                <TableCell align="center">
                   {FormatDataUtils.formatCurrency(product?.quantity * product?.unitPrice)}
                 </TableCell>
               </TableRow>
@@ -90,25 +89,26 @@ const ExportProductTable = ({productList}) => {
                 >
                   <Table className={classes.tableCosignment}>
                     {/* <TableHead> */}
+
+                    {/* </TableHead> */}
+                    <TableBody>
                       <TableRow>
                         <TableCell>Vị trí</TableCell>
                         <TableCell>Ngày nhập</TableCell>
                         <TableCell>Hạn lưu kho</TableCell>
-                        <TableCell align='center'>Số lượng</TableCell>
+                        <TableCell align="center">Số lượng</TableCell>
                       </TableRow>
-                    {/* </TableHead> */}
-                    <TableBody>
-                      {product?.consignments.map((consignment, indexConsignment) => (
+                      {/* {product?.consignments.map((consignment, indexConsignment) => (
                         <TableRow
                           key={indexConsignment}
-                          hover
+                          // hover
                         >
                           <TableCell>{consignment?.warehourseName}</TableCell>
                           <TableCell>{consignment?.importDate}</TableCell>
                           <TableCell>{consignment?.expirationDate}</TableCell>
-                          <TableCell align='center'>{consignment?.quantity}</TableCell>
+                          <TableCell align="center">{consignment?.quantity}</TableCell>
                         </TableRow>
-                      ))}
+                      ))} */}
                     </TableBody>
                   </Table>
                 </TableCell>

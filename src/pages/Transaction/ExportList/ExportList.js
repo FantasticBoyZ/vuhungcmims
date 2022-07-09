@@ -205,12 +205,13 @@ const ExportList = () => {
       >
         <Button
           variant="contained"
+          color='success'
           startIcon={<Add />}
           onClick={handleOnClickCreateExportOrder}
         >
           Tạo phiếu xuất kho
         </Button>
-        <Button
+        {/* <Button
           variant="contained"
           color="secondary"
         >
@@ -221,7 +222,7 @@ const ExportList = () => {
           color="secondary"
         >
           Nhập file excel
-        </Button>
+        </Button> */}
       </Stack>
       <Card className={classes.panelFilter}>
         <div className={classes.labelPanelFilter}>Tìm kiếm theo thông tin</div>

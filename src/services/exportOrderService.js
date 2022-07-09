@@ -13,6 +13,21 @@ const exportOrderService = {
     return axiosClient.get(url, { headers: authHeader() });
   },
 
+  getListConsignmentByExportOrderId: (params) => {
+    const url = `/export-order/list-product-detail`;
+    return axiosClient.get(url, { params, headers: authHeader() });
+  },
+
+  getListProductInStock: () => {
+    const url = '/export-order/list-product';
+    return axiosClient.get(url, { headers: authHeader() });
+  },
+
+  getListConsignmentOfProductInStock: (params) => {
+    const url = '/export-order/list-quantity-instock'
+    return axiosClient.get(url, { headers: authHeader() });
+  },
+
   createExportOrder: (exportOrder) => {
     const url = 'http://localhost:8080/api/export-order/create';
     // const url = process.env.REACT_APP_API_URL + '/export-order/create';

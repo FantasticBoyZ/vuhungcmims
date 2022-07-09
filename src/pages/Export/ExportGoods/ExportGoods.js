@@ -1,4 +1,5 @@
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
+import { getListConsiggnmentOfProductInStock, getListProductInStock } from '@/slices/ExportOrderSlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Delete, Done } from '@mui/icons-material';
 import {
@@ -20,8 +21,10 @@ import {
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { FieldArray, Form, Formik } from 'formik';
-import { Fragment, useRef } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import * as Yup from 'yup';
 
@@ -116,63 +119,69 @@ const productListDataTest = [
   },
 ];
 
+const initialExportOrder = {
+  billReferenceNumber: '',
+  statusName: '',
+  creatorId: '',
+  createdDate: new Date(),
+  description: '',
+  productList: [
+    {
+      id: 1,
+      productCode: 'GACH23',
+      productName: 'Gạch men 60x60',
+      unitMeasure: 'Viên',
+      quantity: 0,
+      unitPrice: 100000,
+      consignments: [
+        {
+          id: 1,
+          warehouseId: 1,
+          warehourseName: 'Kho 1',
+          importDate: '16/07/2022',
+          expirationDate: '30/12/2022',
+          quantity: '0',
+          quantityInstock: '500',
+        },
+        {
+          id: 2,
+          warehouseId: 1,
+          warehourseName: 'Kho 1',
+          importDate: '20/07/2022',
+          expirationDate: '30/12/2022',
+          quantity: '0',
+          quantityInstock: '1000',
+        },
+      ],
+    },
+    {
+      id: 2,
+      productCode: 'GACH23',
+      productName: 'Gạch men 60x60',
+      unitMeasure: 'Viên',
+      quantity: 0,
+      unitPrice: 100000,
+      consignments: [
+        {
+          id: 1,
+          warehouseId: 1,
+          warehourseName: 'Kho 1',
+          importDate: '16/07/2022',
+          expirationDate: '30/12/2022',
+          quantity: '0',
+          quantityInstock: '500',
+        },
+      ],
+    },
+  ],
+};
+
 const ExportGoods = () => {
-  const initialExportOrder = {
-    billReferenceNumber: '',
-    statusName: '',
-    creatorId: '',
-    createdDate: new Date(),
-    description: '',
-    productList: [
-      {
-        id: 1,
-        productCode: 'GACH23',
-        productName: 'Gạch men 60x60',
-        unitMeasure: 'Viên',
-        quantity: 0,
-        unitPrice: 100000,
-        consignments: [
-          {
-            id: 1,
-            warehouseId: 1,
-            warehourseName: 'Kho 1',
-            importDate: '16/07/2022',
-            expirationDate: '30/12/2022',
-            quantity: '0',
-            quantityInstock: '500',
-          },
-          {
-            id: 2,
-            warehouseId: 1,
-            warehourseName: 'Kho 1',
-            importDate: '20/07/2022',
-            expirationDate: '30/12/2022',
-            quantity: '0',
-            quantityInstock: '1000',
-          },
-        ],
-      },
-      {
-        id: 2,
-        productCode: 'GACH23',
-        productName: 'Gạch men 60x60',
-        unitMeasure: 'Viên',
-        quantity: 0,
-        unitPrice: 100000,
-        consignments: [
-          {
-            id: 1,
-            warehouseId: 1,
-            warehourseName: 'Kho 1',
-            importDate: '16/07/2022',
-            expirationDate: '30/12/2022',
-            quantity: '0',
-            quantityInstock: '500',
-          },
-        ],
-      },
-    ],
-  };
+  const [productList, setProductList] = useState();
+  const [consignmentList, setConsignmentList] = useState();
+  const dispatch = useDispatch()
+  const { loading } = useSelector((state) => ({ ...state.exportOrders }))
+  
   const FORM_VALIDATION = Yup.object().shape({
     manufactorId: Yup.string().required('Bạn chưa chọn nhà cung cấp'),
     wareHouseId: Yup.number().required('Bạn chưa chọn kho để nhập hàng'),
@@ -186,7 +195,7 @@ const ExportGoods = () => {
   const handleOnChangeProduct = (e) => {
     const isSelected = valueFormik.current.productList.some((element) => {
       // console.log('element 215',element)
-      if (element.id === e.value.id) {
+      if (element.productId === e.value.productId) {
         return true;
       }
 
@@ -194,8 +203,8 @@ const ExportGoods = () => {
     });
 
     const productSelected = {
-      id: e.value.id,
-      name: e.value.name,
+      productId: e.value.productId,
+      productName: e.value.productName,
       productCode: e.value.productCode,
       unitMeasure: e.value.unitMeasure,
       wrapUnitMeasure: e.value.wrapUnitMeasure,
@@ -207,13 +216,13 @@ const ExportGoods = () => {
     if (isSelected) {
       return;
     } else {
+      fetchConsignmentOfProductInstock(productSelected.productId)
       arrayHelpersRef.current.push(productSelected);
       // console.log('productList', valueFormik.current);
     }
   };
 
   const calculateTotalQuantityOfProduct = (product) => {
-    console.log(product);
     let totalQuantity = 0;
     if (product.consignments !== undefined && product.consignments?.length > 0) {
       product?.consignments.forEach((consignment) => {
@@ -244,6 +253,49 @@ const ExportGoods = () => {
   };
 
   const handleSubmit = () => {};
+
+  const fetchProductInstock = async () => {
+    try {
+      const params = {
+        // pageIndex: page + 1,
+        // pageSize: rowsPerPage,
+        // ...searchProductParams,
+      };
+      const actionResult = await dispatch(getListProductInStock(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        // setTotalRecord(dataResult.data.totalRecord);
+        setProductList(dataResult.data);
+      }
+    } catch (error) {
+      console.log('Failed to fetch product list instock: ', error);
+    }
+  };
+
+  const fetchConsignmentOfProductInstock = async (productId) => {
+    try {
+      const params = {
+        // pageIndex: page + 1,
+        // pageSize: rowsPerPage,
+        productId: productId
+      };
+      const actionResult = await dispatch(getListConsiggnmentOfProductInStock(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('consignment', dataResult);
+      if (dataResult.data) {
+        // setTotalRecord(dataResult.data.totalRecord);
+        setConsignmentList(dataResult.data);
+      }
+    } catch (error) {
+      console.log('Failed to fetch consignment list instock: ', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProductInstock();
+  }, []);
+
   return (
     <Box>
       <Formik
@@ -265,24 +317,24 @@ const ExportGoods = () => {
                 <Card className={classes.cardTable}>
                   <CardHeader title="Thông tin các sản phẩm" />
                   <CardContent>
-                    {/* {!!productList && ( */}
+                    {!!productList && (
                     <Select
                       classNamePrefix="select"
                       placeholder="Chọn sản phẩm của nhà cung cấp phía trên..."
                       noOptionsMessage={() => <>Không có tìm thấy sản phẩm nào</>}
                       isClearable={true}
                       isSearchable={true}
-                      //   isLoading={loading}
+                        isLoading={loading}
                       loadingMessage={() => <>Đang tìm kiếm sản phẩm...</>}
                       name="product"
                       //   value={selectedProduct}
-                      //   options={FormatDataUtils.getOption(productList)}
-                      options={FormatDataUtils.getOption(productListDataTest)}
+                        options={FormatDataUtils.getOptionProduct(productList)}
+                      // options={FormatDataUtils.getOption(productListDataTest)}
                       menuPortalTarget={document.body}
                       styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                       onChange={(e) => handleOnChangeProduct(e)}
                     />
-                    {/* )} */}
+                    )}
                     <br />
                     <Divider />
                     <br />
