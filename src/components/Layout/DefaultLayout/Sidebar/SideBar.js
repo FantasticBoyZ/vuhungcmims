@@ -208,7 +208,7 @@ const Sidebar = () => {
         {
           primary: 'Danh sách nhập hàng',
           icon: '',
-          path: '/import',
+          path: '/import/list',
           children: [],
           hasParent: true,
         },
@@ -230,7 +230,7 @@ const Sidebar = () => {
         {
           primary: 'Danh sách xuất hàng',
           icon: '',
-          path: '/export',
+          path: '/export/list',
           children: [],
           hasParent: true,
         },
