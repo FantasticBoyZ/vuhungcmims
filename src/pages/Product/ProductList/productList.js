@@ -374,7 +374,8 @@ const ProductList = () => {
                       <TextfieldWrapper
                         id="outlined-basic"
                         name="productName"
-                        placeholder="Search"
+                        placeholder="Tìm kiếm theo tên sản phẩm"
+                        fullWidth
                         label={null}
                         variant="outlined"
                         InputProps={{

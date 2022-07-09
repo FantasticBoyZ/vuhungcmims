@@ -62,17 +62,35 @@ const productService = {
     const url = 'http://localhost:8080/api/product/add/image';
     // const url = process.env.REACT_APP_API_URL + '/product/add/image';
 
+    axios.post(url, formData).then(
+      (response) => {
+        return response;
+      },
+      (error) => {
+        console.log(error);
+      },
+    );
+  },
+
+  updateImage: (productId, formData) => {
+    const url = `http://localhost:8080/api/product/update/image/${productId}`;
+    // const url = process.env.REACT_APP_API_URL + `/product/update/image/${productId}`;
+
     axios
-      .post(url, formData)
+      .put(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
       .then(
         (response) => {
-          return response.data;
+          return response;
         },
         (error) => {
           console.log(error);
         },
       );
-  }
+  },
 };
 
 export default productService;

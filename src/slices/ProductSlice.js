@@ -20,6 +20,11 @@ export const uploadNewImageProduct = createAsyncThunk('product/upload-new-image'
   return await productService.uploadNewImage(formData)
 })
 
+export const updateImageProduct = createAsyncThunk('product/update-image', async (params) => {
+  const {productId, formData} = params
+  return await productService.updateImage(productId, formData)
+})
+
 export const getProductByImportOrderId = createAsyncThunk('product/get-by-import-order' , async (params, thunkAPi) => {
   // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
   const productList = await productService.getProductByImportOrderId(params);
@@ -32,7 +37,7 @@ const productSlice = createSlice({
     products: [],
     loading: false,
     error: null,
-    edit: false
+    uploadImage: false
   },
   reducers: {
     addProduct: (state, action) => {
@@ -74,14 +79,29 @@ const productSlice = createSlice({
     },
     [uploadNewImageProduct.pending] : (state) => {
       state.loading = true;
+      state.uploadImage = false
     },
     [uploadNewImageProduct.rejected] :(state, action) => {
       state.loading = false;
+      state.uploadImage = true;
       state.error = action.payload;
     },
     [uploadNewImageProduct.fulfilled] :(state, action) => {
       state.loading = false;
-
+      state.uploadImage = true;
+    },
+    [updateImageProduct.pending] : (state) => {
+      state.loading = true;
+      state.uploadImage = false
+    },
+    [updateImageProduct.rejected] :(state, action) => {
+      state.loading = false;
+      state.uploadImage = true;
+      state.error = action.payload;
+    },
+    [updateImageProduct.fulfilled] :(state, action) => {
+      state.loading = false;
+      state.uploadImage = true;
     },
   }
 });

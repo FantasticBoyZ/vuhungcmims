@@ -1,23 +1,14 @@
 import FormatDataUtils from '@/utils/formatData';
 import { Edit } from '@mui/icons-material';
 import {
-  Box,
   Button,
   Card,
-  CardContent,
-  CardHeader,
-  CardMedia,
-  Divider,
-  Grid,
-  Stack,
-  Table,
-  TableCell,
-  TableRow,
-  TextField,
-  Typography,
+  CardContent, Grid,
+  Stack, Typography
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import React from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
@@ -51,10 +42,20 @@ const deployUrl = 'http://ec2-52-221-240-240.ap-southeast-1.compute.amazonaws.co
 
 const ProductInformation = ({ product }) => {
   const classes = useStyles();
+  const [image, setImage] = useState()
   const navigate = useNavigate();
+  
+  const getImageProduct = async () => {
+    return await axios.get(localhost+'/'+product.image)
+  }
   const handleOnClickEdit = () => {
     navigate(`/product/edit/${product.id}`);
   };
+
+  useEffect(() => {
+    setImage(getImageProduct())
+  }, []);
+  
   return (
     <Grid
       container
@@ -296,13 +297,17 @@ const ProductInformation = ({ product }) => {
                   item
                 >
                   {/* TODO: đổi sang api deploy khi push code lên nhánh master */}
-                  {product.image ? (
+                 
+                  {image ? (
+                    
                     <img
                       // component="img"
                       // height="250"
                       // sx={{ width: 250 }}
                       className={classes.imageStyle}
                       alt="Ảnh sản phẩm"
+                      // src={image}
+                      loading="lazy"
                       src={`${localhost}/${product.image}`}
                     />
                   ) : (

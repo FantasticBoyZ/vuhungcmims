@@ -5,6 +5,7 @@ import { getManufacturerList } from '@/slices/ManufacturerSlice';
 import {
   getProductDetail,
   saveProduct,
+  updateImageProduct,
   uploadNewImageProduct,
 } from '@/slices/ProductSlice';
 import FormatDataUtils from '@/utils/formatData';
@@ -157,6 +158,9 @@ function Dropzone(props) {
   );
 }
 
+const localhost = 'http://localhost:8080';
+const deployUrl = 'http://ec2-52-221-240-240.ap-southeast-1.compute.amazonaws.com:8080';
+
 const AddEditProductForm = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState();
@@ -182,11 +186,12 @@ const AddEditProductForm = () => {
   const [imageUrl, setImageUrl] = useState();
   const [formData, setFormData] = useState(new FormData());
   const [isAdd, setIsAdd] = useState(true);
+  const [isUseWrapUnitMeasure, setIsUseWrapUnitMeasure] = useState(true);
   const classes = useStyles();
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
-  const { loading, products } = useSelector((state) => ({ ...state.products }));
+  const { loading, uploadImage } = useSelector((state) => ({ ...state.products }));
 
   const FORM_VALIDATION = Yup.object().shape({
     productCode: Yup.string().required('Chưa nhập mã sản phẩm'),
@@ -197,28 +202,22 @@ const AddEditProductForm = () => {
   });
 
   const saveProductDetail = async (product) => {
-    let uploadImageSuccess = false;
     try {
       const actionResult = await dispatch(saveProduct(product));
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
       if (!!formData) {
-        const uploadNewImage = await dispatch(uploadNewImageProduct(formData));
-        const responseUpload = unwrapResult(uploadNewImage);
-        if (responseUpload.message) {
-          uploadImageSuccess = true;
+        if (!productId) {
+          const uploadNewImage = await dispatch(uploadNewImageProduct(formData));
+        } else {
+          const uploadNewImage = await dispatch(
+            updateImageProduct({ productId, formData }),
+            console.log(uploadImage)
+          );
         }
       }
-      console.log('outside',...formData)
-      if (isAdd) {
-        if (uploadImageSuccess) {
-          toast.success('Thêm sản phẩm thành công!');
-          navigate('/product');
-        }
-      } else {
-        toast.success('Sửa sản phẩm thành công!');
-        navigate(`/product/detail/${productId}`);
-      }
+      console.log('outside', ...formData);
+      
     } catch (error) {
       console.log('Failed to save product: ', error);
       if (isAdd) {
@@ -231,6 +230,10 @@ const AddEditProductForm = () => {
     }
   };
 
+  const handleOnClickCheckboxWrapUnitMeasure = () => {
+    setIsUseWrapUnitMeasure(!isUseWrapUnitMeasure);
+  };
+
   const handleSubmit = (values) => {
     setLoadingButton(true);
     const newProduct = {
@@ -238,8 +241,8 @@ const AddEditProductForm = () => {
       name: values.name,
       productCode: values.productCode,
       unitMeasure: values.unitMeasure,
-      wrapUnitMeasure: values.wrapUnitMeasure,
-      numberOfWrapUnitMeasure: values.numberOfWrapUnitMeasure,
+      wrapUnitMeasure: isUseWrapUnitMeasure ? values.wrapUnitMeasure : '',
+      numberOfWrapUnitMeasure: isUseWrapUnitMeasure ? values.numberOfWrapUnitMeasure : '',
       color: values.color,
       description: values.description,
       categoryId: values.categoryId,
@@ -248,6 +251,13 @@ const AddEditProductForm = () => {
     console.log(values);
     saveProductDetail(newProduct);
     // TODO: sending formData to backend
+    if (isAdd) {
+        toast.success('Thêm sản phẩm thành công!');
+        navigate('/product');
+    } else {
+        toast.success('Sửa sản phẩm thành công!');
+        navigate(`/product/detail/${productId}`);
+    }
   };
 
   const handleOnClickExit = () => {
@@ -304,6 +314,7 @@ const AddEditProductForm = () => {
         const actionResult = await dispatch(getProductDetail(params));
         const dataResult = unwrapResult(actionResult);
         if (dataResult.data) {
+          console.log(dataResult.data);
           setProduct(dataResult.data.product);
           setSelectedCategory(
             FormatDataUtils.getSelectedOption(
@@ -311,6 +322,10 @@ const AddEditProductForm = () => {
               dataResult.data.product.categoryId,
             ),
           );
+          // TODO: đổi sang api deploy khi push code lên nhánh master
+          if (dataResult.data.product.image) {
+            setImageUrl(localhost + '/' + dataResult.data.product.image);
+          }
         }
         console.log('dataResult', dataResult);
       } catch (error) {
@@ -349,295 +364,400 @@ const AddEditProductForm = () => {
                       xs={9}
                       item
                     >
-                      <Card>
-                        <CardHeader
+                      <Grid
+                        container
+                        spacing={2}
+                      >
+                        <Grid
+                          xs={12}
+                          item
+                        >
+                          <Card>
+                            {/* <CardHeader
                           title={isAdd ? 'Thêm mới sản phẩm' : 'Sửa sản phẩm'}
-                        />
-                        <CardContent>
-                          <Grid
-                            container
-                            spacing={2}
-                          >
-                            <Grid
-                              xs={12}
-                              item
-                            >
-                              <Typography className={classes.wrapIcon}>
-                                Tên sản phẩm: <IconRequired />
-                                {/* <Info className={classes.iconStyle} /> */}
-                              </Typography>
-                              <TextfieldWrapper
-                                name="name"
-                                fullWidth
-                                id="name"
-                                autoComplete="name"
-                                autoFocus
-                              />
-                            </Grid>
-                            <Grid
-                              xs={6}
-                              item
-                            >
-                              <Typography className={classes.wrapIcon}>
-                                Mã sản phẩm: <IconRequired />
-                                {/* <Info className={classes.iconStyle} /> */}
-                              </Typography>
-                              <TextfieldWrapper
-                                name="productCode"
-                                fullWidth
-                                id="productCode"
-                                autoComplete="productCode"
-                              />
-                            </Grid>
-                            <Grid
-                              xs={6}
-                              item
-                            >
-                              <Typography className={classes.wrapIcon}>
-                                Đơn vị: <IconRequired />
-                                {/* <Info className={classes.iconStyle} /> */}
-                              </Typography>
-                              <TextfieldWrapper
-                                name="unitMeasure"
-                                fullWidth
-                                id="unitMeasure"
-                                autoComplete="unitMeasure"
-                              />
-                            </Grid>
-                            <Grid
-                              xs={6}
-                              item
-                            >
-                              <Typography className={classes.wrapIcon}>
-                                Đơn vị quy đổi:
-                                {/* <Info className={classes.iconStyle} /> */}
-                              </Typography>
-                              <TextfieldWrapper
-                                name="wrapUnitMeasure"
-                                fullWidth
-                                id="wrapUnitMeasure"
-                                autoComplete="wrapUnitMeasure"
-                              />
-                            </Grid>
+                        /> */}
+                            <CardContent>
+                              <Typography variant="h6">Thông tin sản phẩm</Typography>
+                              <Grid
+                                container
+                                spacing={2}
+                              >
+                                <Grid
+                                  xs={12}
+                                  item
+                                >
+                                  <Typography className={classes.wrapIcon}>
+                                    Tên sản phẩm: <IconRequired />
+                                    {/* <Info className={classes.iconStyle} /> */}
+                                  </Typography>
+                                  <TextfieldWrapper
+                                    name="name"
+                                    fullWidth
+                                    id="name"
+                                    autoComplete="name"
+                                    autoFocus
+                                  />
+                                </Grid>
+                                <Grid
+                                  xs={6}
+                                  item
+                                >
+                                  <Typography className={classes.wrapIcon}>
+                                    Mã sản phẩm: <IconRequired />
+                                    {/* <Info className={classes.iconStyle} /> */}
+                                  </Typography>
+                                  <TextfieldWrapper
+                                    name="productCode"
+                                    fullWidth
+                                    id="productCode"
+                                    autoComplete="productCode"
+                                  />
+                                </Grid>
+                                <Grid
+                                  xs={6}
+                                  item
+                                >
+                                  <Typography className={classes.wrapIcon}>
+                                    Đơn vị: <IconRequired />
+                                    {/* <Info className={classes.iconStyle} /> */}
+                                  </Typography>
+                                  <TextfieldWrapper
+                                    name="unitMeasure"
+                                    fullWidth
+                                    id="unitMeasure"
+                                    autoComplete="unitMeasure"
+                                  />
+                                </Grid>
 
-                            <Grid
-                              xs={6}
-                              item
-                            >
-                              <Typography className={classes.wrapIcon}>
-                                Số lượng đơn vị:
-                                {/* <Info className={classes.iconStyle} /> */}
+                                <Grid
+                                  xs={6}
+                                  item
+                                >
+                                  <Typography className={classes.wrapIcon}>
+                                    Màu sắc:
+                                    {/* <Info className={classes.iconStyle} /> */}
+                                  </Typography>
+                                  <TextfieldWrapper
+                                    name="color"
+                                    fullWidth
+                                    id="color"
+                                    autoComplete="color"
+                                  />
+                                </Grid>
+                                <Grid
+                                  xs={12}
+                                  item
+                                >
+                                  <Typography className={classes.wrapIcon}>
+                                    Mô tả:
+                                    {/* <Info className={classes.iconStyle} /> */}
+                                  </Typography>
+                                  <TextfieldWrapper
+                                    name="description"
+                                    fullWidth
+                                    multiline
+                                    minRows={5}
+                                    id="description"
+                                    autoComplete="description"
+                                  />
+                                </Grid>
+                              </Grid>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                        <Grid
+                          xs={12}
+                          item
+                        >
+                          <Card>
+                            <CardContent>
+                              <Typography variant="h6">
+                                Đơn vị quy đổi{' '}
+                                <Checkbox
+                                  checked={isUseWrapUnitMeasure}
+                                  onClick={() => {
+                                    handleOnClickCheckboxWrapUnitMeasure();
+                                    // setFieldValue('wrapUnitMeasure', '');
+                                    // setFieldValue('numberOfWrapUnitMeasure', '');
+                                  }}
+                                />
                               </Typography>
-                              <TextfieldWrapper
-                                name="numberOfWrapUnitMeasure"
-                                fullWidth
-                                id="numberOfWrapUnitMeasure"
-                                autoComplete="numberOfWrapUnitMeasure"
-                              />
-                            </Grid>
-                            <Grid
-                              xs={6}
-                              item
-                            >
-                              <Typography className={classes.wrapIcon}>
-                                Màu sắc:
-                                {/* <Info className={classes.iconStyle} /> */}
-                              </Typography>
-                              <TextfieldWrapper
-                                name="color"
-                                fullWidth
-                                id="color"
-                                autoComplete="color"
-                              />
-                            </Grid>
-                            <Grid
-                              xs={12}
-                              item
-                            >
-                              <Typography className={classes.wrapIcon}>
-                                Mô tả:
-                                {/* <Info className={classes.iconStyle} /> */}
-                              </Typography>
-                              <TextfieldWrapper
-                                name="description"
-                                fullWidth
-                                multiline
-                                minRows={5}
-                                id="description"
-                                autoComplete="description"
-                              />
-                            </Grid>
-                          </Grid>
-                        </CardContent>
-                      </Card>
+                              {isUseWrapUnitMeasure && (
+                                <Grid
+                                  container
+                                  spacing={2}
+                                >
+                                  <Grid
+                                    xs={6}
+                                    item
+                                  >
+                                    <Typography className={classes.wrapIcon}>
+                                      Đơn vị quy đổi:
+                                      {/* <Info className={classes.iconStyle} /> */}
+                                    </Typography>
+                                    <TextfieldWrapper
+                                      name="wrapUnitMeasure"
+                                      fullWidth
+                                      id="wrapUnitMeasure"
+                                      autoComplete="wrapUnitMeasure"
+                                    />
+                                  </Grid>
+
+                                  <Grid
+                                    xs={6}
+                                    item
+                                  >
+                                    <Typography className={classes.wrapIcon}>
+                                      Số lượng đơn vị:
+                                      {/* <Info className={classes.iconStyle} /> */}
+                                    </Typography>
+                                    <TextfieldWrapper
+                                      name="numberOfWrapUnitMeasure"
+                                      fullWidth
+                                      id="numberOfWrapUnitMeasure"
+                                      autoComplete="numberOfWrapUnitMeasure"
+                                    />
+                                  </Grid>
+                                </Grid>
+                              )}
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      </Grid>
                     </Grid>
                     <Grid
                       xs={3}
                       item
                     >
-                      <Card>
-                        <CardHeader title="Phân loại" />
-                        <CardContent>
-                          <Grid
-                            container
-                            spacing={2}
-                          >
-                            <Grid
-                              xs={12}
-                              item
-                            >
-                              <Typography className={classes.wrapIcon}>
-                                Danh mục: <IconRequired />
-                              </Typography>
-                              {!!categoryList && (
-                                <Select
-                                  classNamePrefix="select"
-                                  placeholder="Chọn danh mục."
-                                  noOptionsMessage={() => (
-                                    <>Không có tìm thấy danh mục phù hợp</>
-                                  )}
-                                  isClearable={true}
-                                  isSearchable={true}
-                                  name="categoryId"
-                                  value={selectedCategory}
-                                  options={FormatDataUtils.getOptionWithIdandName(
-                                    categoryList,
-                                  )}
-                                  menuPortalTarget={document.body}
-                                  styles={{
-                                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                                    control: (base) => ({
-                                      ...base,
-                                      height: 56,
-                                      minHeight: 56,
-                                    }),
-                                  }}
-                                  onChange={(e) => {
-                                    setFieldValue('categoryId', e?.value);
-                                  }}
-                                />
-                              )}
-                              <FormHelperText
-                                error={true}
-                                className={classes.errorTextHelper}
+                      <Grid
+                        container
+                        spacing={2}
+                      >
+                        <Grid
+                          xs={12}
+                          item
+                        >
+                          <Card>
+                            {/* <CardHeader title="Phân loại" /> */}
+                            <CardContent>
+                              <Typography variant="h6">Phân loại</Typography>
+                              <Grid
+                                container
+                                spacing={2}
                               >
-                                {errors.categoryId}
-                              </FormHelperText>
-                            </Grid>
-                            <Grid
-                              xs={12}
-                              item
-                            >
-                              <Typography className={classes.wrapIcon}>
-                                Danh mục phụ:
-                              </Typography>
-                              {/* {selectedCategory && ( */}
-                              <Select
-                                classNamePrefix="select"
-                                placeholder="Chọn danh mục phụ"
-                                noOptionsMessage={() => (
-                                  <>Không có tìm thấy danh mục phù hợp</>
-                                )}
-                                isClearable={true}
-                                isSearchable={true}
-                                name="subCategoryId"
-                                // value={selectedSubCategory}
-                                options={FormatDataUtils.getOptionWithIdandName(
-                                  subCategoryListTest,
-                                )}
-                                menuPortalTarget={document.body}
-                                styles={{
-                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                                  control: (base) => ({
-                                    ...base,
-                                    height: 56,
-                                    minHeight: 56,
-                                  }),
-                                }}
-                                onChange={(e) => {
-                                  setFieldValue('subCategoryId', e?.value);
-                                }}
-                              />
-                              {/* )} */}
-                            </Grid>
-                            <Grid
-                              xs={12}
-                              item
-                            >
-                              <Typography className={classes.wrapIcon}>
-                                Nhà cung cấp: <IconRequired />
-                              </Typography>
-                              {/* {selectedManufacturer && ( */}
-                              <Select
-                                classNamePrefix="select"
-                                placeholder="Chọn nhà cung cấp"
-                                noOptionsMessage={() => (
-                                  <>Không có tìm thấy nhà cung cấp phù hợp</>
-                                )}
-                                isClearable={true}
-                                isSearchable={true}
-                                name="manufacturerId"
-                                // value={selectedManufacturer}
-                                options={FormatDataUtils.getOptionWithIdandName(
-                                  manufacturerList,
-                                )}
-                                menuPortalTarget={document.body}
-                                styles={{
-                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                                  control: (base) => ({
-                                    ...base,
-                                    height: 56,
-                                    minHeight: 56,
-                                  }),
-                                }}
-                                onChange={(e) => {
-                                  setFieldValue('manufactorId', e?.value);
-                                }}
-                              />
-                              {/* )} */}
-                              <FormHelperText
-                                error={true}
-                                className={classes.errorTextHelper}
+                                <Grid
+                                  xs={12}
+                                  item
+                                >
+                                  <Typography className={classes.wrapIcon}>
+                                    Danh mục: <IconRequired />
+                                  </Typography>
+                                  {!!categoryList && (
+                                    <Select
+                                      classNamePrefix="select"
+                                      placeholder="Chọn danh mục."
+                                      noOptionsMessage={() => (
+                                        <>Không có tìm thấy danh mục phù hợp</>
+                                      )}
+                                      isClearable={true}
+                                      isSearchable={true}
+                                      name="categoryId"
+                                      value={selectedCategory}
+                                      options={FormatDataUtils.getOptionWithIdandName(
+                                        categoryList,
+                                      )}
+                                      menuPortalTarget={document.body}
+                                      styles={{
+                                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                        control: (base) => ({
+                                          ...base,
+                                          height: 56,
+                                          minHeight: 56,
+                                        }),
+                                      }}
+                                      onChange={(e) => {
+                                        setFieldValue('categoryId', e?.value);
+                                      }}
+                                    />
+                                  )}
+                                  <FormHelperText
+                                    error={true}
+                                    className={classes.errorTextHelper}
+                                  >
+                                    {errors.categoryId}
+                                  </FormHelperText>
+                                </Grid>
+                                <Grid
+                                  xs={12}
+                                  item
+                                >
+                                  <Typography className={classes.wrapIcon}>
+                                    Danh mục phụ:
+                                  </Typography>
+                                  {/* {selectedCategory && ( */}
+                                  <Select
+                                    classNamePrefix="select"
+                                    placeholder="Chọn danh mục phụ"
+                                    noOptionsMessage={() => (
+                                      <>Không có tìm thấy danh mục phù hợp</>
+                                    )}
+                                    isClearable={true}
+                                    isSearchable={true}
+                                    name="subCategoryId"
+                                    // value={selectedSubCategory}
+                                    options={FormatDataUtils.getOptionWithIdandName(
+                                      subCategoryListTest,
+                                    )}
+                                    menuPortalTarget={document.body}
+                                    styles={{
+                                      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                      control: (base) => ({
+                                        ...base,
+                                        height: 56,
+                                        minHeight: 56,
+                                      }),
+                                    }}
+                                    onChange={(e) => {
+                                      setFieldValue('subCategoryId', e?.value);
+                                    }}
+                                  />
+                                  {/* )} */}
+                                </Grid>
+                                <Grid
+                                  xs={12}
+                                  item
+                                >
+                                  <Typography className={classes.wrapIcon}>
+                                    Nhà cung cấp: <IconRequired />
+                                  </Typography>
+                                  {/* {selectedManufacturer && ( */}
+                                  <Select
+                                    classNamePrefix="select"
+                                    placeholder="Chọn nhà cung cấp"
+                                    noOptionsMessage={() => (
+                                      <>Không có tìm thấy nhà cung cấp phù hợp</>
+                                    )}
+                                    isClearable={true}
+                                    isSearchable={true}
+                                    name="manufacturerId"
+                                    // value={selectedManufacturer}
+                                    options={FormatDataUtils.getOptionWithIdandName(
+                                      manufacturerList,
+                                    )}
+                                    menuPortalTarget={document.body}
+                                    styles={{
+                                      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                      control: (base) => ({
+                                        ...base,
+                                        height: 56,
+                                        minHeight: 56,
+                                      }),
+                                    }}
+                                    onChange={(e) => {
+                                      setFieldValue('manufactorId', e?.value);
+                                    }}
+                                  />
+                                  {/* )} */}
+                                  <FormHelperText
+                                    error={true}
+                                    className={classes.errorTextHelper}
+                                  >
+                                    {errors.manufactorId}
+                                  </FormHelperText>
+                                </Grid>
+                              </Grid>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                        <Grid
+                          xs={12}
+                          item
+                        >
+                          <Card className={classes.cardImage}>
+                            {/* <CardHeader title="Ảnh sản phẩm" /> */}
+                            <CardContent sx={{ width: '100%' }}>
+                              <Typography variant="h6">Ảnh sản phẩm</Typography>
+                              {/* <Box className={classes.uploadContainer}>
+                            
+                          </Box> */}
+                              <Grid
+                                container
+                                spacing={0}
+                                direction="column"
+                                alignItems="center"
+                                justify="center"
                               >
-                                {errors.manufactorId}
-                              </FormHelperText>
-                            </Grid>
-                          </Grid>
-                        </CardContent>
-                      </Card>
-                      <Card className={classes.cardImage}>
-                        <CardHeader title="Ảnh sản phẩm" />
-                        <CardContent>Thêm ảnh</CardContent>
-                      </Card>
+                                <Grid
+                                  xs={12}
+                                  item
+                                >
+                                  <Dropzone
+                                    // {...userProfile}
+                                    imageUrl={imageUrl}
+                                    setImageUrl={setImageUrl}
+                                    setFormData={setFormData}
+                                  />
+                                </Grid>
+                              </Grid>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                        <Grid
+                          xs={12}
+                          item
+                        >
+                          <Card>
+                            <CardContent>
+                              <Grid
+                                container
+                                spacing={2}
+                              >
+                                <Grid
+                                  xs={6}
+                                  item
+                                >
+                                  <LoadingButton
+                                    loading={loadingButton}
+                                    type="submit"
+                                    variant="contained"
+                                    fullWidth
+                                    loadingPosition="start"
+                                    startIcon={<Done />}
+                                    color="warning"
+                                  >
+                                    Lưu chỉnh sửa
+                                  </LoadingButton>
+                                  {/* <Button
+                                onClick={() => console.log('outside',...formData)}
+                                variant="contained"
+                                fullWidth
+                                startIcon={<Close />}
+                                color="error"
+                              >
+                                Test
+                              </Button> */}
+                                </Grid>
+                                <Grid
+                                  xs={6}
+                                  item
+                                >
+                                  <Button
+                                    onClick={() => handleOnClickExit()}
+                                    variant="contained"
+                                    fullWidth
+                                    startIcon={<Close />}
+                                    color="error"
+                                  >
+                                    Huỷ chỉnh sửa
+                                  </Button>
+                                </Grid>
+                              </Grid>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      </Grid>
                     </Grid>
                     {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
-                    <Grid
-                      xs={12}
-                      item
-                    >
-                      <Stack
-                        direction="row"
-                        spacing={2}
-                        justifyContent="flex-end"
-                        padding="20px"
-                      >
-                        <LoadingButton
-                          loading={loadingButton}
-                          type="submit"
-                          variant="contained"
-                          loadingPosition="start"
-                          startIcon={<Save />}
-                        >
-                          Lưu
-                        </LoadingButton>
-                        <Button
-                          onClick={() => handleOnClickExit()}
-                          variant="outlined"
-                        >
-                          Thoát
-                        </Button>
-                      </Stack>
-                    </Grid>
                   </Grid>
                 </Form>
               )}
@@ -771,44 +891,54 @@ const AddEditProductForm = () => {
                       <Card>
                         <CardContent>
                           <Typography variant="h6">
-                            Đơn vị quy đổi <Checkbox />
+                            Đơn vị quy đổi{' '}
+                            <Checkbox
+                              checked={isUseWrapUnitMeasure}
+                              onClick={() => {
+                                handleOnClickCheckboxWrapUnitMeasure();
+                                // setFieldValue('wrapUnitMeasure', '');
+                                // setFieldValue('numberOfWrapUnitMeasure', '');
+                              }}
+                            />
                           </Typography>
-                          <Grid
-                            container
-                            spacing={2}
-                          >
+                          {isUseWrapUnitMeasure && (
                             <Grid
-                              xs={6}
-                              item
+                              container
+                              spacing={2}
                             >
-                              <Typography className={classes.wrapIcon}>
-                                Đơn vị quy đổi:
-                                {/* <Info className={classes.iconStyle} /> */}
-                              </Typography>
-                              <TextfieldWrapper
-                                name="wrapUnitMeasure"
-                                fullWidth
-                                id="wrapUnitMeasure"
-                                autoComplete="wrapUnitMeasure"
-                              />
-                            </Grid>
+                              <Grid
+                                xs={6}
+                                item
+                              >
+                                <Typography className={classes.wrapIcon}>
+                                  Đơn vị quy đổi:
+                                  {/* <Info className={classes.iconStyle} /> */}
+                                </Typography>
+                                <TextfieldWrapper
+                                  name="wrapUnitMeasure"
+                                  fullWidth
+                                  id="wrapUnitMeasure"
+                                  autoComplete="wrapUnitMeasure"
+                                />
+                              </Grid>
 
-                            <Grid
-                              xs={6}
-                              item
-                            >
-                              <Typography className={classes.wrapIcon}>
-                                Số lượng đơn vị:
-                                {/* <Info className={classes.iconStyle} /> */}
-                              </Typography>
-                              <TextfieldWrapper
-                                name="numberOfWrapUnitMeasure"
-                                fullWidth
-                                id="numberOfWrapUnitMeasure"
-                                autoComplete="numberOfWrapUnitMeasure"
-                              />
+                              <Grid
+                                xs={6}
+                                item
+                              >
+                                <Typography className={classes.wrapIcon}>
+                                  Số lượng đơn vị:
+                                  {/* <Info className={classes.iconStyle} /> */}
+                                </Typography>
+                                <TextfieldWrapper
+                                  name="numberOfWrapUnitMeasure"
+                                  fullWidth
+                                  id="numberOfWrapUnitMeasure"
+                                  autoComplete="numberOfWrapUnitMeasure"
+                                />
+                              </Grid>
                             </Grid>
-                          </Grid>
+                          )}
                         </CardContent>
                       </Card>
                     </Grid>
@@ -1061,337 +1191,3 @@ const AddEditProductForm = () => {
 };
 
 export default AddEditProductForm;
-// {isAdd && (
-//   <Grid
-//     container
-//     direction="row"
-//     justifyContent="center"
-//     alignItems="stretch"
-//   >
-//     <Grid
-//       xs={12}
-//       item
-//     >
-//       <Formik
-//         initialValues={{
-//           initialFormValue,
-//         }}
-//         validationSchema={FORM_VALIDATION}
-//         onSubmit={(values) => handleSubmit(values)}
-//       >
-//         <Form>
-//           <Grid
-//             container
-//             direction="row"
-//             justifyContent="center"
-//             alignItems="stretch"
-//           >
-//             <Grid
-//               xs={6}
-//               item
-//               className={classes.leftContainer}
-//             >
-//               <Box className={classes.infoContainer}>
-//                 <Typography className={classes.wrapIcon}>
-//                   Mã sản phẩm <InfoOutlined className={classes.iconStyle} />
-//                 </Typography>
-//                 <TextfieldWrapper
-//                   name="productCode"
-//                   fullWidth
-//                   id="productCode"
-//                   autoComplete="productCode"
-//                   autoFocus
-//                 />
-//               </Box>
-
-//               <Box className={classes.infoContainer}>
-//                 <Typography className={classes.wrapIcon}>
-//                   Tên sản phẩm <Info className={classes.iconStyle} />
-//                 </Typography>
-//                 <TextfieldWrapper
-//                   name="name"
-//                   fullWidth
-//                   id="name"
-//                   autoComplete="name"
-//                   autoFocus
-//                 />
-//               </Box>
-//               <Box className={classes.infoContainer}>
-//                 <Typography className={classes.wrapIcon}>
-//                   Danh mục <Info className={classes.iconStyle} />
-//                 </Typography>
-//                 {!!categoryList && (
-//                   <SelectWrapper
-//                     name="categoryId"
-//                     fullWidth
-//                     options={categoryList}
-//                     id="categoryId"
-//                     autoFocus
-//                   />
-//                 )}
-//               </Box>
-//               {/* <Box sx={{ display: 'flex', width: '100%' }}>
-//               <Typography>Danh mục phụ</Typography>
-//               {!!categoryList && (
-//                 <SelectWrapper
-//                   name="subCategoryId"
-//                   margin="normal"
-//                   fullWidth
-//                   options={categoryList}
-//                   id="subCategoryId"
-//                 />
-//               )}
-//             </Box> */}
-//               <Box className={classes.infoContainer}>
-//                 <Typography className={classes.wrapIcon}>
-//                   Đơn vị tính <Info className={classes.iconStyle} />
-//                 </Typography>
-//                 <TextfieldWrapper
-//                   name="unitMeasure"
-//                   fullWidth
-//                   id="unitMeasure"
-//                   autoComplete="unitMeasure"
-//                   autoFocus
-//                 />
-//               </Box>
-//             </Grid>
-//             <Grid
-//               xs={6}
-//               item
-//               className={classes.rightContainer}
-//             >
-//               {/* {!isAdd && (
-//                   <Box className={classes.infoContainer}>
-//                     <Typography className={classes.wrapIcon}>
-//                       Tồn kho <Info className={classes.iconStyle} />
-//                     </Typography>
-//                     <TextField
-//                       defaultValue={product.quantity}
-//                       fullWidth
-//                       InputProps={{
-//                         readOnly: true,
-//                       }}
-//                     />
-//                   </Box>
-//                 )} */}
-//               <Box className={classes.infoContainer}>
-//                 <Typography className={classes.wrapIcon}>
-//                   Màu sắc <Info className={classes.iconStyle} />
-//                 </Typography>
-//                 <TextfieldWrapper
-//                   name="color"
-//                   fullWidth
-//                   id="color"
-//                   autoComplete="color"
-//                   autoFocus
-//                 />
-//               </Box>
-//               <Box className={classes.infoContainer}>
-//                 <Typography className={classes.wrapIcon}>
-//                   Mô tả <Info className={classes.iconStyle} />
-//                 </Typography>
-//                 <TextfieldWrapper
-//                   name="description"
-//                   fullWidth
-//                   multiline
-//                   rows={4}
-//                   id="description"
-//                   autoFocus
-//                 />
-//               </Box>
-//             </Grid>
-//           </Grid>
-//           <Stack
-//             direction="row"
-//             spacing={2}
-//             justifyContent="flex-end"
-//             padding="20px"
-//           >
-//             <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
-//             <Button
-//               onClick={() => handleOnClickExit()}
-//               variant="outlined"
-//             >
-//               Thoát
-//             </Button>
-//           </Stack>
-//         </Form>
-//       </Formik>
-//     </Grid>
-//   </Grid>
-// )}
-
-// <Container maxWidth="xl">
-//   <Box className={classes.cardHeader}>
-//     <Typography variant="h4">{isAdd ? 'Thêm ' : 'Sửa '}sản phẩm</Typography>
-//   </Box>
-//   <Card>
-//     {loading && !isAdd ? (
-//       <>Loading...</>
-//     ) : (
-//       <>
-//         <Grid
-//           container
-//           direction="row"
-//           justifyContent="center"
-//           alignItems="stretch"
-//         >
-//           {product && (
-//             <Grid
-//               xs={12}
-//               item
-//             >
-//               <Formik
-//                 initialValues={{
-//                   ...product,
-//                 }}
-//                 validationSchema={FORM_VALIDATION}
-//                 onSubmit={(values) => handleSubmit(values)}
-//               >
-//                 <Form>
-//                   <Grid
-//                     container
-//                     direction="row"
-//                     justifyContent="center"
-//                     alignItems="stretch"
-//                   >
-//                     <Grid
-//                       xs={6}
-//                       item
-//                       className={classes.leftContainer}
-//                     >
-//                       <Box className={classes.infoContainer}>
-//                         <Typography className={classes.wrapIcon}>
-//                           Mã sản phẩm <InfoOutlined className={classes.iconStyle} />
-//                         </Typography>
-//                         <TextfieldWrapper
-//                           name="productCode"
-//                           fullWidth
-//                           id="productCode"
-//                           autoComplete="productCode"
-//                           autoFocus
-//                         />
-//                       </Box>
-
-//                       <Box className={classes.infoContainer}>
-//                         <Typography className={classes.wrapIcon}>
-//                           Tên sản phẩm <InfoOutlined className={classes.iconStyle} />
-//                         </Typography>
-//                         <TextfieldWrapper
-//                           name="name"
-//                           fullWidth
-//                           id="name"
-//                           autoComplete="name"
-//                           autoFocus
-//                         />
-//                       </Box>
-//                       <Box className={classes.infoContainer}>
-//                         <Typography className={classes.wrapIcon}>
-//                           Danh mục <InfoOutlined className={classes.iconStyle} />
-//                         </Typography>
-//                         {!!categoryList && (
-//                           <SelectWrapper
-//                             name="categoryId"
-//                             fullWidth
-//                             options={categoryList}
-//                             id="categoryId"
-//                             autoFocus
-//                           />
-//                         )}
-//                       </Box>
-//                       {/* <Box sx={{ display: 'flex', width: '100%' }}>
-//                 <Typography>Danh mục phụ</Typography>
-//                 {!!categoryList && (
-//                   <SelectWrapper
-//                     name="subCategoryId"
-//                     margin="normal"
-//                     fullWidth
-//                     options={categoryList}
-//                     id="subCategoryId"
-//                   />
-//                 )}
-//               </Box> */}
-//                       <Box className={classes.infoContainer}>
-//                         <Typography className={classes.wrapIcon}>
-//                           Đơn vị tính <InfoOutlined className={classes.iconStyle} />
-//                         </Typography>
-//                         <TextfieldWrapper
-//                           name="unitMeasure"
-//                           fullWidth
-//                           id="unitMeasure"
-//                           autoComplete="unitMeasure"
-//                           autoFocus
-//                         />
-//                       </Box>
-//                     </Grid>
-//                     <Grid
-//                       xs={6}
-//                       item
-//                       className={classes.rightContainer}
-//                     >
-//                       {!isAdd && (
-//                         <Box className={classes.infoContainer}>
-//                           <Typography className={classes.wrapIcon}>
-//                             Tồn kho <InfoOutlined className={classes.iconStyle} />
-//                           </Typography>
-//                           <TextField
-//                             defaultValue={product.quantity}
-//                             fullWidth
-//                             InputProps={{
-//                               readOnly: true,
-//                             }}
-//                           />
-//                         </Box>
-//                       )}
-//                       <Box className={classes.infoContainer}>
-//                         <Typography className={classes.wrapIcon}>
-//                           Màu sắc <InfoOutlined className={classes.iconStyle} />
-//                         </Typography>
-//                         <TextfieldWrapper
-//                           name="color"
-//                           fullWidth
-//                           id="color"
-//                           autoComplete="color"
-//                           autoFocus
-//                         />
-//                       </Box>
-//                       <Box className={classes.infoContainer}>
-//                         <Typography className={classes.wrapIcon}>
-//                           Mô tả <InfoOutlined className={classes.iconStyle} />
-//                         </Typography>
-//                         <TextfieldWrapper
-//                           name="description"
-//                           fullWidth
-//                           multiline
-//                           rows={4}
-//                           id="description"
-//                           autoFocus
-//                         />
-//                       </Box>
-//                     </Grid>
-//                   </Grid>
-//                   <Stack
-//                     direction="row"
-//                     spacing={2}
-//                     justifyContent="flex-end"
-//                     padding="20px"
-//                   >
-//                     <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
-//                     <Button
-//                       variant="outlined"
-//                       onClick={() => handleOnClickExit()}
-//                     >
-//                       Thoát
-//                     </Button>
-//                   </Stack>
-//                 </Form>
-//               </Formik>
-//             </Grid>
-//           )}
-//         </Grid>
-//       </>
-//     )}
-//   </Card>
-//   {/* TODO: tối ưu code */}
-
-// </Container>
