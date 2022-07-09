@@ -13,9 +13,9 @@ export const getImportOrderById = createAsyncThunk('importOrder/detail', async (
   return importOrder;
 })
 
-export const confirmImportOrder = createAsyncThunk('importOrder/confirm', async (id, thunkAPi) => {
+export const confirmImportOrder = createAsyncThunk('importOrder/confirm', async (params, thunkAPi) => {
 
-  return await importOrderService.confirmImportOrder(id);
+  return await importOrderService.confirmImportOrder(params);
 })
 
 export const updateImportOrder = createAsyncThunk('importOrder/update', async (importOrder, thunkAPi) => {

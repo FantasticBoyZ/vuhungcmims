@@ -1,3 +1,4 @@
+import FormatDataUtils from '@/utils/formatData';
 import {
   Table,
   TableBody,
@@ -61,12 +62,12 @@ const ConsignmentsTable = ({ listConsignments }) => {
               <TableCell>{index+1}</TableCell>
               <TableCell>{consignment?.productCode}</TableCell>
               <TableCell>{consignment?.productName}</TableCell>
-              <TableCell>{consignment?.expirationDate}</TableCell>
+              <TableCell>{FormatDataUtils.formatDate(consignment?.expirationDate)}</TableCell>
               <TableCell>{consignment?.unitMeasure}</TableCell>
               <TableCell>{consignment?.quantity}</TableCell>
-              <TableCell>{formatCurrency(consignment?.price || '')}</TableCell>
+              <TableCell>{formatCurrency(consignment?.unitPrice || 0)}</TableCell>
               <TableCell>
-                {formatCurrency(consignment?.quantity * consignment?.price)}
+                {formatCurrency(consignment?.quantity * consignment?.unitPrice)}
               </TableCell>
             </TableRow>
           ))}

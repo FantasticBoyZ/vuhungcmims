@@ -29,8 +29,9 @@ const importOrderService = {
     });
   },
 
-  confirmImportOrder: (importOrderId) => {
-    const url = `/import-order/confirm/${importOrderId}`;
+  confirmImportOrder: (params) => {
+    const {importOrderId, confirmUserId} = params
+    const url = `/import-order/confirm/${importOrderId}/${confirmUserId}`;
     return axiosClient.get(url, { headers: authHeader() });
   },
 

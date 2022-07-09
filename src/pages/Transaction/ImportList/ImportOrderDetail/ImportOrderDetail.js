@@ -1,6 +1,7 @@
 import AlertPopup from '@/components/Common/AlertPopup';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
+import AuthService from '@/services/authService';
 import importOrderService from '@/services/importOrderService';
 import { confirmImportOrder, getImportOrderById } from '@/slices/ImportOrderSlice';
 import { getProductByImportOrderId } from '@/slices/ProductSlice';
@@ -111,7 +112,7 @@ const ImportOrderDetail = () => {
   };
 
   const handleOnClickBack = () => {
-    navigate('/import');
+    navigate('/import/list');
   };
 
   const calculateTotalAmount = () => {
@@ -121,7 +122,7 @@ const ImportOrderDetail = () => {
       for (let index = 0; index < listConsignments.length; index++) {
         totalAmount =
           totalAmount +
-          +listConsignments[index]?.quantity * +listConsignments[index]?.price;
+          +listConsignments[index]?.quantity * +listConsignments[index]?.unitPrice;
       }
     }
 
@@ -136,8 +137,8 @@ const ImportOrderDetail = () => {
   };
 
   const handleOnClickEdit = () => {
-    navigate(`/import/edit/${importOrderId}`)
-  }
+    navigate(`/import/edit/${importOrderId}`);
+  };
 
   const handleOnClickCancel = () => {
     setTitle('Bạn có chắc chắn muốn hủy phiếu nhập này không?');
@@ -146,12 +147,13 @@ const ImportOrderDetail = () => {
     setOpenPopup(true);
   };
 
-
-  const handleConfirm = async () => {  
+  const handleConfirm = async () => {
     if (isConfirm) {
       console.log('Xác nhận');
       try {
-        const actionResult = await dispatch(confirmImportOrder(importOrderId));
+        const confirmUserId = AuthService.getCurrentUser().id;
+        const params = { importOrderId, confirmUserId };
+        const actionResult = await dispatch(confirmImportOrder(params));
         const result = unwrapResult(actionResult);
         if (!!result) {
           if (!!result.message) {
@@ -215,7 +217,7 @@ const ImportOrderDetail = () => {
   return (
     <>
       {loading ? (
-        <ProgressCircleLoading/>
+        <ProgressCircleLoading />
       ) : (
         <>
           {importOrder && (

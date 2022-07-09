@@ -263,7 +263,7 @@ const ImportGoods = () => {
       (response) => {
         toast.success('Tạo phiếu nhập hàng thành công');
         console.log(response.data);
-        navigate('/import');
+        navigate('/import/list');
       },
       (error) => {
         toast.error('Tạo phiếu nhập hàng thất bại');

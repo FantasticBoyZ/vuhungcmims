@@ -138,7 +138,7 @@ const UpdateImportOrderDetail = () => {
       for (let index = 0; index < listConsignments.length; index++) {
         totalAmount =
           totalAmount +
-          +listConsignments[index]?.quantity * +listConsignments[index]?.price;
+          +listConsignments[index]?.quantity * +listConsignments[index]?.unitPrice;
       }
     }
 
@@ -179,8 +179,8 @@ const UpdateImportOrderDetail = () => {
         const actionResult = await dispatch(updateImportOrder(editedImportOrder));
         const result = unwrapResult(actionResult);
         if (!!result) {
-          if (!!result.message) {
-            toast.success(result.message);
+          if (!!result.data.status && result.data.status === 200) {
+            toast.success(result.data.message);
           } else {
             toast.success('Sửa đơn nhập kho thành công!');
           }
@@ -503,7 +503,7 @@ const UpdateImportOrderDetail = () => {
                                                     </TableCell>
                                                     <TableCell>
                                                       <TextfieldWrapper
-                                                        name={`consignments[${index}].price`}
+                                                        name={`consignments[${index}].unitPrice`}
                                                         variant="standard"
                                                         className="text-field-unit-price"
                                                         type={'number'}
@@ -519,7 +519,7 @@ const UpdateImportOrderDetail = () => {
                                                         values.consignments[index]
                                                           .quantity *
                                                           values.consignments[index]
-                                                            .price,
+                                                            .unitPrice,
                                                       )}
                                                     </TableCell>
                                                   </TableRow>
