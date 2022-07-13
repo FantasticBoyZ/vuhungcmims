@@ -53,7 +53,7 @@ const ProductInformation = ({ product }) => {
   };
 
   useEffect(() => {
-    setImage(getImageProduct())
+    // setImage(getImageProduct())
   }, []);
   
   return (
@@ -298,7 +298,7 @@ const ProductInformation = ({ product }) => {
                 >
                   {/* TODO: đổi sang api deploy khi push code lên nhánh master */}
                  
-                  {image ? (
+                  {product.image ? (
                     
                     <img
                       // component="img"
@@ -308,7 +308,7 @@ const ProductInformation = ({ product }) => {
                       alt="Ảnh sản phẩm"
                       // src={image}
                       loading="lazy"
-                      src={`${localhost}/${product.image}`}
+                      src={`${deployUrl}/${product.image}`}
                     />
                   ) : (
                     <img

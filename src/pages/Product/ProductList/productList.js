@@ -133,6 +133,7 @@ const ProductList = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [inputValueManufactor, setInputValueManufactor] = useState('');
   const [selectedManufactor, setSelectedManufactor] = useState(null);
+  const [selectedUnitMeasureList, setSelectedUnitMeasureList] = useState([]);
   const [searchParams, setSearchParams] = useState({
     // productName: '',
     // productCode: '',
@@ -501,8 +502,8 @@ const ProductList = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {productList.map((item) => {
-                        let productQuantity = item.quantity;
+                      {productList.map((item, index) => {
+                        const newSelectdUnitMeasureList = selectedUnitMeasureList.slice();
                         return (
                           <TableRow
                             hover
@@ -524,6 +525,7 @@ const ProductList = () => {
                               ) : (
                                 <Select
                                   classNamePrefix="select"
+                                  isSearchable={false}
                                   defaultValue={
                                     FormatDataUtils.getOption([
                                       {
@@ -554,18 +556,46 @@ const ProductList = () => {
                                     }),
                                   }}
                                   onChange={(e) => {
-                                    console.log(e.value.number);
-                                    if (e.value.number === item.numberOfWrapUnitMeasure) {
-                                      productQuantity = productQuantity / e.value.number;
-                                    } else {
-                                      productQuantity = item.quantity;
+                                    console.log(e.label);
+                                    if (
+                                      e.label === item.wrapUnitMeasure &&
+                                      newSelectdUnitMeasureList[index] !==
+                                        item.wrapUnitMeasure
+                                    ) {
+                                      newSelectdUnitMeasureList[index] =
+                                        item.wrapUnitMeasure;
+                                      console.log(
+                                        'wrapUnitMeasure',
+                                        newSelectdUnitMeasureList[index],
+                                      );
+                                      setSelectedUnitMeasureList(
+                                        newSelectdUnitMeasureList,
+                                      );
                                     }
-                                    console.log(productQuantity);
+                                    if (
+                                      e.label === item.unitMeasure &&
+                                      newSelectdUnitMeasureList[index] !==
+                                        item.unitMeasure
+                                    ) {
+                                      newSelectdUnitMeasureList[index] = item.unitMeasure;
+                                      console.log(
+                                        'unitMeasure',
+                                        newSelectdUnitMeasureList[index],
+                                      );
+                                      setSelectedUnitMeasureList(
+                                        newSelectdUnitMeasureList,
+                                      );
+                                    }
+                                    console.log(selectedUnitMeasureList);
                                   }}
                                 />
                               )}
                             </TableCell>
-                            <TableCell align="center">{productQuantity || '0'}</TableCell>
+                            <TableCell align="center">
+                              {selectedUnitMeasureList[index] === item.wrapUnitMeasure
+                                ? Math.floor(item.quantity / item.numberOfWrapUnitMeasure)
+                                : item.quantity}
+                            </TableCell>
                           </TableRow>
                         );
                       })}

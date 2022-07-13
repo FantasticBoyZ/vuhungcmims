@@ -2,6 +2,8 @@ import axiosClient from '@/utils/axiosCient';
 import authHeader from '@/services/authHeader';
 import axios from 'axios';
 
+// const API_URL = 'http://localhost:8080/api'
+const API_URL = process.env.REACT_APP_API_URL
 const productService = {
   getAllProduct: (params) => {
     const url = '/product';
@@ -32,7 +34,7 @@ const productService = {
     //   categoryId: "1",
     //   manufactorId: "1",
     // };
-    const url = 'http://localhost:8080/api/product/add';
+    const url = API_URL + '/product/add';
     // const url = process.env.REACT_APP_API_URL + '/product/add';
 
     axios
@@ -59,7 +61,7 @@ const productService = {
   },
 
   uploadNewImage: (formData) => {
-    const url = 'http://localhost:8080/api/product/add/image';
+    const url = API_URL + '/product/add/image';
     // const url = process.env.REACT_APP_API_URL + '/product/add/image';
 
     axios.post(url, formData).then(
@@ -73,23 +75,16 @@ const productService = {
   },
 
   updateImage: (productId, formData) => {
-    const url = `http://localhost:8080/api/product/update/image/${productId}`;
+    const url = API_URL + `/product/update/image/${productId}`;
     // const url = process.env.REACT_APP_API_URL + `/product/update/image/${productId}`;
 
-    axios
+    return axios
       .put(url, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       })
-      .then(
-        (response) => {
-          return response;
-        },
-        (error) => {
-          console.log(error);
-        },
-      );
+      
   },
 };
 

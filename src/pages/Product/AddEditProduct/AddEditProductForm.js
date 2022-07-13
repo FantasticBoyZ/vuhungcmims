@@ -1,6 +1,8 @@
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import IconRequired from '@/components/Common/IconRequired';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CategoryService from '@/services/categoryService';
+import productService from '@/services/productService';
 import { getManufacturerList } from '@/slices/ManufacturerSlice';
 import {
   getProductDetail,
@@ -209,15 +211,22 @@ const AddEditProductForm = () => {
       if (!!formData) {
         if (!productId) {
           const uploadNewImage = await dispatch(uploadNewImageProduct(formData));
+          toast.success('Thêm sản phẩm thành công!');
+          navigate('/product');
         } else {
-          const uploadNewImage = await dispatch(
-            updateImageProduct({ productId, formData }),
-            console.log(uploadImage)
+          const uploadNewImage = productService.updateImage(productId, formData).then(
+            (res) => {
+              console.log(res.data.message);
+              toast.success('Sửa sản phẩm thành công!');
+              navigate(`/product/detail/${productId}`);
+            },
+            (err) => {
+              console.err(err);
+            },
           );
         }
       }
       console.log('outside', ...formData);
-      
     } catch (error) {
       console.log('Failed to save product: ', error);
       if (isAdd) {
@@ -250,14 +259,6 @@ const AddEditProductForm = () => {
     };
     console.log(values);
     saveProductDetail(newProduct);
-    // TODO: sending formData to backend
-    if (isAdd) {
-        toast.success('Thêm sản phẩm thành công!');
-        navigate('/product');
-    } else {
-        toast.success('Sửa sản phẩm thành công!');
-        navigate(`/product/detail/${productId}`);
-    }
   };
 
   const handleOnClickExit = () => {
@@ -324,7 +325,7 @@ const AddEditProductForm = () => {
           );
           // TODO: đổi sang api deploy khi push code lên nhánh master
           if (dataResult.data.product.image) {
-            setImageUrl(localhost + '/' + dataResult.data.product.image);
+            setImageUrl(deployUrl + '/' + dataResult.data.product.image);
           }
         }
         console.log('dataResult', dataResult);
@@ -345,7 +346,7 @@ const AddEditProductForm = () => {
     <Box padding="20px">
       {/* Update Product */}
       {loading && !isAdd ? (
-        <>Loading...</>
+        <ProgressCircleLoading/>
       ) : (
         <Box>
           {!!product && (
@@ -767,7 +768,7 @@ const AddEditProductForm = () => {
       )}
 
       {/* Add new Product */}
-      {!product && (
+      {!product && isAdd && (
         <Formik
           initialValues={{ ...initialFormValue }}
           validationSchema={FORM_VALIDATION}

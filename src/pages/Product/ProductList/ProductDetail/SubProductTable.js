@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SubProductTable = ({ subProductList }) => {
+const SubProductTable = ({ selectedUnitMeasure,product, subProductList }) => {
   const classes = useStyles();
 
   const [selectedSubProductList, setSelectedSubProductList] = useState([]);
@@ -64,6 +64,9 @@ const SubProductTable = ({ subProductList }) => {
   //     selectedSubProductList.length < subProductList.length;
   //   const selectedAllSubProductList =
   //     selectedSubProductList.length === subProductList.length;
+  useEffect(() => {
+    
+  }, [selectedUnitMeasure]);
   return (
     <Box>
       <TableContainer>
@@ -93,9 +96,15 @@ const SubProductTable = ({ subProductList }) => {
                     {formatDate(subProduct.importDate)}
                   </TableCell>
                   <TableCell align="center">
-                    {formatDate(subProduct.expirationDate)}
+                    {subProduct.expirationDate
+                      ? formatDate(subProduct.expirationDate)
+                      : 'không có'}
                   </TableCell>
-                  <TableCell align="center">{subProduct.quantity}</TableCell>
+                  <TableCell align="center">
+                    {selectedUnitMeasure === product.wrapUnitMeasure
+                      ? Math.floor(subProduct.quantity / product.numberOfWrapUnitMeasure)
+                      : subProduct.quantity}
+                  </TableCell>
                   <TableCell align="center">{subProduct.inventoryName}</TableCell>
                   <TableCell align="center">{subProduct.addressInventory}</TableCell>
                 </TableRow>

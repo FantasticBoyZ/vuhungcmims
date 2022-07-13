@@ -2,6 +2,8 @@ import authHeader from '@/services/authHeader';
 import axiosClient from '@/utils/axiosCient';
 import axios from 'axios';
 
+// const API_URL = 'http://localhost:8080/api'
+const API_URL = process.env.REACT_APP_API_URL
 const ManufactorService = {
   getManufactorList: (params) => {
     const url = '/manufacturer';
@@ -13,7 +15,7 @@ const ManufactorService = {
     return axiosClient.get(url, { headers: authHeader() });
   },
   saveManufacturer: (manufacturer) => {
-    const url = 'http://localhost:8080/api/manufacturer/add';
+    const url = API_URL + '/manufacturer/add';
     // const url = process.env.REACT_APP_API_URL + '/manufacturer/add'
 
     return axios

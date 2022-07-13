@@ -29,7 +29,7 @@ const ProductDetail = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
-  const [productQuantity, setProductQuantity] = useState(1);
+  const [selectedUnitMeasure, setSelectedUnitMeasure] = useState(null);
   const classes = useStyles();
 
   const dispatch = useDispatch();
@@ -70,7 +70,6 @@ const ProductDetail = () => {
           setTotalRecord(dataResult.data.totalRecord);
           setSubProductList(dataResult.data.consignment);
           setProduct(dataResult.data.product);
-          setProductQuantity(dataResult.data.product.quantity);
         }
         console.log('dataResult', dataResult);
         console.log('product', dataResult.data.product);
@@ -111,7 +110,10 @@ const ProductDetail = () => {
                   <Typography variant="h6">Thông tin kho hàng</Typography>
                   <CardContent>
                     <Grid container>
-                      <Grid xs={4} item>
+                      <Grid
+                        xs={4}
+                        item
+                      >
                         <Grid container>
                           <Grid
                             xs={1}
@@ -165,15 +167,19 @@ const ProductDetail = () => {
                                     }),
                                   }}
                                   onChange={(e) => {
-                                    if (
-                                      e.value.number === product.numberOfWrapUnitMeasure
-                                    ) {
-                                      setProductQuantity(
-                                        product.quantity / e.value.number,
-                                      );
-                                    } else {
-                                      setProductQuantity(product.quantity);
+                                    if (e.label !== selectedUnitMeasure) {
+                                      if (e.label === product.wrapUnitMeasure) {
+                                        setSelectedUnitMeasure(product.wrapUnitMeasure);
+                                        console.log('wrap', product.wrapUnitMeasure);
+                                      }
+
+                                      if (e.label === product.unitMeasure) {
+                                        setSelectedUnitMeasure(product.unitMeasure);
+                                        console.log('unit', product.unitMeasure);
+                                      }
                                     }
+
+                                    console.log('select', selectedUnitMeasure);
                                   }}
                                 />
                               )}
@@ -181,7 +187,10 @@ const ProductDetail = () => {
                           </Grid>
                         </Grid>
                       </Grid>
-                      <Grid xs={4} item>
+                      <Grid
+                        xs={4}
+                        item
+                      >
                         <Grid container>
                           <Grid
                             xs={1}
@@ -200,7 +209,9 @@ const ProductDetail = () => {
                             item
                           >
                             <Typography className={classes.contentInfo}>
-                              {productQuantity || 0}
+                              {selectedUnitMeasure === product.wrapUnitMeasure
+                                ? Math.floor(product.quantity/product.numberOfWrapUnitMeasure)
+                                : product.quantity}
                             </Typography>
                           </Grid>
                         </Grid>
@@ -208,7 +219,7 @@ const ProductDetail = () => {
                     </Grid>
                   </CardContent>
 
-                  <SubProductTable subProductList={subProductList} />
+                  <SubProductTable selectedUnitMeasure={selectedUnitMeasure} product={product} subProductList={subProductList} />
                   {/* <CustomTablePagination
                   page={page}
                   pages={pages}

@@ -2,6 +2,8 @@ import authHeader from '@/services/authHeader';
 import axiosClient from '@/utils/axiosCient';
 import axios from 'axios';
 
+// const API_URL = 'http://localhost:8080/api'
+const API_URL = process.env.REACT_APP_API_URL
 const CategoryService = {
   getCategoryList: (params) => {
     const url = '/category';
@@ -14,7 +16,7 @@ const CategoryService = {
   },
 
   saveCategory: (category) => {
-    const url = 'http://localhost:8080/api/category/add';
+    const url = API_URL + '/category/add';
     // const url = process.env.REACT_APP_API_URL + '/category/add'
     axios
       .post(url, {
