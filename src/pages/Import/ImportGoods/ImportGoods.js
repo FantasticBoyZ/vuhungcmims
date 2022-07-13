@@ -22,11 +22,12 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { vi } from 'date-fns/locale';
-import { FieldArray, Form, Formik } from 'formik';
+import { FieldArray, Form, Formik, useField, useFormikContext } from 'formik';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -34,6 +35,46 @@ import Select from 'react-select';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import './style.css';
+
+const useStyles = makeStyles({
+  unitMeasureSelect: {
+    width: '100px',
+  },
+});
+
+const DependentField = ({ name, ...otherProps }) => {
+  const { values, touched, setFieldValue } = useFormikContext(); // get Formik state and helpers via React Context
+  const [field, meta] = useField(name); // get the props/info necessary for a Formik <Field> (vs just an <input>)
+
+  const configTextfield = {
+    ...field,
+    ...otherProps,
+    // fullWidth: true,
+    // variant: 'outlined'
+  };
+
+  if (meta && meta.touched && meta.error) {
+    configTextfield.error = true;
+    configTextfield.helperText = meta.error;
+  }
+
+  useEffect(() => {
+    // set the values for this field based on those of another
+    switch (values.country) {
+      case 'USA':
+        setFieldValue(name, 'Asia');
+        break;
+      case 'Kenya':
+        setFieldValue(name, 'Africa');
+        break;
+      default:
+        setFieldValue(name, 'Earth');
+        break;
+    }
+  }, [values.country, touched, setFieldValue, name]); // make sure the component will update based on relevant changes
+
+  return <TextField {...configTextfield} />;
+};
 
 const ImportGoods = () => {
   const [manufacturerList, setManufacturerList] = useState();
@@ -44,6 +85,7 @@ const ImportGoods = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const currentUser = AuthService.getCurrentUser();
   const today = new Date();
+  const classes = useStyles();
   const [initialProductList, setInitialProductList] = useState({
     billReferenceNumber: '',
     createdDate: new Date(
@@ -77,72 +119,6 @@ const ImportGoods = () => {
   const navigate = useNavigate();
 
   const { loading } = useSelector((state) => ({ ...state.products }));
-  const manufacturerData = [
-    {
-      id: 1,
-      name: 'Vu Hung',
-    },
-    {
-      id: 2,
-      name: 'Ha Long',
-    },
-    {
-      id: 3,
-      name: 'Ngoc Sang',
-    },
-    {
-      id: 4,
-      name: 'Gom Dat Viet',
-    },
-  ];
-
-  const productData = [
-    {
-      id: 1,
-      manufacturerId: 1,
-      productCode: 'TEST001',
-      name: 'Gạch Gốm Đất Việt 50x50',
-      unitMeasure: 'vien',
-      wrapUnitMeasure: 'Hop',
-      numberOfWrapUnitMeasure: 4,
-    },
-    {
-      id: 2,
-      manufacturerId: 1,
-      productCode: 'TEST002',
-      name: 'Gạch Gốm Đất Việt 50x50',
-      unitMeasure: 'vien',
-      wrapUnitMeasure: 'Hop',
-      numberOfWrapUnitMeasure: 4,
-    },
-    {
-      id: 3,
-      manufacturerId: 1,
-      productCode: 'TEST003',
-      name: 'Gạch Gốm Đất Việt 50x50',
-      unitMeasure: 'vien',
-      wrapUnitMeasure: 'Hop',
-      numberOfWrapUnitMeasure: 4,
-    },
-    {
-      id: 4,
-      manufacturerId: 1,
-      productCode: 'TEST004',
-      name: 'Gạch Gốm Đất Việt 50x50',
-      unitMeasure: 'vien',
-      wrapUnitMeasure: 'Hop',
-      numberOfWrapUnitMeasure: 4,
-    },
-    {
-      id: 5,
-      manufacturerId: 1,
-      productCode: 'TEST005',
-      name: 'Gạch Gốm Đất Việt 50x50',
-      unitMeasure: 'vien',
-      wrapUnitMeasure: null,
-      numberOfWrapUnitMeasure: null,
-    },
-  ];
 
   const warehouseData = [
     {
@@ -207,6 +183,7 @@ const ImportGoods = () => {
   };
 
   const handleOnChangeProduct = (e) => {
+    console.log(e);
     setSelectedProduct(e);
     // console.log('value 211',e.value);
     // console.log(valueFormik.current);
@@ -226,6 +203,7 @@ const ImportGoods = () => {
       productCode: e.value.productCode,
       unitMeasure: e.value.unitMeasure,
       wrapUnitMeasure: e.value.wrapUnitMeasure,
+      selectedUnitMeasure: e.value.unitMeasure,
       numberOfWrapUnitMeasure: e.value.numberOfWrapUnitMeasure,
       expirationDate: null,
       quantity: '',
@@ -241,6 +219,8 @@ const ImportGoods = () => {
 
   const handleSubmit = (values) => {
     // TODO: convert UTCDate to LocalDate before request to back-end
+
+    let consignmentRequests = [];
     let consignments = values.consignmentRequests;
     if (consignments.length === 0) {
       setErrorMessage(' Vui lòng chọn ít nhất 1 sản phẩm để nhập hàng');
@@ -253,13 +233,41 @@ const ImportGoods = () => {
         setOpenPopup(true);
         return;
       }
-      if (consignments[index]?.quantity === 0 ) {
+      if (consignments[index]?.quantity === 0) {
         setErrorMessage('Bạn không thể nhập sản phẩm với số lượng bằng 0');
         setOpenPopup(true);
         return;
       }
+
+      consignmentRequests.push({
+        productId: consignments[index]?.productId,
+        expirationDate: consignments[index]?.expirationDate,
+        unitPrice: Math.round(
+          consignments[index]?.selectedUnitMeasure ===
+            consignments[index]?.wrapUnitMeasure
+            ? consignments[index]?.unitPrice /
+                consignments[index]?.numberOfWrapUnitMeasure
+            : consignments[index]?.unitPrice,
+        ),
+        quantity: Math.round(
+          consignments[index]?.selectedUnitMeasure ===
+            consignments[index]?.wrapUnitMeasure
+            ? consignments[index]?.quantity * consignments[index]?.numberOfWrapUnitMeasure
+            : consignments[index]?.quantity,
+        ),
+      });
     }
-    importOrderService.createImportOrder(values).then(
+    const newImportOrder = {
+      billReferenceNumber: values.billReferenceNumber,
+      createdDate: values.createdDate,
+      description: values.description,
+      userId: values.userId,
+      manufactorId: values.manufactorId,
+      wareHouseId: values.wareHouseId,
+      consignmentRequests: consignmentRequests,
+    };
+    console.log('test new',newImportOrder)
+    importOrderService.createImportOrder(newImportOrder).then(
       (response) => {
         toast.success('Tạo phiếu nhập hàng thành công');
         console.log(response.data);
@@ -271,7 +279,6 @@ const ImportGoods = () => {
       },
     );
 
-    console.log(values);
   };
 
   const calculateTotalAmount = () => {
@@ -426,7 +433,7 @@ const ImportGoods = () => {
                                         <DeleteIcon fontSize="inherit" />
                                       </IconButton>
                                     </TableCell>
-                                    <TableCell>{index+1}</TableCell>
+                                    <TableCell>{index + 1}</TableCell>
                                     <TableCell>{item.productCode}</TableCell>
                                     <TableCell>{item.name}</TableCell>
                                     <TableCell>
@@ -470,7 +477,104 @@ const ImportGoods = () => {
                                         item.unitMeasure
                                       ) : (
                                         <Select
+                                          className={classes.unitMeasureSelect}
                                           classNamePrefix="select"
+                                          // value={getOption([
+                                          //   {
+                                          //     number: 1,
+                                          //     name: item.unitMeasure,
+                                          //   },
+                                          //   {
+                                          //     number: item.numberOfWrapUnitMeasure,
+                                          //     name: item.wrapUnitMeasure,
+                                          //   },
+                                          // ]).filter((option) => {
+                                          //   return (
+                                          //     option.label === item.selectedUnitMeasure
+                                          //   );
+                                          // })}
+                                          onChange={(e) => {
+                                            setFieldValue(
+                                              `consignmentRequests[${index}].selectedUnitMeasure`,
+                                              e.value.name,
+                                            );
+                                            // change quantity when change unitMeasure
+                                            if (
+                                              values.consignmentRequests[index].quantity >
+                                                0 &&
+                                              e.value.name !==
+                                                values.consignmentRequests[index]
+                                                  .selectedUnitMeasure
+                                            ) {
+                                              if (
+                                                e.value.name ===
+                                                values.consignmentRequests[index]
+                                                  .wrapUnitMeasure
+                                              ) {
+                                                setFieldValue(
+                                                  `consignmentRequests[${index}].quantity`,
+                                                  Math.round(
+                                                    values.consignmentRequests[index]
+                                                      .quantity / e.value.number,
+                                                  ),
+                                                );
+                                              }
+
+                                              if (
+                                                e.value.name ===
+                                                values.consignmentRequests[index]
+                                                  .unitMeasure
+                                              ) {
+                                                setFieldValue(
+                                                  `consignmentRequests[${index}].quantity`,
+                                                  Math.round(
+                                                    values.consignmentRequests[index]
+                                                      .quantity *
+                                                      values.consignmentRequests[index]
+                                                        .numberOfWrapUnitMeasure,
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                            // change unitPrice when change unitMeasure
+                                            if (
+                                              values.consignmentRequests[index]
+                                                .unitPrice > 0 &&
+                                              e.value.name !==
+                                                values.consignmentRequests[index]
+                                                  .selectedUnitMeasure
+                                            ) {
+                                              if (
+                                                e.value.name ===
+                                                values.consignmentRequests[index]
+                                                  .wrapUnitMeasure
+                                              ) {
+                                                setFieldValue(
+                                                  `consignmentRequests[${index}].unitPrice`,
+                                                  Math.round(
+                                                    values.consignmentRequests[index]
+                                                      .unitPrice * e.value.number,
+                                                  ),
+                                                );
+                                              }
+
+                                              if (
+                                                e.value.name ===
+                                                values.consignmentRequests[index]
+                                                  .unitMeasure
+                                              ) {
+                                                setFieldValue(
+                                                  `consignmentRequests[${index}].unitPrice`,
+                                                  Math.round(
+                                                    values.consignmentRequests[index]
+                                                      .unitPrice /
+                                                      values.consignmentRequests[index]
+                                                        .numberOfWrapUnitMeasure,
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          }}
                                           defaultValue={
                                             getOption([
                                               {
@@ -543,7 +647,7 @@ const ImportGoods = () => {
                         ></FieldArray>
                       </TableBody>
                     </Table>
-                    {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
+                    <pre>{JSON.stringify(values, null, 2)}</pre>
                   </TableContainer>
                 </Card>
               </div>
@@ -583,6 +687,7 @@ const ImportGoods = () => {
                       id="referenceNumber"
                       name="billReferenceNumber"
                       variant="standard"
+                      fullWidth
                     />
                   </div>
                   <div className="label-field">Ghi chú</div>
@@ -590,8 +695,8 @@ const ImportGoods = () => {
                     id="description"
                     className="text-area-note"
                     name="description"
-                    variant="filled"
-                    maxRows={6}
+                    variant="outlined"
+                    rows={6}
                     multiline
                   />
                   <div className="total-amount">
@@ -615,7 +720,12 @@ const ImportGoods = () => {
                 openPopup={openPopup}
                 setOpenPopup={setOpenPopup}
               >
-                <Box component={'span'} className="popup-message-container">{errorMessage}</Box>
+                <Box
+                  component={'span'}
+                  className="popup-message-container"
+                >
+                  {errorMessage}
+                </Box>
               </AlertPopup>
             </div>
           </Form>
