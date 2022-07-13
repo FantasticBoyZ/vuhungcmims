@@ -1,188 +1,236 @@
-import { useEffect, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import CommonTable from '@/components/Common/CommonTable';
-import SelectWrapper from '@/components/Common/FormsUI/Select';
-import { Search } from '@mui/icons-material';
+import Label from '@/components/Common/Label';
+import { PersonSearch, Search } from '@mui/icons-material';
 import {
-  Box,
   Button,
-  Paper,
+  Card,
+  CardContent,
+  CardHeader,
+  FormControlLabel,
+  Grid,
+  InputAdornment,
   Stack,
+  Switch,
+  Table,
   TableBody,
   TableCell,
+  TableContainer,
+  TableHead,
   TableRow,
   TextField,
-  Toolbar,
-  Switch,
-  InputAdornment,
-  Container,
-  Select,
-  MenuItem,
-  FormControl,
+  Typography,
 } from '@mui/material';
-import { Form, Formik } from 'formik';
+import { makeStyles } from '@mui/styles';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import AddIcon from '@mui/icons-material/Add';
-import { width } from '@mui/system';
+import Select from 'react-select';
 
 const useStyles = makeStyles({
-  searchField: {
-    width: '40%',
-  },
-  icons: {
-    color: 'gray',
-    marginRight: '10px',
-  },
-  form: {
-    display: 'flex',
-    padding: '2% 4%',
-    width: '100%',
-    justifyContent: 'space-between',
-  },
-  styleTable: {
-    padding: '0 0 2% 0',
-  },
-  styleButton: {
-    paddingBottom: '2%',
-  },
   selectBox: {
-    width: '30%',
+    width: '200px',
+  },
+  searchButton: {
+    width: '170px',
+    fontSize: '20px',
+  },
+  table: {
+    '& thead th': {
+      backgroundColor: '#DCF4FC',
+    },
+    '& tbody td': {},
+    '& tbody tr:hover': {
+      cursor: 'pointer',
+    },
+  },
+  imgStaff: {
+    width: '120px',
+    height: '120px',
   },
 });
 
-const headCells = [
-  { id: 'username', label: 'Họ Tên' },
-  { id: 'role', label: 'Vị trí làm việc' },
-  { id: 'phone', label: 'Phone' },
-  { id: 'email', label: 'Email' },
-  { id: 'active', label: 'Active' },
-  { id: 'action', label: 'Action' },
+const optionsSearch = [
+  { value: 'staffName', label: 'Tên' },
+  { value: 'staffCode', label: 'Mã nhân viên' },
+  { value: 'phone', label: 'Số điện thoại' },
 ];
 
-const createrList = {
-  1: 'Quản lý',
-  2: 'Thủ kho',
-  3: 'Seller',
+const getRoleLabel = (exportOrderStatus) => {
+  const map = {
+    storekeeper: {
+      text: 'Thủ kho',
+      color: 'warning',
+    },
+    seller: {
+      text: 'Nhân viên bán hàng',
+      color: 'primary',
+    },
+  };
+
+  const { text, color } = map[exportOrderStatus];
+
+  return <Label color={color}>{text}</Label>;
 };
 
 const StaffList = () => {
   const staffLists = [
     {
       id: '1',
-      username: 'Vũ Tiến Khôi',
-      role: 'Seller',
-      phone: '0123456789',
-      email: 'khoi@gmail.com',
+      username: 'khoivt',
+      imgUrl: 'https://www.w3schools.com/howto/img_avatar.png',
+      fullname: 'Vũ Tiến Khôi',
+      role: 'seller',
+      phone: '0987654321',
+      email: 'khoivt@gmail.com',
+      isActive: true,
     },
     {
       id: '2',
-      username: 'Tri Ba Minh Ninh',
-      role: 'Seller',
+      username: 'ninhtbm',
+      imgUrl: 'https://www.w3schools.com/howto/img_avatar.png',
+      fullname: 'Trịnh Bá Minh Ninh',
+      role: 'storekeeper',
       phone: '0123456789',
-      email: 'khoi@gmail.com',
+      email: 'ninhtbm@gmail.com',
+      isActive: false,
     },
   ];
 
   const classes = useStyles();
   const navigate = useNavigate();
-  const [productList, setProductList] = useState([]);
-  const { TblContainer, TblHead } = CommonTable(productList, headCells);
+  const [searchBy, setSearchBy] = useState('staffName');
 
-  const handleOnClickTableRow = (staffId) => {
-    navigate(`/staff/${staffId}`);
+  const handleOnClickDetail = (staffId) => {
+    navigate(`/staff/detail/${staffId}`);
   };
 
   const handleOnClickAdd = () => {
     navigate(`/staff/add`);
   };
   return (
-    <Container>
-      <Stack
-        direction="row"
-        justifyContent="flex-end"
-        spacing={2}
-        p={2}
+    <Grid
+      container
+      spacing={2}
+    >
+      <Grid
+        xs={12}
+        item
       >
-        <Button
-          className={classes.styleButton}
-          variant="contained"
-          color="secondary"
-          startIcon={<AddIcon />}
-          onClick={() => handleOnClickAdd()}
-        >
-          Thêm mới
-        </Button>
-      </Stack>
-      <Paper>
-        <Toolbar className={classes.form}>
-          <TextField
-            id="outlined-basic"
-            placeholder="Tìm kiếm"
-            variant="outlined"
-            className={classes.searchField}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
-          // onChange={handleSearch}
-          />
-          <Box className={classes.selectBox}>
-            <Formik
-              initialValues={{
-                creater: '1',
+        <Card>
+          <CardHeader title="Tìm kiếm thông tin nhân viên" />
+          <Stack
+            direction="row"
+            spacing={2}
+            p={2}
+          >
+            <TextField
+              id="outlined-basic"
+              name="keyword"
+              placeholder="Tìm kiếm nhân viên"
+              fullWidth
+              label={null}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
               }}
+              // onKeyDown={handleSearch}
+              // onChange={handleSearchChange}
+            />
+            <Select
+              classNamePrefix="select"
+              className={classes.selectBox}
+              // placeholder="Danh mục"
+              // noOptionsMessage={() => <>Không có tìm thấy danh mục phù hợp</>}
+              // isClearable={true}
+              // isSearchable={true}
+              name="searchBy"
+              value={optionsSearch.filter((option) => option.value === searchBy)}
+              options={optionsSearch}
+              menuPortalTarget={document.body}
+              styles={{
+                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                control: (base) => ({
+                  ...base,
+                  height: 56,
+                  minHeight: 56,
+                }),
+              }}
+              onChange={(e) => setSearchBy(e.value)}
+            />
+            <Button
+              variant="contained"
+              startIcon={<PersonSearch />}
+              className={classes.searchButton}
             >
-              <Form>
-                <Stack direction="row">
-                  <SelectWrapper
-                    label="Vị trí việc làm"
-                    name="creater"
-                    options={createrList}
-                  />
-                </Stack>
-              </Form>
-            </Formik>
-          </Box>
-        </Toolbar>
-      </Paper>
-
-      <Paper>
-        <Box className={classes.styleTable}>
-          <TblContainer>
-            <TblHead />
-            <TableBody>
-              {staffLists.map((item) => (
-                <TableRow key={item?.id}>
-                  <TableCell>{item.username}</TableCell>
-                  <TableCell>{item.role}</TableCell>
-                  <TableCell>{item.phone}</TableCell>
-                  <TableCell>{item.email}</TableCell>
-                  <TableCell>
-                    <Switch
-                      // checked={checked}
-                      // onChange={handleChange}
-                      inputProps={{ 'aria-label': 'controlled' }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <ModeEditIcon className={classes.icons} />
-                    <VisibilityIcon
-                      className={classes.icons}
-                      onClick={() => handleOnClickTableRow(item.id)}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </TblContainer>
-        </Box>
-      </Paper>
-    </Container>
+              Tìm kiếm
+            </Button>
+          </Stack>
+        </Card>
+      </Grid>
+      <Grid
+        xs={12}
+        item
+      >
+        <Card>
+          <CardHeader title="Nhân viên" />
+          <CardContent>
+            <TableContainer>
+              <Table className={classes.table}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">Mã nhân viên</TableCell>
+                    <TableCell align="center">Ảnh</TableCell>
+                    <TableCell align="center">Tên nhân viên</TableCell>
+                    <TableCell align="center">Số điện thoại</TableCell>
+                    <TableCell align="center">Chức vụ</TableCell>
+                    <TableCell align="center">Trạng thái động</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {staffLists.map((staff) => {
+                    return (
+                      <TableRow hover onClick={() => handleOnClickDetail(staff.id)}>
+                        <TableCell align="center">{staff.username}</TableCell>
+                        <TableCell align="center">
+                          <img
+                            className={classes.imgStaff}
+                            src={staff.imgUrl}
+                          />
+                        </TableCell>
+                        <TableCell align="center">{staff.fullname}</TableCell>
+                        <TableCell align="center">{staff.phone}</TableCell>
+                        <TableCell align="center">{getRoleLabel(staff.role)}</TableCell>
+                        <TableCell
+                          align="center"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                        >
+                          <FormControlLabel
+                            value="bottom"
+                            // TODO: set checked = active
+                            control={
+                              <Switch
+                                checked={staff.isActive}
+                                color="success"
+                              />
+                            }
+                            label={staff.isActive ? "Đang hoạt động" : "Đã ngưng hoạt động"}
+                            labelPlacement="bottom"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
   );
 };
 
