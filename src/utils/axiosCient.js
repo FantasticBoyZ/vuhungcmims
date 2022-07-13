@@ -71,6 +71,7 @@ axiosClient.interceptors.response.use(
     }
     if (errResponse.status === 401) {
       alert('Bạn chưa đăng nhập');
+      localStorage.clear();
       window.location = '/';
     }
 

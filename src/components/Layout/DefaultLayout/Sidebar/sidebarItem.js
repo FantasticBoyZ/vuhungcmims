@@ -15,16 +15,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 const useStyles = makeStyles({
   root: {
     '&$selected': {
-      backgroundColor: 'rgba(0,88,139,0.79) !important',
+      backgroundColor: 'rgba(0,69,108,1) !important',
       '&:hover': {
         backgroundColor: 'yellow',
       }
     },
   },
   selected: {},
-  active: {
-    backgroundColor: 'red'
-  }
 })
 const SidebarItem = ({ option, openSidebar }) => {
   const navigate = useNavigate();
@@ -39,7 +36,6 @@ const SidebarItem = ({ option, openSidebar }) => {
   }, [openSidebar]);
 
   const handleClick = (option) => {
-    console.log(option)
     if( option?.children.length > 0) {
       setOpenNested(!openNested);
     }else {
@@ -63,11 +59,11 @@ const SidebarItem = ({ option, openSidebar }) => {
       return (
         <ListItemButton
           selected={location.pathname.includes(path)}
-          sx={{paddingLeft: '30px'}}
+          sx={{paddingLeft: '65px', backgroundColor: '#00588B'}}
           classes={{ root: classes.root, selected: classes.selected }}
           onClick={childOptionOnClick}
         >
-          <ListItemIcon sx={{ color: 'white' }}>{icon}</ListItemIcon>
+          {/* <ListItemIcon sx={{ color: 'white' }}>{icon}</ListItemIcon> */}
           <ListItemText primary={primary} />
         </ListItemButton>
       );

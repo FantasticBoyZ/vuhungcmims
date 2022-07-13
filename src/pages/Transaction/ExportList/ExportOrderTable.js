@@ -152,7 +152,8 @@ const ExportOrderTable = ({ exportOrders }) => {
                         gutterBottom
                         noWrap
                       >
-                        {FormatDataUtils.formatDateTime(exportOrder.createdDate)}
+                        {FormatDataUtils.formatDateTime(exportOrder.createDate)}
+                        {/* {exportOrder.createDate} */}
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
@@ -167,7 +168,7 @@ const ExportOrderTable = ({ exportOrders }) => {
                         gutterBottom
                         noWrap
                       >
-                        {exportOrder.totalAmount}
+                        {FormatDataUtils.formatCurrency(exportOrder.totalPrice || 0)}
                       </Typography>
                     </TableCell>
                   </TableRow>

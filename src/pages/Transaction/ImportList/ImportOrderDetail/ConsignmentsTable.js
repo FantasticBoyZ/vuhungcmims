@@ -1,3 +1,4 @@
+import FormatDataUtils from '@/utils/formatData';
 import {
   Table,
   TableBody,
@@ -9,6 +10,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Select from 'react-select';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -42,7 +44,8 @@ const ConsignmentsTable = ({ listConsignments }) => {
             <TableCell>STT</TableCell>
             <TableCell>Mã sản phẩm</TableCell>
             <TableCell>Tên sản phẩm</TableCell>
-            <TableCell>Đơn vị tính</TableCell>
+            <TableCell>Hạn lưu kho</TableCell>
+            <TableCell>Đơn vị</TableCell>
             <TableCell>Số lượng</TableCell>
             <TableCell>Đơn giá</TableCell>
             <TableCell>Thành tiền</TableCell>
@@ -57,14 +60,67 @@ const ConsignmentsTable = ({ listConsignments }) => {
               selected={false}
             >
               {/* TODO: Sửa phần index khi phân trang */}
-              <TableCell>{index+1}</TableCell>
+              <TableCell>{index + 1}</TableCell>
               <TableCell>{consignment?.productCode}</TableCell>
               <TableCell>{consignment?.productName}</TableCell>
-              <TableCell>{consignment?.unitMeasure}</TableCell>
-              <TableCell>{consignment?.quantity}</TableCell>
-              <TableCell>{formatCurrency(consignment?.price || '')}</TableCell>
               <TableCell>
-                {formatCurrency(consignment?.quantity * consignment?.price)}
+                {FormatDataUtils.formatDate(consignment?.expirationDate)}
+              </TableCell>
+              <TableCell
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                {consignment.wrapUnitMeasure == null ? (
+                  consignment.unitMeasure
+                ) : (
+                  <Select
+                    classNamePrefix="select"
+                    defaultValue={
+                      FormatDataUtils.getOption([
+                        {
+                          number: 1,
+                          name: consignment.unitMeasure,
+                        },
+                        {
+                          number: consignment.numberOfWrapUnitMeasure,
+                          name: consignment.wrapUnitMeasure,
+                        },
+                      ])[0]
+                    }
+                    options={FormatDataUtils.getOption([
+                      {
+                        number: 1,
+                        name: consignment.unitMeasure,
+                      },
+                      {
+                        number: consignment.numberOfWrapUnitMeasure,
+                        name: consignment.wrapUnitMeasure,
+                      },
+                    ])}
+                    menuPortalTarget={document.body}
+                    styles={{
+                      menuPortal: (base) => ({
+                        ...base,
+                        zIndex: 9999,
+                      }),
+                    }}
+                    onChange={(e) => {
+                      console.log(e.value.number);
+                      // if (e.value.number === consignment.numberOfWrapUnitMeasure) {
+                      //   productQuantity = productQuantity / e.value.number;
+                      // } else {
+                      //   productQuantity = consignment.quantity;
+                      // }
+                      // console.log(productQuantity);
+                    }}
+                  />
+                )}
+              </TableCell>
+              <TableCell>{consignment?.quantity}</TableCell>
+              <TableCell>{formatCurrency(consignment?.unitPrice || 0)}</TableCell>
+              <TableCell>
+                {formatCurrency(consignment?.quantity * consignment?.unitPrice)}
               </TableCell>
             </TableRow>
           ))}

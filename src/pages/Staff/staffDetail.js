@@ -1,40 +1,43 @@
-import { useEffect, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { useNavigate } from 'react-router-dom';
+import Label from '@/components/Common/Label';
+import { Block, ChangeCircleOutlined, MarkEmailUnread, PhotoCamera } from '@mui/icons-material';
 import {
   Box,
   Button,
   Card,
-  CardMedia,
-  Divider,
+  CardContent,
+  CardHeader,
   Grid,
   Stack,
-  Input,
   Typography,
-  TextField,
 } from '@mui/material';
-import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
-import { Form, Formik } from 'formik';
+import { makeStyles } from '@mui/styles';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const useStyles = makeStyles({
-  staffInformation: {
-    marginBottom: '32px',
-  },
-  cardStyle: {
-    padding: '12px',
-  },
-  styleContainer: {
-    fontWeight: '400',
-    fontSize: '20px',
-  },
-  inputField: {
-    width: '30%',
-  }, styleBox: {
+const useStyles = makeStyles((theme) => ({
+  imgContainer: {
+    width: '100%',
     display: 'flex',
-    justifyContent: 'space-between',
-    padding: '12px'
-  }
-});
+    justifyContent: 'center',
+    flexFlow: 'wrap',
+  },
+  imgProfile: {
+    width: '100%',
+    aspectRatio: '1/1',
+  },
+  labelStyle: {
+    backgroundColor: theme.colors.alpha.black[5],
+    padding: theme.spacing(0.5, 1),
+    fontSize: theme.typography.pxToRem(20),
+    borderRadius: theme.general.borderRadius,
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primary.lighter,
+    color: theme.palette.primary.main,
+    // maxHeight: theme.spacing(3)
+  },
+}));
 
 const StaffDetail = ({ staff }) => {
   const classes = useStyles();
@@ -47,164 +50,271 @@ const StaffDetail = ({ staff }) => {
     role: '',
     phone: '',
     email: '',
-    address: ''
+    address: '',
   });
+
+  const getRoleLabel = (exportOrderStatus) => {
+    const map = {
+      storekeeper: {
+        text: 'Thủ kho',
+        color: 'warning',
+        fontSize: '20px',
+      },
+      seller: {
+        text: 'Nhân viên bán hàng',
+        color: 'primary',
+        fontSize: '20px',
+      },
+    };
+
+    const { text, color, fontSize } = map[exportOrderStatus];
+
+    return (
+      <Label
+        color={color}
+        fontSize={fontSize}
+      >
+        {text}
+      </Label>
+    );
+  };
+
+  const getStatusLabel = (exportOrderStatus) => {
+    const map = {
+      active: {
+        text: 'Đang hoạt động',
+        color: 'success',
+        fontSize: '20px',
+      },
+      deactive: {
+        text: 'Đã ngưng hoạt động',
+        color: 'error',
+        fontSize: '20px',
+      },
+    };
+
+    const { text, color, fontSize } = map[exportOrderStatus];
+
+    return (
+      <Label
+        fontSize={fontSize}
+        color={color}
+      >
+        {text}
+      </Label>
+    );
+  };
 
   const handleOnClickEdit = () => {
     navigate(`/staff/edit/${staff.id}`);
   };
   return (
-    <Box className={classes.staffInformation}>
-      <Card className={classes.cardStyle}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
+    <Grid
+      container
+      spacing={2}
+    >
+      <Grid
+        xs={2.5}
+        item
+      >
+        <Grid
+          container
           spacing={2}
-          p={2}
         >
-          <Typography variant="h3"></Typography>
-          <Stack
-            direction="row"
-            spacing={2}
-          >
-            <Button
-              //   onClick={() => handleOnClickEdit()}
-              variant="contained"
-            >
-              Sửa
-            </Button>
-            <Button variant="outlined">Thoát</Button>
-          </Stack>
-        </Stack>
-        <Divider />
-        <Grid container>
           <Grid
+            xs={12}
             item
-            xs={4}
           >
-            <CardMedia
-              component="img"
-              height="200"
-              sx={{ width: 200, margin: "15%" }}
-              alt="staff Detail"
-              src="https://www.w3schools.com/w3images/avatar2.png"
-            />
+            <Card>
+              <CardContent className={classes.imgContainer}>
+                <Stack spacing={2}>
+                  <img
+                    className={classes.imgProfile}
+                    src="https://www.w3schools.com/howto/img_avatar.png"
+                  />
+                  <Button
+                    variant="outlined"
+                    startIcon={<PhotoCamera />}
+                    color="warning"
+                    fullWidth
+                  >
+                    Cập nhật ảnh đại diện
+                  </Button>
+                </Stack>
+              </CardContent>
+            </Card>
           </Grid>
           <Grid
-            container
+            xs={12}
             item
-            xs={8}
           >
-            <Grid
-              xs={12}
-              item
-            >
-              <Formik
-                initialValues={{
-
-                }}
+            <Card>
+              <Stack
+                padding={2}
+                spacing={2}
+                alignItems="center"
               >
-                <Form>
-                  <Box className={classes.styleBox}>
-                    <Typography
-                      className={classes.inputField}
-                      fontSize="18px"
-                      lineHeight={2}
-                    >
-                      Tên nhân viên:{'  '}
-                    </Typography>
-                    <TextfieldWrapper
-                      defaultValue={'ABC'}
-                      name="username"
-                      fullWidth
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </Box>
-
-                  <Box className={classes.styleBox}>
-                    <Typography
-                      className={classes.inputField}
-                      fontSize="18px"
-                      lineHeight={2}
-                    >
-                      Vị trí làm việc:{' '}
-                    </Typography>
-
-                    <TextfieldWrapper
-                      name="role"
-                      defaultValue={'Seller'}
-                      fullWidth
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </Box>
-
-                  <Box className={classes.styleBox}>
-                    <Typography
-                      className={classes.inputField}
-                      fontSize="18px"
-                      lineHeight={2}
-                    >
-                      Số điện thoại:{' '}
-                    </Typography>
-
-                    <TextfieldWrapper
-                      name="phone"
-                      defaultValue={'0123456789'}
-                      fullWidth
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </Box>
-
-                  <Box className={classes.styleBox}>
-                    <Typography
-                      className={classes.inputField}
-                      fontSize="18px"
-                      lineHeight={2}
-                    >
-                      Email:{' '}
-                    </Typography>
-
-                    <TextfieldWrapper
-                      name="email"
-                      defaultValue={'abc@gmail.com'}
-                      fullWidth
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </Box>
-
-                  <Box className={classes.styleBox}>
-                    <Typography
-                      className={classes.inputField}
-                      fontSize="18px"
-                      lineHeight={2}
-                    >
-                      Địa chỉ:{' '}
-                    </Typography>
-
-                    <TextfieldWrapper
-                      name="address"
-                      defaultValue={'Thạch Thất - HN'}
-                      fullWidth
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </Box>
-                </Form>
-              </Formik>
-            </Grid>
+                <Box>{getRoleLabel('seller')}</Box>
+                <Box>{getStatusLabel('active')}</Box>
+              </Stack>
+            </Card>
           </Grid>
         </Grid>
-      </Card>
-    </Box>
+      </Grid>
+      <Grid
+        xs={9.5}
+        item
+      >
+        <Card>
+          <CardHeader title="Thông tin nhân viên" />
+          <CardContent>
+            <Stack
+              padding={2}
+              spacing={2}
+            >
+              <Grid container>
+                <Grid
+                  xs={3}
+                  item
+                >
+                  <Typography>Họ và tên</Typography>
+                </Grid>
+                <Grid
+                  xs={9}
+                  item
+                >
+                  <Typography>Trịnh Bá Minh Ninh</Typography>
+                </Grid>
+              </Grid>
+              <Grid container>
+                <Grid
+                  xs={3}
+                  item
+                >
+                  <Typography>Mã nhân viên</Typography>
+                </Grid>
+                <Grid
+                  xs={9}
+                  item
+                >
+                  <Typography>ninhtbm</Typography>
+                </Grid>
+              </Grid>
+              <Grid container>
+                <Grid
+                  xs={3}
+                  item
+                >
+                  <Typography>Số điện thoại</Typography>
+                </Grid>
+                <Grid
+                  xs={9}
+                  item
+                >
+                  <Typography>+84 203 384 0560</Typography>
+                </Grid>
+              </Grid>
+              <Grid container>
+                <Grid
+                  xs={3}
+                  item
+                >
+                  <Typography>Email</Typography>
+                </Grid>
+                <Grid
+                  xs={9}
+                  item
+                >
+                  <Typography>ninhtbmhe141325@fpt.edu.vn</Typography>
+                </Grid>
+              </Grid>
+              <Grid container>
+                <Grid
+                  xs={3}
+                  item
+                >
+                  <Typography>Số CCCD/CMND</Typography>
+                </Grid>
+                <Grid
+                  xs={9}
+                  item
+                >
+                  <Typography>002100023440</Typography>
+                </Grid>
+              </Grid>
+              <Grid container>
+                <Grid
+                  xs={3}
+                  item
+                >
+                  <Typography>Địa chỉ</Typography>
+                </Grid>
+                <Grid
+                  xs={9}
+                  item
+                >
+                  <Typography>Tổ 4, khu Tân Xuân, Xuân Mai, Chương Mỹ, Hà Nội</Typography>
+                </Grid>
+              </Grid>
+              <Grid container>
+                <Grid
+                  xs={3}
+                  item
+                >
+                  <Typography>Ngày sinh</Typography>
+                </Grid>
+                <Grid
+                  xs={9}
+                  item
+                >
+                  <Typography>31/07/2000</Typography>
+                </Grid>
+              </Grid>
+              <Grid container>
+                <Grid
+                  xs={3}
+                  item
+                >
+                  <Typography>Giới tính</Typography>
+                </Grid>
+                <Grid
+                  xs={9}
+                  item
+                >
+                  <Typography>Nam</Typography>
+                </Grid>
+              </Grid>
+              <Stack
+                direction="row"
+                spacing={2}
+                justifyContent='flex-end'
+              >
+                <Button
+                  variant="contained"
+                  startIcon={<MarkEmailUnread />}
+                >
+                  Cài lại mật khẩu
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<Block />}
+                  color='error'
+                >
+                  Tạm dừng tài khoản
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<ChangeCircleOutlined />}
+                  color='warning'
+                >
+                  Đổi chức vụ
+                </Button>
+              </Stack>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
   );
 };
 

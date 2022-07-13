@@ -11,8 +11,8 @@ const ButtonWrapper = ({ children, ...otherProps }) => {
 
   const configButton = {
     ...otherProps,
-    variant: 'contained',
-    color: 'primary',
+    // variant: 'contained',
+    // color: 'primary',
     onClick: handleSubmit,
   };
   return <Button {...configButton}> {children}</Button>;

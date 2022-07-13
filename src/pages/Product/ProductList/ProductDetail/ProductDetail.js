@@ -1,15 +1,25 @@
-import CustomTablePagination from '@/components/Common/TablePagination';
-import SubProductList from '@/pages/Product/ProductList/ProductDetail/SubProductList';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import ProductInformation from '@/pages/Product/ProductList/ProductDetail//ProductInformation';
+import SubProductTable from '@/pages/Product/ProductList/ProductDetail//SubProductTable';
 import { getProductDetail } from '@/slices/ProductSlice';
-import { Box, Card, Container, Grid } from '@mui/material';
+import FormatDataUtils from '@/utils/formatData';
+import { Box, Card, CardContent, Grid, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import ProductInformation from './ProductInformation';
+import Select from 'react-select';
 
-const useStyles = makeStyles({});
+const useStyles = makeStyles({
+  labelInfo: {
+    color: '#696969',
+  },
+  contentInfo: {
+    color: '#000000',
+    fontWeight: '400 !important',
+  },
+});
 
 const ProductDetail = () => {
   const { productId } = useParams();
@@ -19,6 +29,7 @@ const ProductDetail = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
+  const [selectedUnitMeasure, setSelectedUnitMeasure] = useState(null);
   const classes = useStyles();
 
   const dispatch = useDispatch();
@@ -76,40 +87,186 @@ const ProductDetail = () => {
   return (
     <>
       {loading ? (
-        <>Loading...</>
+        <ProgressCircleLoading />
       ) : (
-        <Container maxWidth="lg">
-          {!!product && <ProductInformation product={product} />}
-
+        <Grid
+          container
+          spacing={2}
+        >
           <Grid
-            container
-            direction="row"
-            justifyContent="center"
-            alignItems="stretch"
+            xs={12}
+            item
           >
-            <Grid
-              item
-              xs={12}
-            >
-              {/* <Typography variant='h5'>Danh sách lô hàng </Typography> */}
-              {!!totalRecord && totalRecord > 0 ? (
-                <Card>
-                  <SubProductList subProductList={subProductList} />
-                  <CustomTablePagination
-                    page={page}
-                    pages={pages}
-                    rowsPerPage={rowsPerPage}
-                    totalRecord={totalRecord}
-                    handleChangePage={handleChangePage}
-                    handleChangeRowsPerPage={handleChangeRowsPerPage}
-                  />
-                </Card>
-              ) : (
-                <Card> Sản phẩm chưa có lô hàng nào</Card>
-              )}
-            </Grid>
+            {!!product && <ProductInformation product={product} />}
           </Grid>
-        </Container>
+          <Grid
+            item
+            xs={12}
+          >
+            {/* <Typography variant='h5'>Danh sách lô hàng </Typography> */}
+            {!!totalRecord && totalRecord > 0 ? (
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">Thông tin kho hàng</Typography>
+                  <CardContent>
+                    <Grid container>
+                      <Grid
+                        xs={4}
+                        item
+                      >
+                        <Grid container>
+                          <Grid
+                            xs={1}
+                            item
+                          ></Grid>
+                          <Grid
+                            xs={6}
+                            item
+                          >
+                            <Typography className={classes.labelInfo}>
+                              Đơn vị tính
+                            </Typography>
+                          </Grid>
+                          <Grid
+                            xs={5}
+                            item
+                          >
+                            <Box className={classes.contentInfo}>
+                              {product.wrapUnitMeasure == null ? (
+                                product.unitMeasure
+                              ) : (
+                                <Select
+                                  classNamePrefix="select"
+                                  defaultValue={
+                                    FormatDataUtils.getOption([
+                                      {
+                                        number: 1,
+                                        name: product.unitMeasure,
+                                      },
+                                      {
+                                        number: product.numberOfWrapUnitMeasure,
+                                        name: product.wrapUnitMeasure,
+                                      },
+                                    ])[0]
+                                  }
+                                  options={FormatDataUtils.getOption([
+                                    {
+                                      number: 1,
+                                      name: product.unitMeasure,
+                                    },
+                                    {
+                                      number: product.numberOfWrapUnitMeasure,
+                                      name: product.wrapUnitMeasure,
+                                    },
+                                  ])}
+                                  menuPortalTarget={document.body}
+                                  styles={{
+                                    menuPortal: (base) => ({
+                                      ...base,
+                                      zIndex: 9999,
+                                    }),
+                                  }}
+                                  onChange={(e) => {
+                                    if (e.label !== selectedUnitMeasure) {
+                                      if (e.label === product.wrapUnitMeasure) {
+                                        setSelectedUnitMeasure(product.wrapUnitMeasure);
+                                        console.log('wrap', product.wrapUnitMeasure);
+                                      }
+
+                                      if (e.label === product.unitMeasure) {
+                                        setSelectedUnitMeasure(product.unitMeasure);
+                                        console.log('unit', product.unitMeasure);
+                                      }
+                                    }
+
+                                    console.log('select', selectedUnitMeasure);
+                                  }}
+                                />
+                              )}
+                            </Box>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                      <Grid
+                        xs={4}
+                        item
+                      >
+                        <Grid container>
+                          <Grid
+                            xs={1}
+                            item
+                          ></Grid>
+                          <Grid
+                            xs={6}
+                            item
+                          >
+                            <Typography className={classes.labelInfo}>
+                              Số lượng
+                            </Typography>
+                          </Grid>
+                          <Grid
+                            xs={5}
+                            item
+                          >
+                            <Typography className={classes.contentInfo}>
+                              {selectedUnitMeasure === product.wrapUnitMeasure
+                                ? Math.floor(product.quantity/product.numberOfWrapUnitMeasure)
+                                : product.quantity}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+
+                  <SubProductTable selectedUnitMeasure={selectedUnitMeasure} product={product} subProductList={subProductList} />
+                  {/* <CustomTablePagination
+                  page={page}
+                  pages={pages}
+                  rowsPerPage={rowsPerPage}
+                  totalRecord={totalRecord}
+                  handleChangePage={handleChangePage}
+                  handleChangeRowsPerPage={handleChangeRowsPerPage}
+                /> */}
+                </CardContent>
+              </Card>
+            ) : (
+              <Card> Sản phẩm chưa có lô hàng nào</Card>
+            )}
+          </Grid>
+        </Grid>
+        // <Container maxWidth="lg">
+        //   {!!product && <ProductInformation product={product} />}
+
+        //   <Grid
+        //     container
+        //     direction="row"
+        //     justifyContent="center"
+        //     alignItems="stretch"
+        //   >
+        //     <Grid
+        //       item
+        //       xs={12}
+        //     >
+        //       {/* <Typography variant='h5'>Danh sách lô hàng </Typography> */}
+        //       {!!totalRecord && totalRecord > 0 ? (
+        //         <Card>
+        //           <SubProductList subProductList={subProductList} />
+        //           <CustomTablePagination
+        //             page={page}
+        //             pages={pages}
+        //             rowsPerPage={rowsPerPage}
+        //             totalRecord={totalRecord}
+        //             handleChangePage={handleChangePage}
+        //             handleChangeRowsPerPage={handleChangeRowsPerPage}
+        //           />
+        //         </Card>
+        //       ) : (
+        //         <Card> Sản phẩm chưa có lô hàng nào</Card>
+        //       )}
+        //     </Grid>
+        //   </Grid>
+        // </Container>
       )}
     </>
   );

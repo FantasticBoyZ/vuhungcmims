@@ -1,12 +1,16 @@
 import Label from '@/components/Common/Label';
+import FormatDataUtils from '@/utils/formatData';
 import {
-  Box, Checkbox, Table,
+  Box,
+  Checkbox,
+  Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow, Typography,
-  useTheme
+  TableRow,
+  Typography,
+  useTheme,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { format } from 'date-fns';
@@ -42,23 +46,22 @@ const useStyles = makeStyles((theme) => ({
       cursor: 'pointer',
     },
   },
-  
 }));
 
 const getStatusLabel = (importOrderStatus) => {
   const map = {
-    failed: {
+    canceled: {
       text: 'Đã huỷ',
-      color: 'error'
+      color: 'error',
     },
     completed: {
       text: 'Đã nhập kho',
-      color: 'success'
+      color: 'success',
     },
     pending: {
       text: 'Đang chờ xử lý',
-      color: 'warning'
-    }
+      color: 'warning',
+    },
   };
 
   const { text, color } = map[importOrderStatus];
@@ -110,17 +113,20 @@ const ImportOrdersTable = ({ importOrders }) => {
           <Table className={classes.table}>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
+                {/* <TableCell padding="checkbox">
                   <Checkbox
                     color="primary"
                     checked={selectedAllImportOrders}
                     indeterminate={selectedSomeImportOrders}
                   />
-                </TableCell>
-                <TableCell>Mã nhập kho</TableCell>
-                <TableCell>Thời gian</TableCell>
-                <TableCell>Nhà cung cấp</TableCell>
-                <TableCell align='center'>Trạng thái</TableCell>
+                </TableCell> */}
+                <TableCell align="center">Mã nhập kho</TableCell>
+                <TableCell align="center">Tham chiếu</TableCell>
+                <TableCell align="center">Ngày tạo</TableCell>
+                <TableCell align="center">Ngày nhập</TableCell>
+                <TableCell align="center">Nhà cung cấp</TableCell>
+                <TableCell align="center">Trạng thái</TableCell>
+                <TableCell align="center">Giá trị đơn hàng</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -136,7 +142,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                     selected={false}
                     onClick={(value) => handleOnClickTableRow(importOrder.orderId)}
                   >
-                    <TableCell padding="checkbox">
+                    {/* <TableCell padding="checkbox">
                       <Checkbox
                         color="primary"
                         //   checked={isImportOrderSelected}
@@ -149,6 +155,17 @@ const ImportOrdersTable = ({ importOrders }) => {
                         //   value={isImportOrderSelected}
                         value={false}
                       />
+                    </TableCell> */}
+                    <TableCell>
+                      <Typography
+                        variant="body1"
+                        color="text.primary"
+                        gutterBottom
+                        noWrap
+                        align="center"
+                      >
+                        {"NHAP"+importOrder.orderId}
+                      </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography
@@ -156,6 +173,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                         color="text.primary"
                         gutterBottom
                         noWrap
+                        align="center"
                       >
                         {importOrder.billRefernce}
                       </Typography>
@@ -166,9 +184,25 @@ const ImportOrdersTable = ({ importOrders }) => {
                         color="text.primary"
                         gutterBottom
                         noWrap
+                        align="center"
                       >
                         {formatDate(importOrder.createDate)}
                       </Typography>
+                    </TableCell>
+                    <TableCell>
+                      {importOrder?.importDate && (
+                        <Typography
+                          variant="body1"
+                          color="text.primary"
+                          gutterBottom
+                          noWrap
+                          align="center"
+                        >
+                          {FormatDataUtils.formatDate(
+                            importOrder?.importDate,
+                          )}
+                        </Typography>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Typography
@@ -176,21 +210,21 @@ const ImportOrdersTable = ({ importOrders }) => {
                         color="text.primary"
                         gutterBottom
                         noWrap
+                        align="center"
                       >
                         {importOrder.manufactorName}
                       </Typography>
                     </TableCell>
-                    <TableCell align='center'>
-                      {/* TODO: style status  */}
-                      <Typography className={classes.completed}>
-                      {getStatusLabel(importOrder.statusName)}
-                      </Typography>
+                    <TableCell align="center">
+                      <Typography>{getStatusLabel(importOrder.statusName)}</Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography>{importOrder.totalPrice}</Typography>
                     </TableCell>
                   </TableRow>
                 );
               })}
             </TableBody>
-           
           </Table>
         </TableContainer>
       )}

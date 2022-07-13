@@ -22,6 +22,10 @@ import ExportList from '@/pages/Transaction/ExportList/ExportList';
 import ExportOrderDetail from '@/pages/Transaction/ExportList/ExportOrderDetail/ExportOrderDetail';
 import ExportGoods from '@/pages/Export/ExportGoods/ExportGoods';
 import CommonForgotPass from '@/pages/Auth/CommonForgotPass';
+import UpdateImportOrderDetail from '@/pages/Transaction/ImportList/UpdateImportOrderDetail/UpdateImportOrderDetail';
+import ReturnGoods from '@/pages/Export/ReturnGoods/ReturnGoods';
+import UpdateExportOrderDetail from '@/pages/Transaction/ExportList/UpdateExportOrderDetail/UpdateExportOrderDetail';
+import ReturnList from '@/pages/Export/ReturnList/ReturnList';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -59,19 +63,23 @@ const privateRoutes = [
   { path: '/manufacturer/edit/:manufacturerId', component: AddEditManufacturerForm },
 
   // importOrder route
-  { path: '/import', component: ImportList },
+  { path: '/import/list', component: ImportList },
   { path: '/import/create-order', component: ImportGoods },
   { path: '/import/detail/:importOrderId', component: ImportOrderDetail },
+  { path: '/import/edit/:importOrderId', component: UpdateImportOrderDetail },
 
   // exportOrder route
-  { path: '/export', component: ExportList },
+  { path: '/export/list', component: ExportList },
   { path: '/export/create-order', component: ExportGoods },
   { path: '/export/detail/:exportOrderId', component: ExportOrderDetail },
+  { path: '/export/edit/:exportOrderId', component: UpdateExportOrderDetail },
+  { path: '/export/return/:exportOrderId', component: ReturnGoods },
+  { path: '/export/return/list', component: ReturnList },
 
   { path: '/denied', component: Profile, layout: null },
   { path: '*', component: NotFound, layout: null },
-  { path: 'staff', component: StaffList },
-  { path: 'staff/:staffId', component: StaffDetail },
+  { path: 'staff/list', component: StaffList },
+  { path: 'staff/detail/:staffId', component: StaffDetail },
 ];
 
 export { publicRoutes, privateRoutes };

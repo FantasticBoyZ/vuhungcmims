@@ -1,4 +1,13 @@
+import AlertPopup from '@/components/Common/AlertPopup';
+import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
+import IconRequired from '@/components/Common/IconRequired';
+import AuthService from '@/services/authService';
+import {
+  createExportOrder,
+  getListConsiggnmentOfProductInStock,
+  getListProductInStock,
+} from '@/slices/ExportOrderSlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Delete, Done } from '@mui/icons-material';
 import {
@@ -20,9 +29,13 @@ import {
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { FieldArray, Form, Formik } from 'formik';
-import { Fragment, useRef } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
+import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 
 const useStyles = makeStyles({
@@ -66,47 +79,126 @@ const useStyles = makeStyles({
   },
 });
 
-const ExportGoods = () => {
-  const initialExportOrder = {
-    billReferenceNumber: '',
-    statusName: '',
-    creatorId: '',
-    createdDate: new Date(),
-    description: '',
-    productList: [
+const productListDataTest = [
+  {
+    id: 1,
+    productCode: 'GACH23',
+    name: 'Gạch men 60x60',
+    unitMeasure: 'Viên',
+    quantity: 0,
+    unitPrice: 100000,
+    consignments: [
       {
         id: 1,
-        productCode: 'GACH23',
-        productName: 'Gạch men 60x60',
-        unitMeasure: 'Viên',
-        quantity: 0,
-        unitPrice: 100000,
-        consignments: [
-          {
-            id: 1,
-            warehouseId: 1,
-            warehourseName: 'Kho 1',
-            importDate: '16/07/2022',
-            expirationDate: '30/12/2022',
-            quantity: '0',
-            quantityInstock: '500',
-          },
-          {
-            id: 2,
-            warehouseId: 1,
-            warehourseName: 'Kho 1',
-            importDate: '20/07/2022',
-            expirationDate: '30/12/2022',
-            quantity: '0',
-            quantityInstock: '1000',
-          },
-        ],
+        warehouseId: 1,
+        warehourseName: 'Kho 1',
+        importDate: '16/07/2022',
+        expirationDate: '30/12/2022',
+        quantity: '0',
+        quantityInstock: '500',
+      },
+      {
+        id: 2,
+        warehouseId: 1,
+        warehourseName: 'Kho 1',
+        importDate: '20/07/2022',
+        expirationDate: '30/12/2022',
+        quantity: '0',
+        quantityInstock: '1000',
       },
     ],
-  };
+  },
+  {
+    id: 2,
+    productCode: 'GACH33',
+    name: 'Gạch men 30x30',
+    unitMeasure: 'Viên',
+    quantity: 0,
+    unitPrice: 100000,
+    consignments: [
+      {
+        id: 1,
+        warehouseId: 1,
+        warehourseName: 'Kho 1',
+        importDate: '16/07/2022',
+        expirationDate: '30/12/2022',
+        quantity: '0',
+        quantityInstock: '500',
+      },
+    ],
+  },
+];
+
+const initialExportOrder = {
+  billReferenceNumber: '',
+  statusName: '',
+  creatorId: '',
+  createdDate: new Date(),
+  description: '',
+  productList: [
+    // {
+    //   id: 1,
+    //   productCode: 'GACH23',
+    //   productName: 'Gạch men 60x60',
+    //   unitMeasure: 'Viên',
+    //   quantity: 0,
+    //   unitPrice: 100000,
+    //   consignments: [
+    //     {
+    //       id: 1,
+    //       warehouseId: 1,
+    //       warehourseName: 'Kho 1',
+    //       importDate: '16/07/2022',
+    //       expirationDate: '30/12/2022',
+    //       quantity: '0',
+    //       quantityInstock: '500',
+    //     },
+    //     {
+    //       id: 2,
+    //       warehouseId: 1,
+    //       warehourseName: 'Kho 1',
+    //       importDate: '20/07/2022',
+    //       expirationDate: '30/12/2022',
+    //       quantity: '0',
+    //       quantityInstock: '1000',
+    //     },
+    //   ],
+    // },
+    // {
+    //   id: 2,
+    //   productCode: 'GACH23',
+    //   productName: 'Gạch men 60x60',
+    //   unitMeasure: 'Viên',
+    //   quantity: 0,
+    //   unitPrice: 100000,
+    //   consignments: [
+    //     {
+    //       id: 1,
+    //       warehouseId: 1,
+    //       warehourseName: 'Kho 1',
+    //       importDate: '16/07/2022',
+    //       expirationDate: '30/12/2022',
+    //       quantity: '0',
+    //       quantityInstock: '500',
+    //     },
+    //   ],
+    // },
+  ],
+};
+
+const ExportGoods = () => {
+  const [productList, setProductList] = useState();
+  const [consignmentList, setConsignmentList] = useState();
+  const [openPopup, setOpenPopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const today = new Date();
+  const currentUser = AuthService.getCurrentUser();
+  const { loading } = useSelector((state) => ({ ...state.exportOrders }));
+
   const FORM_VALIDATION = Yup.object().shape({
-    manufactorId: Yup.string().required('Bạn chưa chọn nhà cung cấp'),
-    wareHouseId: Yup.number().required('Bạn chưa chọn kho để nhập hàng'),
+    billReferenceNumber: Yup.string().required('Bạn chưa nhập mã phiếu tham chiếu'),
   });
 
   const arrayHelpersRef = useRef(null);
@@ -114,10 +206,44 @@ const ExportGoods = () => {
 
   const classes = useStyles();
 
+  const handleOnChangeProduct = async (e) => {
+    const isSelected = valueFormik.current.productList.some((element) => {
+      // console.log('element 215',element)
+      if (element.productId === e.value.productId) {
+        return true;
+      }
+
+      return false;
+    });
+
+    const productSelected = {
+      productId: e.value.productId,
+      productName: e.value.productName,
+      productCode: e.value.productCode,
+      unitMeasure: e.value.unitMeasure,
+      wrapUnitMeasure: e.value.wrapUnitMeasure,
+      numberOfWrapUnitMeasure: e.value.numberOfWrapUnitMeasure,
+      expirationDate: null,
+      quantity: '',
+      unitPrice: e.value.unitPrice,
+    };
+    if (isSelected) {
+      return;
+    } else {
+      // productSelected.consignments = consignmentList
+      arrayHelpersRef.current.push(
+        await fetchConsignmentOfProductInstock(
+          productSelected.productId,
+          productSelected,
+        ),
+      );
+      // console.log('productList', valueFormik.current);
+    }
+  };
+
   const calculateTotalQuantityOfProduct = (product) => {
-    console.log(product);
     let totalQuantity = 0;
-    {
+    if (product.consignments !== undefined && product.consignments?.length > 0) {
       product?.consignments.forEach((consignment) => {
         totalQuantity = +totalQuantity + +consignment.quantity;
       });
@@ -133,9 +259,11 @@ const ExportGoods = () => {
       if (productList?.length > 0) {
         productList.forEach((product) => {
           let totalQuantity = 0;
-          product.consignments.forEach((consignment) => {
-            totalQuantity = +totalQuantity + +consignment.quantity;
-          });
+          if (product.consignments !== undefined && product.consignments?.length > 0) {
+            product.consignments?.forEach((consignment) => {
+              totalQuantity = +totalQuantity + +consignment.quantity;
+            });
+          }
           totalAmount = totalAmount + totalQuantity * product.unitPrice;
         });
       }
@@ -143,7 +271,129 @@ const ExportGoods = () => {
     return totalAmount;
   };
 
-  const handleSubmit = () => {};
+  const handleSubmit = async (values) => {
+    console.log('submit value', values);
+    let productList = values.productList;
+    let consignmentExports = [];
+    if (productList.length === 0) {
+      setErrorMessage(' Vui lòng chọn ít nhất 1 sản phẩm để xuất hàng');
+      setOpenPopup(true);
+      return;
+    }
+    for (let index = 0; index < productList.length; index++) {
+      if (calculateTotalQuantityOfProduct(productList[index]) === 0) {
+        setErrorMessage('Bạn có sản phẩm chưa nhập số lượng');
+        setOpenPopup(true);
+        return;
+      }
+      // if (productList[index]?.quantity === 0) {
+      //   setErrorMessage('Bạn không thể nhập sản phẩm với số lượng bằng 0');
+      //   setOpenPopup(true);
+      //   return;
+      // }
+      const consignments = productList[index]?.consignments;
+      for (
+        let indexConsignment = 0;
+        indexConsignment < consignments.length;
+        indexConsignment++
+      ) {
+        let consignment = consignments[indexConsignment]
+        if (consignment.quantity > consignment.quantityInstock) {
+          setErrorMessage(
+            'Bạn không thể nhập số lượng lớn hơn số lượng tồn kho của lô hàng',
+          );
+          setOpenPopup(true);
+          return;
+        }
+        if (consignment.quantity < 0) {
+          setErrorMessage('Bạn không thể nhập số lượng nhỏ hơn 0');
+          setOpenPopup(true);
+          return;
+        }
+        if (consignment.quantity > 0) {
+          consignmentExports.push({
+            id: consignment.id,
+            quantity: consignment.quantity,
+            unitPrice: productList[index].unitPrice,
+          });
+        }
+      }
+    }
+    const dataSubmit = {
+      billReferenceNumber: values.billReferenceNumber,
+      createdDate: new Date(
+        today.getTime() - today.getTimezoneOffset() * 60 * 1000,
+      ).toJSON(),
+      description: values.description,
+      userId: currentUser.id,
+      consignmentExports: consignmentExports,
+    };
+    console.log('create new export', dataSubmit);
+    if (consignmentExports.length > 0) {
+      try {
+        const response = await dispatch(createExportOrder(dataSubmit));
+        const resultResponse = unwrapResult(response);
+        if (resultResponse) {
+          toast.success('Tạo phiếu xuất hàng thành công');
+          console.log(resultResponse);
+          navigate('/export/list');
+        }
+      } catch (error) {
+        console.log('Failed to save export order: ', error);
+        toast.error('Tạo phiếu xuất hàng thất bại');
+      }
+    } else {
+      setErrorMessage('Bạn không có lô hàng nào thoả mãn điều kiện xuất hàng');
+      setOpenPopup(true);
+      return;
+    }
+  };
+
+  const fetchProductInstock = async () => {
+    try {
+      const params = {
+        // pageIndex: page + 1,
+        // pageSize: rowsPerPage,
+        // ...searchProductParams,
+      };
+      const actionResult = await dispatch(getListProductInStock(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        // setTotalRecord(dataResult.data.totalRecord);
+        setProductList(dataResult.data);
+      }
+    } catch (error) {
+      console.log('Failed to fetch product list instock: ', error);
+    }
+  };
+
+  const fetchConsignmentOfProductInstock = async (productId, productSelected) => {
+    try {
+      const params = {
+        // pageIndex: page + 1,
+        // pageSize: rowsPerPage,
+        productId: productId,
+      };
+      const actionResult = await dispatch(getListConsiggnmentOfProductInStock(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('consignment', dataResult);
+      if (dataResult) {
+        // setTotalRecord(dataResult.data.totalRecord);
+        console.log('consignmenList', dataResult.productList?.consignmentList);
+        // setConsignmentList(dataResult.productList?.consignmentList);
+        productSelected.consignments = dataResult.productList?.consignmentList;
+        return productSelected;
+      }
+    } catch (error) {
+      console.log('Failed to fetch consignment list instock: ', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProductInstock();
+  }, []);
+
   return (
     <Box>
       <Formik
@@ -165,23 +415,24 @@ const ExportGoods = () => {
                 <Card className={classes.cardTable}>
                   <CardHeader title="Thông tin các sản phẩm" />
                   <CardContent>
-                    {/* {!!productList && !!values.manufactorId && ( */}
-                    <Select
-                      classNamePrefix="select"
-                      placeholder="Chọn sản phẩm của nhà cung cấp phía trên..."
-                      noOptionsMessage={() => <>Không có tìm thấy sản phẩm nào</>}
-                      isClearable={true}
-                      isSearchable={true}
-                      //   isLoading={loading}
-                      loadingMessage={() => <>Đang tìm kiếm sản phẩm...</>}
-                      name="product"
-                      //   value={selectedProduct}
-                      //   options={FormatDataUtils.getOption(productList)}
-                      menuPortalTarget={document.body}
-                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                      //   onChange={(e) => handleOnChangeProduct(e)}
-                    />
-                    {/* )} */}
+                    {!!productList && (
+                      <Select
+                        classNamePrefix="select"
+                        placeholder="Chọn sản phẩm của nhà cung cấp phía trên..."
+                        noOptionsMessage={() => <>Không có tìm thấy sản phẩm nào</>}
+                        isClearable={true}
+                        isSearchable={true}
+                        isLoading={loading}
+                        loadingMessage={() => <>Đang tìm kiếm sản phẩm...</>}
+                        name="product"
+                        //   value={selectedProduct}
+                        options={FormatDataUtils.getOptionProduct(productList)}
+                        // options={FormatDataUtils.getOption(productListDataTest)}
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                        onChange={(e) => handleOnChangeProduct(e)}
+                      />
+                    )}
                     <br />
                     <Divider />
                     <br />
@@ -278,6 +529,7 @@ const ExportGoods = () => {
                                         <TableCell align="center">
                                           {calculateTotalQuantityOfProduct(product)}
                                           {/* {product?.quantity} */}
+                                          {/* setFieldValue(`productList[${index}].quantity`, calculateTotalQuantityOfProduct(product) || 0) */}
                                         </TableCell>
                                         <TableCell align="center">
                                           {FormatDataUtils.formatCurrency(
@@ -316,14 +568,16 @@ const ExportGoods = () => {
                                                   Tồn kho
                                                 </TableCell>
                                               </TableRow>
-                                              {product?.consignments.map(
+                                              {product?.consignments?.map(
                                                 (consignment, indexConsignment) => (
                                                   <TableRow key={indexConsignment}>
                                                     <TableCell>
-                                                      {consignment?.warehourseName}
+                                                      {consignment?.warehouseName}
                                                     </TableCell>
                                                     <TableCell>
-                                                      {consignment?.importDate}
+                                                      {FormatDataUtils.formatDate(
+                                                        consignment?.importDate,
+                                                      )}
                                                     </TableCell>
                                                     <TableCell>
                                                       {consignment?.expirationDate}
@@ -371,7 +625,8 @@ const ExportGoods = () => {
                           ></FieldArray>
                         </TableBody>
                       </Table>
-                      <pre>{JSON.stringify(values, null, 2)}</pre>
+                      {/* <pre>{JSON.stringify(errors, null, 2)}</pre>
+                      <pre>{JSON.stringify(values, null, 2)}</pre> */}
                     </TableContainer>
                   </CardContent>
                 </Card>
@@ -386,7 +641,7 @@ const ExportGoods = () => {
                     <Typography>{FormatDataUtils.formatDateTime(new Date())}</Typography>
                     <br />
                     <Typography>
-                      <strong>Tham chiếu</strong>
+                      <strong>Tham chiếu</strong> <IconRequired />
                     </Typography>
                     <TextfieldWrapper
                       id="referenceNumber"
@@ -419,18 +674,32 @@ const ExportGoods = () => {
                         {FormatDataUtils.formatCurrency(calculateTotalAmount())}
                       </Typography>
                     </Box>
-                    <Button
+                    <ButtonWrapper
+                      type="button"
                       variant="contained"
+                      size="large"
                       startIcon={<Done />}
-                      color="success"
                       fullWidth
+                      color="success"
                     >
                       Hoàn thành
-                    </Button>
+                    </ButtonWrapper>
                   </CardContent>
                 </Card>
               </Grid>
             </Grid>
+            <AlertPopup
+              title="Chú ý"
+              openPopup={openPopup}
+              setOpenPopup={setOpenPopup}
+            >
+              <Box
+                component={'span'}
+                className="popup-message-container"
+              >
+                {errorMessage}
+              </Box>
+            </AlertPopup>
           </Form>
         )}
       </Formik>

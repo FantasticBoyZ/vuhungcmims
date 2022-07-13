@@ -10,7 +10,7 @@ const LabelWrapper = styled('span')(
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      max-height: ${theme.spacing(3)};
+      // max-height: ${theme.spacing(3)};
       
       &.MuiLabel {
         &-primary {
@@ -48,12 +48,16 @@ const LabelWrapper = styled('span')(
           color: ${theme.palette.info.main}
         }
       }
-`
+`,
 );
 
-const Label = ({ className, color = 'secondary', children, ...rest }) => {
+const Label = ({ className, fontSize, color = 'secondary', children, ...rest }) => {
   return (
-    <LabelWrapper className={'MuiLabel-' + color} {...rest}>
+    <LabelWrapper
+      className={'MuiLabel-' + color}
+      {...rest}
+      sx={{ fontSize: fontSize }}
+    >
       {children}
     </LabelWrapper>
   );
@@ -69,8 +73,8 @@ Label.propTypes = {
     'error',
     'warning',
     'success',
-    'info'
-  ])
+    'info',
+  ]),
 };
 
 export default Label;

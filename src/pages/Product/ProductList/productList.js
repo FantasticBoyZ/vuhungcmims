@@ -8,6 +8,8 @@ import {
   Box,
   Button,
   Card,
+  CardContent,
+  CircularProgress,
   Container,
   InputAdornment,
   Stack,
@@ -26,10 +28,10 @@ import { Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import AsyncSelect from 'react-select/async';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 import FormatDataUtils from '@/utils/formatData';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 
 const useStyles = makeStyles({
   searchField: {
@@ -57,7 +59,8 @@ const useStyles = makeStyles({
     minHeight: '56px',
   },
   tableStyle: {
-    padding: '20px',
+    textAlign: 'center',
+    // minHeight: '60vh'
   },
   panelFilter: {
     padding: '24px 0',
@@ -130,6 +133,7 @@ const ProductList = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [inputValueManufactor, setInputValueManufactor] = useState('');
   const [selectedManufactor, setSelectedManufactor] = useState(null);
+  const [selectedUnitMeasureList, setSelectedUnitMeasureList] = useState([]);
   const [searchParams, setSearchParams] = useState({
     // productName: '',
     // productCode: '',
@@ -371,7 +375,8 @@ const ProductList = () => {
                       <TextfieldWrapper
                         id="outlined-basic"
                         name="productName"
-                        placeholder="Search"
+                        placeholder="Tìm kiếm theo tên sản phẩm"
+                        fullWidth
                         label={null}
                         variant="outlined"
                         InputProps={{
@@ -476,54 +481,142 @@ const ProductList = () => {
             </Box>
           </Toolbar>
         </Card>
-
-        {loading ? (
-          <> Loading ... </>
-        ) : (
-          <Card className={classes.tableStyle}>
-            {totalRecord > 0 ? (
-              <Box>
-                <Table className={classes.table}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Mã sản phẩm</TableCell>
-                      <TableCell>Tên sản phẩm</TableCell>
-                      <TableCell align="center">Danh mục</TableCell>
-                      <TableCell align="center">Nhà cung cấp</TableCell>
-                      <TableCell align="center">Tồn kho</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {productList.map((item) => (
-                      <TableRow
-                        hover
-                        key={item.id}
-                        onClick={() => handleOnClickTableRow(item.id)}
-                      >
-                        <TableCell>{item.productCode}</TableCell>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell align="center">{item.categoryName}</TableCell>
-                        <TableCell align="center">{item.manufactorName}</TableCell>
-                        <TableCell align="center">{item.quantity || '0'}</TableCell>
+        <Card className={classes.tableStyle}>
+          {loading ? (
+            <CardContent>
+              <ProgressCircleLoading />
+            </CardContent>
+          ) : (
+            <CardContent>
+              {totalRecord > 0 ? (
+                <Box>
+                  <Table className={classes.table}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Mã sản phẩm</TableCell>
+                        <TableCell>Tên sản phẩm</TableCell>
+                        <TableCell align="center">Danh mục</TableCell>
+                        <TableCell align="center">Nhà cung cấp</TableCell>
+                        <TableCell align="center">Đơn vị tính</TableCell>
+                        <TableCell align="center">Tồn kho</TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <TablePagination
-                  component="div"
-                  page={page}
-                  rowsPerPageOptions={pages}
-                  rowsPerPage={rowsPerPage}
-                  count={totalRecord}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </Box>
-            ) : (
-              <Typography> Không tìm có kết quả phù hợp </Typography>
-            )}
-          </Card>
-        )}
+                    </TableHead>
+                    <TableBody>
+                      {productList.map((item, index) => {
+                        const newSelectdUnitMeasureList = selectedUnitMeasureList.slice();
+                        return (
+                          <TableRow
+                            hover
+                            key={item.id}
+                            onClick={() => handleOnClickTableRow(item.id)}
+                          >
+                            <TableCell>{item.productCode}</TableCell>
+                            <TableCell>{item.name}</TableCell>
+                            <TableCell align="center">{item.categoryName}</TableCell>
+                            <TableCell align="center">{item.manufactorName}</TableCell>
+                            <TableCell
+                              align="center"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              {item.wrapUnitMeasure == null ? (
+                                item.unitMeasure
+                              ) : (
+                                <Select
+                                  classNamePrefix="select"
+                                  isSearchable={false}
+                                  defaultValue={
+                                    FormatDataUtils.getOption([
+                                      {
+                                        number: 1,
+                                        name: item.unitMeasure,
+                                      },
+                                      {
+                                        number: item.numberOfWrapUnitMeasure,
+                                        name: item.wrapUnitMeasure,
+                                      },
+                                    ])[0]
+                                  }
+                                  options={FormatDataUtils.getOption([
+                                    {
+                                      number: 1,
+                                      name: item.unitMeasure,
+                                    },
+                                    {
+                                      number: item.numberOfWrapUnitMeasure,
+                                      name: item.wrapUnitMeasure,
+                                    },
+                                  ])}
+                                  menuPortalTarget={document.body}
+                                  styles={{
+                                    menuPortal: (base) => ({
+                                      ...base,
+                                      zIndex: 9999,
+                                    }),
+                                  }}
+                                  onChange={(e) => {
+                                    console.log(e.label);
+                                    if (
+                                      e.label === item.wrapUnitMeasure &&
+                                      newSelectdUnitMeasureList[index] !==
+                                        item.wrapUnitMeasure
+                                    ) {
+                                      newSelectdUnitMeasureList[index] =
+                                        item.wrapUnitMeasure;
+                                      console.log(
+                                        'wrapUnitMeasure',
+                                        newSelectdUnitMeasureList[index],
+                                      );
+                                      setSelectedUnitMeasureList(
+                                        newSelectdUnitMeasureList,
+                                      );
+                                    }
+                                    if (
+                                      e.label === item.unitMeasure &&
+                                      newSelectdUnitMeasureList[index] !==
+                                        item.unitMeasure
+                                    ) {
+                                      newSelectdUnitMeasureList[index] = item.unitMeasure;
+                                      console.log(
+                                        'unitMeasure',
+                                        newSelectdUnitMeasureList[index],
+                                      );
+                                      setSelectedUnitMeasureList(
+                                        newSelectdUnitMeasureList,
+                                      );
+                                    }
+                                    console.log(selectedUnitMeasureList);
+                                  }}
+                                />
+                              )}
+                            </TableCell>
+                            <TableCell align="center">
+                              {selectedUnitMeasureList[index] === item.wrapUnitMeasure
+                                ? Math.floor(item.quantity / item.numberOfWrapUnitMeasure)
+                                : item.quantity}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                  <TablePagination
+                    component="div"
+                    page={page}
+                    rowsPerPageOptions={pages}
+                    rowsPerPage={rowsPerPage}
+                    count={totalRecord}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </Box>
+              ) : (
+                <Typography> Không tìm thấy kết quả phù hợp </Typography>
+              )}
+            </CardContent>
+          )}
+        </Card>
       </Container>
     </>
   );
