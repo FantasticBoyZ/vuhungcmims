@@ -1,5 +1,15 @@
+import AlertPopup from '@/components/Common/AlertPopup';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import ExportProductTable from '@/pages/Transaction/ExportList/ExportOrderDetail/ExportProductTable';
+import AuthService from '@/services/authService';
+import {
+  cancelExportOrder,
+  confirmExportOrder,
+  getConsignmentsByExportOrderId,
+  getExportOrderById,
+} from '@/slices/ExportOrderSlice';
 import FormatDataUtils from '@/utils/formatData';
-import { Add, Close, Edit, KeyboardReturn } from '@mui/icons-material';
+import { Close, Done, Edit, KeyboardReturn } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -11,16 +21,11 @@ import {
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useNavigate, useParams } from 'react-router-dom';
-import ExportProductTable from '@/pages/Transaction/ExportList/ExportOrderDetail/ExportProductTable';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  getConsignmentsByExportOrderId,
-  getExportOrderById,
-} from '@/slices/ExportOrderSlice';
-import { unwrapResult } from '@reduxjs/toolkit';
-import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -119,13 +124,17 @@ const ExportOrderDetail = () => {
   const navigate = useNavigate();
   const [exportOrder, setExportOrder] = useState();
   const [listConsignments, setListConsignments] = useState([]);
+  const [openPopup, setOpenPopup] = useState(false);
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
+  const [isConfirm, setIsConfirm] = useState(false);
   const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => ({ ...state.products }));
+  const { loading } = useSelector((state) => ({ ...state.exportOrders }));
 
   const calculateTotalAmount = () => {
     let totalAmount = 0;
@@ -137,6 +146,68 @@ const ExportOrderDetail = () => {
       }
     }
     return totalAmount;
+  };
+
+  const handleOnClickConfirm = () => {
+    setTitle('Bạn có chắc chắn muốn xác nhận xuất hàng thành công?');
+    setMessage('Hãy kiểm tra kỹ hàng hóa trước khi xác nhận.');
+    setIsConfirm(true);
+    setOpenPopup(true);
+  };
+
+  const handleOnClickCancel = () => {
+    setTitle('Bạn có chắc chắn muốn hủy phiếu xuất hàng không?');
+    setMessage('');
+    setIsConfirm(false);
+    setOpenPopup(true);
+  };
+
+  const handleConfirm = async () => {
+    if (isConfirm) {
+      console.log('Xác nhận');
+      try {
+        const confirmUserId = AuthService.getCurrentUser().id;
+        const params = { exportOrderId, confirmUserId };
+        const actionResult = await dispatch(confirmExportOrder(params));
+        const result = unwrapResult(actionResult);
+        console.log(result);
+        if (!!result) {
+          if (!!result.body.message) {
+            toast.success(result.body.message);
+          } else {
+            toast.success('Xác nhận xuất kho thành công!');
+          }
+          fetchExportOrderDetail();
+          fetchConsignmentsByExportOrderId();
+          setOpenPopup(false);
+        }
+      } catch (error) {
+        console.log('Failed to confirm importOder: ', error);
+        toast.error('Lỗi! Xác nhận xuất kho thất bại!');
+      }
+    } else {
+      console.log('Huỷ');
+      try {
+        const confirmUserId = AuthService.getCurrentUser().id;
+        const params = { exportOrderId, confirmUserId };
+        const actionResult = await dispatch(cancelExportOrder(params));
+        const result = unwrapResult(actionResult);
+        console.log(result);
+        if (!!result) {
+          if (!!result.body.message) {
+            toast.success(result.body.message);
+          } else {
+            toast.success('Huỷ xuất kho thành công!');
+          }
+          fetchExportOrderDetail();
+          fetchConsignmentsByExportOrderId();
+          setOpenPopup(false);
+        }
+      } catch (error) {
+        console.log('Failed to cancel importOder: ', error);
+        toast.error('Lỗi! Huỷ xuất kho thất bại!');
+      }
+    }
   };
 
   const fetchExportOrderDetail = async () => {
@@ -165,7 +236,7 @@ const ExportOrderDetail = () => {
       const actionResult = await dispatch(getConsignmentsByExportOrderId(params));
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
-        setListConsignments(dataResult.data);
+        setListConsignments(dataResult.data.productList);
         setTotalRecord(dataResult.data.totalRecord);
       }
       console.log('consignments List', dataResult);
@@ -217,8 +288,9 @@ const ExportOrderDetail = () => {
                       >
                         <Button
                           variant="contained"
-                          startIcon={<Add />}
+                          startIcon={<Done />}
                           color="success"
+                          onClick={() => handleOnClickConfirm()}
                         >
                           Xác nhận xuất kho
                         </Button>
@@ -226,6 +298,9 @@ const ExportOrderDetail = () => {
                           variant="contained"
                           startIcon={<Edit />}
                           color="warning"
+                          onClick={() => {
+                            navigate(`/export/edit/${exportOrderId}`);
+                          }}
                         >
                           Chỉnh sửa
                         </Button>
@@ -233,6 +308,7 @@ const ExportOrderDetail = () => {
                           variant="contained"
                           startIcon={<Close />}
                           color="error"
+                          onClick={() => handleOnClickCancel()}
                         >
                           Huỷ phiếu xuất kho
                         </Button>
@@ -282,7 +358,11 @@ const ExportOrderDetail = () => {
                       ) : (
                         <ExportProductTable productList={listConsignments} />
                       )} */}
-                      {listConsignments && listConsignments?.length > 0 ? <ExportProductTable productList={listConsignments} /> : (<Box>Đơn xuất hàng không có lô hàng nào</Box>)}
+                      {listConsignments && listConsignments?.length > 0 ? (
+                        <ExportProductTable productList={listConsignments} />
+                      ) : (
+                        <Box>Đơn xuất hàng không có lô hàng nào</Box>
+                      )}
                     </Card>
                   </Grid>
                 </Grid>
@@ -366,6 +446,21 @@ const ExportOrderDetail = () => {
                   </Grid>
                 </Grid>
               </Grid>
+              <AlertPopup
+                maxWidth="sm"
+                title={title}
+                openPopup={openPopup}
+                setOpenPopup={setOpenPopup}
+                isConfirm={true}
+                handleConfirm={handleConfirm}
+              >
+                <Box
+                  component={'span'}
+                  className="popupMessageContainer"
+                >
+                  {message}
+                </Box>
+              </AlertPopup>
             </Grid>
           )}
         </Box>
