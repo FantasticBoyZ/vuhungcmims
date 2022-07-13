@@ -237,7 +237,7 @@ const Sidebar = () => {
         {
           primary: 'Danh sách trả hàng',
           icon: '',
-          path: '/export/return',
+          path: '/export/return/list',
           children: [],
           hasParent: true,
         },
@@ -301,7 +301,7 @@ const Sidebar = () => {
           hasParent: true,
         },
         {
-          primary: 'Đăng ký nhân viên mới',
+          primary: 'Danh sách nhân viên',
           icon: '',
           path: '/staff/list',
           children: [],
