@@ -3,7 +3,11 @@ import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
 import AuthService from '@/services/authService';
 import importOrderService from '@/services/importOrderService';
-import { confirmImportOrder, getImportOrderById } from '@/slices/ImportOrderSlice';
+import {
+  cancelImportOrder,
+  confirmImportOrder,
+  getImportOrderById,
+} from '@/slices/ImportOrderSlice';
 import { getProductByImportOrderId } from '@/slices/ProductSlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Close, Done, Edit, KeyboardReturn } from '@mui/icons-material';
@@ -170,6 +174,24 @@ const ImportOrderDetail = () => {
       }
     } else {
       console.log('Huỷ');
+      try {
+        const confirmUserId = AuthService.getCurrentUser().id;
+        const params = { importOrderId, confirmUserId };
+        const actionResult = await dispatch(cancelImportOrder(params));
+        const result = unwrapResult(actionResult);
+        if (!!result) {
+          if (!!result.message) {
+            toast.success(result.message);
+          } else {
+            toast.success('Huỷ nhập kho thành công!');
+          }
+          fetchImportOrderDetail();
+          fetchProductListByImportOrderId();
+          setOpenPopup(false);
+        }
+      } catch (error) {
+        console.log('Failed to cancel importOder: ', error);
+      }
     }
   };
 
@@ -237,7 +259,7 @@ const ImportOrderDetail = () => {
                   >
                     <Box className={classes.billReferenceContainer}>
                       <Typography variant="span">
-                        <strong>Phiếu nhập kho số:</strong> {importOrder.billRefernce}
+                        <strong>Phiếu nhập kho số:</strong> {'NHAP' + importOrderId}
                       </Typography>{' '}
                       <span>
                         {FormatDataUtils.getStatusLabel(importOrder.statusName)}
@@ -366,7 +388,7 @@ const ImportOrderDetail = () => {
                     <Card>
                       <CardContent className={classes.confirmInfo}>
                         <Typography variant="h6">Thông tin xác nhận</Typography>
-                        <br />
+                        {/* <br /> */}
                         <Typography>
                           Người tạo đơn: <i>{importOrder.createBy}</i>
                         </Typography>
@@ -374,9 +396,10 @@ const ImportOrderDetail = () => {
                         <Typography>
                           {FormatDataUtils.formatDateTime(importOrder.createDate)}
                         </Typography>
-                        <br />
+
                         {importOrder.confirmDate && (
                           <Box>
+                            <br />
                             <Typography>
                               Người xác nhận: <i>{importOrder.confirmBy}</i>
                             </Typography>
@@ -386,6 +409,10 @@ const ImportOrderDetail = () => {
                             </Typography>
                           </Box>
                         )}
+                        <br />
+                        <Typography>
+                          Tham chiếu: <i>{importOrder.billRefernce}</i>
+                        </Typography>
                       </CardContent>
                     </Card>
                   </Grid>

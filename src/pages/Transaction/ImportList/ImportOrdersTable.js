@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 const getStatusLabel = (importOrderStatus) => {
   const map = {
-    failed: {
+    canceled: {
       text: 'Đã huỷ',
       color: 'error',
     },
@@ -113,14 +113,15 @@ const ImportOrdersTable = ({ importOrders }) => {
           <Table className={classes.table}>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
+                {/* <TableCell padding="checkbox">
                   <Checkbox
                     color="primary"
                     checked={selectedAllImportOrders}
                     indeterminate={selectedSomeImportOrders}
                   />
-                </TableCell>
+                </TableCell> */}
                 <TableCell align="center">Mã nhập kho</TableCell>
+                <TableCell align="center">Tham chiếu</TableCell>
                 <TableCell align="center">Ngày tạo</TableCell>
                 <TableCell align="center">Ngày nhập</TableCell>
                 <TableCell align="center">Nhà cung cấp</TableCell>
@@ -141,7 +142,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                     selected={false}
                     onClick={(value) => handleOnClickTableRow(importOrder.orderId)}
                   >
-                    <TableCell padding="checkbox">
+                    {/* <TableCell padding="checkbox">
                       <Checkbox
                         color="primary"
                         //   checked={isImportOrderSelected}
@@ -154,6 +155,17 @@ const ImportOrdersTable = ({ importOrders }) => {
                         //   value={isImportOrderSelected}
                         value={false}
                       />
+                    </TableCell> */}
+                    <TableCell>
+                      <Typography
+                        variant="body1"
+                        color="text.primary"
+                        gutterBottom
+                        noWrap
+                        align="center"
+                      >
+                        {"NHAP"+importOrder.orderId}
+                      </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography
@@ -161,6 +173,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                         color="text.primary"
                         gutterBottom
                         noWrap
+                        align="center"
                       >
                         {importOrder.billRefernce}
                       </Typography>
@@ -171,6 +184,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                         color="text.primary"
                         gutterBottom
                         noWrap
+                        align="center"
                       >
                         {formatDate(importOrder.createDate)}
                       </Typography>
@@ -182,8 +196,9 @@ const ImportOrdersTable = ({ importOrders }) => {
                           color="text.primary"
                           gutterBottom
                           noWrap
+                          align="center"
                         >
-                          {FormatDataUtils.formatDateTime(
+                          {FormatDataUtils.formatDate(
                             importOrder?.importDate,
                           )}
                         </Typography>
@@ -195,6 +210,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                         color="text.primary"
                         gutterBottom
                         noWrap
+                        align="center"
                       >
                         {importOrder.manufactorName}
                       </Typography>

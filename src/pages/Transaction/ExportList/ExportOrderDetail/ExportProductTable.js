@@ -98,17 +98,17 @@ const ExportProductTable = ({ productList }) => {
                         <TableCell>Hạn lưu kho</TableCell>
                         <TableCell align="center">Số lượng</TableCell>
                       </TableRow>
-                      {/* {product?.consignments.map((consignment, indexConsignment) => (
+                      {product?.consignmentList.map((consignment, indexConsignment) => (
                         <TableRow
                           key={indexConsignment}
                           // hover
                         >
-                          <TableCell>{consignment?.warehourseName}</TableCell>
-                          <TableCell>{consignment?.importDate}</TableCell>
-                          <TableCell>{consignment?.expirationDate}</TableCell>
+                          <TableCell>{consignment?.warehouseName}</TableCell>
+                          <TableCell>{FormatDataUtils.formatDate(consignment?.importDate)}</TableCell>
+                          <TableCell>{ consignment?.expirationDate ? FormatDataUtils.formatDate(consignment?.expirationDate) : "Không có"}</TableCell>
                           <TableCell align="center">{consignment?.quantity}</TableCell>
                         </TableRow>
-                      ))} */}
+                      ))}
                     </TableBody>
                   </Table>
                 </TableCell>
