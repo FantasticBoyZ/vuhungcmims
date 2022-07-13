@@ -31,6 +31,25 @@ export const getListConsiggnmentOfProductInStock = createAsyncThunk('exportOrder
   return consignmenttInstock;
 })
 
+export const createExportOrder = createAsyncThunk('exportOrder/create-export-order', async (exportOrder, thunkAPi) => {
+  const response = await exportOrderService.createExportOrder(exportOrder);
+  return response;
+})
+
+export const confirmExportOrder = createAsyncThunk('exportOrder/confirm', async (params, thunkAPi) => {
+
+  return await exportOrderService.confirmExportOrder(params);
+})
+
+export const cancelExportOrder = createAsyncThunk('exportOrder/cancel', async (params, thunkAPi) => {
+
+  return await exportOrderService.cancelExportOrder(params);
+})
+
+export const updateExportOrder = createAsyncThunk('exportOrder/update', async (exportOrder, thunkAPi) => {
+
+  return await exportOrderService.updateExportOrder(exportOrder);
+})
 
 const exportOrderSlice = createSlice({
   name: 'exportOrders',
@@ -94,6 +113,50 @@ const exportOrderSlice = createSlice({
       state.error = action.payload;
     },
     [getListConsiggnmentOfProductInStock.fulfilled]: (state, action) => {
+      state.loading = false;
+
+    },
+    [createExportOrder.pending]: (state) => {
+      state.loading = true;
+    },
+    [createExportOrder.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [createExportOrder.fulfilled]: (state, action) => {
+      state.loading = false;
+
+    },
+    [confirmExportOrder.pending]: (state) => {
+      state.loading = true;
+    },
+    [confirmExportOrder.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [confirmExportOrder.fulfilled]: (state, action) => {
+      state.loading = false;
+
+    },
+    [cancelExportOrder.pending]: (state) => {
+      state.loading = true;
+    },
+    [cancelExportOrder.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [cancelExportOrder.fulfilled]: (state, action) => {
+      state.loading = false;
+
+    },
+    [updateExportOrder.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateExportOrder.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [updateExportOrder.fulfilled]: (state, action) => {
       state.loading = false;
 
     }

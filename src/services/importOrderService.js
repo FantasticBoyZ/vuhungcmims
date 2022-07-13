@@ -35,6 +35,12 @@ const importOrderService = {
     return axiosClient.get(url, { headers: authHeader() });
   },
 
+  cancelImportOrder: (params) => {
+    const {importOrderId, confirmUserId} = params
+    const url = `/import-order/cancel/${importOrderId}`;
+    return axiosClient.get(url, { headers: authHeader() });
+  },
+
   updateImportOrder: (importOrder) => {
     const url = `http://localhost:8080/api/import-order/update`;
     // const url = process.env.REACT_APP_API_URL + '/import-order/update';
