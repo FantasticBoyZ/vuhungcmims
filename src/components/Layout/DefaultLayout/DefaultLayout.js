@@ -11,7 +11,7 @@ function DefaultLayout({ children }) {
       <Stack
         direction="row"
         justifyContent="space-between"
-        // sx={{ backgroundColor: theme.palette.sidebar.main}}
+        sx={{ backgroundColor: theme.palette.sidebar.main}}
       >
         <Sidebar />
         <Stack flex={6}>
