@@ -24,6 +24,8 @@ import ExportGoods from '@/pages/Export/ExportGoods/ExportGoods';
 import CommonForgotPass from '@/pages/Auth/CommonForgotPass';
 import UpdateImportOrderDetail from '@/pages/Transaction/ImportList/UpdateImportOrderDetail/UpdateImportOrderDetail';
 import ReturnGoods from '@/pages/Export/ReturnGoods/ReturnGoods';
+import UpdateExportOrderDetail from '@/pages/Transaction/ExportList/UpdateExportOrderDetail/UpdateExportOrderDetail';
+import ReturnList from '@/pages/Export/ReturnList/ReturnList';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -70,12 +72,14 @@ const privateRoutes = [
   { path: '/export/list', component: ExportList },
   { path: '/export/create-order', component: ExportGoods },
   { path: '/export/detail/:exportOrderId', component: ExportOrderDetail },
+  { path: '/export/edit/:exportOrderId', component: UpdateExportOrderDetail },
   { path: '/export/return/:exportOrderId', component: ReturnGoods },
+  { path: '/export/return/list', component: ReturnList },
 
   { path: '/denied', component: Profile, layout: null },
   { path: '*', component: NotFound, layout: null },
-  { path: 'staff', component: StaffList },
-  { path: 'staff/:staffId', component: StaffDetail },
+  { path: 'staff/list', component: StaffList },
+  { path: 'staff/detail/:staffId', component: StaffDetail },
 ];
 
 export { publicRoutes, privateRoutes };
