@@ -1,5 +1,6 @@
 import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import { getCategoryList, saveCategory } from '@/slices/CategorySlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Box, Grid, Stack, Typography } from '@mui/material';
@@ -167,7 +168,7 @@ const CategoryForm = (props) => {
       {({ values, setFieldValue }) => (
         <Form>
           {loading && !isAdd ? (
-            <>Loading...</>
+            <ProgressCircleLoading/>
           ) : (
             <Grid
               container
