@@ -24,8 +24,11 @@ import ExportGoods from '@/pages/Export/ExportGoods/ExportGoods';
 import CommonForgotPass from '@/pages/Auth/CommonForgotPass';
 import UpdateImportOrderDetail from '@/pages/Transaction/ImportList/UpdateImportOrderDetail/UpdateImportOrderDetail';
 import ReturnGoods from '@/pages/Export/ReturnGoods/ReturnGoods';
+<<<<<<< HEAD
 import UpdateExportOrderDetail from '@/pages/Transaction/ExportList/UpdateExportOrderDetail/UpdateExportOrderDetail';
 import ReturnList from '@/pages/Export/ReturnList/ReturnList';
+=======
+>>>>>>> f4808b0ce5b4bbb0f67d90801640fe078bc8844d
 import WarehouseList from '@/pages/Warehouse/wareHouseList';
 
 const publicRoutes = [

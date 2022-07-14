@@ -99,6 +99,7 @@ const EditWareHouseForm = (props) => {
             provinceId: selectedProvince,
             districtId: selectedDistrict,
             wardId: selectedWard,
+<<<<<<< HEAD
             addressDetail: values.addressDetail,
         };
         console.log(newCategory);
@@ -118,6 +119,23 @@ const EditWareHouseForm = (props) => {
             toast.error('Sửa kho thất bại!');
         }
         closePopup();
+=======
+            addressDetail: values.address,
+        };
+        console.log(newCategory);
+        // try {
+        //     let actionResult;
+        //     actionResult = await dispatch(addWarehouse(newCategory));
+        //     const dataResult = unwrapResult(actionResult);
+        //     console.log('dataResult', dataResult);
+        //     toast.success('Thêm kho thành công!');
+
+        // } catch (error) {
+        //     console.log('Failed to save warehouse: ', error);
+        //     toast.error('Thêm kho thất bại!');
+        // }
+        // closePopup();
+>>>>>>> f4808b0ce5b4bbb0f67d90801640fe078bc8844d
     };
 
     const getDetail = async () => {
@@ -243,8 +261,13 @@ const EditWareHouseForm = (props) => {
                     initialValues={
                         { ...initialFormValue }
                     }
+<<<<<<< HEAD
                     // validationSchema={FORM_VALIDATION}
                     onSubmit={(values) => handleSubmit(values)}
+=======
+                    validationSchema={FORM_VALIDATION}
+                    onSubmit={() => console.log("submit")}
+>>>>>>> f4808b0ce5b4bbb0f67d90801640fe078bc8844d
                 >
 
                     <Form>
