@@ -307,7 +307,7 @@ const WareHouseForm = (props) => {
                                                 )}
                                                 isSearchable={true}
                                                 isLoading={loading}
-                                                loadingMessage={() => <>Đang tìm kiếm danh mục cha...</>}
+                                                loadingMessage={() => <>Đang tìm kiếm ...</>}
                                                 name="district"
                                                 menuPortalTarget={document.body}
                                                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
@@ -329,7 +329,7 @@ const WareHouseForm = (props) => {
                                                 )}
                                                 isSearchable={true}
                                                 isLoading={loading}
-                                                loadingMessage={() => <>Đang tìm kiếm danh mục cha...</>}
+                                                loadingMessage={() => <>Đang tìm kiếm ...</>}
                                                 name="ward"
                                                 menuPortalTarget={document.body}
                                                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
