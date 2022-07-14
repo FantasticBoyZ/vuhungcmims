@@ -103,20 +103,14 @@ const WareHouseForm = (props) => {
         navigate(`/warehouse`);
     };
 
-<<<<<<< HEAD
     const handleSubmit = async (values) => {
         const newWarehouse = {
-=======
-    const handleSubmit = (values) => {
-        const newCategory = {
->>>>>>> f4808b0ce5b4bbb0f67d90801640fe078bc8844d
             name: values.name,
             provinceId: selectedProvince,
             districtId: selectedDistrict,
             wardId: selectedWard,
             addressDetail: values.address,
         };
-<<<<<<< HEAD
         console.log(newWarehouse);
         try {
             let actionResult;
@@ -137,11 +131,6 @@ const WareHouseForm = (props) => {
             toast.error('Thêm kho thất bại!');
         }
 
-=======
-        console.log(newCategory);
-        saveWarehouse(newCategory);
-        closePopup();
->>>>>>> f4808b0ce5b4bbb0f67d90801640fe078bc8844d
     };
 
     const saveWarehouse = async (warehouse) => {
@@ -318,11 +307,7 @@ const WareHouseForm = (props) => {
                                                 )}
                                                 isSearchable={true}
                                                 isLoading={loading}
-<<<<<<< HEAD
                                                 loadingMessage={() => <>Đang tìm kiếm ...</>}
-=======
-                                                loadingMessage={() => <>Đang tìm kiếm danh mục cha...</>}
->>>>>>> f4808b0ce5b4bbb0f67d90801640fe078bc8844d
                                                 name="district"
                                                 menuPortalTarget={document.body}
                                                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
@@ -344,11 +329,7 @@ const WareHouseForm = (props) => {
                                                 )}
                                                 isSearchable={true}
                                                 isLoading={loading}
-<<<<<<< HEAD
                                                 loadingMessage={() => <>Đang tìm kiếm ...</>}
-=======
-                                                loadingMessage={() => <>Đang tìm kiếm danh mục cha...</>}
->>>>>>> f4808b0ce5b4bbb0f67d90801640fe078bc8844d
                                                 name="ward"
                                                 menuPortalTarget={document.body}
                                                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
@@ -400,7 +381,3 @@ const WareHouseForm = (props) => {
 };
 
 export default WareHouseForm;
-<<<<<<< HEAD
-
-=======
->>>>>>> f4808b0ce5b4bbb0f67d90801640fe078bc8844d
