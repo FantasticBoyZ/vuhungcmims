@@ -22,12 +22,12 @@ const Popup = (props) => {
         <Dialog open={openPopup} maxWidth="md" classes={{ paper: classes.dialogWrapper }}>
             <DialogTitle className={classes.dialogTitle}>
                 <div style={{ display: 'flex' }}>
-                    <Typography variant="h6" component="div" style={{ flexGrow: 1 }}>
+                    <Typography variant="h6" component="div" style={{ flexGrow: 1, fontSize: '24px' }}>
                         {title}
                     </Typography>
                     <Button
-                        sx={{ color: 'red'}}
-                        onClick={()=>{setOpenPopup(false)}}>
+                        sx={{ color: 'red' }}
+                        onClick={() => { setOpenPopup(false) }}>
                         <Close />
                     </Button>
                 </div>

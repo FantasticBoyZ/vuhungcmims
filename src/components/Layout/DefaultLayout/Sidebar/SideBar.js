@@ -186,7 +186,7 @@ const Sidebar = () => {
         {
           primary: 'Nhà kho',
           icon: '',
-          path: '/warehourse',
+          path: '/warehouse',
           children: [],
           hasParent: true,
         },
@@ -334,13 +334,13 @@ const Sidebar = () => {
             <Typography
               variant="h6"
               fontSize={14}
-              sx={{color: 'white'}}
+              sx={{ color: 'white' }}
             >
               Vu Hung Company's CMIMS
             </Typography>
           </Link>
         )}
-        <IconButton sx={{color: 'white'}} onClick={(e) => setOpen(!open)}>
+        <IconButton sx={{ color: 'white' }} onClick={(e) => setOpen(!open)}>
           {theme.direction === 'rtl' ? <ChevronRight /> : <Menu />}
         </IconButton>
       </DrawerHeader>
