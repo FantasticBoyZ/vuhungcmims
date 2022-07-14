@@ -24,6 +24,7 @@ import ExportGoods from '@/pages/Export/ExportGoods/ExportGoods';
 import CommonForgotPass from '@/pages/Auth/CommonForgotPass';
 import UpdateImportOrderDetail from '@/pages/Transaction/ImportList/UpdateImportOrderDetail/UpdateImportOrderDetail';
 import ReturnGoods from '@/pages/Export/ReturnGoods/ReturnGoods';
+import WarehouseList from '@/pages/Warehouse/wareHouseList';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -76,6 +77,9 @@ const privateRoutes = [
   { path: '*', component: NotFound, layout: null },
   { path: 'staff', component: StaffList },
   { path: 'staff/:staffId', component: StaffDetail },
+
+  //warehouse route
+  { path: '/wareHouse', component: WarehouseList },
 ];
 
 export { publicRoutes, privateRoutes };
