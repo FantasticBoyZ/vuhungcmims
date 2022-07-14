@@ -64,7 +64,7 @@ const WarehouseList = () => {
     const classes = useStyles();
     const navigate = useNavigate();
     const [warehouseList, setWarehouseList] = useState();
-    const [warehouse, setWarehouse] = useState({});
+    // const [warehouse, setWarehouse] = useState({});
     const [selectedWarehouse, setSelectedWarehouse] = useState();
     const dispatch = useDispatch();
     const { loading } = useSelector((state) => ({ ...state.warehouse }));
@@ -92,6 +92,10 @@ const WarehouseList = () => {
             const dataResult = unwrapResult(actionResult);
             toast.success('Xóa kho thành công!');
             closePopupDelete()
+            setTimeout(() => {
+                window.location.reload(true);
+                window.close()
+            }, 5000);
         } catch (error) {
             console.log('Failed to delete warehouse: ', error);
             toast.error('Xóa kho thất bại!');
@@ -106,17 +110,17 @@ const WarehouseList = () => {
         setOpenPopupDelete(false);
     };
 
-    const getDetail = async () => {
-        try {
-            const actionResult = await dispatch(getWarehouseDetail(selectedWarehouse));
-            const dataResult = unwrapResult(actionResult);
-            // if (dataResult.data) {
-            setWarehouse(dataResult.data.warehouse);
-            // }
-        } catch (error) {
-            console.log('Failed to fetch warehouse detail: ', error);
-        }
-    };
+    // const getDetail = async () => {
+    //     try {
+    //         const actionResult = await dispatch(getWarehouseDetail(selectedWarehouse));
+    //         const dataResult = unwrapResult(actionResult);
+    //         // if (dataResult.data) {
+    //         setWarehouse(dataResult.data.warehouse);
+    //         // }
+    //     } catch (error) {
+    //         console.log('Failed to fetch warehouse detail: ', error);
+    //     }
+    // };
 
     const getAllWarehouse = async (keyword) => {
         try {
@@ -131,9 +135,9 @@ const WarehouseList = () => {
     };
     useEffect(() => {
         getAllWarehouse()
-        if (selectedWarehouse) {
-            getDetail()
-        }
+        // if (selectedWarehouse) {
+        //     getDetail()
+        // }
     }, [selectedWarehouse])
     return (
         <Container>
@@ -211,7 +215,7 @@ const WarehouseList = () => {
                 <EditWareHouseForm
                     closePopup={closePopup}
                     selectedWarehouse={selectedWarehouse}
-                    warehouse={warehouse}
+                // warehouse={warehouse}
                 />
             </Popup>
             <Popup
@@ -250,3 +254,4 @@ const WarehouseList = () => {
 };
 
 export default WarehouseList;
+

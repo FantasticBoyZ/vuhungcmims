@@ -103,17 +103,34 @@ const WareHouseForm = (props) => {
         navigate(`/warehouse`);
     };
 
-    const handleSubmit = (values) => {
-        const newCategory = {
+    const handleSubmit = async (values) => {
+        const newWarehouse = {
             name: values.name,
             provinceId: selectedProvince,
             districtId: selectedDistrict,
             wardId: selectedWard,
             addressDetail: values.address,
         };
-        console.log(newCategory);
-        saveWarehouse(newCategory);
-        closePopup();
+        console.log(newWarehouse);
+        try {
+            let actionResult;
+            actionResult = await dispatch(addWarehouse(newWarehouse));
+            const dataResult = unwrapResult(actionResult);
+            console.log('dataResult', dataResult);
+            if (dataResult.data) {
+                toast.success('Thêm kho thành công!');
+                setTimeout(() => {
+                    window.location.reload(true);
+                    window.close()
+                }, 5000);
+            }
+
+
+        } catch (error) {
+            console.log('Failed to save warehouse: ', error);
+            toast.error('Thêm kho thất bại!');
+        }
+
     };
 
     const saveWarehouse = async (warehouse) => {
@@ -364,3 +381,4 @@ const WareHouseForm = (props) => {
 };
 
 export default WareHouseForm;
+
