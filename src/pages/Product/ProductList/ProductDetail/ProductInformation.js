@@ -308,7 +308,7 @@ const ProductInformation = ({ product }) => {
                       alt="Ảnh sản phẩm"
                       // src={image}
                       loading="lazy"
-                      src={`${deployUrl}/${product.image}`}
+                      src={`${localhost}/${product.image}`}
                     />
                   ) : (
                     <img

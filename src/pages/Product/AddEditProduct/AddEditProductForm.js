@@ -325,7 +325,7 @@ const AddEditProductForm = () => {
           );
           // TODO: đổi sang api deploy khi push code lên nhánh master
           if (dataResult.data.product.image) {
-            setImageUrl(deployUrl + '/' + dataResult.data.product.image);
+            setImageUrl(localhost + '/' + dataResult.data.product.image);
           }
         }
         console.log('dataResult', dataResult);

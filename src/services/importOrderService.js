@@ -2,8 +2,8 @@ import axiosClient from '@/utils/axiosCient';
 import authHeader from '@/services/authHeader';
 import axios from 'axios';
 
-// const API_URL = 'http://localhost:8080/api'
-const API_URL = process.env.REACT_APP_API_URL
+const API_URL = 'http://localhost:8080/api'
+// const API_URL = process.env.REACT_APP_API_URL
 const importOrderService = {
   getImportOrderList: (params) => {
     const url = '/import-order/list';
