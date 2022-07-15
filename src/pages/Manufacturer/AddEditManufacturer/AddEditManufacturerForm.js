@@ -27,6 +27,8 @@ import ManufactorService from '@/services/manufactorService';
 import Select from 'react-select';
 import FormatDataUtils from '@/utils/formatData';
 import IconRequired from '@/components/Common/IconRequired';
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
@@ -91,14 +93,14 @@ const AddEditManufacturerForm = () => {
   // });
   const initialManufacturerValue = isAdd
     ? {
-        name: '',
-        email: '',
-        phone: '',
-        provinceId: '',
-        districtId: '',
-        wardId: '',
-        addressDetail: '',
-      }
+      name: '',
+      email: '',
+      phone: '',
+      provinceId: '',
+      districtId: '',
+      wardId: '',
+      addressDetail: '',
+    }
     : manufacturer;
   // const phoneRegExp =
   //   '(84|0[3|5|7|8|9])+([0-9]{8})\b';
@@ -126,13 +128,13 @@ const AddEditManufacturerForm = () => {
 
   const FORM_VALIDATION = Yup.object().shape({
     name: Yup.string()
-      .max(200, 'Tên nhà cung cấp không thể dài quá 200 kí tự')
-      .required('Chưa nhập tên nhà cung cấp'),
+      .max(200, 'Tên nhà sản xuất không thể dài quá 200 kí tự')
+      .required('Chưa nhập tên nhà sản xuất'),
     email: Yup.string()
       .email('Email không hợp lệ')
-      .required('Chưa nhập email nhà cung cấp'),
+      .required('Chưa nhập email nhà sản xuất'),
 
-    phone: Yup.number().required('Chưa nhập số điện thoại nhà cung cấp'),
+    phone: Yup.number().required('Chưa nhập số điện thoại nhà sản xuất'),
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố'),
     districtId: Yup.number().required('Chưa chọn quận/huyện phố'),
     wardId: Yup.number().required('Chưa chọn xã/phường'),
@@ -147,19 +149,19 @@ const AddEditManufacturerForm = () => {
       ManufactorService.saveManufacturer(manufacturer).then(
         (response) => {
           if (isAdd) {
-            toast.success('Thêm nhà cung cấp thành công!');
+            toast.success('Thêm nhà sản xuất thành công!');
             navigate('/manufacturer');
           } else {
-            toast.success('Sửa nhà cung cấp thành công!');
+            toast.success('Sửa nhà sản xuất thành công!');
             navigate(`/manufacturer/detail/${manufacturerId}`);
           }
           return response.data;
         },
         (error) => {
           if (isAdd) {
-            toast.error('Thêm nhà cung cấp thất bại!');
+            toast.error('Thêm nhà sản xuất thất bại!');
           } else {
-            toast.error('Sửa nhà cung cấp thất bại!');
+            toast.error('Sửa nhà sản xuất thất bại!');
           }
           console.log(error);
         },
@@ -244,7 +246,7 @@ const AddEditManufacturerForm = () => {
               ) : (
                 <Box>
                   <Card className={classes.cardInfo}>
-                    <CardHeader title="Thông tin nhà cung cấp" />
+                    <CardHeader title="Thông tin nhà sản xuất" />
 
                     <CardContent>
                       {/* {!!manufacturer && ( */}
@@ -257,7 +259,7 @@ const AddEditManufacturerForm = () => {
                           item
                         >
                           <Typography className={classes.wrapIcon}>
-                            Tên nhà cung cấp: <IconRequired />
+                            Tên nhà sản xuất: <IconRequired />
                             {/* <Info className={classes.iconStyle} /> */}
                           </Typography>
                           <TextfieldWrapper
@@ -283,7 +285,7 @@ const AddEditManufacturerForm = () => {
                             fullWidth
                             id="phone"
                             autoComplete="phone"
-                            // autoFocus
+                          // autoFocus
                           />
                         </Grid>
                         <Grid
@@ -300,7 +302,7 @@ const AddEditManufacturerForm = () => {
                             fullWidth
                             id="email"
                             autoComplete="email"
-                            // autoFocus
+                          // autoFocus
                           />
                         </Grid>
                       </Grid>
@@ -461,12 +463,14 @@ const AddEditManufacturerForm = () => {
                       justifyContent="flex-end"
                       padding="20px"
                     >
-                      <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
+                      <ButtonWrapper color='warning' variant="contained" startIcon={<CheckIcon />}>Lưu chỉnh sửa</ButtonWrapper>
                       <Button
+                        color='error'
                         onClick={() => handleOnClickExit()}
-                        variant="outlined"
+                        variant="contained"
+                        startIcon={<ClearIcon />}
                       >
-                        Thoát
+                        Hủy chỉnh sửa
                       </Button>
                     </Stack>
                   </Card>
@@ -487,7 +491,7 @@ const AddEditManufacturerForm = () => {
             <Form>
               <Box>
                 <Card className={classes.cardInfo}>
-                  <CardHeader title="Thông tin nhà cung cấp" />
+                  <CardHeader title="Thông tin nhà sản xuất" />
 
                   <CardContent>
                     {/* {!!manufacturer && ( */}
@@ -500,7 +504,7 @@ const AddEditManufacturerForm = () => {
                         item
                       >
                         <Typography className={classes.wrapIcon}>
-                          Tên nhà cung cấp: <IconRequired />
+                          Tên nhà sản xuất: <IconRequired />
                           {/* <Info className={classes.iconStyle} /> */}
                         </Typography>
                         <TextfieldWrapper
@@ -526,7 +530,7 @@ const AddEditManufacturerForm = () => {
                           fullWidth
                           id="phone"
                           autoComplete="phone"
-                          // autoFocus
+                        // autoFocus
                         />
                       </Grid>
                       <Grid
@@ -543,7 +547,7 @@ const AddEditManufacturerForm = () => {
                           fullWidth
                           id="email"
                           autoComplete="email"
-                          // autoFocus
+                        // autoFocus
                         />
                       </Grid>
                     </Grid>
@@ -688,19 +692,21 @@ const AddEditManufacturerForm = () => {
                       </Grid>
                     </Grid>
                   </CardContent>
-                  {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
+                  <pre>{JSON.stringify(values, null, 2)}</pre>
                   <Stack
                     direction="row"
                     spacing={2}
                     justifyContent="flex-end"
                     padding="20px"
                   >
-                    <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
+                    <ButtonWrapper color='success' variant="contained" startIcon={<CheckIcon />}>Thêm nhà sản xuất</ButtonWrapper>
                     <Button
+                      color='error'
                       onClick={() => handleOnClickExit()}
-                      variant="outlined"
+                      variant="contained"
+                      startIcon={<ClearIcon />}
                     >
-                      Thoát
+                      Hủy
                     </Button>
                   </Stack>
                 </Card>

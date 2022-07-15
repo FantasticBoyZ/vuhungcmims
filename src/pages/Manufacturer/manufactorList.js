@@ -7,7 +7,10 @@ import {
   Card,
   InputAdornment, Stack,
   TextField,
-  Toolbar
+  Toolbar,
+  Typography,
+  FormControl, InputLabel,
+
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Container } from '@mui/system';
@@ -16,10 +19,13 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ManufacturerTable from './ManufacturerTable';
-
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import Select from 'react-select';
+import SearchIcon from '@mui/icons-material/Search';
 const useStyles = makeStyles({
   searchField: {
-    width: '30%',
+    width: '60%',
+    padding: '10px 14px'
   },
   toolbar: {
     display: 'flex',
@@ -39,7 +45,22 @@ const useStyles = makeStyles({
   cardTable: {
     padding: '0 20px',
   },
+  text: {
+    paddingBottom: '1%',
+    paddingLeft: '2%'
+  },
+  style: {
+    width: '130px',
+    height: '56px',
+    // minHeight: '56px',
+  }
 });
+
+const optionSelect = [{
+  value: 1, label: "Tên"
+}, {
+  value: 2, label: "Khu vực"
+}]
 
 const ManufacturerList = () => {
   const pages = [10, 20, 50];
@@ -133,26 +154,17 @@ const ManufacturerList = () => {
             startIcon={<Add />}
             onClick={() => handleOnclickAddNewManufacturer()}
           >
-            Thêm mới
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-          >
-            Xuất file excel
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-          >
-            Nhập file excel
+            Thêm nhà sản xuất mới
           </Button>
         </Stack>
         <Card className={classes.cardFilter}>
+          <Typography className={classes.text}>
+            Tìm kiếm thông tin nhà sản xuất
+          </Typography>
           <Toolbar className={classes.toolbar}>
             <TextField
               id="outlined-basic"
-              placeholder="Tìm kiếm theo tên nhà cung cấp"
+              placeholder="Tìm kiếm theo..."
               label={null}
               variant="outlined"
               className={classes.searchField}
@@ -164,15 +176,17 @@ const ManufacturerList = () => {
                 ),
               }}
               onKeyDown={handleSearch}
-              // onChange={handleSearch}
+            // onChange={handleSearch}
             />
+            <Button className={classes.style} color='primary' variant="contained" startIcon={<SearchIcon />}> Tìm kiếm</Button>
           </Toolbar>
+
         </Card>
       </Box>
       <Box>
         <Card className={classes.cardTable}>
           {loading ? (
-            <>Loading...</>
+            <ProgressCircleLoading />
           ) : (
             <Box>
               <ManufacturerTable manufacturerList={manufacturerList} />

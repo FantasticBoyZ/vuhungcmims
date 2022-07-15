@@ -1,22 +1,30 @@
 import { getManufacturerById } from '@/slices/ManufacturerSlice';
-import { Box, Button, Card, Container, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, Container, Grid, Stack, TextField, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import CreateIcon from '@mui/icons-material/Create';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 
 const useStyles = makeStyles({
   cardHeader: {
-    padding: '30px 20px',
+    display: 'flex',
+    padding: '20px 20px',
     marginBottom: '20px',
+    justifyContent: 'space-between'
   },
   infoContainer: {
     display: 'block',
     // verticalAlign: 'center',
     // justifyContent: 'center',
     padding: '20px',
+    marginBottom: '20px',
   },
+  infoProduct: {
+    padding: '20px'
+  }
 });
 const ManufacturerDetail = () => {
   const { manufacturerId } = useParams();
@@ -25,11 +33,6 @@ const ManufacturerDetail = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.manufacturers }));
-  // const manufacturer = {
-  //   name: 'Nguyễn Văn A',
-  //   email: 'callapi@gmail.com',
-  //   phone: '0982412342',
-  // };
 
   const handleOnClickEdit = () => {
     navigate(`/manufacturer/edit/${manufacturerId}`)
@@ -48,7 +51,6 @@ const ManufacturerDetail = () => {
         console.log('Failed to fetch manufacturer detail: ', error);
       }
     };
-    // console.log('subProductList', subProductList);
 
     fetchManufacturerDetail();
   }, []);
@@ -59,39 +61,49 @@ const ManufacturerDetail = () => {
           variant="h5"
           lineHeight={2}
         >
-          Thông tin nhà cung cấp
+          {manufacturer?.name}
         </Typography>
+        <Button onClick={() => handleOnClickEdit()} color='warning' variant="contained" startIcon={<CreateIcon />}>
+          Chỉnh sửa
+        </Button>
       </Card>
       <Card className={classes.infoContainer}>
         {loading ? (
-          <>Loading...</>
+          <ProgressCircleLoading />
         ) : (
           <Box>
             <Typography
               fontSize="20px"
               lineHeight={2}
             >
-              Tên nhà cung cấp: <strong>{manufacturer?.name}</strong>
+              <strong> Thông tin chi tiết:</strong>
+            </Typography>
+            <Grid
+              xs={12}
+              item
+            >
+              <Typography
+                fontSize="20px"
+                lineHeight={2}
+                item xs={4}
+              >Số điện thoại:  <strong item xs={8}>{manufacturer?.phone}</strong>
+              </Typography>
+
+
+            </Grid>
+            <Typography
+              fontSize="20px"
+              lineHeight={2}
+            >
+              Email: {manufacturer?.email}
             </Typography>
             <Typography
               fontSize="20px"
               lineHeight={2}
             >
-              Email: <strong>{manufacturer?.email}</strong>
+              Địa chỉ: {manufacturer?.addressManufactor}
             </Typography>
-            <Typography
-              fontSize="20px"
-              lineHeight={2}
-            >
-              Số điện thoại: <strong>{manufacturer?.phone}</strong>
-            </Typography>
-            <Typography
-              fontSize="20px"
-              lineHeight={2}
-            >
-              Địa chỉ: <strong>{manufacturer?.addressManufactor}</strong>
-            </Typography>
-            <Stack
+            {/* <Stack
               direction="row"
               spacing={2}
               justifyContent='flex-end'
@@ -108,9 +120,14 @@ const ManufacturerDetail = () => {
               >
                 Thoát
               </Button>
-            </Stack>
+            </Stack> */}
           </Box>
         )}
+      </Card>
+      <Card className={classes.infoProduct}>
+        <Box>
+          <Typography>Các sản phẩm cung cấp</Typography>
+        </Box>
       </Card>
     </Container>
   );

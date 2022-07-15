@@ -1,19 +1,33 @@
 import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
-import { Box, Button, Card, Container, FormHelperText, Grid, Stack, Typography } from '@mui/material';
+import {
+    Box,
+    Button,
+    Card,
+    Container,
+    Grid,
+    Stack,
+    Typography,
+    FormHelperText,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import Select from 'react-select';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import { toast } from 'react-toastify';
-import { addWarehouse, getProvinceList, getDistrictList, getWardList, getWarehouseDetail } from '@/slices/WarehouseSlice';
+import {
+    addWarehouse,
+    getProvinceList,
+    getDistrictList,
+    getWardList,
+} from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
+import IconRequired from '@/components/Common/IconRequired';
 
 const useStyles = makeStyles((theme) => ({
     cardHeader: {
@@ -31,20 +45,20 @@ const useStyles = makeStyles((theme) => ({
         verticalAlign: 'center',
         justifyContent: 'center',
         padding: '12px',
-        paddingBottom: '25px'
+        paddingBottom: '25px',
     },
     infoAddress: {
         display: 'block',
         verticalAlign: 'center',
         justifyContent: 'center',
-        padding: '18px 12px 0',
+        padding: '12px 12px 25px 12px',
     },
     wrapIcon: {
         verticalAlign: 'middle',
         display: 'inline-flex',
         width: '200px',
         paddingBottom: '10px',
-        padding: '10px 0'
+        padding: '10px 0',
     },
     textfieldStyle: {
         flex: '5',
@@ -54,27 +68,32 @@ const useStyles = makeStyles((theme) => ({
         margin: '0 10px ',
     },
     styleBox: {
-        display: 'flex'
+        display: 'flex',
     },
     infoBox: {
-        textAlign: 'center'
+        textAlign: 'center',
     },
     styleInput: {
-        padding: '10px 0'
-    }
+        padding: '10px 0',
+    },
 }));
 
-const EditWareHouseForm = (props) => {
-    const { selectedWarehouse, closePopup } = props;
+const WareHouseForm = (props) => {
+    const { closePopup } = props;
+
     const pages = [10, 20, 50];
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
     const classes = useStyles();
-    const [provinceList, setProvinceList] = useState([]);
     const dispatch = useDispatch();
     const { loading } = useSelector((state) => ({ ...state.warehouse }));
-    const [warehouse, setWarehouse] = useState();
-
+    const initialFormValue = {
+        name: '',
+        addressDetail: '',
+        provinceId: '',
+        districtId: '',
+        wardId: '',
+    };
 
     const FORM_VALIDATION = Yup.object().shape({
         name: Yup.string()
@@ -86,57 +105,41 @@ const EditWareHouseForm = (props) => {
         wardId: Yup.number().required('Chưa chọn xã/phường'),
     });
 
-
     const handleOnClickExit = () => {
         closePopup();
     };
 
     const handleSubmit = async (values) => {
-        const newCategory = {
-            id: warehouse?.id,
+        const newWarehouse = {
             name: values.name,
             provinceId: selectedProvince,
             districtId: selectedDistrict,
             wardId: selectedWard,
             addressDetail: values.addressDetail,
         };
-        console.log(newCategory);
+        console.log(newWarehouse);
         try {
             let actionResult;
-            actionResult = await dispatch(addWarehouse(newCategory));
+            actionResult = await dispatch(addWarehouse(newWarehouse));
             const dataResult = unwrapResult(actionResult);
             console.log('dataResult', dataResult);
-            toast.success('Sửa kho thành công!', { autoClose: 2000 });
-            setTimeout(() => {
-                window.location.reload(true);
-                window.close()
-            }, 2000);
-
+            if (dataResult.data) {
+                toast.success('Thêm kho thành công!', { autoClose: 2000 });
+                setTimeout(() => {
+                    window.location.reload(true);
+                    window.close();
+                }, 2000);
+            }
         } catch (error) {
             console.log('Failed to save warehouse: ', error);
-            toast.error('Sửa kho thất bại!');
-        }
-        closePopup();
-    };
-
-    const getDetail = async () => {
-        try {
-            const actionResult = await dispatch(getWarehouseDetail(selectedWarehouse));
-            const dataResult = unwrapResult(actionResult);
-            // if (dataResult.data) {
-            setWarehouse(dataResult.data.warehouse);
-            setSelectedProvince(dataResult.data.warehouse?.provinceId)
-            setSelectedDistrict(dataResult.data.warehouse?.districtId)
-            setSelectedWard(dataResult.data.warehouse?.wardId)
-            // }
-        } catch (error) {
-            console.log('Failed to fetch warehouse detail: ', error);
+            toast.error('Thêm kho thất bại!');
         }
     };
 
     const [selectedProvince, setSelectedProvince] = useState();
     const [selectedDistrict, setSelectedDistrict] = useState();
     const [selectedWard, setSelectedWard] = useState();
+    const [provinceList, setProvinceList] = useState([]);
     const [districtList, setDistrictList] = useState([]);
     const [wardList, setWardList] = useState([]);
 
@@ -182,27 +185,15 @@ const EditWareHouseForm = (props) => {
         }
     };
 
-    const initialFormValue = {
-        name: warehouse?.name,
-        addressDetail: warehouse?.addressDetail,
-        provinceId: warehouse?.provinceId,
-        districtId: warehouse?.districtId,
-        wardId: warehouse?.wardId
-    }
-
     useEffect(() => {
-        getProvince()
+        getProvince();
         if (selectedProvince) {
-            getDistrict()
+            getDistrict();
         }
         if (selectedDistrict) {
-            getWard()
+            getWard();
         }
-    }, [selectedProvince, selectedDistrict,])
-
-    useEffect(() => {
-        getDetail()
-    }, [])
+    }, [selectedProvince, selectedDistrict]);
 
     return (
         <Container maxWidth="lg">
@@ -212,14 +203,12 @@ const EditWareHouseForm = (props) => {
                 justifyContent="center"
                 alignItems="stretch"
             >
-
                 <Formik
-                    enableReinitialize={true}
-                    initialValues={
-                        { ...initialFormValue }
-                    }
+                    initialValues={{
+                        ...initialFormValue,
+                    }}
                     validationSchema={FORM_VALIDATION}
-                    onSubmit={(values) => handleSubmit(values)}
+                    onSubmit={(value) => handleSubmit(value)}
                 >
                     {({ values, errors, setFieldValue }) => (
                         <Form>
@@ -229,10 +218,13 @@ const EditWareHouseForm = (props) => {
                                 justifyContent="center"
                                 alignItems="stretch"
                             >
-                                <Box >
-                                    <Box sx={{ borderBottom: '1px solid #A7A7A7' }} className={classes.infoContainer}>
+                                <Box>
+                                    <Box
+                                        sx={{ borderBottom: '1px solid #A7A7A7' }}
+                                        className={classes.infoContainer}
+                                    >
                                         <Typography className={classes.wrapIcon}>
-                                            Tên nhà kho
+                                            Tên nhà kho: <IconRequired />
                                         </Typography>
                                         <TextfieldWrapper
                                             className={classes.styleInput}
@@ -242,32 +234,30 @@ const EditWareHouseForm = (props) => {
                                             autoComplete="name"
                                         />
                                     </Box>
-
-
-                                    <Typography className={classes.infoAddress}>
-                                        Địa chỉ :
-                                    </Typography>
+                                    <Typography className={classes.infoAddress}>Địa chỉ :</Typography>
 
                                     <Grid>
                                         <Box className={classes.styleBox}>
                                             <Box className={classes.infoAddress}>
                                                 <Typography className={classes.wrapIcon}>
-                                                    Tỉnh/Thành phố
+                                                    Tỉnh/Thành phố <IconRequired />
                                                 </Typography>
                                                 <Select
-                                                    // classNamePrefix="select"
+                                                    classNamePrefix="select"
                                                     className={classes.selectBox}
                                                     options={FormatDataUtils.getOptionWithIdandName(provinceList)}
-                                                    noOptionsMessage={() => <>Không có tìm thấy tỉnh thành phù hợp</>}
+                                                    noOptionsMessage={() => (
+                                                        <>Không có tìm thấy tỉnh thành phù hợp</>
+                                                    )}
                                                     isClearable={true}
                                                     isSearchable={true}
                                                     isLoading={loading}
                                                     name="provinceId"
                                                     menuPortalTarget={document.body}
                                                     styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                                                    value={FormatDataUtils.getOptionWithIdandName(provinceList)?.filter(function (option) {
-                                                        return option.value === selectedProvince;
-                                                    })}
+                                                    value={provinceList.find(
+                                                        (obj) => obj.value === selectedProvince,
+                                                    )} // set selected value
                                                     onChange={(e) => {
                                                         setFieldValue('provinceId', e?.value, setSelectedProvince(e?.value))
                                                     }}
@@ -283,25 +273,27 @@ const EditWareHouseForm = (props) => {
                                                     ''
                                                 )}
                                             </Box>
+
                                             <Box className={classes.infoAddress}>
                                                 <Typography className={classes.wrapIcon}>
-                                                    Quận/huyện
+                                                    Quận/huyện <IconRequired />
                                                 </Typography>
                                                 <Select
-                                                    // classNamePrefix="select"
                                                     className={classes.selectBox}
-                                                    noOptionsMessage={() => <>Không có tìm thấy quận huyện phù hợp</>}
+                                                    noOptionsMessage={() => (
+                                                        <>Không có tìm thấy quận huyện phù hợp</>
+                                                    )}
                                                     isClearable={true}
                                                     options={FormatDataUtils.getOptionWithIdandName(districtList)}
                                                     isSearchable={true}
                                                     isLoading={loading}
-                                                    loadingMessage={() => <>Đang tìm kiếm địa chỉ...</>}
+                                                    loadingMessage={() => <>Đang tìm kiếm ...</>}
                                                     name="districtId"
                                                     menuPortalTarget={document.body}
                                                     styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                                                    value={FormatDataUtils.getOptionWithIdandName(districtList)?.filter(function (option) {
-                                                        return option.value === selectedDistrict;
-                                                    })}
+                                                    value={districtList.find(
+                                                        (obj) => obj.value === selectedDistrict,
+                                                    )} // set selected value
                                                     onChange={(e) => {
                                                         setFieldValue('districtId', e?.value, setSelectedDistrict(e?.value))
                                                     }}
@@ -319,7 +311,7 @@ const EditWareHouseForm = (props) => {
                                             </Box>
                                             <Box className={classes.infoAddress}>
                                                 <Typography className={classes.wrapIcon}>
-                                                    Phường/xã
+                                                    Phường/xã <IconRequired />
                                                 </Typography>
                                                 <Select
                                                     className={classes.selectBox}
@@ -328,13 +320,11 @@ const EditWareHouseForm = (props) => {
                                                     options={FormatDataUtils.getOptionWithIdandName(wardList)}
                                                     isSearchable={true}
                                                     isLoading={loading}
-                                                    loadingMessage={() => <>Đang tìm kiếm địa chỉ...</>}
+                                                    loadingMessage={() => <>Đang tìm kiếm ...</>}
                                                     name="wardId"
                                                     menuPortalTarget={document.body}
                                                     styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                                                    value={FormatDataUtils.getOptionWithIdandName(wardList)?.filter(function (option) {
-                                                        return option.value === selectedWard;
-                                                    })}
+                                                    value={wardList.find((obj) => obj.value === selectedWard)} // set selected value
                                                     onChange={(e) => {
                                                         setFieldValue('wardId', e?.value, setSelectedWard(e?.value))
                                                     }}
@@ -350,39 +340,43 @@ const EditWareHouseForm = (props) => {
                                                     ''
                                                 )}
                                             </Box>
-
                                         </Box>
                                     </Grid>
 
                                     <Box className={classes.infoContainer}>
                                         <Typography className={classes.wrapIcon}>
-                                            Địa chỉ chi tiết
+                                            Địa chỉ chi tiết <IconRequired />
                                         </Typography>
                                         <TextfieldWrapper
                                             className={classes.styleInput}
                                             name="addressDetail"
                                             fullWidth
-                                            id="address"
-                                            autoComplete="address"
+                                            id="addressDetail"
+                                            autoComplete="addressDetail"
                                         />
                                     </Box>
                                 </Box>
                             </Grid>
-
                             <Stack
                                 direction="row"
                                 spacing={2}
                                 justifyContent="flex-end"
                                 padding="20px"
                             >
-                                <ButtonWrapper color='success' variant="contained" startIcon={<CheckIcon />}>Lưu chỉnh sửa</ButtonWrapper>
+                                <ButtonWrapper
+                                    color="success"
+                                    variant="contained"
+                                    startIcon={<CheckIcon />}
+                                >
+                                    Thêm nhà kho
+                                </ButtonWrapper>
                                 <Button
-                                    color='error'
+                                    color="error"
                                     onClick={() => handleOnClickExit()}
                                     variant="contained"
                                     startIcon={<ClearIcon />}
                                 >
-                                    Hủy chỉnh sửa
+                                    Hủy
                                 </Button>
                             </Stack>
                         </Form>
@@ -393,4 +387,4 @@ const EditWareHouseForm = (props) => {
     );
 };
 
-export default EditWareHouseForm;
+export default WareHouseForm;
