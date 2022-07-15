@@ -16,9 +16,24 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
+import { makeStyles } from '@mui/styles';
+
+const useStyles = makeStyles({
+  styleBox: {
+    margin: '8% auto',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '32px',
+    width: '375px',
+    background: '#fff',
+    boxShadow: '4px 4px 4px 4px rgba(0, 0, 0, 0.25);'
+  },
+});
 
 const Login = () => {
   let navigate = useNavigate();
+  const classes = useStyles()
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [disabled, setDisabled] = useState(false);
@@ -66,16 +81,8 @@ const Login = () => {
       <Grid
         item
         component="main"
-        sx={{ height: '100vh' }}
       >
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '32px',
-          }}
+        <Box className={classes.styleBox}
         >
           <Avatar sx={{ m: 1, bgcolor: 'primary.light' }}>
             <LockOutlined />

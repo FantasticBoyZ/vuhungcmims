@@ -30,6 +30,7 @@ import ReturnOrderDetail from '@/pages/Export/ReturnList/ReturnOrderDetail/Retur
 import InventoryCheckingList from '@/pages/InventoryChecking/InventoryCheckingList/InventoryCheckingList';
 import CreateInventoryChecking from '@/pages/InventoryChecking/CreateInventoryChecking/CreateInventoryChecking';
 import InventoryCheckingDetail from '@/pages/InventoryChecking/InventoryCheckingList/InventoyCheckingDetail/InventoryCheckingDetail';
+import WarehouseList from '@/pages/Warehouse/wareHouseList';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -90,6 +91,11 @@ const privateRoutes = [
   { path: '*', component: NotFound, layout: null },
   { path: 'staff/list', component: StaffList },
   { path: 'staff/detail/:staffId', component: StaffDetail },
+  { path: 'staff', component: StaffList },
+  { path: 'staff/:staffId', component: StaffDetail },
+
+  //warehouse route
+  { path: '/wareHouse', component: WarehouseList },
 ];
 
 export { publicRoutes, privateRoutes };
