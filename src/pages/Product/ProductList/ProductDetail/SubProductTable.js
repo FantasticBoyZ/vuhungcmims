@@ -1,3 +1,4 @@
+import FormatDataUtils from '@/utils/formatData';
 import {
   Box,
   Card,
@@ -102,7 +103,7 @@ const SubProductTable = ({ selectedUnitMeasure,product, subProductList }) => {
                   </TableCell>
                   <TableCell align="center">
                     {selectedUnitMeasure === product.wrapUnitMeasure
-                      ? Math.floor(subProduct.quantity / product.numberOfWrapUnitMeasure)
+                      ? FormatDataUtils.getRoundNumber(subProduct.quantity / product.numberOfWrapUnitMeasure, 1)
                       : subProduct.quantity}
                   </TableCell>
                   <TableCell align="center">{subProduct.inventoryName}</TableCell>
