@@ -15,6 +15,11 @@ const formatDate = (date) => {
   });
 };
 
+const getRoundNumber = (value, precision) => {
+  var multiplier = Math.pow(10, precision || 0);
+  return Math.round(value * multiplier) / multiplier;
+};
+
 const convertUTCDateToLocalDate = (date) => {
   var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
 
@@ -87,6 +92,7 @@ const FormatDataUtils = {
   getOptionWithIdandName,
   getSelectedOption,
   getStatusLabel,
-  getOptionProduct
+  getOptionProduct,
+  getRoundNumber,
 };
 export default FormatDataUtils;
