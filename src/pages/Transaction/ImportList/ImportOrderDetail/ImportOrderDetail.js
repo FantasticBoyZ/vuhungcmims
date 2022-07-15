@@ -298,7 +298,7 @@ const ImportOrderDetail = () => {
                         </Button>
                       </Stack>
                     )}
-                    {importOrder.statusName === 'completed' && (
+                    {/* {importOrder.statusName === 'completed' && (
                       <Stack
                         direction="row"
                         justifyContent="flex-end"
@@ -313,7 +313,7 @@ const ImportOrderDetail = () => {
                           Trả hàng
                         </Button>
                       </Stack>
-                    )}
+                    )} */}
                   </Stack>
                 </Card>
               </Grid>
