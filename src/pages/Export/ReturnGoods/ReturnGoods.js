@@ -166,6 +166,16 @@ const ReturnGoods = () => {
     return totalAmount;
   };
 
+  const calculateTotalQuantityOfProduct = (product) => {
+    let totalQuantity = 0;
+    if (product.consignments !== undefined && product.consignments?.length > 0) {
+      product?.consignments.forEach((consignment) => {
+        totalQuantity = +totalQuantity + +consignment.quantityReturn;
+      });
+    }
+    return totalQuantity;
+  };
+
   useEffect(() => {
     if (exportOrder?.statusName !== 'completed') {
       navigate(`/export/detail/${exportOrderId}`);
@@ -256,6 +266,7 @@ const ReturnGoods = () => {
                                 <TableCell>Mã sản phẩm</TableCell>
                                 <TableCell>Tên sản phẩm</TableCell>
                                 <TableCell>Đơn vị</TableCell>
+                                <TableCell align="center">Số lượng</TableCell>
                                 <TableCell align="center">Đơn giá</TableCell>
                                 <TableCell align="center">Thành tiền</TableCell>
                               </TableRow>
@@ -274,13 +285,17 @@ const ReturnGoods = () => {
                                     <TableCell>{product?.productName}</TableCell>
                                     <TableCell>{product?.unitMeasure}</TableCell>
                                     <TableCell align="center">
+                                      {calculateTotalQuantityOfProduct(values.productList[index])}
+                                    </TableCell>
+                                    <TableCell align="center">
                                       {FormatDataUtils.formatCurrency(
                                         product?.unitPrice || '0',
                                       )}
                                     </TableCell>
                                     <TableCell align="center">
                                       {FormatDataUtils.formatCurrency(
-                                        product?.quantity * product?.unitPrice,
+                                        calculateTotalQuantityOfProduct(values.productList[index]) *
+                                          product?.unitPrice,
                                       )}
                                     </TableCell>
                                   </TableRow>
@@ -289,7 +304,7 @@ const ReturnGoods = () => {
                                       className={classes.tableCellConsignment}
                                     ></TableCell>
                                     <TableCell
-                                      colSpan={4}
+                                      colSpan={5}
                                       className={classes.tableCellConsignment}
                                     >
                                       <Table className={classes.tableCosignment}>
