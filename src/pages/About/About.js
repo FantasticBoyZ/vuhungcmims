@@ -24,6 +24,11 @@ import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
+import { AsyncPaginate } from 'react-select-async-paginate';
+import { useDispatch } from 'react-redux';
+import { getListProductInStock } from '@/slices/ExportOrderSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { getProductList } from '@/slices/ProductSlice';
 const useStyles = makeStyles({
   preview: {
     width: '300px',
@@ -75,7 +80,9 @@ const UserProfiles = () => {
     fetchUserProfiles();
   }, []);
   return userProfiles.map((userProfile, index) => {
-    console.log(`http://localhost:8080/api/v1/user-profile/${userProfile.userProfileId}/image/download`)
+    console.log(
+      `http://localhost:8080/api/v1/user-profile/${userProfile.userProfileId}/image/download`,
+    );
     return (
       <Box key={index}>
         {userProfile.userProfileId ? (
@@ -101,15 +108,11 @@ function Dropzone({ userProfileId }) {
     const formData = new FormData();
     formData.append('file', file);
     axios
-      .put(
-        `http://localhost:8080/api/product/update/image/17`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+      .put(`http://localhost:8080/api/product/update/image/17`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
         },
-      )
+      })
       .then(() => {
         console.log('file uploaded successfully');
       })
@@ -119,7 +122,9 @@ function Dropzone({ userProfileId }) {
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
   const classes = useStyles();
-  const imageProduct = axios.get(`http://localhost:8080/api/v1/user-profile/82f2cd6a-2af3-4d18-a6c3-f8efb06160de/image/download`)
+  const imageProduct = axios.get(
+    `http://localhost:8080/api/v1/user-profile/82f2cd6a-2af3-4d18-a6c3-f8efb06160de/image/download`,
+  );
   return (
     <div {...getRootProps({ className: 'dropzone' })}>
       <input {...getInputProps()} />
@@ -129,7 +134,7 @@ function Dropzone({ userProfileId }) {
           fontSize="large"
           className={classes.iconUpload}
         />
-        
+
         {isDragActive ? <span>Thả ảnh vào đây</span> : <span>Tải ảnh lên</span>}
         {/* {baseImage && (
             <img
@@ -158,10 +163,12 @@ function Dropzone({ userProfileId }) {
 const About = () => {
   const [selectedValue, setSelectedValue] = useState('');
   const [baseImage, setBaseImage] = useState('');
+  const [currentProduct, setCurrentProduct] = useState('');
   const [errorUpload, setErrorUpload] = useState('');
   const arrayHelpersRef = useRef(null);
   const valueFormik = useRef();
   const classes = useStyles();
+  const dispatch = useDispatch();
   const categoryList = {
     1: 'Gạch',
     2: 'Sơn',
@@ -300,8 +307,49 @@ const About = () => {
     console.log(event.target.value);
     setAge(event.target.value);
   };
+  const loadOptions = async (searchQuery, loadedOptions, { page }) => {
+    try {
+      const params = {
+        pageIndex: page,
+        // pageSize: rowsPerPage,
+        // ...searchProductParams,
+      };
+      const actionResult = await dispatch(getProductList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        // setTotalRecord(dataResult.data.totalRecord);
+        // setProductList(dataResult.data);
+        console.log(page)
+        return {
+          options: dataResult.data.product,
+          hasMore: dataResult.data.product.length >= 1,
+          additional: {
+            page: searchQuery ? 2 : page + 1,
+          },
+        };
+      }
+    } catch (error) {
+      console.log('Failed to fetch product list instock: ', error);
+    }
+  };
   return (
     <Box>
+      <AsyncPaginate
+        value={currentProduct}
+        loadOptions={loadOptions}
+        getOptionValue={(option) => option}
+        getOptionLabel={(option) => option.name}
+        onChange={(product) => {
+          setCurrentProduct(product);
+          console.log(product)
+        }}
+        isSearchable={false}
+        placeholder="Select House"
+        additional={{
+          page: 1,
+        }}
+      />
       <UserProfiles />
       <Box>
         <label
