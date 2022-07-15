@@ -26,6 +26,10 @@ import UpdateImportOrderDetail from '@/pages/Transaction/ImportList/UpdateImport
 import ReturnGoods from '@/pages/Export/ReturnGoods/ReturnGoods';
 import UpdateExportOrderDetail from '@/pages/Transaction/ExportList/UpdateExportOrderDetail/UpdateExportOrderDetail';
 import ReturnList from '@/pages/Export/ReturnList/ReturnList';
+import ReturnOrderDetail from '@/pages/Export/ReturnList/ReturnOrderDetail/ReturnOrderDetail';
+import InventoryCheckingList from '@/pages/InventoryChecking/InventoryCheckingList/InventoryCheckingList';
+import CreateInventoryChecking from '@/pages/InventoryChecking/CreateInventoryChecking/CreateInventoryChecking';
+import InventoryCheckingDetail from '@/pages/InventoryChecking/InventoryCheckingList/InventoyCheckingDetail/InventoryCheckingDetail';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -75,6 +79,12 @@ const privateRoutes = [
   { path: '/export/edit/:exportOrderId', component: UpdateExportOrderDetail },
   { path: '/export/return/:exportOrderId', component: ReturnGoods },
   { path: '/export/return/list', component: ReturnList },
+  { path: '/export/return/detail/:exportOrderId', component: ReturnOrderDetail },
+
+  // inventoryChecking route
+  { path: '/inventory-checking/list', component: InventoryCheckingList },
+  { path: '/inventory-checking/detail/:inventoryCheckingId', component: InventoryCheckingDetail },
+  { path: '/inventory-checking/create', component: CreateInventoryChecking },
 
   { path: '/denied', component: Profile, layout: null },
   { path: '*', component: NotFound, layout: null },
