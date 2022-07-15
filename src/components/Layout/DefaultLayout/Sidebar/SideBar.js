@@ -274,14 +274,14 @@ const Sidebar = () => {
         {
           primary: 'Tạo phiếu kiểm hàng',
           icon: '',
-          path: '/warehoure-check/create',
+          path: '/inventory-checking/create',
           children: [],
           hasParent: true,
         },
         {
           primary: 'Lịch sử kiểm hàng',
           icon: '',
-          path: '/warehoure-check/list',
+          path: '/inventory-checking/list',
           children: [],
           hasParent: true,
         },
