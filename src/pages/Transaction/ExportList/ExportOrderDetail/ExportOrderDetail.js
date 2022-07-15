@@ -381,16 +381,39 @@ const ExportOrderDetail = () => {
                   >
                     <Card>
                       <CardContent className={classes.confirmInfo}>
-                        <Typography variant="h6">Thông tin xác nhận</Typography>
-                        <Typography>
-                          Người tạo đơn: <i>{exportOrder.createBy}</i>
-                        </Typography>
-                        <Typography>Ngày tạo đơn:</Typography>
-                        <Typography>
-                          {exportOrder.createDate
-                            ? FormatDataUtils.formatDateTime(exportOrder.createDate)
-                            : null}
-                        </Typography>
+                        <Stack spacing={2}>
+                          <Box>
+                            <Typography variant="h6">Thông tin xác nhận</Typography>
+                            <Typography>
+                              Người tạo đơn: <i>{exportOrder.createBy}</i>
+                            </Typography>
+                            <Typography>Ngày tạo đơn:</Typography>
+                            <Typography>
+                              <i>
+                                {exportOrder.createDate
+                                  ? FormatDataUtils.formatDateTime(exportOrder.createDate)
+                                  : null}
+                              </i>
+                            </Typography>
+                          </Box>
+                          {exportOrder.statusName === 'completed' && (
+                            <Box>
+                              <Typography>
+                                Người xác nhận: <i>{exportOrder.confirmBy}</i>
+                              </Typography>
+                              <Typography>Ngày xác nhận:</Typography>
+                              <Typography>
+                                <i>
+                                  {exportOrder.confirmDate
+                                    ? FormatDataUtils.formatDateTime(
+                                        exportOrder.confirmDate,
+                                      )
+                                    : null}
+                                </i>
+                              </Typography>
+                            </Box>
+                          )}
+                        </Stack>
                       </CardContent>
                     </Card>
                   </Grid>
