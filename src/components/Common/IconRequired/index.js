@@ -1,9 +1,10 @@
-import {  Tooltip } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React from 'react';
 const useStyles = makeStyles(() => ({
   iconRequired: {
     color: 'red',
+    paddingLeft: '3px'
   },
 }));
 const IconRequired = () => {
