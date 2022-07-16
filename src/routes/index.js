@@ -80,7 +80,7 @@ const privateRoutes = [
   { path: '/export/edit/:exportOrderId', component: UpdateExportOrderDetail },
   { path: '/export/return/:exportOrderId', component: ReturnGoods },
   { path: '/export/return/list', component: ReturnList },
-  { path: '/export/return/detail/:exportOrderId', component: ReturnOrderDetail },
+  { path: '/export/return/detail/:returnOrderId', component: ReturnOrderDetail },
 
   // inventoryChecking route
   { path: '/inventory-checking/list', component: InventoryCheckingList },

@@ -1,3 +1,6 @@
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import CustomTablePagination from '@/components/Common/TablePagination';
+import { getReturnOrderList } from '@/slices/ExportOrderSlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Search } from '@mui/icons-material';
 import {
@@ -23,7 +26,10 @@ import {
 import { makeStyles } from '@mui/styles';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import React, { useState } from 'react';
+import { unwrapResult } from '@reduxjs/toolkit';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   searchField: {
@@ -60,12 +66,59 @@ const createrList = [
 
 const ReturnList = () => {
   const classes = useStyles();
+  const [returnOrderList, setReturnOrderList] = useState([]);
+  const [searchParams, setSearchParams] = useState({});
+  const pages = [10, 20, 50];
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
+  const [totalRecord, setTotalRecord] = useState(0);
   const [creatorId, setCreatorId] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { loading } = useSelector((state) => ({ ...state.exportOrders }));
 
   const handleChangeCreator = (event) => {
     setCreatorId(event.target.value);
   };
 
+  const handleOnClickTableRow = (returnOrderId) => {
+    navigate(`/export/return/detail/${returnOrderId}`);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+    // fetchProductList(newPage, rowsPerPage, searchParams);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+    // fetchProductList(page, parseInt(event.target.value, 10), searchParams);
+  };
+
+  const fetchReturnOrderList = async () => {
+    try {
+      const params = {
+        pageIndex: page,
+        pageSize: rowsPerPage,
+        ...searchParams,
+      };
+      const actionResult = await dispatch(getReturnOrderList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        setTotalRecord(dataResult.data.totalRecord);
+        setReturnOrderList(dataResult.data.returnOrderList);
+      }
+    } catch (error) {
+      console.log('Failed to fetch returnOrder list: ', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchReturnOrderList();
+  }, [page, rowsPerPage]);
   return (
     <Grid
       container
@@ -159,24 +212,57 @@ const ReturnList = () => {
       >
         <Card>
           <CardContent>
-            <TableContainer>
-              <Table className={classes.table}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell align='center'>Ngày tạo</TableCell>
-                    <TableCell align='center'>Được trả từ mã xuất kho</TableCell>
-                    <TableCell align='center'>Giá trị đơn hàng</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow hover>
-                    <TableCell align='center'>{FormatDataUtils.formatDate("04/06/2022")}</TableCell>
-                    <TableCell align='center'>ABC1234</TableCell>
-                    <TableCell align='center'>{FormatDataUtils.formatCurrency(700000)}</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
+            {loading ? (
+              <ProgressCircleLoading />
+            ) : (
+              <Box>
+                {totalRecord > 0 ? (
+                  <TableContainer>
+                    <Table className={classes.table}>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell align="center">Ngày tạo</TableCell>
+                          <TableCell align="center">Được trả từ mã xuất kho</TableCell>
+                          <TableCell align="center">Giá trị đơn hàng</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {returnOrderList &&
+                          returnOrderList.map((returnOrder, index) => (
+                            <TableRow
+                              hover
+                              key={returnOrder.id}
+                              onClick={() => handleOnClickTableRow(returnOrder.id)}
+                            >
+                              <TableCell align="center">
+                                {returnOrder.createDate
+                                  ? FormatDataUtils.formatDate(returnOrder.createDate)
+                                  : 'Không có'}
+                              </TableCell>
+                              <TableCell align="center">
+                                {returnOrder.billRefernce}
+                              </TableCell>
+                              <TableCell align="center">
+                                {FormatDataUtils.formatCurrency(returnOrder.totalPrice)}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                    <CustomTablePagination
+                      page={page}
+                      pages={pages}
+                      rowsPerPage={rowsPerPage}
+                      totalRecord={totalRecord}
+                      handleChangePage={handleChangePage}
+                      handleChangeRowsPerPage={handleChangeRowsPerPage}
+                    />
+                  </TableContainer>
+                ) : (
+                  <Box>Không tìm thấy kết quả nào</Box>
+                )}
+              </Box>
+            )}
           </CardContent>
         </Card>
       </Grid>

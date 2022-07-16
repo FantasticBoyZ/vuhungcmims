@@ -13,9 +13,13 @@ import {
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ReturnProductTable from '@/pages/Export/ReturnList/ReturnOrderDetail/ReturnProductTable';
+import { getReturnOrderById } from '@/slices/ExportOrderSlice';
+import { useParams } from 'react-router-dom';
+import { unwrapResult } from '@reduxjs/toolkit';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -118,7 +122,9 @@ const exportOrder = {
 };
 
 const ReturnOrderDetail = () => {
+  const { returnOrderId } = useParams();
   const classes = useStyles();
+  const [returnOrder, setReturnOrder] = useState();
   const [listConsignments, setListConsignments] = useState(exportOrder.productList);
   const [openPopup, setOpenPopup] = useState(false);
   const [title, setTitle] = useState('');
@@ -139,159 +145,191 @@ const ReturnOrderDetail = () => {
     return totalAmount;
   };
 
+  const fetchReturnOrderDetail = async () => {
+    try {
+      const params = {
+        orderId: returnOrderId,
+      };
+      const actionResult = await dispatch(getReturnOrderById(params));
+      const dataResult = unwrapResult(actionResult);
+      if (dataResult.data) {
+        setReturnOrder(dataResult.data.inforExportDetail);
+        setListConsignments(dataResult.data.productList)
+      }
+      console.log('Return Order Detail', dataResult);
+    } catch (error) {
+      console.log('Failed to fetch exportOrder detail: ', error);
+    }
+  };
+
   const handleConfirm = () => {};
 
+  useEffect(() => {
+    fetchReturnOrderDetail();
+  }, []);
+
   return (
-    <Grid
-      container
-      spacing={2}
-    >
-      <Grid
-        xs={12}
-        item
-      >
-        <Card>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            p={2}
-          >
-            <Box className={classes.billReferenceContainer}>
-              <Typography variant="span">
-                <strong>Phiếu trả hàng từ phiếu xuất hàng số:</strong> {exportOrder.billRefernce}
-              </Typography>
-            </Box>
-          </Stack>
-        </Card>
-      </Grid>
-      <Grid
-        xs={9}
-        item
-      >
-        <Grid
-          container
-          spacing={2}
+    <Box>
+      {loading ? (
+        <ProgressCircleLoading />
+      ) : (
+        <Box>
+          {!!returnOrder && (
+            <Grid
+              container
+              spacing={2}
+            >
+              <Grid
+                xs={12}
+                item
+              >
+                <Card>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    p={2}
+                  >
+                    <Box className={classes.billReferenceContainer}>
+                      <Typography variant="span">
+                        <strong>Phiếu trả hàng từ phiếu xuất hàng số:</strong>{' '}
+                        {returnOrder.billRefernce}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Card>
+              </Grid>
+              <Grid
+                xs={9}
+                item
+              >
+                <Grid
+                  container
+                  spacing={2}
+                >
+                  {/* <Grid
+          xs={12}
+          item
         >
-          {/* <Grid
-            xs={12}
-            item
-          >
-            <Card>Thông tin phiếu xuất kho</Card>
-          </Grid> */}
-          <Grid
-            xs={12}
-            item
-          >
-            <Card className={classes.cardTable}>
-              {/* {loading ? (
-                        <ProgressCircleLoading />
+          <Card>Thông tin phiếu xuất kho</Card>
+        </Grid> */}
+                  <Grid
+                    xs={12}
+                    item
+                  >
+                    <Card className={classes.cardTable}>
+                      {/* {loading ? (
+                      <ProgressCircleLoading />
+                    ) : (
+                      <ExportProductTable productList={listConsignments} />
+                    )} */}
+                      {listConsignments && listConsignments?.length > 0 ? (
+                        <ReturnProductTable productList={listConsignments} />
                       ) : (
-                        <ExportProductTable productList={listConsignments} />
-                      )} */}
-              {listConsignments && listConsignments?.length > 0 ? (
-                <ReturnProductTable productList={listConsignments} />
-              ) : (
-                <Box>Đơn xuất hàng không có lô hàng nào</Box>
-              )}
-            </Card>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid
-        xs={3}
-        item
-      >
-        <Grid
-          container
-          spacing={2}
-        >
-          <Grid
-            xs={12}
-            item
-          >
-            <Card>
-              <CardContent className={classes.confirmInfo}>
-                <Typography variant="h6">Thông tin xác nhận</Typography>
-                <Typography>
-                  Người tạo đơn: <i>{exportOrder.createBy}</i>
-                </Typography>
-                <Typography>Ngày tạo đơn:</Typography>
-                <Typography>
-                  {exportOrder.createDate
-                    ? FormatDataUtils.formatDateTime(exportOrder.createDate)
-                    : null}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid
-            xs={12}
-            item
-          >
-            <Card>
-              <CardContent className={classes.warehourseInfo}>
-                <Typography variant="h6">Kho lấy hàng</Typography>
-                <Typography>{exportOrder.wareHouseName}</Typography>
-                <Divider />
-                <Typography>{exportOrder.addressDetail}</Typography>
-                <Typography>
-                  {exportOrder.wardName} - {exportOrder.districtName} -{' '}
-                  {exportOrder.provinceName}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid
-            xs={12}
-            item
-          >
-            <Card>
-              {/* <CardHeader
-                  titleTypographyProps={{ variant: 'h6' }}
-                  title="Tổng giá trị đơn hàng"
-                /> */}
-              <CardContent className={classes.orderNote}>
-                <Typography variant="h6">Ghi chú</Typography>
-                <Typography>{exportOrder.description}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid
-            xs={12}
-            item
-          >
-            <Card>
-              <CardContent className={classes.totalAmount}>
-                {/* <CardHeader
-                  titleTypographyProps={{ variant: 'h6' }}
-                  title="Tổng giá trị đơn hàng"
-                /> */}
-                <Typography variant="h6">Tổng giá trị đơn hàng</Typography>
-                <br />
-                <Typography align="right">
-                  {FormatDataUtils.formatCurrency(calculateTotalAmount())}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Grid>
-      <AlertPopup
-        maxWidth="sm"
-        title={title}
-        openPopup={openPopup}
-        setOpenPopup={setOpenPopup}
-        isConfirm={true}
-        handleConfirm={handleConfirm}
-      >
-        <Box
-          component={'span'}
-          className="popupMessageContainer"
-        >
-          {message}
+                        <Box>Đơn xuất hàng không có lô hàng nào</Box>
+                      )}
+                    </Card>
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid
+                xs={3}
+                item
+              >
+                <Grid
+                  container
+                  spacing={2}
+                >
+                  <Grid
+                    xs={12}
+                    item
+                  >
+                    <Card>
+                      <CardContent className={classes.confirmInfo}>
+                        <Typography variant="h6">Thông tin xác nhận</Typography>
+                        <Typography>
+                          Người tạo đơn: <i>{returnOrder.createBy}</i>
+                        </Typography>
+                        <Typography>Ngày tạo đơn:</Typography>
+                        <Typography>
+                          {returnOrder.createDate
+                            ? FormatDataUtils.formatDateTime(returnOrder.createDate)
+                            : null}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid
+                    xs={12}
+                    item
+                  >
+                    <Card>
+                      <CardContent className={classes.warehourseInfo}>
+                        <Typography variant="h6">Kho lấy hàng</Typography>
+                        <Typography>{returnOrder.wareHouseName}</Typography>
+                        <Divider />
+                        <Typography>{returnOrder.addressDetail}</Typography>
+                        <Typography>
+                          {returnOrder.wardName} - {returnOrder.districtName} -{' '}
+                          {returnOrder.provinceName}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid
+                    xs={12}
+                    item
+                  >
+                    <Card>
+                      {/* <CardHeader
+                titleTypographyProps={{ variant: 'h6' }}
+                title="Tổng giá trị đơn hàng"
+              /> */}
+                      <CardContent className={classes.orderNote}>
+                        <Typography variant="h6">Ghi chú</Typography>
+                        <Typography>{returnOrder.description}</Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid
+                    xs={12}
+                    item
+                  >
+                    <Card>
+                      <CardContent className={classes.totalAmount}>
+                        {/* <CardHeader
+                titleTypographyProps={{ variant: 'h6' }}
+                title="Tổng giá trị đơn hàng"
+              /> */}
+                        <Typography variant="h6">Tổng giá trị đơn hàng</Typography>
+                        <br />
+                        <Typography align="right">
+                          {FormatDataUtils.formatCurrency(calculateTotalAmount())}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                </Grid>
+              </Grid>
+              <AlertPopup
+                maxWidth="sm"
+                title={title}
+                openPopup={openPopup}
+                setOpenPopup={setOpenPopup}
+                isConfirm={true}
+                handleConfirm={handleConfirm}
+              >
+                <Box
+                  component={'span'}
+                  className="popupMessageContainer"
+                >
+                  {message}
+                </Box>
+              </AlertPopup>
+            </Grid>
+          )}
         </Box>
-      </AlertPopup>
-    </Grid>
+      )}
+    </Box>
   );
 };
 
