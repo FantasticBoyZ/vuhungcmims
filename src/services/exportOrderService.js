@@ -54,6 +54,22 @@ const exportOrderService = {
     // const url = process.env.REACT_APP_API_URL + '/import-order/update';
     return axios.put(url, exportOrder)
   },
+
+  getReturnOrderList: (params) => {
+    const url = '/return-order/list';
+    return axiosClient.get(url, { params, headers: authHeader() });
+  },
+
+  getReturnOrderDetail: (params) => {
+    console.log(params)
+    const url = `/return-order/detail`;
+    return axiosClient.get(url, { params, headers: authHeader() });
+  },
+
+  createReturnOrder: (returnOrder) => {
+    const url = API_URL + `/return-order/create`;
+    return axios.post(url, returnOrder);
+  }
 };
 
 export default exportOrderService;

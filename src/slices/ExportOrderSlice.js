@@ -51,6 +51,23 @@ export const updateExportOrder = createAsyncThunk('exportOrder/update', async (e
   return await exportOrderService.updateExportOrder(exportOrder);
 })
 
+export const getReturnOrderList = createAsyncThunk('returnOrder/list', async (params, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const exportOrder = await exportOrderService.getReturnOrderList(params);
+  return exportOrder;
+})
+
+export const getReturnOrderById = createAsyncThunk('returnOrder/detail', async (params, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const exportOrder = await exportOrderService.getReturnOrderDetail(params);
+  return exportOrder;
+})
+
+export const createReturnOrder = createAsyncThunk('returnOrder/create', async (returnOrder, thunkAPi) => {
+  const response = await exportOrderService.createReturnOrder(returnOrder);
+  return response;
+})
+
 const exportOrderSlice = createSlice({
   name: 'exportOrders',
   initialState: {
@@ -157,6 +174,40 @@ const exportOrderSlice = createSlice({
       state.error = action.payload;
     },
     [updateExportOrder.fulfilled]: (state, action) => {
+      state.loading = false;
+
+    },
+    [getReturnOrderList.pending]: (state) => {
+      state.loading = true;
+    },
+    [getReturnOrderList.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getReturnOrderList.fulfilled]: (state, action) => {
+      state.loading = false;
+
+    }
+    ,
+    [getReturnOrderById.pending]: (state) => {
+      state.loading = true;
+    },
+    [getReturnOrderById.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getReturnOrderById.fulfilled]: (state, action) => {
+      state.loading = false;
+
+    },
+    [createReturnOrder.pending]: (state) => {
+      state.loading = true;
+    },
+    [createReturnOrder.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [createReturnOrder.fulfilled]: (state, action) => {
       state.loading = false;
 
     }

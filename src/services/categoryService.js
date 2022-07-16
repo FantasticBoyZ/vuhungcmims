@@ -10,6 +10,11 @@ const CategoryService = {
     return axiosClient.get(url, { params, headers: authHeader() });
   },
 
+  getSubCategoryByCategoryId: (params) => {
+    const url = '/subCategory';
+    return axiosClient.get(url, { params, headers: authHeader() });
+  },
+
   getCategoryDetail: (params) => {
     const url = `/category/${params.categoryId}`;
     return axiosClient.get(url, { params, headers: authHeader() });
