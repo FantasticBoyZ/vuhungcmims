@@ -63,6 +63,11 @@ const getSelectedOption = (array, value) => {
   return arrayOption.find((item) => item.value === value);
 };
 
+const getSelectedOptionWithId = (array, id) => {
+  const arrayOption = getOption(array);
+  return arrayOption.find((item) => item.value.id === id);
+};
+
 const getStatusLabel = (exportOrderStatus) => {
   const map = {
     canceled: {
@@ -94,5 +99,6 @@ const FormatDataUtils = {
   getStatusLabel,
   getOptionProduct,
   getRoundNumber,
+  getSelectedOptionWithId,
 };
 export default FormatDataUtils;
