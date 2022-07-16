@@ -311,6 +311,7 @@ const About = () => {
     try {
       const params = {
         pageIndex: page,
+        // productName: searchQuery,
         // pageSize: rowsPerPage,
         // ...searchProductParams,
       };
@@ -338,13 +339,14 @@ const About = () => {
       <AsyncPaginate
         value={currentProduct}
         loadOptions={loadOptions}
+        debounceTimeout={300}
         getOptionValue={(option) => option}
         getOptionLabel={(option) => option.name}
         onChange={(product) => {
           setCurrentProduct(product);
           console.log(product)
         }}
-        isSearchable={false}
+        isSearchable={true}
         placeholder="Select House"
         additional={{
           page: 1,

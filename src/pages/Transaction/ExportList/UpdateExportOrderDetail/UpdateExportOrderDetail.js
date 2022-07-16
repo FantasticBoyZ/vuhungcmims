@@ -188,12 +188,14 @@ const UpdateExportOrderDetail = () => {
 
   const calculateTotalAmount = () => {
     let totalAmount = 0;
-    const productList = valueFormik.current.productList
-    console.log(valueFormik.current.productList)
+    const productList = valueFormik.current.productList;
+    console.log(valueFormik.current.productList);
     if (productList) {
       for (let index = 0; index < productList.length; index++) {
         totalAmount =
-          totalAmount + calculateTotalQuantityOfProduct(productList[index]) * +productList[index]?.unitPrice;
+          totalAmount +
+          calculateTotalQuantityOfProduct(productList[index]) *
+            +productList[index]?.unitPrice;
       }
     }
     return totalAmount;
@@ -202,7 +204,7 @@ const UpdateExportOrderDetail = () => {
   const handleOnClickConfirm = () => {
     setTitle('Bạn có chắc chắn muốn lưu lại chỉnh sửa không?');
     setMessage('Hãy kiểm tra kỹ thông tin trước khi xác nhận.');
-    setErrorMessage(null)
+    setErrorMessage(null);
     setIsConfirm(true);
     setOpenPopup(true);
   };
@@ -220,7 +222,7 @@ const UpdateExportOrderDetail = () => {
       let productList = values.productList;
       let consignmentExports = [];
       console.log('xác nhận', values);
-      
+
       for (let index = 0; index < productList.length; index++) {
         if (calculateTotalQuantityOfProduct(productList[index]) === 0) {
           setErrorMessage('Bạn có sản phẩm chưa nhập số lượng');
@@ -449,7 +451,9 @@ const UpdateExportOrderDetail = () => {
                                             <TableCell>{product?.productName}</TableCell>
                                             <TableCell>{product?.unitMeasure}</TableCell>
                                             <TableCell align="center">
-                                              {calculateTotalQuantityOfProduct(values.productList[index])}
+                                              {calculateTotalQuantityOfProduct(
+                                                values.productList[index],
+                                              )}
                                             </TableCell>
                                             <TableCell align="center">
                                               {FormatDataUtils.formatCurrency(
@@ -458,7 +462,9 @@ const UpdateExportOrderDetail = () => {
                                             </TableCell>
                                             <TableCell align="center">
                                               {FormatDataUtils.formatCurrency(
-                                                calculateTotalQuantityOfProduct(values.productList[index]) * product?.unitPrice,
+                                                calculateTotalQuantityOfProduct(
+                                                  values.productList[index],
+                                                ) * product?.unitPrice,
                                               )}
                                             </TableCell>
                                           </TableRow>
@@ -603,7 +609,14 @@ const UpdateExportOrderDetail = () => {
                 /> */}
                               <CardContent className={classes.orderNote}>
                                 <Typography variant="h6">Ghi chú</Typography>
-                                <Typography>{exportOrder.description}</Typography>
+                                <TextfieldWrapper
+                                  id="description"
+                                  name="description"
+                                  variant="outlined"
+                                  multiline
+                                  rows={6}
+                                  fullWidth
+                                />
                               </CardContent>
                             </Card>
                           </Grid>

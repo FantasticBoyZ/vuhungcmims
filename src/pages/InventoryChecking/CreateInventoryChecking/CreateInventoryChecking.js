@@ -1,4 +1,5 @@
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
+import { getWarehouseList } from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
 import { CloudUpload, Delete, FileDownload, Input } from '@mui/icons-material';
 import {
@@ -19,9 +20,12 @@ import {
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { FieldArray, Form, Formik } from 'formik';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
+import { AsyncPaginate } from 'react-select-async-paginate';
 import * as Yup from 'yup';
 
 const useStyles = makeStyles((theme) => ({
@@ -69,6 +73,9 @@ const useStyles = makeStyles((theme) => ({
     right: 10,
     bottom: 0,
   },
+  tableContainer: {
+    marginBottom: '40px',
+  },
 }));
 
 const warehouseList = [
@@ -91,6 +98,8 @@ const initialExportOrder = {
       productCode: 'GACH23',
       productName: 'Gạch men 60x60',
       unitMeasure: 'Viên',
+      wrapUnitMeasure: 'Viên',
+      numberOfWrapUnitMeasure: 10,
       quantity: 0,
       unitPrice: 100000,
       consignments: [
@@ -137,12 +146,37 @@ const initialExportOrder = {
 };
 
 const CreateInventoryChecking = () => {
+  const [warehouseList, setWarehouseList] = useState([]);
+  const [productList, setProductList] = useState([]);
   const [warehouseId, setWarehouseId] = useState('');
+  const [fileUploadName, setFileUploadName] = useState('');
   const classes = useStyles();
+  const hiddenFileInput = useRef(null);
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => ({ ...state.warehouse }));
+  const arrayHelpersRef = useRef(null);
+  const valueFormik = useRef();
 
   const FORM_VALIDATION = Yup.object().shape({
     billReferenceNumber: Yup.string().required('Bạn chưa nhập mã phiếu tham chiếu'),
   });
+
+  // Create a reference to the hidden file input element
+
+  // Programatically click the hidden file input element
+  // when the Button component is clicked
+  const handleClickImportExcel = (event) => {
+    hiddenFileInput.current.click();
+  };
+  // Call a function (passed as a prop from the parent component)
+  // to handle the user-selected file
+  const handleChangeFileExcel = (event) => {
+    const fileUploaded = event.target.files[0];
+    console.log(fileUploaded.name);
+    setFileUploadName(fileUploaded.name);
+    const formData = new FormData();
+    formData.append('file', fileUploaded);
+  };
 
   const handleChangeWarehouse = (event) => {
     setWarehouseId(event.target.value);
@@ -151,6 +185,74 @@ const CreateInventoryChecking = () => {
   const handleSubmit = (values) => {
     console.log(values);
   };
+
+  const getAllWarehouse = async (keyword) => {
+    try {
+      const actionResult = await dispatch(getWarehouseList());
+      const dataResult = unwrapResult(actionResult);
+      console.log('warehouse list', dataResult.data);
+      if (dataResult.data) {
+        setWarehouseList(dataResult.data.warehouse);
+      }
+    } catch (error) {
+      console.log('Failed to fetch warehouse list: ', error);
+    }
+  };
+
+  // const loadWarehouseOptions = async (searchQuery, loadedOptions, { page }) => {
+  //   try {
+  //     const params = {
+  //       pageIndex: page,
+  //       // pageSize: rowsPerPage,
+  //       // ...searchProductParams,
+  //     };
+  //     const actionResult = await dispatch(getWarehouseList());
+  //     const dataResult = unwrapResult(actionResult);
+  //     console.log('warehouse list', dataResult.data);
+  //     if (dataResult.data) {
+  //       setWarehouseList(dataResult.data.warehouse);
+  //       return {
+  //         options: dataResult.data.warehouse,
+  //         hasMore: dataResult.data.warehouse.length >= 1,
+  //         additional: {
+  //           page: searchQuery ? 2 : page + 1,
+  //         },
+  //       };
+  //     }
+  //   } catch (error) {
+  //     console.log('Failed to fetch product list instock: ', error);
+  //   }
+  // };
+
+  const loadProductOptions = async (searchQuery, loadedOptions, { page }) => {
+    try {
+      const params = {
+        pageIndex: page,
+        // pageSize: rowsPerPage,
+        // ...searchProductParams,
+      };
+      const actionResult = await dispatch(getWarehouseList());
+      const dataResult = unwrapResult(actionResult);
+      console.log('warehouse list', dataResult.data);
+      if (dataResult.data) {
+        setWarehouseList(dataResult.data.warehouse);
+        return {
+          options: dataResult.data.warehouse,
+          hasMore: dataResult.data.warehouse.length >= 1,
+          additional: {
+            page: searchQuery ? 2 : page + 1,
+          },
+        };
+      }
+    } catch (error) {
+      console.log('Failed to fetch product list instock: ', error);
+    }
+  };
+
+  useEffect(() => {
+    getAllWarehouse();
+  }, []);
+
   return (
     <Box>
       <Formik
@@ -178,6 +280,22 @@ const CreateInventoryChecking = () => {
                       justifyContent="space-between"
                     >
                       <Box className={classes.selectBox}>
+                        {/* <AsyncPaginate
+                          value={warehouseId}
+                          loadOptions={loadWarehouseOptions}
+                          getOptionValue={(option) => option.id}
+                          getOptionLabel={(option) => option.name}
+                          noOptionsMessage={() => <>Không có tìm thấy sản phẩm nào</>}
+                          onChange={(warehouseId) => {
+                            setWarehouseId(warehouseId);
+                            console.log(warehouseId);
+                          }}
+                          isSearchable={false}
+                          placeholder="Chọn kho"
+                          additional={{
+                            page: 1,
+                          }}
+                        /> */}
                         <Select
                           classNamePrefix="select"
                           placeholder="Chọn kho"
@@ -228,10 +346,20 @@ const CreateInventoryChecking = () => {
                           variant="outlined"
                           color="success"
                           startIcon={<CloudUpload />}
+                          onClick={handleClickImportExcel}
                         >
                           Nhập bảng tính
                         </Button>
-                        <Typography>file.xls</Typography>
+                        <input
+                          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                          style={{ display: 'none' }}
+                          ref={hiddenFileInput}
+                          onChange={handleChangeFileExcel}
+                          id="upload-file"
+                          type="file"
+                        />
+
+                        <Typography>{fileUploadName}</Typography>
                       </Stack>
 
                       <Button
@@ -251,7 +379,7 @@ const CreateInventoryChecking = () => {
               >
                 <Card>
                   <CardContent className={classes.cardTable}>
-                    <Typography>Các sản phẩm kiểm kho</Typography>
+                    <Typography variant="h6">Các sản phẩm kiểm kho</Typography>
                     <br />
                     <Select
                       classNamePrefix="select"
@@ -272,7 +400,7 @@ const CreateInventoryChecking = () => {
                     <br />
                     <Divider />
                     <br />
-                    <TableContainer>
+                    <TableContainer className={classes.tableContainer}>
                       <Table className={classes.table}>
                         <TableHead>
                           <TableRow>

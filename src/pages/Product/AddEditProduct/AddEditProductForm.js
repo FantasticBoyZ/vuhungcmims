@@ -3,6 +3,7 @@ import IconRequired from '@/components/Common/IconRequired';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CategoryService from '@/services/categoryService';
 import productService from '@/services/productService';
+import { getSubCategoryByCategoryId } from '@/slices/CategorySlice';
 import { getManufacturerList } from '@/slices/ManufacturerSlice';
 import {
   getProductDetail,
@@ -184,6 +185,7 @@ const AddEditProductForm = () => {
     imageUrl: '',
   };
   const [categoryList, setCategoryList] = useState([]);
+  const [subCategoryList, setSubCategoryList] = useState([]);
   const [manufacturerList, setManufacturerList] = useState([]);
   const [imageUrl, setImageUrl] = useState();
   const [formData, setFormData] = useState(new FormData());
@@ -202,6 +204,13 @@ const AddEditProductForm = () => {
     categoryId: Yup.string().required('Chưa chọn danh mục'),
     manufactorId: Yup.string().required('Chưa chọn nhà cung cấp'),
   });
+
+  const onChangeCategory = (event) => {
+    setSelectedSubCategory(null)
+    setSelectedCategory(event)
+    fetchSubCategoryByCategoryId(event.value)
+    
+  }
 
   const saveProductDetail = async (product) => {
     try {
@@ -264,6 +273,22 @@ const AddEditProductForm = () => {
   const handleOnClickExit = () => {
     // TODO: fix lỗi nút exit phần thêm mới
     navigate(isAdd ? '/product' : `/product/detail/${productId}`);
+  };
+
+  const fetchSubCategoryByCategoryId = async (categoryId) => {
+    try {
+      const params = {
+        categoryId: categoryId
+      };
+      const actionResult = await dispatch(getSubCategoryByCategoryId(params));
+        const dataResult = unwrapResult(actionResult);
+        if (dataResult.data) {
+          console.log(dataResult.data);
+          setSubCategoryList(dataResult.data.subCategory);
+        }
+    } catch (error) {
+      console.log('Failed to fetch category list: ', error);
+    }
   };
 
   useEffect(() => {
@@ -578,6 +603,7 @@ const AddEditProductForm = () => {
                                       }}
                                       onChange={(e) => {
                                         setFieldValue('categoryId', e?.value);
+                                        onChangeCategory(e)
                                       }}
                                     />
                                   )}
@@ -595,7 +621,7 @@ const AddEditProductForm = () => {
                                   <Typography className={classes.wrapIcon}>
                                     Danh mục phụ:
                                   </Typography>
-                                  {/* {selectedCategory && ( */}
+                                  {!!subCategoryList && (
                                   <Select
                                     classNamePrefix="select"
                                     placeholder="Chọn danh mục phụ"
@@ -605,9 +631,9 @@ const AddEditProductForm = () => {
                                     isClearable={true}
                                     isSearchable={true}
                                     name="subCategoryId"
-                                    // value={selectedSubCategory}
+                                    value={selectedSubCategory}
                                     options={FormatDataUtils.getOptionWithIdandName(
-                                      subCategoryListTest,
+                                      subCategoryList,
                                     )}
                                     menuPortalTarget={document.body}
                                     styles={{
@@ -620,9 +646,10 @@ const AddEditProductForm = () => {
                                     }}
                                     onChange={(e) => {
                                       setFieldValue('subCategoryId', e?.value);
+                                      setSelectedSubCategory(e)
                                     }}
                                   />
-                                  {/* )} */}
+                                  )}
                                 </Grid>
                                 <Grid
                                   xs={12}

@@ -136,7 +136,8 @@ const Login = () => {
                   label="Lưu đăng nhập"
                 />
                 <Button
-                  fullWidth={true}
+                  fullWidth
+                  variant='contained'
                   disabled={disabled}
                   sx={{ mt: 3, mb: 2 }}
                 >

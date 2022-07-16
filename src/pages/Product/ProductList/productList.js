@@ -32,6 +32,7 @@ import Select from 'react-select';
 import { toast } from 'react-toastify';
 import FormatDataUtils from '@/utils/formatData';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import CustomTablePagination from '@/components/Common/TablePagination';
 
 const useStyles = makeStyles({
   searchField: {
@@ -593,7 +594,10 @@ const ProductList = () => {
                             </TableCell>
                             <TableCell align="center">
                               {selectedUnitMeasureList[index] === item.wrapUnitMeasure
-                                ? FormatDataUtils.getRoundNumber(item.quantity / item.numberOfWrapUnitMeasure,1)
+                                ? FormatDataUtils.getRoundNumber(
+                                    item.quantity / item.numberOfWrapUnitMeasure,
+                                    1,
+                                  )
                                 : item.quantity}
                             </TableCell>
                           </TableRow>
@@ -601,14 +605,13 @@ const ProductList = () => {
                       })}
                     </TableBody>
                   </Table>
-                  <TablePagination
-                    component="div"
+                  <CustomTablePagination
                     page={page}
-                    rowsPerPageOptions={pages}
+                    pages={pages}
                     rowsPerPage={rowsPerPage}
-                    count={totalRecord}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    totalRecord={totalRecord}
+                    handleChangePage={handleChangePage}
+                    handleChangeRowsPerPage={handleChangeRowsPerPage}
                   />
                 </Box>
               ) : (
