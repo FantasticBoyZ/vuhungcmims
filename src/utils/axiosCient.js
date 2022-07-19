@@ -70,7 +70,8 @@ axiosClient.interceptors.response.use(
       window.location = '/';
     }
     if (errResponse.status === 401) {
-      alert('Bạn chưa đăng nhập');
+      alert('Phiên làm việc hết hạn');
+      // alert('Bạn chưa đăng nhập');
       localStorage.clear();
       window.location = '/';
     }
