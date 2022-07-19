@@ -106,8 +106,8 @@ const SubProductTable = ({ selectedUnitMeasure,product, subProductList }) => {
                       ? FormatDataUtils.getRoundNumber(subProduct.quantity / product.numberOfWrapUnitMeasure, 1)
                       : subProduct.quantity}
                   </TableCell>
-                  <TableCell align="center">{subProduct.inventoryName}</TableCell>
-                  <TableCell align="center">{subProduct.addressInventory}</TableCell>
+                  <TableCell align="center">{subProduct.wareHouseName}</TableCell>
+                  <TableCell align="center">{subProduct.addressWareHouse}</TableCell>
                 </TableRow>
               );
             })}
