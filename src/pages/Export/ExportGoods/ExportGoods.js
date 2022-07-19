@@ -19,6 +19,7 @@ import {
   Divider,
   Grid,
   IconButton,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -45,6 +46,8 @@ const useStyles = makeStyles({
   },
   totalAmount: {
     marginBottom: '24px',
+    display: 'flex',
+    justifyContent:'space-between'
   },
   table: {
     textAlign: 'center',
@@ -76,6 +79,10 @@ const useStyles = makeStyles({
   },
   selectBoxUnitMeasure: {
     maxWidth: '90px',
+  },
+  buttonCreate: {
+    display: 'flex',
+    justifyContent: 'center',
   },
 });
 
@@ -297,7 +304,7 @@ const ExportGoods = () => {
         indexConsignment < consignments.length;
         indexConsignment++
       ) {
-        let consignment = consignments[indexConsignment]
+        let consignment = consignments[indexConsignment];
         if (consignment.quantity > consignment.quantityInstock) {
           setErrorMessage(
             'Bạn không thể nhập số lượng lớn hơn số lượng tồn kho của lô hàng',
@@ -670,20 +677,23 @@ const ExportGoods = () => {
                         variant="h5"
                         align="center"
                       >
-                        Tổng tiền:{' '}
+                        Tổng tiền:
+                      </Typography>
+                      <Typography variant="h5">
                         {FormatDataUtils.formatCurrency(calculateTotalAmount())}
                       </Typography>
                     </Box>
-                    <ButtonWrapper
-                      type="button"
-                      variant="contained"
-                      size="large"
-                      startIcon={<Done />}
-                      fullWidth
-                      color="success"
-                    >
-                      Hoàn thành
-                    </ButtonWrapper>
+                    <Box className={classes.buttonCreate}>
+                      <ButtonWrapper
+                        type="button"
+                        variant="contained"
+                        size="large"
+                        startIcon={<Done />}
+                        color="success"
+                      >
+                        Tạo phiếu xuất kho
+                      </ButtonWrapper>
+                    </Box>
                   </CardContent>
                 </Card>
               </Grid>

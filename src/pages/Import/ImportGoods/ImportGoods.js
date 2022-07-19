@@ -13,6 +13,7 @@ import {
   Card,
   FormHelperText,
   IconButton,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -39,6 +40,15 @@ import './style.css';
 const useStyles = makeStyles({
   unitMeasureSelect: {
     width: '100px',
+  },
+  table: {
+    textAlign: 'center',
+    '& thead th': {
+      backgroundColor: '#DCF4FC',
+    },
+    '& tbody tr:hover': {
+      // cursor: 'pointer',
+    },
   },
 });
 
@@ -376,7 +386,7 @@ const ImportGoods = () => {
                   </FormHelperText>
                   {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
                 </Card>
-                <Card className="card-container">
+                <Card className="product-list-container">
                   <div className="label">Thông tin các sản phẩm</div>
                   {!!productList && !!values.manufactorId && (
                     <Select
@@ -398,7 +408,7 @@ const ImportGoods = () => {
 
                   <hr />
                   <TableContainer>
-                    <Table>
+                    <Table className={classes.table}>
                       <TableHead>
                         <TableRow>
                           <TableCell></TableCell>
@@ -647,12 +657,12 @@ const ImportGoods = () => {
                         ></FieldArray>
                       </TableBody>
                     </Table>
-                    <pre>{JSON.stringify(values, null, 2)}</pre>
+                    {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
                   </TableContainer>
                 </Card>
               </div>
               <div className="right-container">
-                <Card className="card-container">
+                <Card className="order-detail-container">
                   <div className="label">Thông tin đơn hàng</div>
                   <div className="time">
                     {/* chỗ này là createdDate */}
@@ -699,6 +709,7 @@ const ImportGoods = () => {
                     rows={6}
                     multiline
                   />
+                  <Stack mt={25} justifyContent='flex-end'>
                   <div className="total-amount">
                     <div>Tổng tiền:</div>
                     <div>{FormatDataUtils.formatCurrency(calculateTotalAmount())}</div>
@@ -709,10 +720,12 @@ const ImportGoods = () => {
                       variant="contained"
                       size="large"
                       startIcon={<CheckIcon />}
+                      color='success'
                     >
-                      Nhập hàng
+                      Tạo phiếu nhập kho
                     </ButtonWrapper>
                   </div>
+                  </Stack>
                 </Card>
               </div>
               <AlertPopup

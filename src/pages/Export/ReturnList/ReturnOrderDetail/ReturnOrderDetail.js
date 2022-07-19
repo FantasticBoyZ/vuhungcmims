@@ -35,7 +35,11 @@ const useStyles = makeStyles((theme) => ({
   orderNote: {
     minHeight: '20vh',
   },
-  totalAmount: {},
+  warehouseContainer: {
+    backgroundColor: 'rgba(220, 244, 252,0.5)',
+    padding: theme.spacing(1),
+    borderRadius: '10px',
+  },
 }));
 
 const exportOrder = {
@@ -125,7 +129,8 @@ const ReturnOrderDetail = () => {
   const { returnOrderId } = useParams();
   const classes = useStyles();
   const [returnOrder, setReturnOrder] = useState();
-  const [listConsignments, setListConsignments] = useState(exportOrder.productList);
+  const [listConsignments, setListConsignments] = useState([]);
+  const [addressWarehouse, setAddressWarehouse] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -154,7 +159,8 @@ const ReturnOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setReturnOrder(dataResult.data.inforExportDetail);
-        setListConsignments(dataResult.data.productList)
+        setAddressWarehouse(dataResult.data.addressWarehouse);
+        setListConsignments(dataResult.data.productList);
       }
       console.log('Return Order Detail', dataResult);
     } catch (error) {
@@ -222,7 +228,7 @@ const ReturnOrderDetail = () => {
                     ) : (
                       <ExportProductTable productList={listConsignments} />
                     )} */}
-                      {listConsignments && listConsignments?.length > 0 ? (
+                      {!!listConsignments && listConsignments?.length > 0 ? (
                         <ReturnProductTable productList={listConsignments} />
                       ) : (
                         <Box>Đơn xuất hàng không có lô hàng nào</Box>
@@ -265,13 +271,23 @@ const ReturnOrderDetail = () => {
                     <Card>
                       <CardContent className={classes.warehourseInfo}>
                         <Typography variant="h6">Kho lấy hàng</Typography>
-                        <Typography>{returnOrder.wareHouseName}</Typography>
-                        <Divider />
-                        <Typography>{returnOrder.addressDetail}</Typography>
-                        <Typography>
-                          {returnOrder.wardName} - {returnOrder.districtName} -{' '}
-                          {returnOrder.provinceName}
-                        </Typography>
+                        <Stack spacing={2}>
+                          {addressWarehouse.length > 0 &&
+                            addressWarehouse.map((address, index) => (
+                              <Box
+                                key={index}
+                                className={classes.warehouseContainer}
+                              >
+                                <Typography>{address.warehouseName}</Typography>
+                                <Divider />
+                                <Typography>{address.detailAddress}</Typography>
+                                <Typography>
+                                  {address.wardName} - {address.districtName} -{' '}
+                                  {address.provinceName}
+                                </Typography>
+                              </Box>
+                            ))}
+                        </Stack>
                       </CardContent>
                     </Card>
                   </Grid>
