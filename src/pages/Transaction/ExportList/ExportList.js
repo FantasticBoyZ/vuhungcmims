@@ -96,9 +96,9 @@ const ExportList = () => {
   const [exportOrderList, setExportOrderList] = useState();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useState({
-    // billRefernceNumber: '',
-    // startDate: '',
-    // endDate: '',
+    billRefernceNumber: '',
+    startDate: '',
+    endDate: '',
   });
 
   const dispatch = useDispatch();
@@ -229,7 +229,7 @@ const ExportList = () => {
         <Toolbar className={classes.toolbar}>
           <TextField
             id="outlined-basic"
-            placeholder="Tìm kiếm phiếu nhập kho"
+            placeholder="Tìm kiếm phiếu xuất kho"
             label={null}
             variant="outlined"
             className={classes.searchField}

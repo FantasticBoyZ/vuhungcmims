@@ -79,6 +79,11 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: 'rgba(217, 217, 217, 0.5)',
     },
   },
+  warehouseContainer: {
+    backgroundColor: 'rgba(220, 244, 252,0.5)',
+    padding: theme.spacing(1),
+    borderRadius: '10px'
+  }
 }));
 
 const exportOrder = {
@@ -166,6 +171,7 @@ const UpdateExportOrderDetail = () => {
   const classes = useStyles();
   const [exportOrder, setExportOrder] = useState();
   const [productList, setProductList] = useState([]);
+  const [addressWarehouse, setAddressWarehouse] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -306,6 +312,7 @@ const UpdateExportOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setExportOrder(dataResult.data.inforExportDetail);
+        setAddressWarehouse(dataResult.data.addressWarehouse);
         if (dataResult.data.inforExportDetail?.statusName !== 'pending') {
           navigate(`/export/detail/${exportOrderId}`);
         }
@@ -588,13 +595,20 @@ const UpdateExportOrderDetail = () => {
                             <Card>
                               <CardContent className={classes.warehourseInfo}>
                                 <Typography variant="h6">Kho lấy hàng</Typography>
-                                <Typography>{exportOrder.wareHouseName}</Typography>
-                                <Divider />
-                                <Typography>{exportOrder.addressDetail}</Typography>
-                                <Typography>
-                                  {exportOrder.wardName} - {exportOrder.districtName} -{' '}
-                                  {exportOrder.provinceName}
-                                </Typography>
+                                <Stack spacing={2}>
+                                  {addressWarehouse.length > 0 &&
+                                    addressWarehouse.map((address) => (
+                                      <Box className={classes.warehouseContainer}>
+                                        <Typography>{address.warehouseName}</Typography>
+                                        <Divider />
+                                        <Typography>{address.detailAddress}</Typography>
+                                        <Typography>
+                                          {address.wardName} - {address.districtName} -{' '}
+                                          {address.provinceName}
+                                        </Typography>
+                                      </Box>
+                                    ))}
+                                </Stack>
                               </CardContent>
                             </Card>
                           </Grid>

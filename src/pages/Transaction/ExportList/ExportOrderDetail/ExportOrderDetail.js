@@ -1,4 +1,5 @@
 import AlertPopup from '@/components/Common/AlertPopup';
+import Label from '@/components/Common/Label';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import ExportProductTable from '@/pages/Transaction/ExportList/ExportOrderDetail/ExportProductTable';
 import AuthService from '@/services/authService';
@@ -41,7 +42,11 @@ const useStyles = makeStyles((theme) => ({
   orderNote: {
     minHeight: '20vh',
   },
-  totalAmount: {},
+  warehouseContainer: {
+    backgroundColor: 'rgba(220, 244, 252,0.5)',
+    padding: theme.spacing(1),
+    borderRadius: '10px',
+  },
 }));
 
 const exportOrder = {
@@ -119,11 +124,37 @@ const exportOrder = {
   ],
 };
 
+const getStatusLabel = (exportOrderStatus) => {
+  const map = {
+    canceled: {
+      text: 'Đã huỷ',
+      color: 'error',
+    },
+    completed: {
+      text: 'Đã xuất kho',
+      color: 'success',
+    },
+    pending: {
+      text: 'Đang chờ xử lý',
+      color: 'warning',
+    },
+    returned: {
+      text: 'Đã xuất kho',
+      color: 'success',
+    },
+  };
+
+  const { text, color } = map[exportOrderStatus];
+
+  return <Label color={color}>{text}</Label>;
+};
+
 const ExportOrderDetail = () => {
   const { exportOrderId } = useParams();
   const navigate = useNavigate();
   const [exportOrder, setExportOrder] = useState();
   const [listConsignments, setListConsignments] = useState([]);
+  const [addressWarehouse, setAddressWarehouse] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -219,6 +250,7 @@ const ExportOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setExportOrder(dataResult.data.inforExportDetail);
+        setAddressWarehouse(dataResult.data.addressWarehouse);
       }
       console.log('Export Order Detail', dataResult);
     } catch (error) {
@@ -275,9 +307,7 @@ const ExportOrderDetail = () => {
                       <Typography variant="span">
                         <strong>Phiếu xuất kho số:</strong> {exportOrder.billRefernce}
                       </Typography>{' '}
-                      <span>
-                        {FormatDataUtils.getStatusLabel(exportOrder.statusName)}
-                      </span>
+                      <span>{exportOrder.statusName && getStatusLabel(exportOrder.statusName)}</span>
                     </Box>
                     {exportOrder.statusName === 'pending' && (
                       <Stack
@@ -314,7 +344,7 @@ const ExportOrderDetail = () => {
                         </Button>
                       </Stack>
                     )}
-                    {exportOrder.statusName === 'completed' && (
+                    {exportOrder.statusName === 'completed' && exportOrder.isReturn !== true && (
                       <Stack
                         direction="row"
                         justifyContent="flex-end"
@@ -424,13 +454,23 @@ const ExportOrderDetail = () => {
                     <Card>
                       <CardContent className={classes.warehourseInfo}>
                         <Typography variant="h6">Kho lấy hàng</Typography>
-                        <Typography>{exportOrder.wareHouseName}</Typography>
-                        <Divider />
-                        <Typography>{exportOrder.addressDetail}</Typography>
-                        <Typography>
-                          {exportOrder.wardName} - {exportOrder.districtName} -{' '}
-                          {exportOrder.provinceName}
-                        </Typography>
+                        <Stack spacing={2}>
+                          {addressWarehouse.length > 0 &&
+                            addressWarehouse.map((address, index) => (
+                              <Box
+                                key={index}
+                                className={classes.warehouseContainer}
+                              >
+                                <Typography>{address.warehouseName}</Typography>
+                                <Divider />
+                                <Typography>{address.detailAddress}</Typography>
+                                <Typography>
+                                  {address.wardName} - {address.districtName} -{' '}
+                                  {address.provinceName}
+                                </Typography>
+                              </Box>
+                            ))}
+                        </Stack>
                       </CardContent>
                     </Card>
                   </Grid>
