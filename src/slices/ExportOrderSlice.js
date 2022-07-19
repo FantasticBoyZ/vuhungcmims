@@ -63,8 +63,8 @@ export const getReturnOrderById = createAsyncThunk('returnOrder/detail', async (
   return exportOrder;
 })
 
-export const createReturnOrder = createAsyncThunk('returnOrder/create', async (returnOrder, thunkAPi) => {
-  const response = await exportOrderService.createReturnOrder(returnOrder);
+export const createReturnOrder = createAsyncThunk('returnOrder/create', async (params, thunkAPi) => {
+  const response = await exportOrderService.createReturnOrder(params);
   return response;
 })
 

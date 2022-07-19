@@ -244,6 +244,7 @@ const ReturnGoods = () => {
           if (consignment.quantityReturn > 0) {
             consignmentReturns.push({
               id: consignment.id,
+              productId: productList[index].productId,
               quantity: consignment.quantityReturn,
               unitPrice: productList[index].unitPrice,
             });
@@ -260,7 +261,11 @@ const ReturnGoods = () => {
       console.log('return', returnOrder);
       if (consignmentReturns.length > 0) {
         try {
-          const response = await dispatch(createReturnOrder(returnOrder));
+          const params = {
+            returnOrder: returnOrder,
+            exportOrderId: exportOrderId
+          }
+          const response = await dispatch(createReturnOrder(params));
           const resultResponse = unwrapResult(response);
           console.log(resultResponse);
           if (resultResponse) {

@@ -231,8 +231,8 @@ const ReturnList = () => {
                           returnOrderList.map((returnOrder, index) => (
                             <TableRow
                               hover
-                              key={returnOrder.id}
-                              onClick={() => handleOnClickTableRow(returnOrder.id)}
+                              key={returnOrder?.orderId}
+                              onClick={() => handleOnClickTableRow(returnOrder.orderId)}
                             >
                               <TableCell align="center">
                                 {returnOrder.createDate

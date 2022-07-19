@@ -39,7 +39,7 @@ const exportOrderService = {
 
   confirmExportOrder: (params) => {
     const {exportOrderId, confirmUserId} = params
-    const url = `/export-order/confirm/${exportOrderId}`;
+    const url = `/export-order/confirm/${exportOrderId}/${confirmUserId}`;
     return axiosClient.get(url, { headers: authHeader() });
   },
 
@@ -66,8 +66,9 @@ const exportOrderService = {
     return axiosClient.get(url, { params, headers: authHeader() });
   },
 
-  createReturnOrder: (returnOrder) => {
-    const url = API_URL + `/return-order/create`;
+  createReturnOrder: (params) => {
+    const {returnOrder, exportOrderId} = params
+    const url = API_URL + `/return-order/return/${exportOrderId}`;
     return axios.post(url, returnOrder);
   }
 };
