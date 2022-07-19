@@ -190,7 +190,7 @@ const AddEditProductForm = () => {
   const [imageUrl, setImageUrl] = useState();
   const [formData, setFormData] = useState(new FormData());
   const [isAdd, setIsAdd] = useState(true);
-  const [isUseWrapUnitMeasure, setIsUseWrapUnitMeasure] = useState(true);
+  const [isUseWrapUnitMeasure, setIsUseWrapUnitMeasure] = useState(false);
   const classes = useStyles();
   const navigate = useNavigate();
 
@@ -217,7 +217,7 @@ const AddEditProductForm = () => {
       const actionResult = await dispatch(saveProduct(product));
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
-      if (!!formData) {
+      if (formData.has('file')) {
         if (!productId) {
           const uploadNewImage = await dispatch(uploadNewImageProduct(formData));
           toast.success('Thêm sản phẩm thành công!');
@@ -230,9 +230,17 @@ const AddEditProductForm = () => {
               navigate(`/product/detail/${productId}`);
             },
             (err) => {
-              console.err(err);
+              console.log(err);
             },
           );
+        }
+      }else{
+        if(!productId) {
+          navigate('/product');
+          toast.success('Thêm sản phẩm thành công!');
+        }else {
+          navigate(`/product/detail/${productId}`);
+          toast.success('Sửa sản phẩm thành công!');
         }
       }
       console.log('outside', ...formData);
@@ -259,8 +267,8 @@ const AddEditProductForm = () => {
       name: values.name,
       productCode: values.productCode,
       unitMeasure: values.unitMeasure,
-      wrapUnitMeasure: isUseWrapUnitMeasure ? values.wrapUnitMeasure : '',
-      numberOfWrapUnitMeasure: isUseWrapUnitMeasure ? values.numberOfWrapUnitMeasure : '',
+      wrapUnitMeasure: isUseWrapUnitMeasure ? values.wrapUnitMeasure : null,
+      numberOfWrapUnitMeasure: isUseWrapUnitMeasure ? values.numberOfWrapUnitMeasure : null,
       color: values.color,
       description: values.description,
       categoryId: values.categoryId,
@@ -348,6 +356,7 @@ const AddEditProductForm = () => {
               dataResult.data.product.categoryId,
             ),
           );
+          setIsUseWrapUnitMeasure(!!dataResult.data.product.wrapUnitMeasure && !!dataResult.data.product.numberOfWrapUnitMeasure)
           // TODO: đổi sang api deploy khi push code lên nhánh master
           if (dataResult.data.product.image) {
             setImageUrl(localhost + '/' + dataResult.data.product.image);
