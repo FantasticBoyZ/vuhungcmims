@@ -65,20 +65,26 @@ const getRoleLabel = (exportOrderStatus) => {
     ROLE_STOREKEEPER: {
       text: 'Thủ kho',
       color: 'warning',
+      fontSize: '12px',
+      padding: '2px 4px',
     },
     ROLE_SELLER: {
       text: 'Nhân viên bán hàng',
       color: 'primary',
+      fontSize: '12px',
+      padding: '2px 4px',
     },
     ROLE_OWNER: {
       text: 'Chủ cửa hàng',
       color: 'error',
+      fontSize: '12px',
+      padding: '2px 4px',
     },
   };
 
-  const { text, color } = map[exportOrderStatus];
+  const { text, color, fontSize, padding } = map[exportOrderStatus];
 
-  return <Label color={color}>{text}</Label>;
+  return <Label padding={padding} fontSize={fontSize} color={color}>{text}</Label>;
 };
 
 const Header = () => {
@@ -133,7 +139,7 @@ const Header = () => {
           </Badge> */}
           <UserBox onClick={(e) => setOpen(true)}>
             <Stack alignItems='flex-end'>
-            <Typography variant="span"><b>{username}</b></Typography>
+            <Typography variant="h5">{username}</Typography>
             {role && getRoleLabel(role)}
             </Stack>
             <Avatar
