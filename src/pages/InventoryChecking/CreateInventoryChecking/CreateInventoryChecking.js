@@ -1,13 +1,19 @@
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
+import {
+  createInventoryChecking,
+  getConsignmentByProductId,
+  getProductByWarehouseId,
+} from '@/slices/InventoryCheckingSlice';
 import { getWarehouseList } from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
-import { CloudUpload, Delete, FileDownload, Input } from '@mui/icons-material';
+import { CloudUpload, Delete, Done, FileDownload, Input } from '@mui/icons-material';
 import {
   Box,
   Button,
   Card,
   CardContent,
   Divider,
+  FormHelperText,
   Grid,
   IconButton,
   Stack,
@@ -27,6 +33,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import { AsyncPaginate } from 'react-select-async-paginate';
 import * as Yup from 'yup';
+import LoadingButton from '@mui/lab/LoadingButton';
+import AuthService from '@/services/authService';
+import AlertPopup from '@/components/Common/AlertPopup';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   searchField: {
@@ -64,101 +75,96 @@ const useStyles = makeStyles((theme) => ({
     padding: '15px 0 !important',
   },
   cardTable: {
-    minHeight: '70vh',
+    minHeight: '74vh',
     position: 'relative',
   },
   totalDifferentContainer: {
+    minHeight: '100px',
     width: '35%',
     position: 'absolute',
     right: 10,
-    bottom: 0,
+    bottom: 10,
   },
   tableContainer: {
-    marginBottom: '40px',
+    marginBottom: '150px',
   },
 }));
 
-const warehouseList = [
-  { id: 1, name: 'Kho 1' },
-  { id: 2, name: 'Kho 2' },
-  { id: 3, name: 'Kho 3' },
-  { id: 4, name: 'Kho 4' },
-  { id: 5, name: 'Kho 5' },
-];
-
 const initialExportOrder = {
-  billReferenceNumber: '',
-  statusName: '',
-  creatorId: '',
   createdDate: new Date(),
   description: '',
   productList: [
-    {
-      id: 1,
-      productCode: 'GACH23',
-      productName: 'Gạch men 60x60',
-      unitMeasure: 'Viên',
-      wrapUnitMeasure: 'Viên',
-      numberOfWrapUnitMeasure: 10,
-      quantity: 0,
-      unitPrice: 100000,
-      consignments: [
-        {
-          id: 1,
-          warehouseId: 1,
-          warehourseName: 'Kho 1',
-          importDate: '16/07/2022',
-          expirationDate: '30/12/2022',
-          quantity: '0',
-          quantityInstock: '500',
-        },
-        {
-          id: 2,
-          warehouseId: 1,
-          warehourseName: 'Kho 1',
-          importDate: '20/07/2022',
-          expirationDate: '30/12/2022',
-          quantity: '0',
-          quantityInstock: '1000',
-        },
-      ],
-    },
-    {
-      id: 2,
-      productCode: 'GACH23',
-      productName: 'Gạch men 60x60',
-      unitMeasure: 'Viên',
-      quantity: 0,
-      unitPrice: 100000,
-      consignments: [
-        {
-          id: 1,
-          warehouseId: 1,
-          warehourseName: 'Kho 1',
-          importDate: '16/07/2022',
-          expirationDate: '30/12/2022',
-          quantity: '0',
-          quantityInstock: '500',
-        },
-      ],
-    },
+    // {
+    //   id: 1,
+    //   productCode: 'GACH23',
+    //   productName: 'Gạch men 60x60',
+    //   unitMeasure: 'Viên',
+    //   wrapUnitMeasure: 'Viên',
+    //   numberOfWrapUnitMeasure: 10,
+    //   quantity: 0,
+    //   unitPrice: 100000,
+    //   consignments: [
+    //     {
+    //       id: 1,
+    //       warehouseId: 1,
+    //       warehourseName: 'Kho 1',
+    //       importDate: '16/07/2022',
+    //       expirationDate: '30/12/2022',
+    //       quantity: '0',
+    //       quantityInstock: '500',
+    //     },
+    //     {
+    //       id: 2,
+    //       warehouseId: 1,
+    //       warehourseName: 'Kho 1',
+    //       importDate: '20/07/2022',
+    //       expirationDate: '30/12/2022',
+    //       quantity: '0',
+    //       quantityInstock: '1000',
+    //     },
+    //   ],
+    // },
+    // {
+    //   id: 2,
+    //   productCode: 'GACH23',
+    //   productName: 'Gạch men 60x60',
+    //   unitMeasure: 'Viên',
+    //   quantity: 0,
+    //   unitPrice: 100000,
+    //   consignments: [
+    //     {
+    //       id: 1,
+    //       warehouseId: 1,
+    //       warehourseName: 'Kho 1',
+    //       importDate: '16/07/2022',
+    //       expirationDate: '30/12/2022',
+    //       quantity: '0',
+    //       quantityInstock: '500',
+    //     },
+    //   ],
+    // },
   ],
 };
 
 const CreateInventoryChecking = () => {
   const [warehouseList, setWarehouseList] = useState([]);
   const [productList, setProductList] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState();
   const [warehouseId, setWarehouseId] = useState('');
+  const [openPopup, setOpenPopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [fileUploadName, setFileUploadName] = useState('');
   const classes = useStyles();
   const hiddenFileInput = useRef(null);
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => ({ ...state.warehouse }));
+  const navigate = useNavigate();
+  const user = AuthService.getCurrentUser();
+  const { loading } = useSelector((state) => ({ ...state.inventoryChecking }));
   const arrayHelpersRef = useRef(null);
   const valueFormik = useRef();
 
   const FORM_VALIDATION = Yup.object().shape({
-    billReferenceNumber: Yup.string().required('Bạn chưa nhập mã phiếu tham chiếu'),
+    warehouseId: Yup.string().required('Bạn chưa chọn kho kiểm'),
   });
 
   // Create a reference to the hidden file input element
@@ -179,11 +185,134 @@ const CreateInventoryChecking = () => {
   };
 
   const handleChangeWarehouse = (event) => {
-    setWarehouseId(event.target.value);
+    setProductList(null);
+    if (event !== null) {
+      fetchProductByWarehouseId(event.value.id);
+      setSelectedProduct(null);
+    }
   };
 
-  const handleSubmit = (values) => {
-    console.log(values);
+  const handleOnChangeProduct = async (e) => {
+    setSelectedProduct(e);
+    if (e !== null) {
+      const isSelected = valueFormik.current.productList.some((element) => {
+        // console.log('element 215',element)
+        if (element.id === e.value.productId) {
+          return true;
+        }
+
+        return false;
+      });
+
+      const productSelected = {
+        productId: e.value.productId,
+      };
+      if (isSelected) {
+        return;
+      } else {
+        // productSelected.consignments = consignmentList
+        arrayHelpersRef.current.push(
+          await fetchConsignmentByProductId(productSelected.productId),
+        );
+        // console.log('productList', valueFormik.current);
+      }
+    }
+  };
+
+  const handleSubmit = async (values, setSubmitting) => {
+    let listCheckingHistory = [];
+    if (!!values.productList) {
+      for (let index = 0; index < values.productList.length; index++) {
+        const product = values.productList[index];
+        const consignments = product.listConsignment;
+        for (
+          let indexConsignment = 0;
+          indexConsignment < consignments.length;
+          indexConsignment++
+        ) {
+          const consignment = consignments[indexConsignment];
+          listCheckingHistory.push({
+            consignmentId: consignment.id,
+            instockQuantity: consignment.quantity,
+            realityQuantity:
+              product.selectedUnitMeasure === product.unitMeasure
+                ? consignment.realityQuantity
+                : Math.round(
+                    consignment.realityQuantity * product.numberOfWrapUnitMeasure,
+                  ),
+            differentAmout: calculateTotalDifferentAmountOfConsignment(
+              product,
+              indexConsignment,
+            ),
+          });
+        }
+      }
+    }
+    if (listCheckingHistory.length > 0) {
+      const inventoryChecking = {
+        userId: user.id,
+        wareHouseId: values.warehouseId,
+        totalDifferentAmout: calculateTotalDifferentAmountOfOrder(),
+        listCheckingHistoryDetailRequest: listCheckingHistory,
+      };
+      console.log(inventoryChecking);
+      try {
+        const response = await dispatch(createInventoryChecking(inventoryChecking));
+        const resultResponse = unwrapResult(response);
+        console.log('resultResponse', resultResponse);
+        if (resultResponse) {
+          toast.success(resultResponse.data.message);
+          navigate('/inventory-checking/list');
+        }
+      } catch (error) {
+        setSubmitting(false);
+        console.log('Failed to save inventoryChecking: ', error);
+        toast.error('Tạo phiếu kiểm kho thất bại');
+      }
+    } else {
+      setSubmitting(false);
+      setErrorMessage(' Vui lòng chọn ít nhất 1 sản phẩm để xác nhận kiểm kho');
+      setOpenPopup(true);
+      return;
+    }
+  };
+
+  const calculateTotalDifferentAmountOfConsignment = (product, indexConsignment) => {
+    let totalDifferent = 0;
+    if (!!product) {
+      const quantity =
+        product.selectedUnitMeasure === product.unitMeasure
+          ? product.listConsignment[indexConsignment].quantity
+          : Math.round(
+              product.listConsignment[indexConsignment].quantity /
+                product.numberOfWrapUnitMeasure,
+            );
+      totalDifferent =
+        (product.listConsignment[indexConsignment].realityQuantity - quantity) *
+        product.unitPrice;
+    }
+    return totalDifferent;
+  };
+
+  const calculateTotalDifferentAmountOfOrder = () => {
+    let totalDifferentAmount = 0;
+    if (valueFormik.current) {
+      const productList = valueFormik.current.productList;
+      for (let index = 0; index < productList.length; index++) {
+        const product = productList[index];
+        const listConsignment = productList[index].listConsignment;
+        for (
+          let indexConsignment = 0;
+          indexConsignment < listConsignment.length;
+          indexConsignment++
+        ) {
+          totalDifferentAmount =
+            totalDifferentAmount +
+            calculateTotalDifferentAmountOfConsignment(product, indexConsignment);
+        }
+      }
+    }
+    return totalDifferentAmount;
   };
 
   const getAllWarehouse = async (keyword) => {
@@ -224,28 +353,45 @@ const CreateInventoryChecking = () => {
   //   }
   // };
 
-  const loadProductOptions = async (searchQuery, loadedOptions, { page }) => {
+  const fetchProductByWarehouseId = async (warehouseId) => {
     try {
       const params = {
-        pageIndex: page,
+        // pageIndex: page + 1,
         // pageSize: rowsPerPage,
-        // ...searchProductParams,
+        warehouseId: warehouseId,
       };
-      const actionResult = await dispatch(getWarehouseList());
+      const actionResult = await dispatch(getProductByWarehouseId(warehouseId));
       const dataResult = unwrapResult(actionResult);
-      console.log('warehouse list', dataResult.data);
+      console.log('dataResult', dataResult);
       if (dataResult.data) {
-        setWarehouseList(dataResult.data.warehouse);
-        return {
-          options: dataResult.data.warehouse,
-          hasMore: dataResult.data.warehouse.length >= 1,
-          additional: {
-            page: searchQuery ? 2 : page + 1,
-          },
-        };
+        // setTotalRecord(dataResult.data.totalRecord);
+        setProductList(dataResult.data.listProduct);
       }
     } catch (error) {
       console.log('Failed to fetch product list instock: ', error);
+    }
+  };
+
+  const fetchConsignmentByProductId = async (productId) => {
+    try {
+      const params = {
+        // pageIndex: page + 1,
+        // pageSize: rowsPerPage,
+        productId: productId,
+      };
+      const actionResult = await dispatch(getConsignmentByProductId(productId));
+      const dataResult = unwrapResult(actionResult);
+      console.log('consignment', dataResult);
+      if (dataResult) {
+        console.log('consignmenList', dataResult.data.product);
+        const product = {
+          ...dataResult.data.product,
+          selectedUnitMeasure: dataResult.data.product.unitMeasure,
+        };
+        return product;
+      }
+    } catch (error) {
+      console.log('Failed to fetch consignment list instock: ', error);
     }
   };
 
@@ -259,9 +405,11 @@ const CreateInventoryChecking = () => {
         enableReinitialize={true}
         initialValues={initialExportOrder}
         validationSchema={FORM_VALIDATION}
-        onSubmit={(values) => handleSubmit(values)}
+        onSubmit={(values, { setSubmitting }) => {
+          handleSubmit(values, setSubmitting);
+        }}
       >
-        {({ values, errors, setFieldValue }) => (
+        {({ values, errors, setFieldValue, isSubmitting }) => (
           <Form>
             <Grid
               container
@@ -296,22 +444,37 @@ const CreateInventoryChecking = () => {
                             page: 1,
                           }}
                         /> */}
-                        <Select
-                          classNamePrefix="select"
-                          placeholder="Chọn kho"
-                          noOptionsMessage={() => <>Không có tìm thấy kho nào</>}
-                          isClearable={true}
-                          isSearchable={true}
-                          //   isLoading={loading}
-                          loadingMessage={() => <>Đang tìm kiếm kho...</>}
-                          name="product"
-                          //   value={selectedProduct}
-                          options={FormatDataUtils.getOption(warehouseList)}
-                          // options={FormatDataUtils.getOption(productListDataTest)}
-                          menuPortalTarget={document.body}
-                          styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                          onChange={(e) => handleChangeWarehouse(e)}
-                        />
+                        {warehouseList && (
+                          <Box>
+                            <Select
+                              classNamePrefix="select"
+                              placeholder="Chọn kho"
+                              noOptionsMessage={() => <>Không có tìm thấy kho nào</>}
+                              isClearable={true}
+                              isSearchable={true}
+                              //   isLoading={loading}
+                              loadingMessage={() => <>Đang tìm kiếm kho...</>}
+                              name="warehouse"
+                              // value={warehouseId}
+                              options={FormatDataUtils.getOption(warehouseList)}
+                              menuPortalTarget={document.body}
+                              styles={{
+                                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                              }}
+                              onChange={(e) => {
+                                setFieldValue('warehouseId', e?.value.id || '');
+                                setFieldValue('productList', []);
+                                handleChangeWarehouse(e);
+                              }}
+                            />
+                            <FormHelperText
+                              error={true}
+                              className="error-text-helper"
+                            >
+                              {errors.warehouseId}
+                            </FormHelperText>
+                          </Box>
+                        )}
                       </Box>
                       <Button
                         variant="contained"
@@ -381,22 +544,24 @@ const CreateInventoryChecking = () => {
                   <CardContent className={classes.cardTable}>
                     <Typography variant="h6">Các sản phẩm kiểm kho</Typography>
                     <br />
-                    <Select
-                      classNamePrefix="select"
-                      placeholder="Chọn sản phẩm từ kho trên"
-                      noOptionsMessage={() => <>Không có tìm thấy sản phẩm nào</>}
-                      isClearable={true}
-                      isSearchable={true}
-                      //   isLoading={loading}
-                      loadingMessage={() => <>Đang tìm kiếm sản phẩm...</>}
-                      name="product"
-                      //   value={selectedProduct}
-                      options={FormatDataUtils.getOption(warehouseList)}
-                      // options={FormatDataUtils.getOption(productListDataTest)}
-                      menuPortalTarget={document.body}
-                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                      onChange={(e) => handleChangeWarehouse(e)}
-                    />
+                    {!!productList && productList.length > 0 && (
+                      <Select
+                        classNamePrefix="select"
+                        placeholder="Chọn sản phẩm từ kho trên"
+                        noOptionsMessage={() => <>Không có tìm thấy sản phẩm nào</>}
+                        isClearable={true}
+                        isSearchable={true}
+                        isLoading={loading}
+                        loadingMessage={() => <>Đang tìm kiếm sản phẩm...</>}
+                        name="product"
+                        value={selectedProduct}
+                        options={FormatDataUtils.getOptionProduct(productList)}
+                        // options={FormatDataUtils.getOption(productListDataTest)}
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                        onChange={(e) => handleOnChangeProduct(e)}
+                      />
+                    )}
                     <br />
                     <Divider />
                     <br />
@@ -421,8 +586,8 @@ const CreateInventoryChecking = () => {
                           <FieldArray
                             name="productList"
                             render={(arrayHelpers) => {
-                              //   arrayHelpersRef.current = arrayHelpers;
-                              //   valueFormik.current = values;
+                              arrayHelpersRef.current = arrayHelpers;
+                              valueFormik.current = values;
                               return (
                                 <>
                                   {values.productList.map((product, index) => (
@@ -448,7 +613,7 @@ const CreateInventoryChecking = () => {
                                         </TableCell>
                                         <TableCell align="center">{index + 1}</TableCell>
                                         <TableCell>{product?.productCode}</TableCell>
-                                        <TableCell>{product?.productName}</TableCell>
+                                        <TableCell>{product?.name}</TableCell>
                                         <TableCell>
                                           {product?.wrapUnitMeasure == null ? (
                                             product?.unitMeasure
@@ -456,6 +621,121 @@ const CreateInventoryChecking = () => {
                                             <Box className={classes.selectBoxUnitMeasure}>
                                               <Select
                                                 classNamePrefix="select"
+                                                onChange={(e) => {
+                                                  setFieldValue(
+                                                    `productList[${index}].selectedUnitMeasure`,
+                                                    e.value.name,
+                                                  );
+                                                  // change quantity when change unitMeasure
+                                                  if (
+                                                    e.value.name !==
+                                                    values.productList[index]
+                                                      .selectedUnitMeasure
+                                                  ) {
+                                                    if (
+                                                      e.value.name ===
+                                                      values.productList[index]
+                                                        .wrapUnitMeasure
+                                                    ) {
+                                                      // TODO: set value cho quantity của từng consignment trong product
+                                                      let consingments =
+                                                        values.productList[index]
+                                                          .listConsignment;
+                                                      for (
+                                                        let indexConsignment = 0;
+                                                        indexConsignment <
+                                                        consingments.length;
+                                                        indexConsignment++
+                                                      ) {
+                                                        const consignment =
+                                                          consingments[indexConsignment];
+                                                        // console.log('alo',consignment)
+                                                        setFieldValue(
+                                                          `productList[${index}].listConsignment[${indexConsignment}].realityQuantity`,
+                                                          Math.round(
+                                                            consignment.realityQuantity /
+                                                              e.value.number,
+                                                          ),
+                                                        );
+                                                      }
+                                                    }
+
+                                                    if (
+                                                      e.value.name ===
+                                                      values.productList[index]
+                                                        .unitMeasure
+                                                    ) {
+                                                      // setFieldValue(
+                                                      //   `productList[${index}].quantity`,
+                                                      //   Math.round(
+                                                      //     values.consignmentRequests[index]
+                                                      //       .quantity *
+                                                      //       values.consignmentRequests[index]
+                                                      //         .numberOfWrapUnitMeasure,
+                                                      //   ),
+                                                      // );
+                                                      let consingments =
+                                                        values.productList[index]
+                                                          .listConsignment;
+                                                      for (
+                                                        let indexConsignment = 0;
+                                                        indexConsignment <
+                                                        consingments.length;
+                                                        indexConsignment++
+                                                      ) {
+                                                        const consignment =
+                                                          consingments[indexConsignment];
+
+                                                        setFieldValue(
+                                                          `productList[${index}].listConsignment[${indexConsignment}].realityQuantity`,
+                                                          Math.round(
+                                                            consignment.realityQuantity *
+                                                              values.productList[index]
+                                                                .numberOfWrapUnitMeasure,
+                                                          ),
+                                                        );
+                                                      }
+                                                    }
+                                                  }
+                                                  // change unitPrice when change unitMeasure
+                                                  if (
+                                                    values.productList[index].unitPrice >
+                                                      0 &&
+                                                    e.value.name !==
+                                                      values.productList[index]
+                                                        .selectedUnitMeasure
+                                                  ) {
+                                                    if (
+                                                      e.value.name ===
+                                                      values.productList[index]
+                                                        .wrapUnitMeasure
+                                                    ) {
+                                                      setFieldValue(
+                                                        `productList[${index}].unitPrice`,
+                                                        Math.round(
+                                                          values.productList[index]
+                                                            .unitPrice * e.value.number,
+                                                        ),
+                                                      );
+                                                    }
+
+                                                    if (
+                                                      e.value.name ===
+                                                      values.productList[index]
+                                                        .unitMeasure
+                                                    ) {
+                                                      setFieldValue(
+                                                        `productList[${index}].unitPrice`,
+                                                        Math.round(
+                                                          values.productList[index]
+                                                            .unitPrice /
+                                                            values.productList[index]
+                                                              .numberOfWrapUnitMeasure,
+                                                        ),
+                                                      );
+                                                    }
+                                                  }
+                                                }}
                                                 defaultValue={
                                                   FormatDataUtils.getOption([
                                                     {
@@ -526,7 +806,7 @@ const CreateInventoryChecking = () => {
                                                   Giá trị chênh lệch
                                                 </TableCell>
                                               </TableRow>
-                                              {product?.consignments?.map(
+                                              {product?.listConsignment?.map(
                                                 (consignment, indexConsignment) => (
                                                   <TableRow key={indexConsignment}>
                                                     <TableCell align="center">
@@ -538,21 +818,31 @@ const CreateInventoryChecking = () => {
                                                       )}
                                                     </TableCell>
                                                     <TableCell>
-                                                      {consignment?.expirationDate}
+                                                      {consignment?.expirationDate
+                                                        ? FormatDataUtils.formatDateTime(
+                                                            consignment?.expirationDate,
+                                                          )
+                                                        : 'Không có'}
                                                     </TableCell>
                                                     <TableCell align="center">
-                                                      {consignment?.quantityInstock}
+                                                      {product.selectedUnitMeasure ===
+                                                      product.unitMeasure
+                                                        ? consignment?.quantity
+                                                        : Math.round(
+                                                            consignment?.quantity /
+                                                              product.numberOfWrapUnitMeasure,
+                                                          )}
                                                     </TableCell>
                                                     <TableCell align="center">
                                                       <TextfieldWrapper
-                                                        name={`productList[${index}].consignments[${indexConsignment}].quantity`}
+                                                        name={`productList[${index}].listConsignment[${indexConsignment}].realityQuantity`}
                                                         variant="standard"
                                                         className="text-field-quantity"
                                                         type={'number'}
                                                         InputProps={{
                                                           inputProps: {
                                                             min: 0,
-                                                            max: consignment?.quantityInstock,
+                                                            // max: consignment?.quantity,
                                                           },
                                                         }}
                                                         // onChange={(e) => {
@@ -565,15 +855,10 @@ const CreateInventoryChecking = () => {
                                                     </TableCell>
                                                     <TableCell align="center">
                                                       {FormatDataUtils.formatCurrency(
-                                                        (values.productList[index]
-                                                          .consignments[indexConsignment]
-                                                          .quantity -
-                                                          values.productList[index]
-                                                            .consignments[
-                                                            indexConsignment
-                                                          ].quantityInstock) *
-                                                          values.productList[index]
-                                                            .unitPrice,
+                                                        calculateTotalDifferentAmountOfConsignment(
+                                                          product,
+                                                          indexConsignment,
+                                                        ),
                                                       )}
                                                     </TableCell>
                                                   </TableRow>
@@ -591,26 +876,62 @@ const CreateInventoryChecking = () => {
                           ></FieldArray>
                         </TableBody>
                       </Table>
+                      {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
+                      {/* <pre>{JSON.stringify(errors, null, 2)}</pre>
+                      <pre>{JSON.stringify(isSubmitting, null, 2)}</pre> */}
                     </TableContainer>
                     <Box className={classes.totalDifferentContainer}>
                       <Divider />
-                      <Stack
-                        direction="row"
-                        p={2}
-                        justifyContent="space-between"
-                      >
-                        <Typography className={classes.labelTotalDifferent}>
-                          Tổng chênh lệch:
-                        </Typography>
-                        <Typography className={classes.totalDifferent}>
-                          <b>{FormatDataUtils.formatCurrency(-1400000)}</b>
-                        </Typography>
+                      <Stack spacing={2}>
+                        <Stack
+                          direction="row"
+                          p={2}
+                          justifyContent="space-between"
+                        >
+                          <Typography className={classes.labelTotalDifferent}>
+                            Tổng chênh lệch:
+                          </Typography>
+                          <Typography className={classes.totalDifferent}>
+                            <b>
+                              {FormatDataUtils.formatCurrency(
+                                calculateTotalDifferentAmountOfOrder(),
+                              )}
+                            </b>
+                          </Typography>
+                        </Stack>
+                        <Stack
+                          direction="row"
+                          justifyContent="flex-end"
+                        >
+                          <LoadingButton
+                            variant="contained"
+                            color="success"
+                            startIcon={<Done />}
+                            loading={isSubmitting}
+                            loadingPosition="start"
+                            type="submit"
+                          >
+                            Xác nhận kiểm kho
+                          </LoadingButton>
+                        </Stack>
                       </Stack>
                     </Box>
                   </CardContent>
                 </Card>
               </Grid>
             </Grid>
+            <AlertPopup
+              title="Chú ý"
+              openPopup={openPopup}
+              setOpenPopup={setOpenPopup}
+            >
+              <Box
+                component={'span'}
+                className="popup-message-container"
+              >
+                {errorMessage}
+              </Box>
+            </AlertPopup>
           </Form>
         )}
       </Formik>

@@ -1,3 +1,6 @@
+import { getListInventoryChecking } from '@/slices/InventoryCheckingSlice';
+import { getStaffList } from '@/slices/StaffSlice';
+import { getWarehouseList } from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
 import {
   Box,
@@ -21,7 +24,9 @@ import {
 import { makeStyles } from '@mui/styles';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import React, { useState } from 'react';
+import { unwrapResult } from '@reduxjs/toolkit';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -79,8 +84,18 @@ const InventoryCheckingList = () => {
   const classes = useStyles();
   const [creatorId, setCreatorId] = useState('');
   const [warehouseId, setWarehouseId] = useState('');
-  const [sortById, setSortById] = useState(1)
-  const navigate = useNavigate()
+  const [sortById, setSortById] = useState(1);
+  const [warehouseList, setWarehouseList] = useState([]);
+  const [staffList, setStaffList] = useState([]);
+  const [inventoryCheckingList, setInventoryCheckingList] = useState([]);
+  const [searchParams, setSearchParams] = useState({});
+  const pages = [10, 20, 50];
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
+  const [totalRecord, setTotalRecord] = useState(0);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => ({ ...state.inventoryChecking }));
 
   const handleChangeCreator = (event) => {
     setCreatorId(event.target.value);
@@ -92,6 +107,62 @@ const InventoryCheckingList = () => {
   const handleChangeSortBy = (event) => {
     setSortById(event.target.value);
   };
+
+  const getAllWarehouse = async () => {
+    try {
+      const actionResult = await dispatch(getWarehouseList());
+      const dataResult = unwrapResult(actionResult);
+      console.log('warehouse list', dataResult.data);
+      if (dataResult.data) {
+        setWarehouseList(dataResult.data.warehouse);
+      }
+    } catch (error) {
+      console.log('Failed to fetch warehouse list: ', error);
+    }
+  };
+
+  const getAllStaff = async () => {
+    const params = {
+      // pageIndex: page + 1,
+      // pageSize: rowsPerPage,
+      keyWords  : '',
+    };
+    try {
+      const actionResult = await dispatch(getStaffList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('staff list', dataResult);
+      if (dataResult.listStaff) {
+        setStaffList(dataResult.listStaff);
+      }
+    } catch (error) {
+      console.log('Failed to fetch staff list: ', error);
+    }
+  };
+
+  const fetchInventoryCheckingList = async () => {
+    try {
+      const params = {
+        pageIndex: page + 1,
+        pageSize: rowsPerPage,
+        order: 'asc',
+      };
+      const actionResult = await dispatch(getListInventoryChecking(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        setTotalRecord(dataResult.data.totalRecord);
+        setInventoryCheckingList(dataResult.data.listInventoryCheckingHistory);
+      }
+    } catch (error) {
+      console.log('Failed to fetch inventoryChecking list: ', error);
+    }
+  };
+
+  useEffect(() => {
+    getAllStaff()
+    getAllWarehouse();
+    fetchInventoryCheckingList();
+  }, []);
   return (
     <Grid
       container
@@ -112,21 +183,23 @@ const InventoryCheckingList = () => {
               <Box className={classes.selectBox}>
                 <FormControl fullWidth>
                   <InputLabel id="select-creator">Kho kiểm</InputLabel>
-                  <Select
-                    id="creator"
-                    value={warehouseId}
-                    label="Kho kiểm"
-                    onChange={handleChangeWarehouse}
-                  >
-                    {warehouseList.map((item) => (
-                      <MenuItem
-                        key={item.id}
-                        value={item.id}
-                      >
-                        {item.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  {warehouseList && (
+                    <Select
+                      id="creator"
+                      value={warehouseId}
+                      label="Kho kiểm"
+                      onChange={handleChangeWarehouse}
+                    >
+                      {warehouseList.map((item) => (
+                        <MenuItem
+                          key={item.id}
+                          value={item.id}
+                        >
+                          {item.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
                 </FormControl>
               </Box>
               <Box className={classes.selectBox}>
@@ -150,16 +223,24 @@ const InventoryCheckingList = () => {
                 </FormControl>
               </Box>
             </Stack>
-            <Stack direction='row' justifyContent='space-between'>
-            <Typography variant="h6">Khoảng thời gian tạo đơn</Typography>
-            <Typography variant="h6" className={classes.sortBy}>Sắp xếp theo</Typography>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+            >
+              <Typography variant="h6">Khoảng thời gian tạo đơn</Typography>
+              <Typography
+                variant="h6"
+                className={classes.sortBy}
+              >
+                Sắp xếp theo
+              </Typography>
             </Stack>
             <Stack
               direction="row"
               py={2}
-              justifyContent='space-between'
+              justifyContent="space-between"
             >
-              <Stack direction="row" >
+              <Stack direction="row">
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DatePicker
                     id="startDate"
@@ -218,25 +299,38 @@ const InventoryCheckingList = () => {
               <Table className={classes.table}>
                 <TableHead>
                   <TableRow>
-                    <TableCell align='center'>Kho</TableCell>
-                    <TableCell align='center'>Ngày kiểm kho</TableCell>
-                    <TableCell align='center'>Người kiểm kho</TableCell>
-                    <TableCell align='center'>Tổng chênh lệch</TableCell>
+                    <TableCell align="center">Kho</TableCell>
+                    <TableCell align="center">Ngày kiểm kho</TableCell>
+                    <TableCell align="center">Người kiểm kho</TableCell>
+                    <TableCell align="center">Tổng chênh lệch</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  <TableRow hover onClick={() => navigate(`/inventory-checking/detail/${1}`)}>
-                  <TableCell align='center'>Kho 1</TableCell>
-                    <TableCell align='center'>{FormatDataUtils.formatDate("04/06/2022")}</TableCell>
-                    <TableCell align='center'>Trịnh Bá Minh Ninh(ninhtbm)</TableCell>
-                    <TableCell align='center'>{FormatDataUtils.formatCurrency(700000)}</TableCell>
-                  </TableRow>
-                  <TableRow hover>
-                  <TableCell align='center'>Kho 1</TableCell>
-                    <TableCell align='center'>{FormatDataUtils.formatDate("04/06/2022")}</TableCell>
-                    <TableCell align='center'>Trịnh Bá Minh Ninh(ninhtbm)</TableCell>
-                    <TableCell align='center'>{FormatDataUtils.formatCurrency(-1400000)}</TableCell>
-                  </TableRow>
+                  {inventoryCheckingList &&
+                    inventoryCheckingList.map((inventoryChecking) => (
+                      <TableRow
+                        hover
+                        key={inventoryChecking.id}
+                        onClick={() =>
+                          navigate(`/inventory-checking/detail/${inventoryChecking.id}`)
+                        }
+                      >
+                        <TableCell align="center">
+                          {inventoryChecking.wareHouseName}
+                        </TableCell>
+                        <TableCell align="center">
+                          {FormatDataUtils.formatDate(inventoryChecking.createDate)}
+                        </TableCell>
+                        <TableCell align="center">
+                          Trịnh Bá Minh Ninh({inventoryChecking.userName})
+                        </TableCell>
+                        <TableCell align="center">
+                          {FormatDataUtils.formatCurrency(
+                            inventoryChecking.differentAmout,
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </TableContainer>
