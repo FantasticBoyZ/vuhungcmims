@@ -46,11 +46,11 @@ const titles = [
   { url: '/category/detail', title: 'Thông tin danh mục' },
   { url: '/category/add', title: 'Thêm mới danh mục' },
   { url: '/category/edit', title: 'Sửa danh mục' },
-  { url: '/manufacturer', title: 'Danh sách nhà cung cấp' },
-  { url: '/manufacturer/detail', title: 'Thông tin nhà cung cấp' },
-  { url: '/manufacturer/add', title: 'Thêm mới nhà cung cấp' },
-  { url: '/manufacturer/edit', title: 'Sửa nhà cung cấp' },
-  { url: '/import/list', title: 'Danh sách phiếu nhập kho' },
+  { url: '/manufacturer', title: 'Danh sách nhà sản xuất' },
+  { url: '/manufacturer/detail', title: 'Chi tiết nhà sản xuất' },
+  { url: '/manufacturer/add', title: 'Thêm mới nhà sản xuất' },
+  { url: '/manufacturer/edit', title: 'Chỉnh sửa thông tin nhà sản xuất' },
+  { url: '/import', title: 'Danh sách phiếu nhập kho' },
   { url: '/import/detail', title: 'Thông tin phiếu nhập kho' },
   { url: '/import/create-order', title: 'Nhập kho' },
   { url: '/import/edit', title: 'Thông tin phiếu nhập kho' },
@@ -58,6 +58,7 @@ const titles = [
   { url: '/export/detail', title: 'Thông tin phiếu xuất kho' },
   { url: '/export/create-order', title: 'Xuất kho' },
   { url: '/export/edit', title: 'Thông tin phiếu xuất kho' },
+  { url: '/warehouse', title: 'Quản lý nhà kho' },
 ];
 
 const getRoleLabel = (exportOrderStatus) => {
@@ -139,8 +140,8 @@ const Header = () => {
           </Badge> */}
           <UserBox onClick={(e) => setOpen(true)}>
             <Stack alignItems='flex-end'>
-            <Typography variant="h5">{username}</Typography>
-            {role && getRoleLabel(role)}
+              <Typography variant="h5">{username}</Typography>
+              {role && getRoleLabel(role)}
             </Stack>
             <Avatar
               sx={{ width: 45, height: 45 }}

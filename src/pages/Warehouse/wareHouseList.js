@@ -15,24 +15,23 @@ import {
     TableContainer,
     Typography
 } from '@mui/material';
-import { Form, Formik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import { getWarehouseList, getWarehouseDetail, deleteWarehouse } from '@/slices/WarehouseSlice';
+import { getWarehouseList, deleteWarehouse } from '@/slices/WarehouseSlice';
 import AddIcon from '@mui/icons-material/Add';
-import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
-import WareHouseForm from './wareHouseForm';
+import WareHouseForm from './AddWareHouse';
 import { toast } from 'react-toastify';
 import EditWareHouseForm from './EditWarehouse';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 
 const useStyles = makeStyles((theme) => ({
     table: {
+        // width: 'inherit',
         textAlign: 'center',
         padding: '20px',
         '& thead th': {
@@ -41,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 
         },
         '& tbody td': {
-            width: '20%',
+            // width: '20%',
             textAlign: 'center'
         },
         '& tbody tr:hover': {
@@ -51,9 +50,6 @@ const useStyles = makeStyles((theme) => ({
     cardStyle: {
         padding: '12px',
     },
-    icons: {
-        marginRight: '20px',
-    },
 }));
 
 
@@ -62,12 +58,9 @@ const WarehouseList = () => {
     const [openPopupDelete, setOpenPopupDelete] = useState(false);
     const [openPopupEdit, setOpenPopupEdit] = useState(false);
     const classes = useStyles();
-    const navigate = useNavigate();
     const [warehouseList, setWarehouseList] = useState();
-    // const [warehouse, setWarehouse] = useState({});
     const [selectedWarehouse, setSelectedWarehouse] = useState();
     const dispatch = useDispatch();
-    const { loading } = useSelector((state) => ({ ...state.warehouse }));
 
     const handleOnclickAddNewWareHouse = (wareHouseId) => {
         setSelectedWarehouse(wareHouseId)
@@ -90,12 +83,12 @@ const WarehouseList = () => {
             let actionResult;
             actionResult = await dispatch(deleteWarehouse(selectedWarehouse));
             const dataResult = unwrapResult(actionResult);
-            toast.success('Xóa kho thành công!');
+            toast.success('Xóa kho thành công!', { autoClose: 2000 });
             closePopupDelete()
             setTimeout(() => {
                 window.location.reload(true);
                 window.close()
-            }, 5000);
+            }, 2000);
         } catch (error) {
             console.log('Failed to delete warehouse: ', error);
             toast.error('Xóa kho thất bại!');
@@ -104,23 +97,12 @@ const WarehouseList = () => {
 
     const closePopup = () => {
         setOpenPopup(false);
+        setOpenPopupEdit(false);
     };
 
     const closePopupDelete = () => {
         setOpenPopupDelete(false);
     };
-
-    // const getDetail = async () => {
-    //     try {
-    //         const actionResult = await dispatch(getWarehouseDetail(selectedWarehouse));
-    //         const dataResult = unwrapResult(actionResult);
-    //         // if (dataResult.data) {
-    //         setWarehouse(dataResult.data.warehouse);
-    //         // }
-    //     } catch (error) {
-    //         console.log('Failed to fetch warehouse detail: ', error);
-    //     }
-    // };
 
     const getAllWarehouse = async (keyword) => {
         try {
@@ -133,12 +115,11 @@ const WarehouseList = () => {
             console.log('Failed to fetch warehouse list: ', error);
         }
     };
+
     useEffect(() => {
         getAllWarehouse()
-        // if (selectedWarehouse) {
-        //     getDetail()
-        // }
     }, [selectedWarehouse])
+
     return (
         <Container>
             <Stack
@@ -163,7 +144,7 @@ const WarehouseList = () => {
                     <ProgressCircleLoading />
                 ) : (
                     <Box className={classes.table}>
-                        <TableContainer>
+                        <TableContainer sx={{ display: 'table' }}>
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Nhà kho</TableCell>
@@ -181,13 +162,13 @@ const WarehouseList = () => {
                                                 title="Chỉnh sửa"
                                                 arrow
                                             >
-                                                <ModeEditIcon onClick={() => handleOnClickEdit(item?.id)} color='warning' className={classes.icons} />
+                                                <ModeEditIcon onClick={() => handleOnClickEdit(item?.id)} color='warning' />
                                             </Tooltip>
                                             <Tooltip
                                                 title="Xóa"
                                                 arrow
                                             >
-                                                <DeleteForeverIcon color='error' onClick={() => handleOnClickDelete(item?.id)} className={classes.icons} />
+                                                <DeleteForeverIcon color='error' onClick={() => handleOnClickDelete(item?.id)} sx={{ marginLeft: '15%' }} />
                                             </Tooltip>
                                         </TableCell>
                                     </TableRow>
@@ -204,7 +185,6 @@ const WarehouseList = () => {
             >
                 <WareHouseForm
                     closePopup={closePopup}
-                //   warehouse={warehouse}
                 />
             </Popup>
             <Popup
