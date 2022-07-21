@@ -9,7 +9,8 @@ import {
   TextField,
   Toolbar,
   Typography,
-  FormControl, InputLabel,
+  Grid,
+  FormControl, InputLabel, CardHeader,
 
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -32,7 +33,10 @@ const useStyles = makeStyles({
     justifyContent: 'space-between',
   },
   selectBox: {
-    width: '50%',
+    // backgroundColor: 'green',
+    width: '150px',
+    height: '56px',
+    minHeight: '56px',
   },
   labelDateRange: {
     fontSize: '24px',
@@ -40,18 +44,14 @@ const useStyles = makeStyles({
   },
   cardFilter: {
     padding: '20px 0',
-    marginBottom: '20px',
+    boxShadow: '0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)',
+    background: '#fff'
   },
   cardTable: {
     padding: '0 20px',
   },
-  text: {
-    paddingBottom: '1%',
-    paddingLeft: '2%'
-  },
-  style: {
-    width: '130px',
-    height: '56px',
+  btnSearch: {
+    width: '200px',
     // minHeight: '56px',
   }
 });
@@ -141,33 +141,42 @@ const ManufacturerList = () => {
   }, [page, rowsPerPage]);
 
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ marginBottom: '20px' }}>
-        <Stack
-          direction="row"
-          justifyContent="flex-end"
-          spacing={2}
-          p={2}
+    <Grid
+      container
+      spacing={2}
+      justifyContent="flex-end"
+    >
+      <Stack
+        direction="row"
+        spacing={2}
+        paddingY={2}
+      >
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={() => handleOnclickAddNewManufacturer()}
         >
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => handleOnclickAddNewManufacturer()}
+          Thêm nhà sản xuất mới
+        </Button>
+      </Stack>
+      <Grid
+        xs={12}
+        item
+      >
+        <Card>
+          <CardHeader title="Tìm kiếm thông tin nhà sản xuất" />
+          <Stack
+            direction="row"
+            spacing={2}
+            padding={2}
           >
-            Thêm nhà sản xuất mới
-          </Button>
-        </Stack>
-        <Card className={classes.cardFilter}>
-          <Typography className={classes.text}>
-            Tìm kiếm thông tin nhà sản xuất
-          </Typography>
-          <Toolbar className={classes.toolbar}>
             <TextField
               id="outlined-basic"
+              name="keyword"
               placeholder="Tìm kiếm theo..."
+              fullWidth
               label={null}
               variant="outlined"
-              className={classes.searchField}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -175,34 +184,60 @@ const ManufacturerList = () => {
                   </InputAdornment>
                 ),
               }}
-              onKeyDown={handleSearch}
-            // onChange={handleSearch}
             />
-            <Button className={classes.style} color='primary' variant="contained" startIcon={<SearchIcon />}> Tìm kiếm</Button>
-          </Toolbar>
+            <Select
+              classNamePrefix="select"
+              className={classes.btnSearch}
+              defaultValue={optionSelect[0]}
+              name="searchBy"
+              options={optionSelect}
+              menuPortalTarget={document.body}
+              styles={{
+                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                control: (base) => ({
+                  ...base,
+                  height: 56,
+                  minHeight: 56,
+                }),
+              }}
+            />
+            <Button
+              variant="contained"
+              startIcon={<SearchIcon />}
+              className={classes.btnSearch}
+            >
+              Tìm kiếm
+            </Button>
+          </Stack>
+        </Card>
+      </Grid>
+      <Grid
+        xs={12}
+        item
+      >
+        <Box>
+          <Card className={classes.cardTable}>
+            {loading ? (
+              <ProgressCircleLoading />
+            ) : (
+              <Box>
+                <ManufacturerTable manufacturerList={manufacturerList} />
+                <CustomTablePagination
+                  page={page}
+                  pages={pages}
+                  rowsPerPage={rowsPerPage}
+                  totalRecord={totalRecord}
+                  handleChangePage={handleChangePage}
+                  handleChangeRowsPerPage={handleChangeRowsPerPage}
+                />
+              </Box>
+            )}
+          </Card>
+        </Box>
 
-        </Card>
-      </Box>
-      <Box>
-        <Card className={classes.cardTable}>
-          {loading ? (
-            <ProgressCircleLoading />
-          ) : (
-            <Box>
-              <ManufacturerTable manufacturerList={manufacturerList} />
-              <CustomTablePagination
-                page={page}
-                pages={pages}
-                rowsPerPage={rowsPerPage}
-                totalRecord={totalRecord}
-                handleChangePage={handleChangePage}
-                handleChangeRowsPerPage={handleChangeRowsPerPage}
-              />
-            </Box>
-          )}
-        </Card>
-      </Box>
-    </Container>
+      </Grid>
+
+    </Grid>
   );
 };
 

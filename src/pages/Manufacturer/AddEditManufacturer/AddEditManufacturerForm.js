@@ -9,6 +9,7 @@ import {
   CardContent,
   CardHeader,
   Container,
+  Divider,
   FormHelperText,
   Grid,
   Stack,
@@ -29,7 +30,11 @@ import FormatDataUtils from '@/utils/formatData';
 import IconRequired from '@/components/Common/IconRequired';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
-
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import GetDistrict from '@/pages/Address/GetDistricts';
+import GetWard from '@/pages/Address/GetWard';
+import GetProvince from '@/pages/Address/GetProvince';
+import Popup from '@/components/Common/Popup';
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
     padding: '30px 20px',
@@ -48,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
     verticalAlign: 'middle',
     display: 'inline-flex',
     width: '200px',
+    color: '#696969',
   },
   textfieldStyle: {
     flex: '5',
@@ -56,13 +62,6 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 'small',
     margin: '0 10px ',
   },
-  // formContainer: {
-  //   padding: '24px',
-  //   rowGap: '20px',
-  // },
-  // manufacturerName: {
-  //   marginBottom: '24px',
-  // },
   phoneStyle: {
     paddingRight: '12px',
   },
@@ -85,12 +84,9 @@ const AddEditManufacturerForm = () => {
   const [manufacturer, setManufacturer] = useState();
   const classes = useStyles();
   const isAdd = !manufacturerId;
-  // console.log(isAdd);
-  // const { initialFormValue, setInitialFormValue } = useState({
-  //   name: '',
-  //   email: '',
-  //   phone: '',
-  // });
+  const [openPopup, setopenPopup] = useState(false);
+
+
   const initialManufacturerValue = isAdd
     ? {
       name: '',
@@ -101,30 +97,17 @@ const AddEditManufacturerForm = () => {
       wardId: '',
       addressDetail: '',
     }
-    : manufacturer;
-  // const phoneRegExp =
-  //   '(84|0[3|5|7|8|9])+([0-9]{8})\b';
-
-  const provinceTestData = [
+    :
     {
-      id: 1,
-      name: 'Hà Nội',
-    },
-  ];
+      name: manufacturer?.name,
+      email: manufacturer?.email,
+      phone: manufacturer?.phone,
+      provinceId: manufacturer?.provinceId,
+      districtId: manufacturer?.districtId,
+      wardId: manufacturer?.wardId,
+      addressDetail: manufacturer?.addressDetail,
+    }
 
-  const districtTestData = [
-    {
-      id: 1,
-      name: 'Huyện Thạch Thất',
-    },
-  ];
-
-  const wardTestData = [
-    {
-      id: 1,
-      name: 'Xã Thạch Hoà',
-    },
-  ];
 
   const FORM_VALIDATION = Yup.object().shape({
     name: Yup.string()
@@ -136,16 +119,13 @@ const AddEditManufacturerForm = () => {
 
     phone: Yup.number().required('Chưa nhập số điện thoại nhà sản xuất'),
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố'),
-    districtId: Yup.number().required('Chưa chọn quận/huyện phố'),
-    wardId: Yup.number().required('Chưa chọn xã/phường'),
+    districtId: Yup.number().required('Chưa chọn quận/huyện/thành phố'),
+    wardId: Yup.number().required('Chưa chọn phường/xã'),
     // .matches(phoneRegExp, 'Số điện thoại không hợp lệ')
   });
 
   const saveManufacturerDetail = async (manufacturer) => {
     try {
-      // const actionResult = await dispatch(saveManufacturer(manufacturer));
-      // const dataResult = unwrapResult(actionResult);
-      // console.log('dataResult', dataResult);
       ManufactorService.saveManufacturer(manufacturer).then(
         (response) => {
           if (isAdd) {
@@ -182,9 +162,14 @@ const AddEditManufacturerForm = () => {
       wardId: values.wardId,
       addressDetail: values.addressDetail,
     };
-    console.log(values);
-    saveManufacturerDetail(newManufacturer);
+    setopenPopup(true)
+    setManufacturer(values)
   };
+
+  const handleConfirm = () => {
+    saveManufacturerDetail(manufacturer);
+    setopenPopup(false)
+  }
 
   const handleOnClickExit = () => {
     navigate(isAdd ? '/manufacturer' : `/manufacturer/detail/${manufacturerId}`);
@@ -197,25 +182,9 @@ const AddEditManufacturerForm = () => {
         const dataResult = unwrapResult(actionResult);
         if (dataResult.data) {
           setManufacturer(dataResult.data.manufactor);
-          // TODO: sửa provinceTestData,districtTestData, wardTestData thành data get từ api và sửa logic province => district => ward
-          setSelectedProvince(
-            FormatDataUtils.getSelectedOption(
-              provinceTestData,
-              dataResult.data.manufactor.provinceId,
-            ),
-          );
-          setSelectedDistrict(
-            FormatDataUtils.getSelectedOption(
-              districtTestData,
-              dataResult.data.manufactor.districtId,
-            ),
-          );
-          setSelectedWard(
-            FormatDataUtils.getSelectedOption(
-              wardTestData,
-              dataResult.data.manufactor.wardId,
-            ),
-          );
+          setSelectedProvince(dataResult.data.manufactor.provinceId)
+          setSelectedDistrict(dataResult.data.manufactor.districtId)
+          setSelectedWard(dataResult.data.manufactor.wardId)
         }
         console.log(dataResult.data.manufactor);
         console.log('dataResult', dataResult);
@@ -227,8 +196,14 @@ const AddEditManufacturerForm = () => {
     if (!isAdd) {
       fetchManufacturerDetail(manufacturerId);
     }
-    console.log(FormatDataUtils.getOptionWithIdandName(provinceTestData));
   }, [manufacturerId]);
+
+  useEffect(() => {
+    if (selectedProvince) {
+      setSelectedDistrict('');
+      setSelectedWard('')
+    }
+  }, [selectedProvince])
 
   return (
     <Container maxWidth="lg">
@@ -242,7 +217,7 @@ const AddEditManufacturerForm = () => {
           {({ values, errors, setFieldValue }) => (
             <Form>
               {!isAdd && loading ? (
-                <>Loading...</>
+                <ProgressCircleLoading />
               ) : (
                 <Box>
                   <Card className={classes.cardInfo}>
@@ -253,14 +228,14 @@ const AddEditManufacturerForm = () => {
                       <Grid
                         container
                         spacing={2}
+                        padding={2}
                       >
                         <Grid
                           xs={12}
                           item
                         >
                           <Typography className={classes.wrapIcon}>
-                            Tên nhà sản xuất: <IconRequired />
-                            {/* <Info className={classes.iconStyle} /> */}
+                            Tên nhà sản xuất <IconRequired />
                           </Typography>
                           <TextfieldWrapper
                             name="name"
@@ -268,89 +243,89 @@ const AddEditManufacturerForm = () => {
                             id="name"
                             autoComplete="name"
                             autoFocus
-                            className={classes.manufacturerName}
                           />
                         </Grid>
                         <Grid
-                          xs={6}
+                          xs={12}
                           item
-                          className={classes.phoneStyle}
                         >
                           <Typography className={classes.wrapIcon}>
-                            Số điện thoại: <IconRequired />
-                            {/* <Info className={classes.iconStyle} /> */}
+                            Số điện thoại <IconRequired />
                           </Typography>
                           <TextfieldWrapper
                             name="phone"
                             fullWidth
                             id="phone"
                             autoComplete="phone"
-                          // autoFocus
                           />
                         </Grid>
                         <Grid
-                          xs={6}
+                          xs={12}
                           item
-                          className={classes.emailStyle}
                         >
-                          <Typography className={classes.wrapIcon}>
-                            Email: <IconRequired />
-                            {/* <Info className={classes.iconStyle} /> */}
-                          </Typography>
+                          <Typography className={classes.wrapIcon}>Email</Typography>
                           <TextfieldWrapper
                             name="email"
                             fullWidth
                             id="email"
                             autoComplete="email"
-                          // autoFocus
                           />
                         </Grid>
                       </Grid>
                       {/* )} */}
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader title="Thông tin địa chỉ" />
-                    <CardContent>
                       <Grid
                         container
                         spacing={2}
+                        paddingTop={2}
+                        paddingX={2}
+                      >
+                        <Grid
+                          xs={12}
+                          item
+                        >
+                          <Divider textAlign="left" style={{ fontSize: '18px' }}>Địa chỉ</Divider>
+                        </Grid>
+                      </Grid>
+
+                      <Grid
+                        container
+                        spacing={2}
+                        padding={2}
                       >
                         <Grid
                           xs={4}
                           item
                         >
                           <Typography className={classes.wrapIcon}>
-                            Tỉnh: <IconRequired />
+                            Tỉnh/Thành phố <IconRequired />
                           </Typography>
-                          {selectedProvince && (
-                            <Select
-                              classNamePrefix="select"
-                              placeholder="Chọn tỉnh thành."
-                              noOptionsMessage={() => (
-                                <>Không có tìm thấy tỉnh thành phù hợp</>
-                              )}
-                              isClearable={true}
-                              isSearchable={true}
-                              name="provinceId"
-                              value={selectedProvince}
-                              options={FormatDataUtils.getOptionWithIdandName(
-                                provinceTestData,
-                              )}
-                              menuPortalTarget={document.body}
-                              styles={{
-                                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                                control: (base) => ({
-                                  ...base,
-                                  height: 56,
-                                  minHeight: 56,
-                                }),
-                              }}
-                              onChange={(e) => {
-                                setFieldValue('provinceId', e?.value);
-                              }}
-                            />
-                          )}
+                          <Select
+                            classNamePrefix="select"
+                            placeholder="Chọn tỉnh thành."
+                            noOptionsMessage={() => (
+                              <>Không có tìm thấy tỉnh thành phù hợp</>
+                            )}
+                            isClearable={true}
+                            isSearchable={true}
+                            name="provinceId"
+                            value={FormatDataUtils.getOptionWithIdandName(GetProvince())?.filter(function (option) {
+                              return option.value === selectedProvince;
+                            })}
+                            options={FormatDataUtils.getOptionWithIdandName(GetProvince())}
+                            menuPortalTarget={document.body}
+                            styles={{
+                              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                              control: (base) => ({
+                                ...base,
+                                height: 56,
+                                minHeight: 56,
+                              }),
+                            }}
+                            onChange={(e) => {
+                              setFieldValue('provinceId', e?.value, setSelectedProvince(e?.value));
+                            }}
+                          />
+
                           <FormHelperText
                             error={true}
                             className={classes.errorTextHelper}
@@ -363,36 +338,35 @@ const AddEditManufacturerForm = () => {
                           item
                         >
                           <Typography className={classes.wrapIcon}>
-                            Huyện: <IconRequired />
+                            Quận/Huyện/Thành phố <IconRequired />
                           </Typography>
-                          {selectedDistrict && (
-                            <Select
-                              classNamePrefix="select"
-                              placeholder="Chọn quận/huyện"
-                              noOptionsMessage={() => (
-                                <>Không có tìm thấy quận/huyện phù hợp</>
-                              )}
-                              isClearable={true}
-                              isSearchable={true}
-                              name="districtId"
-                              value={selectedDistrict}
-                              options={FormatDataUtils.getOptionWithIdandName(
-                                districtTestData,
-                              )}
-                              menuPortalTarget={document.body}
-                              styles={{
-                                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                                control: (base) => ({
-                                  ...base,
-                                  height: 56,
-                                  minHeight: 56,
-                                }),
-                              }}
-                              onChange={(e) => {
-                                setFieldValue('districtId', e?.value);
-                              }}
-                            />
-                          )}
+
+                          <Select
+                            classNamePrefix="select"
+                            placeholder="Chọn quận/huyện"
+                            noOptionsMessage={() => (
+                              <>Không có tìm thấy quận/huyện phù hợp</>
+                            )}
+                            isClearable={true}
+                            isSearchable={true}
+                            name="districtId"
+                            value={FormatDataUtils.getOptionWithIdandName(GetDistrict(selectedProvince))?.filter(function (option) {
+                              return option.value === selectedDistrict;
+                            })}
+                            options={FormatDataUtils.getOptionWithIdandName(GetDistrict(selectedProvince))}
+                            menuPortalTarget={document.body}
+                            styles={{
+                              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                              control: (base) => ({
+                                ...base,
+                                height: 56,
+                                minHeight: 56,
+                              }),
+                            }}
+                            onChange={(e) => {
+                              setFieldValue('districtId', e?.value, setSelectedDistrict(e?.value));
+                            }}
+                          />
                           <FormHelperText
                             error={true}
                             className={classes.errorTextHelper}
@@ -405,36 +379,34 @@ const AddEditManufacturerForm = () => {
                           item
                         >
                           <Typography className={classes.wrapIcon}>
-                            Xã: <IconRequired />
+                            Phường/Xã: <IconRequired />
                           </Typography>
-                          {selectedWard && (
-                            <Select
-                              classNamePrefix="select"
-                              placeholder="Chọn xã/phường"
-                              noOptionsMessage={() => (
-                                <>Không có tìm thấy xã/phường thành phù hợp</>
-                              )}
-                              isClearable={true}
-                              isSearchable={true}
-                              name="wardId"
-                              value={selectedWard}
-                              options={FormatDataUtils.getOptionWithIdandName(
-                                wardTestData,
-                              )}
-                              menuPortalTarget={document.body}
-                              styles={{
-                                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                                control: (base) => ({
-                                  ...base,
-                                  height: 56,
-                                  minHeight: 56,
-                                }),
-                              }}
-                              onChange={(e) => {
-                                setFieldValue('wardId', e?.value);
-                              }}
-                            />
-                          )}
+                          <Select
+                            classNamePrefix="select"
+                            placeholder="Chọn xã/phường"
+                            noOptionsMessage={() => (
+                              <>Không có tìm thấy xã/phường thành phù hợp</>
+                            )}
+                            isClearable={true}
+                            isSearchable={true}
+                            name="wardId"
+                            value={FormatDataUtils.getOptionWithIdandName(GetWard(selectedDistrict))?.filter(function (option) {
+                              return option.value === selectedWard;
+                            })}
+                            options={FormatDataUtils.getOptionWithIdandName(GetWard(selectedDistrict))}
+                            menuPortalTarget={document.body}
+                            styles={{
+                              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                              control: (base) => ({
+                                ...base,
+                                height: 56,
+                                minHeight: 56,
+                              }),
+                            }}
+                            onChange={(e) => {
+                              setFieldValue('wardId', e?.value, setSelectedWard(e?.value));
+                            }}
+                          />
                           <FormHelperText
                             error={true}
                             className={classes.errorTextHelper}
@@ -446,7 +418,7 @@ const AddEditManufacturerForm = () => {
                           xs={12}
                           item
                         >
-                          <Typography className={classes.wrapIcon}>Địa chỉ:</Typography>
+                          <Typography className={classes.wrapIcon}>Địa chỉ chi tiết <IconRequired /></Typography>
                           <TextfieldWrapper
                             name="addressDetail"
                             fullWidth
@@ -456,16 +428,24 @@ const AddEditManufacturerForm = () => {
                         </Grid>
                       </Grid>
                     </CardContent>
-                    {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
+                  </Card>
+
+                  <Card>
                     <Stack
                       direction="row"
                       spacing={2}
                       justifyContent="flex-end"
                       padding="20px"
                     >
-                      <ButtonWrapper color='warning' variant="contained" startIcon={<CheckIcon />}>Lưu chỉnh sửa</ButtonWrapper>
+                      <ButtonWrapper
+                        color="warning"
+                        variant="contained"
+                        startIcon={<CheckIcon />}
+                      >
+                        Lưu chỉnh sửa
+                      </ButtonWrapper>
                       <Button
-                        color='error'
+                        color="error"
                         onClick={() => handleOnClickExit()}
                         variant="contained"
                         startIcon={<ClearIcon />}
@@ -498,13 +478,14 @@ const AddEditManufacturerForm = () => {
                     <Grid
                       container
                       spacing={2}
+                      padding={2}
                     >
                       <Grid
                         xs={12}
                         item
                       >
                         <Typography className={classes.wrapIcon}>
-                          Tên nhà sản xuất: <IconRequired />
+                          Tên nhà sản xuất <IconRequired />
                           {/* <Info className={classes.iconStyle} /> */}
                         </Typography>
                         <TextfieldWrapper
@@ -517,12 +498,11 @@ const AddEditManufacturerForm = () => {
                         />
                       </Grid>
                       <Grid
-                        xs={6}
+                        xs={12}
                         item
-                        className={classes.phoneStyle}
                       >
                         <Typography className={classes.wrapIcon}>
-                          Số điện thoại: <IconRequired />
+                          Số điện thoại <IconRequired />
                           {/* <Info className={classes.iconStyle} /> */}
                         </Typography>
                         <TextfieldWrapper
@@ -534,12 +514,11 @@ const AddEditManufacturerForm = () => {
                         />
                       </Grid>
                       <Grid
-                        xs={6}
+                        xs={12}
                         item
-                        className={classes.emailStyle}
                       >
                         <Typography className={classes.wrapIcon}>
-                          Email: <IconRequired />
+                          Email
                           {/* <Info className={classes.iconStyle} /> */}
                         </Typography>
                         <TextfieldWrapper
@@ -552,21 +531,30 @@ const AddEditManufacturerForm = () => {
                       </Grid>
                     </Grid>
                     {/* )} */}
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader title="Thông tin địa chỉ" />
-                  <CardContent>
                     <Grid
                       container
                       spacing={2}
+                      paddingTop={2}
+                      paddingX={2}
+                    >
+                      <Grid
+                        xs={12}
+                        item
+                      >
+                        <Divider textAlign="left" style={{ fontSize: '18px' }}>Địa chỉ</Divider>
+                      </Grid>
+                    </Grid>
+                    <Grid
+                      container
+                      spacing={2}
+                      padding={2}
                     >
                       <Grid
                         xs={4}
                         item
                       >
                         <Typography className={classes.wrapIcon}>
-                          Tỉnh: <IconRequired />
+                          Tỉnh/Thành phố <IconRequired />
                         </Typography>
 
                         <Select
@@ -578,8 +566,9 @@ const AddEditManufacturerForm = () => {
                           isClearable={true}
                           isSearchable={true}
                           name="provinceId"
-                          options={FormatDataUtils.getOptionWithIdandName(
-                            provinceTestData,
+                          options={FormatDataUtils.getOptionWithIdandName(GetProvince())}
+                          value={GetProvince()?.find(
+                            (obj) => obj.value === selectedProvince,
                           )}
                           menuPortalTarget={document.body}
                           styles={{
@@ -591,7 +580,7 @@ const AddEditManufacturerForm = () => {
                             }),
                           }}
                           onChange={(e) => {
-                            setFieldValue('provinceId', e?.value);
+                            setFieldValue('provinceId', e?.value, setSelectedProvince(e?.value));
                           }}
                         />
 
@@ -607,7 +596,7 @@ const AddEditManufacturerForm = () => {
                         item
                       >
                         <Typography className={classes.wrapIcon}>
-                          Huyện: <IconRequired />
+                          Quận/Huyện/Thành phố <IconRequired />
                         </Typography>
                         <Select
                           classNamePrefix="select"
@@ -618,9 +607,7 @@ const AddEditManufacturerForm = () => {
                           isClearable={true}
                           isSearchable={true}
                           name="districtId"
-                          options={FormatDataUtils.getOptionWithIdandName(
-                            districtTestData,
-                          )}
+                          options={FormatDataUtils.getOptionWithIdandName(GetDistrict(selectedProvince))}
                           menuPortalTarget={document.body}
                           styles={{
                             menuPortal: (base) => ({ ...base, zIndex: 9999 }),
@@ -631,7 +618,7 @@ const AddEditManufacturerForm = () => {
                             }),
                           }}
                           onChange={(e) => {
-                            setFieldValue('districtId', e?.value);
+                            setFieldValue('districtId', e?.value, setSelectedDistrict(e?.value));
                           }}
                         />
                         <FormHelperText
@@ -646,7 +633,7 @@ const AddEditManufacturerForm = () => {
                         item
                       >
                         <Typography className={classes.wrapIcon}>
-                          Xã: <IconRequired />
+                          Phường/Xã <IconRequired />
                         </Typography>
                         <Select
                           classNamePrefix="select"
@@ -657,7 +644,7 @@ const AddEditManufacturerForm = () => {
                           isClearable={true}
                           isSearchable={true}
                           name="wardId"
-                          options={FormatDataUtils.getOptionWithIdandName(wardTestData)}
+                          options={FormatDataUtils.getOptionWithIdandName(GetWard(selectedDistrict))}
                           menuPortalTarget={document.body}
                           styles={{
                             menuPortal: (base) => ({ ...base, zIndex: 9999 }),
@@ -668,7 +655,7 @@ const AddEditManufacturerForm = () => {
                             }),
                           }}
                           onChange={(e) => {
-                            setFieldValue('wardId', e?.value);
+                            setFieldValue('wardId', e?.value, setSelectedWard(e?.value));
                           }}
                         />
                         <FormHelperText
@@ -682,7 +669,7 @@ const AddEditManufacturerForm = () => {
                         xs={12}
                         item
                       >
-                        <Typography className={classes.wrapIcon}>Địa chỉ:</Typography>
+                        <Typography className={classes.wrapIcon}>Địa chỉ chi tiết <IconRequired /></Typography>
                         <TextfieldWrapper
                           name="addressDetail"
                           fullWidth
@@ -692,16 +679,23 @@ const AddEditManufacturerForm = () => {
                       </Grid>
                     </Grid>
                   </CardContent>
-                  <pre>{JSON.stringify(values, null, 2)}</pre>
+                </Card>
+                <Card>
                   <Stack
                     direction="row"
                     spacing={2}
                     justifyContent="flex-end"
                     padding="20px"
                   >
-                    <ButtonWrapper color='success' variant="contained" startIcon={<CheckIcon />}>Thêm nhà sản xuất</ButtonWrapper>
+                    <ButtonWrapper
+                      color="success"
+                      variant="contained"
+                      startIcon={<CheckIcon />}
+                    >
+                      Thêm nhà sản xuất
+                    </ButtonWrapper>
                     <Button
-                      color='error'
+                      color="error"
                       onClick={() => handleOnClickExit()}
                       variant="contained"
                       startIcon={<ClearIcon />}
@@ -715,7 +709,36 @@ const AddEditManufacturerForm = () => {
           )}
         </Formik>
       )}
+      <Popup
+        title={isAdd ? 'Bạn có chắc chắn muốn thêm nhà xuất không?' : "Bạn có chắc chắn muốn lưu lại chỉnh sửa không?"}
+        openPopup={openPopup}
+        setOpenPopup={setopenPopup}
+      >
+        <Typography >
+          Hãy kiểm tra kỹ thông tin trước khi xác nhận.
+        </Typography>
+        <Stack
+          direction="row"
+          spacing={2}
+          justifyContent="flex-end"
+          padding="20px"
+        >
+          <Button
+            variant="contained"
+            olor='primary'
+            onClick={() => handleConfirm()}
+          >
+            Xác nhận</Button>
+          <Button
+            variant="outlined"
+            onClick={() => setopenPopup(false)}
+          >
+            Hủy
+          </Button>
+        </Stack>
+      </Popup>
     </Container>
+
   );
 };
 
