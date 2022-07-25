@@ -248,10 +248,11 @@ const ImportGoods = () => {
         setOpenPopup(true);
         return;
       }
-
+      console.log('timezone', (new Date().getTimezoneOffset()) / 60)
       consignmentRequests.push({
         productId: consignments[index]?.productId,
-        expirationDate: consignments[index]?.expirationDate,
+        expirationDate: new Date(consignments[index]?.expirationDate + (new Date().getTimezoneOffset()) / 60).toJSON(),
+        // expirationDate: new Date(FormatDataUtils.convertUTCDateToLocalDate(consignments[index]?.expirationDate)).toJSON(),
         unitPrice: Math.round(
           consignments[index]?.selectedUnitMeasure ===
             consignments[index]?.wrapUnitMeasure
@@ -276,7 +277,7 @@ const ImportGoods = () => {
       wareHouseId: values.wareHouseId,
       consignmentRequests: consignmentRequests,
     };
-    console.log('test new',newImportOrder)
+    console.log('test new', newImportOrder);
     importOrderService.createImportOrder(newImportOrder).then(
       (response) => {
         toast.success('Tạo phiếu nhập hàng thành công');
@@ -288,7 +289,6 @@ const ImportGoods = () => {
         console.log(error);
       },
     );
-
   };
 
   const calculateTotalAmount = () => {
@@ -709,22 +709,25 @@ const ImportGoods = () => {
                     rows={6}
                     multiline
                   />
-                  <Stack mt={25} justifyContent='flex-end'>
-                  <div className="total-amount">
-                    <div>Tổng tiền:</div>
-                    <div>{FormatDataUtils.formatCurrency(calculateTotalAmount())}</div>
-                  </div>
-                  <div className="button-import">
-                    <ButtonWrapper
-                      type="button"
-                      variant="contained"
-                      size="large"
-                      startIcon={<CheckIcon />}
-                      color='success'
-                    >
-                      Tạo phiếu nhập kho
-                    </ButtonWrapper>
-                  </div>
+                  <Stack
+                    mt={25}
+                    justifyContent="flex-end"
+                  >
+                    <div className="total-amount">
+                      <div>Tổng tiền:</div>
+                      <div>{FormatDataUtils.formatCurrency(calculateTotalAmount())}</div>
+                    </div>
+                    <div className="button-import">
+                      <ButtonWrapper
+                        type="button"
+                        variant="contained"
+                        size="large"
+                        startIcon={<CheckIcon />}
+                        color="success"
+                      >
+                        Tạo phiếu nhập kho
+                      </ButtonWrapper>
+                    </div>
                   </Stack>
                 </Card>
               </div>
