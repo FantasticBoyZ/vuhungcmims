@@ -28,7 +28,7 @@ const importOrderService = {
       // wareHouseId: '',
       wareHouseId: importOrder.wareHouseId,
       consignmentRequests: importOrder.consignmentRequests,
-    });
+    }, { headers: authHeader() });
   },
 
   confirmImportOrder: (params) => {
@@ -46,7 +46,7 @@ const importOrderService = {
   updateImportOrder: (importOrder) => {
     const url = API_URL +`/import-order/update`;
     // const url = process.env.REACT_APP_API_URL + '/import-order/update';
-    return axios.put(url, importOrder)
+    return axios.put(url, importOrder, { headers: authHeader() })
   },
 };
 
