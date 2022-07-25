@@ -21,12 +21,12 @@ const getRoundNumber = (value, precision) => {
 };
 
 const convertUTCDateToLocalDate = (date) => {
-  var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+  var newDate = new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
 
-  var offset = date.getTimezoneOffset() / 60;
-  var hours = date.getHours();
+  // var offset = date.getTimezoneOffset() / 60;
+  // var hours = date.getHours();
 
-  newDate.setHours(hours - offset);
+  // newDate.setHours(hours - offset);
 
   return newDate;
 };
@@ -60,7 +60,11 @@ const getOptionProduct = (listData) => {
 
 const getSelectedOption = (array, value) => {
   const arrayOption = getOptionWithIdandName(array);
-  return arrayOption.find((item) => item.value === value);
+  if (value !== null) {
+    return arrayOption.find((item) => item.value === value);
+  } else {
+    return null;
+  }
 };
 
 const getSelectedOptionWithId = (array, id) => {
