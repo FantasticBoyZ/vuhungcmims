@@ -18,13 +18,13 @@ const staffService = {
   setActiveForStaff: (params) => {
     const { staffId, isActive } = params;
     const url = `/staff/update-status/${staffId}`;
-    return axiosClient.get(url, { isActive, headers: authHeader() });
+    return axiosClient.get(url, { params, headers: authHeader() });
   },
 
   updateRoleForStaff: (params) => {
     const { staffId, roleId } = params;
-    const url = `/staff/update-role/${staffId}`;
-    return axiosClient.get(url, { roleId, headers: authHeader() });
+    const url = API_URL + `/staff/update-role/${staffId}`;
+    return axiosClient.get(url, { params, headers: authHeader() });
   },
 
   signUpStaff: (staff) => {
@@ -35,6 +35,33 @@ const staffService = {
   updateStaff: (staff) => {
     const url = API_URL + `/staff/update`;
     return axios.put(url, staff);
+  },
+
+  uploadImageNewStaff: (formData) => {
+    const url = API_URL + '/staff/add/image';
+    // const url = process.env.REACT_APP_API_URL + '/staff/add/image';
+
+    axios.post(url, formData).then(
+      (response) => {
+        return response;
+      },
+      (error) => {
+        console.log(error);
+      },
+    );
+  },
+
+  updateImageStaff: (staffId, formData) => {
+    const url = API_URL + `/staff/update/image/${staffId}`;
+    // const url = process.env.REACT_APP_API_URL + `/staff/update/image/${staffId}`;
+
+    return axios
+      .put(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      
   },
 };
 
