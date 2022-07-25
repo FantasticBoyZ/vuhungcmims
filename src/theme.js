@@ -2,7 +2,7 @@ import { alpha, createTheme, darken, lighten } from '@mui/material/styles';
 
 const themeColors = {
   primary: '#5569ff',
-  secondary: '#6E759F',
+  secondary: '#FFF500',
   success: '#57CA22',
   warning: '#FFA319',
   error: '#FF1943',
