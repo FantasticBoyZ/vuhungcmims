@@ -1,11 +1,6 @@
 import FormatDataUtils from '@/utils/formatData';
 import { Edit } from '@mui/icons-material';
-import {
-  Button,
-  Card,
-  CardContent, Grid,
-  Stack, Typography
-} from '@mui/material';
+import { Button, Card, CardContent, Grid, Stack, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
@@ -37,25 +32,34 @@ const useStyles = makeStyles({
   },
 });
 
-const localhost = 'http://localhost:8080'
-const deployUrl = 'http://ec2-52-221-240-240.ap-southeast-1.compute.amazonaws.com:8080'
+const localhost = 'http://localhost:8080';
+const deployUrl = 'http://ec2-52-221-240-240.ap-southeast-1.compute.amazonaws.com:8080';
 
 const ProductInformation = ({ product }) => {
   const classes = useStyles();
-  const [image, setImage] = useState()
+  const [image, setImage] = useState();
   const navigate = useNavigate();
-  
+
   const getImageProduct = async () => {
-    return await axios.get(localhost+'/'+product.image)
-  }
+    return await axios.get(localhost + '/' + product.image);
+  };
   const handleOnClickEdit = () => {
     navigate(`/product/edit/${product.id}`);
   };
 
+  const fetchImage = async (imageUrl) => {
+    const res = await fetch(imageUrl);
+    const imageBlob = await res.blob();
+    const imageObjectURL = URL.createObjectURL(imageBlob);
+    setImage(imageObjectURL);
+  };
+
   useEffect(() => {
-    // setImage(getImageProduct())
+    if (product.image) {
+      fetchImage(localhost + '/' + product.image);
+    }
   }, []);
-  
+
   return (
     <Grid
       container
@@ -297,207 +301,24 @@ const ProductInformation = ({ product }) => {
                   item
                 >
                   {/* TODO: đổi sang api deploy khi push code lên nhánh master */}
-                 
-                  {product.image ? (
-                    
-                    <img
-                      // component="img"
-                      // height="250"
-                      // sx={{ width: 250 }}
-                      className={classes.imageStyle}
-                      alt="Ảnh sản phẩm"
-                      // src={image}
-                      loading="lazy"
-                      src={`${localhost}/${product.image}`}
-                    />
-                  ) : (
-                    <img
-                      // component="img"
-                      // height="250"
-                      // sx={{ width: 250 }}
-                      className={classes.imageStyle}
-                      alt="Ảnh sản phẩm"
-                      src={require('@/assets/images/no-image-found.png')}
-                    />
-                  )}
+
+                  <img
+                    // component="img"
+                    // height="250"
+                    // sx={{ width: 250 }}
+                    className={classes.imageStyle}
+                    alt="Ảnh sản phẩm"
+                    // src={image}
+                    loading="lazy"
+                    src={
+                      product.image
+                        ? image
+                        : require('@/assets/images/no-image-found.png')
+                    }
+                  />
                 </Grid>
               </Grid>
             </CardContent>
-            {/* <Grid container>
-              <Grid
-                container
-                item
-                xs={9}
-              >
-                <Grid
-                  xs={6}
-                  item
-                  // sx={{ backgroundColor:"red" }}
-                >
-                  <Typography
-                    component={'span'}
-                    className={classes.infoStyle}
-                    lineHeight={2}
-                  >
-                    <Grid container>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        Mã sản phẩm{' '}
-                      </Grid>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        : <strong>{product.productCode}</strong>
-                      </Grid>
-                    </Grid>
-                  </Typography>
-
-                  <Typography
-                    component={'span'}
-                    className={classes.infoStyle}
-                    lineHeight={2}
-                  >
-                    <Grid container>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        Danh mục{' '}
-                      </Grid>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        : <strong>{product.categoryName}</strong>
-                      </Grid>
-                    </Grid>
-                  </Typography>
-
-                  <Typography
-                    component={'span'}
-                    className={classes.infoStyle}
-                    lineHeight={2}
-                  >
-                    <Grid container>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        Danh mục phụ
-                      </Grid>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        : <strong>{product.subCategoryName}</strong>
-                      </Grid>
-                    </Grid>
-                  </Typography>
-
-                  <Typography
-                    component={'span'}
-                    className={classes.infoStyle}
-                    lineHeight={2}
-                  >
-                    <Grid container>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        Đơn vị tính
-                      </Grid>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        : <strong>{product.unitMeasure}</strong>
-                      </Grid>
-                    </Grid>
-                  </Typography>
-
-                  <Typography
-                    component={'span'}
-                    className={classes.infoStyle}
-                    lineHeight={2}
-                  >
-                    <Grid container>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        Tồn kho
-                      </Grid>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        : <strong>{product.quantity || '0'}</strong>
-                      </Grid>
-                    </Grid>
-                  </Typography>
-                </Grid>
-
-                <Grid
-                  xs={6}
-                  item
-                  // sx={{ backgroundColor:"blue" }}
-                >
-                  <Typography
-                    component={'span'}
-                    className={classes.infoStyle}
-                    lineHeight={2}
-                  >
-                    <Grid container>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        Nhà cung cấp
-                      </Grid>
-                      <Grid
-                        xs={6}
-                        item
-                      >
-                        : <strong>{product.manufactorName}</strong>
-                      </Grid>
-                    </Grid>
-                  </Typography>
-                  <Typography
-                    className={classes.infoStyle}
-                    lineHeight={2}
-                  >
-                    Mô tả{' '}
-                  </Typography>
-                  <Box>
-                    <TextField
-                      defaultValue={product.description}
-                      variant="standard"
-                      multiline
-                      sx={{ width: '80%' }}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </Box>
-                </Grid>
-              </Grid>
-              <Grid
-                item
-                xs={3}
-                // sx={{ backgroundColor:"green" }}
-              >
-                <CardMedia
-                  component="img"
-                  height="180"
-                  sx={{ width: 180 }}
-                  alt="Product Detail"
-                  src="https://i.picsum.photos/id/604/200/300.jpg?hmac=6ceMKS8u7easDoKzWSaIiSTpRlTPn1OUOdfSJWou3uQ"
-                />
-              </Grid>
-            </Grid> */}
           </CardContent>
         </Card>
       </Grid>

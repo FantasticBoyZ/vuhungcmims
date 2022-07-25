@@ -198,12 +198,12 @@ const AddEditManufacturerForm = () => {
     }
   }, [manufacturerId]);
 
-  useEffect(() => {
-    if (selectedProvince) {
-      setSelectedDistrict('');
-      setSelectedWard('')
-    }
-  }, [selectedProvince])
+  // useEffect(() => {
+  //   if (selectedProvince) {
+  //     setSelectedDistrict('');
+  //     setSelectedWard('')
+  //   }
+  // }, [selectedProvince])
 
   return (
     <Container maxWidth="lg">
