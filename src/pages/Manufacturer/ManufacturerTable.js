@@ -64,9 +64,9 @@ const ManufacturerTable = ({ manufacturerList }) => {
               />
             </TableCell> */}
             <TableCell>Tên nhà cung cấp</TableCell>
-            <TableCell>Email</TableCell>
             <TableCell>Số điện thoại</TableCell>
-            <TableCell align="left">Hành động</TableCell>
+            <TableCell>Email</TableCell>
+            <TableCell align="left">Địa chỉ</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -75,11 +75,12 @@ const ManufacturerTable = ({ manufacturerList }) => {
             //   const isImportOrderSelected = selectedImportOrders.includes(importOrder.id);
             return (
               <TableRow
+                onClick={() => handleOnClickDetailManufacturer(manufacturer.id)}
                 hover
                 key={manufacturer.id}
                 //   selected={isImportOrderSelected}
                 selected={false}
-                // onClick={(value) => handleOnClickTableRow(importOrder.orderId)}
+              // onClick={(value) => handleOnClickTableRow(importOrder.orderId)}
               >
                 {/* <TableCell padding="checkbox">
                   <Checkbox
@@ -112,7 +113,7 @@ const ManufacturerTable = ({ manufacturerList }) => {
                     gutterBottom
                     noWrap
                   >
-                    {manufacturer.email}
+                    {manufacturer.phone}
                   </Typography>
                 </TableCell>
                 <TableCell>
@@ -122,11 +123,11 @@ const ManufacturerTable = ({ manufacturerList }) => {
                     gutterBottom
                     noWrap
                   >
-                    {manufacturer.phone}
+                    {manufacturer.email}
                   </Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <Stack
+                  {/* <Stack
                     direction="row"
                     spacing={2}
                     sx={{ width: '40px' }}
@@ -167,7 +168,7 @@ const ManufacturerTable = ({ manufacturerList }) => {
                         <EditTwoTone fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                  </Stack>
+                  </Stack> */}
                 </TableCell>
               </TableRow>
             );

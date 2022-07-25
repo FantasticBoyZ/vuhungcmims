@@ -7,7 +7,11 @@ import {
   Card,
   InputAdornment, Stack,
   TextField,
-  Toolbar
+  Toolbar,
+  Typography,
+  Grid,
+  FormControl, InputLabel, CardHeader,
+
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Container } from '@mui/system';
@@ -16,17 +20,23 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ManufacturerTable from './ManufacturerTable';
-
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import Select from 'react-select';
+import SearchIcon from '@mui/icons-material/Search';
 const useStyles = makeStyles({
   searchField: {
-    width: '30%',
+    width: '60%',
+    padding: '10px 14px'
   },
   toolbar: {
     display: 'flex',
     justifyContent: 'space-between',
   },
   selectBox: {
-    width: '50%',
+    // backgroundColor: 'green',
+    width: '150px',
+    height: '56px',
+    minHeight: '56px',
   },
   labelDateRange: {
     fontSize: '24px',
@@ -34,12 +44,23 @@ const useStyles = makeStyles({
   },
   cardFilter: {
     padding: '20px 0',
-    marginBottom: '20px',
+    boxShadow: '0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)',
+    background: '#fff'
   },
   cardTable: {
     padding: '0 20px',
   },
+  btnSearch: {
+    width: '200px',
+    // minHeight: '56px',
+  }
 });
+
+const optionSelect = [{
+  value: 1, label: "Tên"
+}, {
+  value: 2, label: "Khu vực"
+}]
 
 const ManufacturerList = () => {
   const pages = [10, 20, 50];
@@ -120,42 +141,42 @@ const ManufacturerList = () => {
   }, [page, rowsPerPage]);
 
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ marginBottom: '20px' }}>
-        <Stack
-          direction="row"
-          justifyContent="flex-end"
-          spacing={2}
-          p={2}
+    <Grid
+      container
+      spacing={2}
+      justifyContent="flex-end"
+    >
+      <Stack
+        direction="row"
+        spacing={2}
+        paddingY={2}
+      >
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={() => handleOnclickAddNewManufacturer()}
         >
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => handleOnclickAddNewManufacturer()}
+          Thêm nhà sản xuất mới
+        </Button>
+      </Stack>
+      <Grid
+        xs={12}
+        item
+      >
+        <Card>
+          <CardHeader title="Tìm kiếm thông tin nhà sản xuất" />
+          <Stack
+            direction="row"
+            spacing={2}
+            padding={2}
           >
-            Thêm mới
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-          >
-            Xuất file excel
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-          >
-            Nhập file excel
-          </Button>
-        </Stack>
-        <Card className={classes.cardFilter}>
-          <Toolbar className={classes.toolbar}>
             <TextField
               id="outlined-basic"
-              placeholder="Tìm kiếm theo tên nhà cung cấp"
+              name="keyword"
+              placeholder="Tìm kiếm theo..."
+              fullWidth
               label={null}
               variant="outlined"
-              className={classes.searchField}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -163,32 +184,60 @@ const ManufacturerList = () => {
                   </InputAdornment>
                 ),
               }}
-              onKeyDown={handleSearch}
-              // onChange={handleSearch}
             />
-          </Toolbar>
+            <Select
+              classNamePrefix="select"
+              className={classes.btnSearch}
+              defaultValue={optionSelect[0]}
+              name="searchBy"
+              options={optionSelect}
+              menuPortalTarget={document.body}
+              styles={{
+                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                control: (base) => ({
+                  ...base,
+                  height: 56,
+                  minHeight: 56,
+                }),
+              }}
+            />
+            <Button
+              variant="contained"
+              startIcon={<SearchIcon />}
+              className={classes.btnSearch}
+            >
+              Tìm kiếm
+            </Button>
+          </Stack>
         </Card>
-      </Box>
-      <Box>
-        <Card className={classes.cardTable}>
-          {loading ? (
-            <>Loading...</>
-          ) : (
-            <Box>
-              <ManufacturerTable manufacturerList={manufacturerList} />
-              <CustomTablePagination
-                page={page}
-                pages={pages}
-                rowsPerPage={rowsPerPage}
-                totalRecord={totalRecord}
-                handleChangePage={handleChangePage}
-                handleChangeRowsPerPage={handleChangeRowsPerPage}
-              />
-            </Box>
-          )}
-        </Card>
-      </Box>
-    </Container>
+      </Grid>
+      <Grid
+        xs={12}
+        item
+      >
+        <Box>
+          <Card className={classes.cardTable}>
+            {loading ? (
+              <ProgressCircleLoading />
+            ) : (
+              <Box>
+                <ManufacturerTable manufacturerList={manufacturerList} />
+                <CustomTablePagination
+                  page={page}
+                  pages={pages}
+                  rowsPerPage={rowsPerPage}
+                  totalRecord={totalRecord}
+                  handleChangePage={handleChangePage}
+                  handleChangeRowsPerPage={handleChangeRowsPerPage}
+                />
+              </Box>
+            )}
+          </Card>
+        </Box>
+
+      </Grid>
+
+    </Grid>
   );
 };
 
