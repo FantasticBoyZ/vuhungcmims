@@ -42,6 +42,9 @@ const useStyles = makeStyles({
   cardTable: {
     padding: '0 20px',
   },
+  buttonAdd: {
+    height: '36px !important'
+  }
 });
 
 const CategoryList = () => {
@@ -50,7 +53,7 @@ const CategoryList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
   const [categoryList, setCategoryList] = useState([]);
-  const [allCategoryList, setAllCategoryList] = useState([])
+  const [allCategoryList, setAllCategoryList] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [searchParams, setSearchParams] = useState({
     categoryName: '',
@@ -153,7 +156,7 @@ const CategoryList = () => {
   return (
     <Container maxWidth="xl">
       <Box sx={{ marginBottom: '20px' }}>
-        <Stack
+        {/* <Stack
           direction="row"
           justifyContent="flex-end"
           spacing={2}
@@ -178,9 +181,15 @@ const CategoryList = () => {
           >
             Nhập file excel
           </Button>
-        </Stack>
+        </Stack> */}
         <Card className={classes.cardFilter}>
-          <Toolbar className={classes.toolbar}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems='center'
+            spacing={2}
+            p={2}
+          >
             <TextField
               id="outlined-basic"
               placeholder="Tìm kiếm theo tên danh mục"
@@ -197,7 +206,15 @@ const CategoryList = () => {
               onKeyDown={handleSearch}
               // onChange={handleSearch}
             />
-          </Toolbar>
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              className={classes.buttonAdd}
+              onClick={() => handleOnclickAddNewProduct()}
+            >
+              Thêm mới danh mục mới
+            </Button>
+          </Stack>
         </Card>
       </Box>
       <Box>
@@ -206,7 +223,10 @@ const CategoryList = () => {
             <>Loading...</>
           ) : (
             <Box>
-              <CategoryTable categoryList={categoryList} allCategoryList={allCategoryList} />
+              <CategoryTable
+                categoryList={categoryList}
+                allCategoryList={allCategoryList}
+              />
               <CustomTablePagination
                 page={page}
                 pages={pages}
