@@ -1,4 +1,5 @@
 import CustomTablePagination from '@/components/Common/TablePagination';
+import AuthService from '@/services/authService';
 import exportOrderService from '@/services/exportOrderService';
 import { getExportOrderList } from '@/slices/ExportOrderSlice';
 import { Add, Search } from '@mui/icons-material';
@@ -95,6 +96,7 @@ const ExportList = () => {
   const [creatorId, setCreatorId] = useState('');
   const [exportOrderList, setExportOrderList] = useState();
   const navigate = useNavigate();
+  const currentUserRole = AuthService.getCurrentUser().roles[0];
   const [searchParams, setSearchParams] = useState({
     billRefernceNumber: '',
     startDate: '',
@@ -197,21 +199,23 @@ const ExportList = () => {
   }, [page, rowsPerPage]);
   return (
     <Container maxWidth="xl">
-      <Stack
-        direction="row"
-        justifyContent="flex-end"
-        spacing={2}
-        p={2}
-      >
-        <Button
-          variant="contained"
-          color='success'
-          startIcon={<Add />}
-          onClick={handleOnClickCreateExportOrder}
+      {(currentUserRole === 'ROLE_OWNER' || currentUserRole === 'ROLE_SELLER') && (
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          spacing={2}
+          p={2}
         >
-          Tạo phiếu xuất kho
-        </Button>
-        {/* <Button
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<Add />}
+            onClick={handleOnClickCreateExportOrder}
+          >
+            Tạo phiếu xuất kho
+          </Button>
+
+          {/* <Button
           variant="contained"
           color="secondary"
         >
@@ -223,7 +227,8 @@ const ExportList = () => {
         >
           Nhập file excel
         </Button> */}
-      </Stack>
+        </Stack>
+      )}
       <Card className={classes.panelFilter}>
         <div className={classes.labelPanelFilter}>Tìm kiếm theo thông tin</div>
         <Toolbar className={classes.toolbar}>

@@ -166,6 +166,7 @@ const ExportOrderDetail = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.exportOrders }));
+  const currentUserRole = AuthService.getCurrentUser().roles[0];
 
   const calculateTotalAmount = () => {
     let totalAmount = 0;
@@ -307,7 +308,9 @@ const ExportOrderDetail = () => {
                       <Typography variant="span">
                         <strong>Phiếu xuất kho số:</strong> {exportOrder.billRefernce}
                       </Typography>{' '}
-                      <span>{exportOrder.statusName && getStatusLabel(exportOrder.statusName)}</span>
+                      <span>
+                        {exportOrder.statusName && getStatusLabel(exportOrder.statusName)}
+                      </span>
                     </Box>
                     {exportOrder.statusName === 'pending' && (
                       <Stack
@@ -316,24 +319,30 @@ const ExportOrderDetail = () => {
                         spacing={2}
                         className={classes.buttonAction}
                       >
-                        <Button
-                          variant="contained"
-                          startIcon={<Done />}
-                          color="success"
-                          onClick={() => handleOnClickConfirm()}
-                        >
-                          Xác nhận xuất kho
-                        </Button>
-                        <Button
-                          variant="contained"
-                          startIcon={<Edit />}
-                          color="warning"
-                          onClick={() => {
-                            navigate(`/export/edit/${exportOrderId}`);
-                          }}
-                        >
-                          Chỉnh sửa
-                        </Button>
+                        {(currentUserRole === 'ROLE_OWNER' ||
+                          currentUserRole === 'ROLE_STOREKEEPER') && (
+                          <Button
+                            variant="contained"
+                            startIcon={<Done />}
+                            color="success"
+                            onClick={() => handleOnClickConfirm()}
+                          >
+                            Xác nhận xuất kho
+                          </Button>
+                        )}
+                        {(currentUserRole === 'ROLE_OWNER' ||
+                          currentUserRole === 'ROLE_STOREKEEPER') && (
+                          <Button
+                            variant="contained"
+                            startIcon={<Edit />}
+                            color="warning"
+                            onClick={() => {
+                              navigate(`/export/edit/${exportOrderId}`);
+                            }}
+                          >
+                            Chỉnh sửa
+                          </Button>
+                        )}
                         <Button
                           variant="contained"
                           startIcon={<Close />}
@@ -344,23 +353,26 @@ const ExportOrderDetail = () => {
                         </Button>
                       </Stack>
                     )}
-                    {exportOrder.statusName === 'completed' && exportOrder.isReturn !== true && (
-                      <Stack
-                        direction="row"
-                        justifyContent="flex-end"
-                        spacing={2}
-                        className={classes.buttonAction}
-                      >
-                        <Button
-                          variant="contained"
-                          startIcon={<KeyboardReturn />}
-                          color="warning"
-                          onClick={() => navigate(`/export/return/${exportOrderId}`)}
+                    {exportOrder.statusName === 'completed' &&
+                      exportOrder.isReturn !== true &&
+                      (currentUserRole === 'ROLE_OWNER' ||
+                        currentUserRole === 'ROLE_SELLER') && (
+                        <Stack
+                          direction="row"
+                          justifyContent="flex-end"
+                          spacing={2}
+                          className={classes.buttonAction}
                         >
-                          Trả hàng
-                        </Button>
-                      </Stack>
-                    )}
+                          <Button
+                            variant="contained"
+                            startIcon={<KeyboardReturn />}
+                            color="warning"
+                            onClick={() => navigate(`/export/return/${exportOrderId}`)}
+                          >
+                            Trả hàng
+                          </Button>
+                        </Stack>
+                      )}
                   </Stack>
                 </Card>
               </Grid>

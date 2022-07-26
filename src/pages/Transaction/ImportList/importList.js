@@ -26,6 +26,7 @@ import { Form, Formik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import AuthService from '@/services/authService';
 
 const useStyles = makeStyles({
   searchField: {
@@ -69,6 +70,7 @@ const ImportList = () => {
   const [totalRecord, setTotalRecord] = useState();
   const [importOrderList, setImportOrderList] = useState();
   const navigate = useNavigate();
+  const currentUserRole = AuthService.getCurrentUser().roles[0];
   const [searchParams, setSearchParams] = useState({
     billRefernceNumber: '',
     userId: '',
@@ -108,7 +110,10 @@ const ImportList = () => {
   const handleChangeStartDate = (value) => {
     setStartDate(value);
     console.log('startDate', format(new Date(value), 'dd-MM-yyyy'));
-    setSearchParams({ ...searchParams, startDate: format(new Date(value), 'dd-MM-yyyy') });
+    setSearchParams({
+      ...searchParams,
+      startDate: format(new Date(value), 'dd-MM-yyyy'),
+    });
     searchImportOrder({
       ...searchParams,
       startDate: format(new Date(value), 'dd-MM-yyyy'),
@@ -165,28 +170,34 @@ const ImportList = () => {
       console.log('Failed to fetch importOrder list: ', error);
     }
   };
-  // hook này để test biến thôi nha
+
+  useEffect(() => {
+    searchImportOrder(searchParams);
+  }, [page, rowsPerPage]);
+
   useEffect(() => {
     console.log(startDate + ' ' + endDate);
     fetchImportOrderList();
-  }, [page, rowsPerPage]);
+  }, []);
 
   return (
     <Container maxWidth="xl">
-      <Stack
-        direction="row"
-        justifyContent="flex-end"
-        spacing={2}
-        p={2}
-      >
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleOnClickCreateImportOrder}
+      {(currentUserRole === 'ROLE_OWNER' || currentUserRole === 'ROLE_SELLER') && (
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          spacing={2}
+          p={2}
         >
-          Tạo phiếu nhập kho
-        </Button>
-        <Button
+          <Button
+            variant="contained"
+            color='success'
+            startIcon={<AddIcon />}
+            onClick={handleOnClickCreateImportOrder}
+          >
+            Tạo phiếu nhập kho
+          </Button>
+          {/* <Button
           variant="contained"
           color="secondary"
         >
@@ -197,8 +208,9 @@ const ImportList = () => {
           color="secondary"
         >
           Nhập file excel
-        </Button>
-      </Stack>
+        </Button> */}
+        </Stack>
+      )}
       <Card className={classes.panelFilter}>
         <Toolbar className={classes.toolbar}>
           <TextField
