@@ -19,10 +19,18 @@ export const getCategoryDetail = createAsyncThunk('category/get-one' , async (pa
   return category;
 })
 
-export const saveCategory = createAsyncThunk('category/save' , async (category, thunkAPi) => {
+export const saveCategory = createAsyncThunk('category/save' , async (category, { rejectWithValue }) => {
   // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
-  const response = await categoryService.saveCategory(category);
+  try {
+    const response = await categoryService.saveCategory(category);
   return response;
+  } catch (err) {
+    if (!err.response) {
+      throw err;
+    }
+    return rejectWithValue(err.response.data);
+  }
+  
 })
 
 const categorySlice = createSlice({

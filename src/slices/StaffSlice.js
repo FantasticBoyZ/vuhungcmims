@@ -14,6 +14,11 @@ export const getStaffDetail = createAsyncThunk(
   },
 );
 
+export const getProfile = createAsyncThunk('profile', async (staffId, thunkAPi) => {
+  const profile = await staffService.getProfile(staffId);
+  return profile;
+});
+
 export const setActiveForStaff = createAsyncThunk(
   'staff/set-active',
   async (params, thunkAPi) => {
@@ -30,19 +35,78 @@ export const updateRoleForStaff = createAsyncThunk(
   },
 );
 
-export const signUpStaff = createAsyncThunk('staff/sign-up', async (staff, thunkAPi) => {
-  const response = await staffService.signUpStaff(staff);
-  return response;
-})
+export const signUpStaff = createAsyncThunk(
+  'staff/sign-up',
+  async (staff, { rejectWithValue }) => {
+    try {
+      const response = await staffService.signUpStaff(staff);
+      return response;
+    } catch (err) {
+      if (!err.response) {
+        throw err;
+      }
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
 
-export const uploadImageNewStaff = createAsyncThunk('staff/upload-new-image', async (formData) => {
-  return await staffService.uploadImageNewStaff(formData)
-})
+export const uploadImageNewStaff = createAsyncThunk(
+  'staff/upload-new-image',
+  async (formData) => {
+    return await staffService.uploadImageNewStaff(formData);
+  },
+);
 
 export const updateImageStaff = createAsyncThunk('staff/update-image', async (params) => {
-  const {staffId, formData} = params
-  return await staffService.updateImageStaff(staffId, formData)
-})
+  const { staffId, formData } = params;
+  return await staffService.updateImageStaff(staffId, formData);
+});
+
+export const updateProfile = createAsyncThunk(
+  'staff/update-profile',
+  async (staff, { rejectWithValue }) => {
+    try {
+      return await staffService.updateProfile(staff);
+    } catch (err) {
+      if (!err.response) {
+        throw err;
+      }
+      console.log(err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const setNewPassword = createAsyncThunk(
+  'profile/set-new-password',
+  async (newPassword, { rejectWithValue }) => {
+    try {
+      return await staffService.setNewPassword(newPassword);
+    } catch (err) {
+      if (!err.response) {
+        throw err;
+      }
+      console.log(err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const resetPassword = createAsyncThunk(
+  'staff/reset-password',
+  async (staff, { rejectWithValue }) => {
+    try {
+      return await staffService.resetPassword(staff);
+    } catch (err) {
+      if (!err.response) {
+        throw err;
+      }
+      console.log(err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
 
 const staffSlice = createSlice({
   name: 'staff',
@@ -127,6 +191,50 @@ const staffSlice = createSlice({
       state.error = action.payload;
     },
     [updateImageStaff.fulfilled]: (state, action) => {
+      state.loading = false;
+      // state.importOrderList = action.payload;
+    },
+    [updateProfile.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateProfile.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [updateProfile.fulfilled]: (state, action) => {
+      state.loading = false;
+      // state.importOrderList = action.payload;
+    },
+    [getProfile.pending]: (state) => {
+      state.loading = true;
+    },
+    [getProfile.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getProfile.fulfilled]: (state, action) => {
+      state.loading = false;
+      // state.importOrderList = action.payload;
+    },
+    [setNewPassword.pending]: (state) => {
+      state.loading = true;
+    },
+    [setNewPassword.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [setNewPassword.fulfilled]: (state, action) => {
+      state.loading = false;
+      // state.importOrderList = action.payload;
+    },
+    [resetPassword.pending]: (state) => {
+      state.loading = true;
+    },
+    [resetPassword.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [resetPassword.fulfilled]: (state, action) => {
       state.loading = false;
       // state.importOrderList = action.payload;
     },
