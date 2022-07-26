@@ -58,7 +58,22 @@ const titles = [
   { url: '/export/detail', title: 'Thông tin phiếu xuất kho' },
   { url: '/export/create-order', title: 'Xuất kho' },
   { url: '/export/edit', title: 'Thông tin phiếu xuất kho' },
+  { url: '/export/return', title: 'Trả hàng' },
+  { url: '/export/return/list', title: 'Phiếu trả hàng' },
+  { url: '/export/return/detail', title: 'Thông tin phiếu trả hàng' },
+  { url: '/term-inventory/return', title: 'Tạo phiếu lưu kho' },
+  { url: '/term-inventory/return/list', title: 'Danh sách lưu kho' },
+  { url: '/term-inventory/return/detail', title: 'Thông tin phiếu lưu kho' },
+  { url: '/inventory-checking/create', title: 'Kiểm kho' },
+  { url: '/inventory-checking/list', title: 'Lịch sử kiểm kho' },
+  { url: '/inventory-checking/detail', title: 'Chi tiết kiểm kho' },
+  { url: '/staff/list', title: 'Danh sách nhân viên' },
+  { url: '/staff/detail', title: 'Thông tin nhân viên' },
+  { url: '/staff/register', title: 'Đăng ký nhân viên mới' },
   { url: '/warehouse', title: 'Quản lý nhà kho' },
+  { url: '/profile', title: 'Hồ sơ cá nhân' },
+  { url: '/reset-password', title: 'Đổi mật khẩu' },
+  { url: '/profile/edit', title: 'Thay đổi hồ sơ cá nhân' },
 ];
 
 const getRoleLabel = (exportOrderStatus) => {
@@ -167,7 +182,7 @@ const Header = () => {
         }}
         sx={{ marginTop: '38px' }}
       >
-        <MenuItem>Hồ sơ cá nhân</MenuItem>
+        <MenuItem onClick={() => navigate('/profile')}>Hồ sơ cá nhân</MenuItem>
         <MenuItem onClick={logOut}>Đăng xuất</MenuItem>
       </Menu>
     </AppBar>
