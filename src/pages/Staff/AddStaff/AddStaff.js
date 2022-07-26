@@ -173,7 +173,7 @@ const AddStaff = () => {
   const FORM_VALIDATION = Yup.object().shape({
     username: Yup.string().required('Chưa nhập mã nhân viên'),
     fullName: Yup.string().required('Chưa nhập Họ và tên nhân viên'),
-    identityCard: Yup.string().required('Chưa nhập Số CCCD/CMND'),
+    identityCard: Yup.number().typeError('Vui lòng nhập CCCD/CMND là chữ số').required('Chưa nhập Số CCCD/CMND'),
     phone: Yup.string().required('Chưa nhập Số điện thoại'),
     email: Yup.string()
       .email('Vui lòng nhập đúng định dạng email. VD abc@xyz.com')
@@ -223,7 +223,7 @@ const AddStaff = () => {
       username: values.username,
       fullName: values.fullName,
       identityCard: values.identityCard,
-      dateOfBirth: values.dateOfBirth,
+      dateOfBirth: new Date(new Date(values.dateOfBirth) + (new Date().getTimezoneOffset()) / 60).toJSON(),
       gender: Boolean(+values.gender),
       phone: values.phone,
       email: values.email,
@@ -247,6 +247,7 @@ const AddStaff = () => {
                 navigate('/staff/list');
               },
               (err) => {
+                
                 console.log(err);
               },
             );
@@ -263,7 +264,7 @@ const AddStaff = () => {
       }
     } catch (error) {
       console.log('Failed to sign up staff: ', error);
-      toast.error('Tạo nhân viên thất bại');
+      toast.error(error.message);
     }
   };
 
