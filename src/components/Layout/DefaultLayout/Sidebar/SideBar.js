@@ -34,6 +34,7 @@ import {
 import { Link } from 'react-router-dom';
 import SidebarItem from './sidebarItem';
 import { makeStyles } from '@mui/styles';
+import AuthService from '@/services/authService';
 
 const drawerWidth = 250;
 
@@ -83,14 +84,14 @@ const useStyles = makeStyles((theme) => ({
   drawerPaper: {
     width: 250,
     // overflow: "auto",
-    height: "100%",
-    [theme.breakpoints.up("md")]: {
-      overflow: "auto",
+    height: '100%',
+    [theme.breakpoints.up('md')]: {
+      overflow: 'auto',
       width: drawerWidth,
-      position: "relative",
-      height: "100%"
-    }
-  }
+      position: 'relative',
+      height: '100%',
+    },
+  },
 }));
 
 const openedMixin = (theme) => ({
@@ -130,8 +131,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     whiteSpace: 'nowrap',
     boxSizing: 'border-box',
     backgroundColor: 'red',
-    overflow: "auto",
-    height: "100%",
+    overflow: 'auto',
+    height: '100%',
     ...(open && {
       ...openedMixin(theme),
       '& .MuiDrawer-paper': openedMixin(theme),
@@ -146,7 +147,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const Sidebar = () => {
   const theme = useTheme();
   const classes = useStyles();
-
+  const currentUserRole = AuthService.getCurrentUser().roles[0];
   const [open, setOpen] = useState(true);
 
   const LIST_ITEM_SIDEBAR = [
@@ -156,16 +157,19 @@ const Sidebar = () => {
       path: '/dashboard',
       children: [],
       hasParent: false,
+      acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
     },
     {
       primary: 'Quản lý kho hàng',
       icon: <AutoAwesomeMosaic />,
       path: '/warehourse-management',
+      acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
       children: [
         {
           primary: 'Sản phẩm',
           icon: '',
           path: '/product',
+          acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -173,6 +177,7 @@ const Sidebar = () => {
           primary: 'Nhà sản xuất',
           icon: '',
           path: '/manufacturer',
+          acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -180,6 +185,7 @@ const Sidebar = () => {
           primary: 'Danh mục',
           icon: '',
           path: '/category',
+          acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -187,6 +193,7 @@ const Sidebar = () => {
           primary: 'Nhà kho',
           icon: '',
           path: '/warehouse',
+          acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -197,11 +204,13 @@ const Sidebar = () => {
       primary: 'Quản lý nhập hàng',
       icon: <Input />,
       path: '/import-order',
+      acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
       children: [
         {
           primary: 'Tạo phiếu nhập hàng',
           icon: '',
           path: '/import/create-order',
+          acceptRole: ['ROLE_OWNER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -209,6 +218,7 @@ const Sidebar = () => {
           primary: 'Danh sách nhập hàng',
           icon: '',
           path: '/import/list',
+          acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -219,11 +229,13 @@ const Sidebar = () => {
       primary: 'Quản lý xuất hàng',
       icon: <Output />,
       path: '/export-order',
+      acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
       children: [
         {
           primary: 'Tạo phiếu xuất hàng',
           icon: '',
           path: '/export/create-order',
+          acceptRole: ['ROLE_OWNER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -231,6 +243,7 @@ const Sidebar = () => {
           primary: 'Danh sách xuất hàng',
           icon: '',
           path: '/export/list',
+          acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -238,6 +251,7 @@ const Sidebar = () => {
           primary: 'Danh sách trả hàng',
           icon: '',
           path: '/export/return/list',
+          acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -248,11 +262,13 @@ const Sidebar = () => {
       primary: 'Trả hàng lưu kho',
       icon: <TurnLeft />,
       path: '/transaction',
+      acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
       children: [
         {
           primary: 'Tạo phiếu lưu kho',
           icon: '',
           path: '/storage/create',
+          acceptRole: ['ROLE_OWNER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -260,6 +276,7 @@ const Sidebar = () => {
           primary: 'Danh sách lưu kho',
           icon: '',
           path: '/storage/list',
+          acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -270,11 +287,13 @@ const Sidebar = () => {
       primary: 'Kiểm hàng',
       icon: <TableView />,
       path: '/customer',
+      acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER'],
       children: [
         {
           primary: 'Tạo phiếu kiểm hàng',
           icon: '',
           path: '/inventory-checking/create',
+          acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -282,6 +301,7 @@ const Sidebar = () => {
           primary: 'Lịch sử kiểm hàng',
           icon: '',
           path: '/inventory-checking/list',
+          acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -292,11 +312,13 @@ const Sidebar = () => {
       primary: 'Nhân viên',
       icon: <Person />,
       path: '/staff-management',
+      acceptRole: ['ROLE_OWNER'],
       children: [
         {
           primary: 'Đăng ký nhân viên mới',
           icon: '',
           path: '/staff/register',
+          acceptRole: ['ROLE_OWNER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -304,6 +326,7 @@ const Sidebar = () => {
           primary: 'Danh sách nhân viên',
           icon: '',
           path: '/staff/list',
+          acceptRole: ['ROLE_OWNER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
         },
@@ -322,7 +345,7 @@ const Sidebar = () => {
         sx: {
           backgroundColor: theme.palette.sidebar.main,
           color: theme.palette.common.white,
-        }
+        },
       }}
     >
       <DrawerHeader>
@@ -340,7 +363,10 @@ const Sidebar = () => {
             </Typography>
           </Link>
         )}
-        <IconButton sx={{ color: 'white' }} onClick={(e) => setOpen(!open)}>
+        <IconButton
+          sx={{ color: 'white' }}
+          onClick={(e) => setOpen(!open)}
+        >
           {theme.direction === 'rtl' ? <ChevronRight /> : <Menu />}
         </IconButton>
       </DrawerHeader>
@@ -356,7 +382,12 @@ const Sidebar = () => {
           // />
           return (
             <Box key={index}>
-              <SidebarItem option={item} openSidebar={open} />
+              {item.acceptRole.includes(currentUserRole) && (
+                <SidebarItem
+                  option={item}
+                  openSidebar={open}
+                />
+              )}
             </Box>
           );
         })}

@@ -1,3 +1,4 @@
+import AuthService from '@/services/authService';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import {
   Box,
@@ -11,23 +12,23 @@ import { makeStyles } from '@mui/styles';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-
 const useStyles = makeStyles({
   root: {
     '&$selected': {
       backgroundColor: 'rgba(0,69,108,1) !important',
       '&:hover': {
         backgroundColor: 'yellow',
-      }
+      },
     },
   },
   selected: {},
-})
+});
 const SidebarItem = ({ option, openSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const classes = useStyles()
+  const classes = useStyles();
   const [openNested, setOpenNested] = useState(false);
+  const currentUserRole = AuthService.getCurrentUser().roles[0];
 
   useEffect(() => {
     if (openSidebar === false) {
@@ -36,16 +37,15 @@ const SidebarItem = ({ option, openSidebar }) => {
   }, [openSidebar]);
 
   const handleClick = (option) => {
-    if( option?.children.length > 0) {
+    if (option?.children.length > 0) {
       setOpenNested(!openNested);
-    }else {
-      navigate(option.path)
+    } else {
+      navigate(option.path);
     }
-    
   };
 
   const renderSidebarItem = (option, childOption) => {
-    const { primary, icon, children, path, hasParent } = option || {};
+    const { primary, icon, children, path, hasParent, acceptRole } = option || {};
 
     // child option icon is padding left and also can navigate to the page
     const childOptionStyle = childOption ? { pl: 2, color: 'white' } : {};
@@ -59,7 +59,7 @@ const SidebarItem = ({ option, openSidebar }) => {
       return (
         <ListItemButton
           selected={location.pathname.includes(path)}
-          sx={{paddingLeft: '65px', backgroundColor: '#00588B'}}
+          sx={{ paddingLeft: '65px', backgroundColor: '#00588B' }}
           classes={{ root: classes.root, selected: classes.selected }}
           onClick={childOptionOnClick}
         >
@@ -98,7 +98,11 @@ const SidebarItem = ({ option, openSidebar }) => {
             primary={primary}
             sx={{ color: 'White' }}
           />
-          {children.length > 0 ? <>{openNested ? <ExpandLess /> : <ExpandMore />}</> : <></>}
+          {children.length > 0 ? (
+            <>{openNested ? <ExpandLess /> : <ExpandMore />}</>
+          ) : (
+            <></>
+          )}
         </ListItemButton>
         <Collapse in={openNested}>
           <Box
@@ -106,7 +110,18 @@ const SidebarItem = ({ option, openSidebar }) => {
             disablePadding
           >
             {children.map((item, index) => {
-              return <ListItem sx={{ padding: 0}} key={index}>{renderSidebarItem(item, true)}</ListItem>;
+              return (
+                <>
+                  {item.acceptRole.includes(currentUserRole) && (
+                    <ListItem
+                      sx={{ padding: 0 }}
+                      key={index}
+                    >
+                      {renderSidebarItem(item, true)}
+                    </ListItem>
+                  )}
+                </>
+              );
             })}
           </Box>
         </Collapse>
