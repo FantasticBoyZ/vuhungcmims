@@ -3,6 +3,7 @@ import Label from '@/components/Common/Label';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import {
   getStaffDetail,
+  resetPassword,
   setActiveForStaff,
   updateImageStaff,
   updateRoleForStaff,
@@ -188,11 +189,16 @@ const StaffDetail = () => {
 
   const handleResetPasswordStaff = () => {
     console.log('reset mật khẩu nhân viên');
+    setTitle('Thao tác này sẽ cài lại mật khẩu và gửi mật khẩu cài lại về email “'+ staff.email +'”.');
+    setConfirmTask('resetPassword');
+    setMessage('');
+    setErrorMessage(null);
+    setOpenPopup(true);
   };
 
   const handleSetActiveStaff = () => {
     console.log('Đổi trạng thái tài khoản');
-    if (Boolean(staff.isActive) === true) {
+    if (Boolean(staff.active) === true) {
       setTitle(
         'Bạn có chắc chắn muốn ngưng hoạt động của tài khoản ' +
           staff.userName +
@@ -225,13 +231,27 @@ const StaffDetail = () => {
   const handleConfirm = async () => {
     switch (confirmTask) {
       case 'resetPassword':
+        try {
+          const params = {
+            id: staffId,
+          };
+          const actionResult = await dispatch(resetPassword(params));
+          const dataResult = unwrapResult(actionResult);
+          console.log('dataResult', dataResult);
+          if (dataResult) {
+            toast.success(dataResult.data.message);
+            setOpenPopup(false);
+          }
+        } catch (error) {
+          console.log('Failed to set active staff: ', error);
+        }
         break;
       case 'setActive':
         if (!!staff) {
           try {
             const params = {
               staffId: staffId,
-              isActive: !staff.isActive,
+              isActive: !staff.active,
             };
             const actionResult = await dispatch(setActiveForStaff(params));
             const dataResult = unwrapResult(actionResult);
@@ -361,7 +381,7 @@ const StaffDetail = () => {
                         alignItems="center"
                       >
                         <Box>{getRoleLabel(staff.roleName)}</Box>
-                        <Box>{getStatusLabel(Boolean(staff.isActive))}</Box>
+                        <Box>{getStatusLabel(Boolean(staff.active))}</Box>
                       </Stack>
                     </Card>
                   </Grid>
@@ -492,7 +512,7 @@ const StaffDetail = () => {
                           xs={9}
                           item
                         >
-                          <Typography>{staff.gender === 1 ? 'Nam' : 'Nữ'}</Typography>
+                          <Typography>{staff.gender === true ? 'Nam' : 'Nữ'}</Typography>
                         </Grid>
                       </Grid>
                       <Stack
@@ -509,11 +529,11 @@ const StaffDetail = () => {
                         </Button>
                         <Button
                           variant="contained"
-                          startIcon={!Boolean(staff.isActive) ? <LockOpen /> : <Block />}
-                          color={!Boolean(staff.isActive) ? 'success' : 'error'}
+                          startIcon={!Boolean(staff.active) ? <LockOpen /> : <Block />}
+                          color={!Boolean(staff.active) ? 'success' : 'error'}
                           onClick={() => handleSetActiveStaff()}
                         >
-                          {!Boolean(staff.isActive)
+                          {!Boolean(staff.active)
                             ? 'Kích hoạt tài khoản'
                             : 'Tạm dừng tài khoản'}
                         </Button>

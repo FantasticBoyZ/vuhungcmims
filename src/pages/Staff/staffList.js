@@ -90,7 +90,7 @@ const staffLists = [
     role: 'seller',
     phone: '0987654321',
     email: 'khoivt@gmail.com',
-    isActive: true,
+    active: true,
   },
   {
     id: '2',
@@ -100,7 +100,7 @@ const staffLists = [
     role: 'storekeeper',
     phone: '0123456789',
     email: 'ninhtbm@gmail.com',
-    isActive: false,
+    active: false,
   },
 ];
 
@@ -144,12 +144,12 @@ const StaffList = () => {
   };
 
   const handleConfirm = async () => {
-    console.log(!changedActiveStaff.isActive);
+    console.log(!changedActiveStaff.active);
     if (!!changedActiveStaff) {
       try {
         const params = {
           staffId: changedActiveStaff.id,
-          isActive: !changedActiveStaff.isActive,
+          isActive: !changedActiveStaff.active,
         };
         const actionResult = await dispatch(setActiveForStaff(params));
         const dataResult = unwrapResult(actionResult);
@@ -187,7 +187,7 @@ const StaffList = () => {
 
   const setActiveStaff = async (staff) => {
     console.log(staff);
-    if (Boolean(staff.isActive) === true) {
+    if (Boolean(staff.active) === true) {
       setTitle(
         'Bạn có chắc chắn muốn ngưng hoạt động của tài khoản ' +
           staff.userName +
@@ -230,9 +230,12 @@ const StaffList = () => {
   };
 
   useEffect(() => {
-    fetchStaffList();
-    fetchImage('https://i.imgur.com/fHyEMsl.jpg');
+    searchStaff();
   }, [page, rowsPerPage]);
+
+  useEffect(() => {
+    fetchStaffList();
+  }, []);
   return (
     <Grid
       container
@@ -360,12 +363,12 @@ const StaffList = () => {
                                     onChange={() => setActiveStaff(staff)}
                                     control={
                                       <Switch
-                                        checked={Boolean(staff.isActive)}
+                                        checked={Boolean(staff.active)}
                                         color="success"
                                       />
                                     }
                                     label={
-                                      staff.isActive
+                                      staff.active
                                         ? 'Đang hoạt động'
                                         : 'Đã ngưng hoạt động'
                                     }
