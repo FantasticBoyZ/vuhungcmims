@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import { makeStyles } from '@mui/styles';
+import { Stack } from '@mui/material';
 
 const useStyles = makeStyles({
   styleBox: {
@@ -27,13 +28,13 @@ const useStyles = makeStyles({
     padding: '32px',
     width: '375px',
     background: '#fff',
-    boxShadow: '4px 4px 4px 4px rgba(0, 0, 0, 0.25);'
+    boxShadow: '4px 4px 4px 4px rgba(0, 0, 0, 0.25);',
   },
 });
 
 const Login = () => {
   let navigate = useNavigate();
-  const classes = useStyles()
+  const classes = useStyles();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [disabled, setDisabled] = useState(false);
@@ -44,11 +45,10 @@ const Login = () => {
   };
 
   const FORM_VALIDATION = Yup.object().shape({
-    username: Yup.string()
-      .required('Vui lòng nhập tên đăng nhập'),
+    username: Yup.string().required('Vui lòng nhập tên đăng nhập'),
     password: Yup.string()
       // .min(8, "Vui lòng nhập ít nhất 8 kí tự")
-      .max(50, "Vui lòng nhập không vượt quá 50 kí tự")
+      .max(50, 'Vui lòng nhập không vượt quá 50 kí tự')
       .required('Vui lòng nhập mật khẩu'),
   });
 
@@ -82,8 +82,7 @@ const Login = () => {
         item
         component="main"
       >
-        <Box className={classes.styleBox}
-        >
+        <Box className={classes.styleBox}>
           <Avatar sx={{ m: 1, bgcolor: 'primary.light' }}>
             <LockOutlined />
           </Avatar>
@@ -110,9 +109,9 @@ const Login = () => {
                   fullWidth
                   id="username"
                   autoComplete="username"
-                // autoFocus
-                // value={username}
-                // onChange={onChangeUsername}
+                  // autoFocus
+                  // value={username}
+                  // onChange={onChangeUsername}
                 />
 
                 <Textfield
@@ -123,21 +122,35 @@ const Login = () => {
                   type="password"
                   id="password"
                   autoComplete="current-password"
-                // value={password}
-                // onChange={onChangePassword}
+                  // value={password}
+                  // onChange={onChangePassword}
                 />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      value="remember"
-                      color="primary"
-                    />
-                  }
-                  label="Lưu đăng nhập"
-                />
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        value="remember"
+                        color="primary"
+                      />
+                    }
+                    label="Lưu đăng nhập"
+                  />
+
+                  <Link
+                    href="/forgotPassword"
+                    variant="body2"
+                  >
+                    Quên mật khẩu?
+                  </Link>
+                </Stack>
+
                 <Button
                   fullWidth
-                  variant='contained'
+                  variant="contained"
                   disabled={disabled}
                   sx={{ mt: 3, mb: 2 }}
                 >
@@ -145,7 +158,7 @@ const Login = () => {
                 </Button>
               </Form>
             </Formik>
-            <Grid container>
+            {/* <Grid container>
               <Grid
                 item
                 xs
@@ -165,7 +178,7 @@ const Login = () => {
                   {'Bạn chưa có tài khoản? Đăng ký'}
                 </Link>
               </Grid>
-            </Grid>
+            </Grid> */}
           </Box>
         </Box>
       </Grid>
