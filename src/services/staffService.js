@@ -15,6 +15,11 @@ const staffService = {
     return axiosClient.get(url, { headers: authHeader() });
   },
 
+  getProfile: (staffId) => {
+    const url = `/staff/detail-profile/${staffId}`
+    return axiosClient.get(url, { headers: authHeader() });
+  },
+
   setActiveForStaff: (params) => {
     const { staffId, isActive } = params;
     const url = `/staff/update-status/${staffId}`;
@@ -53,15 +58,36 @@ const staffService = {
 
   updateImageStaff: (staffId, formData) => {
     const url = API_URL + `/staff/update/image/${staffId}`;
-    // const url = process.env.REACT_APP_API_URL + `/staff/update/image/${staffId}`;
 
-    return axios
-      .put(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      
+    return axios.put(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+
+  updateProfile: (staff) => {
+    const url = API_URL + `/staff/update`;
+
+    return axios.post(url, staff, {
+      headers: authHeader(),
+    });
+  },
+
+  setNewPassword: (newPassword) => {
+    const url = API_URL + `/user/new-password`;
+
+    return axios.post(url, newPassword, {
+      headers: authHeader(),
+    });
+  },
+
+  resetPassword: (staff) => {
+    const url = API_URL + `/staff/reset-password`;
+
+    return axios.post(url, staff, {
+      headers: authHeader(),
+    });
   },
 };
 
