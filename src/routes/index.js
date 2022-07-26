@@ -1,5 +1,5 @@
 import NotFound from '@/components/Layout/NotFound/NotFound';
-import Profile from '@/components/TestComponent/Profile';
+
 import About from '@/pages/About/About';
 import Login from '@/pages/Auth/Login';
 import AddEditCategoryForm from '@/pages/Category/AddEditCategory/AddEditCategoryForm';
@@ -32,6 +32,9 @@ import CreateInventoryChecking from '@/pages/InventoryChecking/CreateInventoryCh
 import InventoryCheckingDetail from '@/pages/InventoryChecking/InventoryCheckingList/InventoyCheckingDetail/InventoryCheckingDetail';
 import WarehouseList from '@/pages/Warehouse/wareHouseList';
 import AddStaff from '@/pages/Staff/AddStaff/AddStaff';
+import Profile from '@/pages/Profile/Profile';
+import ResetPassword from '@/pages/Profile/ResetPassword/ResetPassword';
+import UpdateProfile from '@/pages/Profile/UpdateProfile/UpdateProfile';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -46,7 +49,6 @@ const publicRoutes = [
 const privateRoutes = [
   { path: '/dashboard', component: HomePage },
   { path: '/about', component: About },
-  { path: '/profile', component: Profile },
   { path: 'post/add', component: TestPost },
   { path: 'post/:postId', component: TestPost },
 
@@ -97,6 +99,11 @@ const privateRoutes = [
 
   //warehouse route
   { path: '/wareHouse', component: WarehouseList },
+
+  // profile route
+  { path: '/profile', component: Profile },
+  { path: '/reset-password', component: ResetPassword },
+  { path: '/profile/edit', component: UpdateProfile },
 ];
 
 export { publicRoutes, privateRoutes };
