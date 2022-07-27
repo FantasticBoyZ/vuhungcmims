@@ -8,62 +8,53 @@ import { Form, Formik, FormikConfig, FormikValues, FormikHelpers } from 'formik'
 import * as Yup from 'yup';
 
 const useStyles = makeStyles({
-    styleForm: {
-        width: '410px',
-        paddingTop: '5%',
-        lineHeight: '26px'
-    }
+  styleForm: {
+    width: '410px',
+    paddingTop: '5%',
+    lineHeight: '26px',
+  },
 });
 
-
-
 export default function ForgotPassword() {
-    const classes = useStyles();
+  const classes = useStyles();
 
-    const FORM_VALIDATION = Yup.object().shape({
-        email: Yup.string()
-            .required('Vui lòng không để trống'),
-    });
-
-
-    return (
-        <Grid
-            item
-            component="main"
+  return (
+    <Grid
+      item
+      component="main"
+    >
+      <Box
+        sx={{
+          marginTop: 4,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: '32px',
+        }}
+      >
+        <Typography
+          component="h1"
+          variant="h5"
         >
-            <Box
-                sx={{
-                    marginTop: 4,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    padding: '32px',
-                }}
-            >
-                <Typography
-                    component="h1"
-                    variant="h5"
-                >
-                    Quên mật khẩu
-                </Typography>
+          Quên mật khẩu
+        </Typography>
 
-                <Box sx={{ mt: 1 }}>
-                    <Formik validationSchema={FORM_VALIDATION}>
-                        <Form className={classes.styleForm}>
-                            <label htmlFor="email">Bạn quên mật khẩu? vui lòng điền email đã dùng để đăng ký tài khoảng của bạn ở đây.</label>
-                            <Textfield
-                                name="email"
-                                label="Email"
-                                margin="normal"
-                                fullWidth
-                                id="email"
-                                autoComplete="email"
-                            />
-                        </Form>
-                    </Formik>
+        <Box sx={{ mt: 1 }} className={classes.styleForm}>
+          <label htmlFor="email">
+            Bạn quên mật khẩu? vui lòng điền mã nhân viên đã dùng để đăng ký tài khoản của
+            bạn ở đây.
+          </label>
+          <Textfield
+            name="userName"
+            label="Mã nhân viên"
+            margin="normal"
+            fullWidth
+            id="userName"
+            autoComplete="userName"
+          />
 
-                </Box>
-            </Box>
-        </Grid>
-    );
+        </Box>
+      </Box>
+    </Grid>
+  );
 }
