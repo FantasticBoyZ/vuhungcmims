@@ -5,6 +5,7 @@ import AuthService from '@/services/authService';
 import importOrderService from '@/services/importOrderService';
 import { getManufacturerList } from '@/slices/ManufacturerSlice';
 import { getProductList } from '@/slices/ProductSlice';
+import { getWarehouseList } from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
 import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -89,6 +90,7 @@ const DependentField = ({ name, ...otherProps }) => {
 const ImportGoods = () => {
   const [manufacturerList, setManufacturerList] = useState();
   const [searchManufacturerParams, setSearchManufacturerParams] = useState();
+  const [warehouseList, setWarehouseList] = useState([]);
   const [productList, setProductList] = useState();
   const [selectedProduct, setSelectedProduct] = useState();
   const [openPopup, setOpenPopup] = useState(false);
@@ -248,10 +250,12 @@ const ImportGoods = () => {
         setOpenPopup(true);
         return;
       }
-      console.log('timezone', (new Date().getTimezoneOffset()) / 60)
+      console.log('timezone', new Date().getTimezoneOffset() / 60);
       consignmentRequests.push({
         productId: consignments[index]?.productId,
-        expirationDate: new Date(consignments[index]?.expirationDate + (new Date().getTimezoneOffset()) / 60).toJSON(),
+        expirationDate: new Date(
+          consignments[index]?.expirationDate + new Date().getTimezoneOffset() / 60,
+        ).toJSON(),
         // expirationDate: new Date(FormatDataUtils.convertUTCDateToLocalDate(consignments[index]?.expirationDate)).toJSON(),
         unitPrice: Math.round(
           consignments[index]?.selectedUnitMeasure ===
@@ -342,8 +346,22 @@ const ImportGoods = () => {
     }
   };
 
+  const getAllWarehouse = async () => {
+    try {
+      const actionResult = await dispatch(getWarehouseList());
+      const dataResult = unwrapResult(actionResult);
+      console.log('warehouse list', dataResult.data);
+      if (dataResult.data) {
+        setWarehouseList(dataResult.data.warehouse);
+      }
+    } catch (error) {
+      console.log('Failed to fetch warehouse list: ', error);
+    }
+  };
+
   useEffect(() => {
     fetchManufacturerList();
+    getAllWarehouse();
   }, []);
 
   return (
@@ -361,29 +379,32 @@ const ImportGoods = () => {
                 <Card className="card-container">
                   <div className="label">Thông tin nhà cung cấp</div>
                   {manufacturerList && (
-                    <Select
-                      classNamePrefix="select"
-                      placeholder="Chọn nhà cung cấp..."
-                      noOptionsMessage={() => <>Không có tìm thấy nhà cung cấp nào</>}
-                      isClearable={true}
-                      isSearchable={true}
-                      name="manufacturer"
-                      options={getOption(manufacturerList)}
-                      menuPortalTarget={document.body}
-                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                      onChange={(e) => {
-                        setFieldValue('manufactorId', e?.value.id || '');
-                        setFieldValue('consignmentRequests', []);
-                        handleOnChangeManufacturer(e);
-                      }}
-                    />
+                    <Box>
+                      <Select
+                        classNamePrefix="select"
+                        placeholder="Chọn nhà cung cấp..."
+                        noOptionsMessage={() => <>Không có tìm thấy nhà cung cấp nào</>}
+                        isClearable={true}
+                        isSearchable={true}
+                        name="manufacturer"
+                        options={FormatDataUtils.getOptionWithIdandName(manufacturerList)}
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                        onChange={(e) => {
+                          setFieldValue('manufactorId', e?.value);
+                          setFieldValue('consignmentRequests', []);
+                          handleOnChangeManufacturer(e);
+                        }}
+                      />
+                      <FormHelperText
+                        error={true}
+                        className="error-text-helper"
+                      >
+                        {errors.manufactorId}
+                      </FormHelperText>
+                    </Box>
                   )}
-                  <FormHelperText
-                    error={true}
-                    className="error-text-helper"
-                  >
-                    {errors.manufactorId}
-                  </FormHelperText>
+
                   {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
                 </Card>
                 <Card className="product-list-container">
@@ -669,28 +690,30 @@ const ImportGoods = () => {
                     {FormatDataUtils.formatDate(today)}
                   </div>
                   <div className="label-field">Vị trí lưu kho</div>
-                  <Box className="selectbox-warehouse">
-                    <Select
-                      classNamePrefix="select"
-                      placeholder="Chọn kho hàng..."
-                      noOptionsMessage={() => <>Không có tìm thấy kho nào</>}
-                      isClearable={true}
-                      isSearchable={true}
-                      name="warehouse"
-                      options={getOption(warehouseData)}
-                      menuPortalTarget={document.body}
-                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                      onChange={(e) => {
-                        setFieldValue('wareHouseId', e?.value.id);
-                      }}
-                    />
-                    <FormHelperText
-                      error={true}
-                      className="error-text-helper"
-                    >
-                      {errors.wareHouseId}
-                    </FormHelperText>
-                  </Box>
+                  {warehouseList && (
+                    <Box className="selectbox-warehouse">
+                      <Select
+                        classNamePrefix="select"
+                        placeholder="Chọn kho hàng..."
+                        noOptionsMessage={() => <>Không có tìm thấy kho nào</>}
+                        isClearable={true}
+                        isSearchable={true}
+                        name="warehouse"
+                        options={FormatDataUtils.getOptionWithIdandName(warehouseList)}
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                        onChange={(e) => {
+                          setFieldValue('wareHouseId', e?.value);
+                        }}
+                      />
+                      <FormHelperText
+                        error={true}
+                        className="error-text-helper"
+                      >
+                        {errors.wareHouseId}
+                      </FormHelperText>
+                    </Box>
+                  )}
                   <div className="label-field">Tham chiếu</div>
                   <div className="margin-bottom-16">
                     <TextfieldWrapper
