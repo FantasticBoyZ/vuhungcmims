@@ -3,17 +3,14 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 
 
-const ProtectedRoute = (roleRequired) => {
+const ProtectedRoute = ({ acceptRole}) => {
   const { auth, role } = useAuth();
   const location = useLocation();
   const roles = ['ROLE_OWNER', 'ROLE_SELLER','ROLE_STOREKEEPER'];
-  // console.log(roleRequired?.roleRequired === role && roles.includes(role))
-  // console.log("26", roleRequired.roleRequired === role)
-  // console.log('27', roles.includes(role))
-  // console.log("28", roleRequired)
-  if (roleRequired.roleRequired !== undefined) {
+
+  if (!!acceptRole) {
     return auth ? (
-      roleRequired.roleRequired === role && roles.includes(role) ? (
+      acceptRole.includes(role) ? (
         <Outlet />
       ) : (
         <Navigate

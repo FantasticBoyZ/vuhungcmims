@@ -4,9 +4,10 @@ import React, { Fragment } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from '@/routes/ProtectedRoute';
 import PublicRoute from '@/routes/PublicRoute';
+import useAuth from '@/utils/useAuth';
 
 const App = () => {
-
+  const { auth, role } = useAuth();
   return (
     <Router>
       <div className="App">
@@ -40,19 +41,26 @@ const App = () => {
             {privateRoutes.map((route, index) => {
               const Layout = route.layout === null ? Fragment : DefaultLayout;
               const Page = route.component;
+              const acceptRole = route.acceptRole;
               return (
                 <Route
+                  path="/"
                   key={index}
-                  path={route.path}
-                  element={
-                    <Layout>
-                      <Page />
-                    </Layout>
-                  }
-                />
+                  element={<ProtectedRoute acceptRole={acceptRole} />}
+                >
+                  <Route
+                    
+                    path={route.path}
+                    element={
+                      <Layout>
+                        <Page />
+                      </Layout>
+                    }
+                  />
+                </Route>
               );
             })}
-            <Route
+            {/* <Route
               path="/owner"
               element={<ProtectedRoute roleRequired="ROLE_OWNER" />}
             >
@@ -60,7 +68,7 @@ const App = () => {
                 path="/owner"
                 element={<DefaultLayout />}
               ></Route>
-            </Route>
+            </Route> */}
           </Route>
         </Routes>
       </div>

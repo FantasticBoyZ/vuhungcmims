@@ -9,7 +9,7 @@ import {
   ListItemText,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
@@ -111,16 +111,13 @@ const SidebarItem = ({ option, openSidebar }) => {
           >
             {children.map((item, index) => {
               return (
-                <>
+                <Fragment key={index}>
                   {item.acceptRole.includes(currentUserRole) && (
-                    <ListItem
-                      sx={{ padding: 0 }}
-                      key={index}
-                    >
+                    <ListItem sx={{ padding: 0 }}>
                       {renderSidebarItem(item, true)}
                     </ListItem>
                   )}
-                </>
+                </Fragment>
               );
             })}
           </Box>
