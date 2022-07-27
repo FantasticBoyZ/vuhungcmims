@@ -38,7 +38,8 @@ const useStyles = makeStyles({
   },
   searchButton: {
     width: '170px',
-    fontSize: '20px',
+    fontSize: '18px',
+    maxHeight: '56px'
   },
   table: {
     '& thead th': {
@@ -156,7 +157,7 @@ const StaffList = () => {
         console.log('dataResult', dataResult);
         if (dataResult) {
           toast.success(dataResult.message);
-          fetchStaffList();
+          searchStaff();
           setOpenPopup(false);
         }
       } catch (error) {

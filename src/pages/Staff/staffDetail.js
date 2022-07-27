@@ -179,7 +179,7 @@ const StaffDetail = () => {
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
       if (dataResult) {
-        toast.success(dataResult.message);
+        toast.success(dataResult.data.message);
         fetchStaffDetail();
       }
     } catch (error) {

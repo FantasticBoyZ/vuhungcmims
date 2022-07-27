@@ -100,6 +100,7 @@ const ExportOrderTable = ({ exportOrders }) => {
             <TableHead>
               <TableRow>
                 <TableCell>Mã xuất kho</TableCell>
+                <TableCell>Mã tham chiếu</TableCell>
                 <TableCell>Ngày tạo</TableCell>
                 <TableCell>Ngày xuất</TableCell>
                 <TableCell align="center">Trạng thái</TableCell>
@@ -136,6 +137,17 @@ const ExportOrderTable = ({ exportOrders }) => {
                         gutterBottom
                         noWrap
                       >
+                        {exportOrder.billRefernce}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <Typography
+                        variant="body1"
+                        color="text.primary"
+                        gutterBottom
+                        noWrap
+                      >
                         {FormatDataUtils.formatDate(exportOrder.createDate)}
                         {/* {exportOrder.createDate} */}
                       </Typography>
@@ -147,7 +159,8 @@ const ExportOrderTable = ({ exportOrders }) => {
                         gutterBottom
                         noWrap
                       >
-                        {exportOrder.confirmDate && FormatDataUtils.formatDate(exportOrder.confirmDate)}
+                        {exportOrder.confirmDate &&
+                          FormatDataUtils.formatDate(exportOrder.confirmDate)}
                         {/* {exportOrder.createDate} */}
                       </Typography>
                     </TableCell>
