@@ -49,7 +49,7 @@ const ResetPassword = () => {
       .required('Vui lòng nhập mật khẩu mới')
       .min(8, 'Vui lòng nhập ít nhất 8 ký tự')
       .matches(
-        /\d/,
+        /^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/,
         'Vui lòng nhập mật khẩu có ít 8 ký tự, trong đó có chứa cả chữ và số',
       ),
     reNewPassword: Yup.string().oneOf(
