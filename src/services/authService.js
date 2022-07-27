@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
-const LOCAL_API_URL = 'http://localhost:8080';
-// const API_URL = process.env.REACT_APP_API_URL + '/auth';
-const API_URL = LOCAL_API_URL + '/api/auth';
+import authHeader from '@/services/authHeader';
+
+// const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = 'http://localhost:8080/api';
 const register = (username, email, password) => {
-  return axios.post(API_URL + '/signup', {
+  return axios.post(API_URL + '/auth/signup', {
     username,
     email,
     password,
@@ -12,7 +13,7 @@ const register = (username, email, password) => {
 };
 const login = (username, password) => {
   return axios
-    .post(API_URL + '/signin', {
+    .post(API_URL + '/auth/signin', {
       username,
       password,
     })
@@ -55,10 +56,82 @@ const runLogoutTimer = (timer) => {
 const getCurrentUser = () => {
   return JSON.parse(localStorage.getItem('user'));
 };
+
+const forgotPassword = (username) => {
+  const url = API_URL + `/user/forgot_password`;
+
+  return axios.post(url, username, {
+    headers: authHeader(),
+  }) .then(
+    (response) => {
+      if (response.data) {
+        return response.data;
+      }
+      
+    },
+    (error) => {
+      const errResponse = error.message;
+      if (!errResponse) {
+        return Promise.reject(error);
+      }
+
+      return Promise.reject(error);
+    },
+  );
+};
+
+const checkOtp = (userInfo) => {
+  const url = API_URL + `/user/check_otp`;
+
+  return axios.post(url, userInfo, {
+    headers: authHeader(),
+  }) .then(
+    (response) => {
+      if (response.data) {
+        return response.data;
+      }
+      
+    },
+    (error) => {
+      const errResponse = error.message;
+      if (!errResponse) {
+        return Promise.reject(error);
+      }
+
+      return Promise.reject(error);
+    },
+  );
+};
+
+const setNewPassword = (userInfo) => {
+  const url = API_URL + `/user/create-password`;
+
+  return axios.post(url, userInfo, {
+    headers: authHeader(),
+  }) .then(
+    (response) => {
+      if (response.data) {
+        return response.data;
+      }
+      
+    },
+    (error) => {
+      const errResponse = error.message;
+      if (!errResponse) {
+        return Promise.reject(error);
+      }
+
+      return Promise.reject(error);
+    },
+  );
+};
 const AuthService = {
   register,
   login,
   logout,
   getCurrentUser,
+  forgotPassword,
+  checkOtp,
+  setNewPassword,
 };
 export default AuthService;

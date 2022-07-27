@@ -6,6 +6,11 @@ export const getStaffList = createAsyncThunk('staff/list', async (params, thunkA
   return staffList;
 });
 
+export const getCreaterList = createAsyncThunk('creater/list', async (params, thunkAPi) => {
+  const staffList = await staffService.getCreaterList(params);
+  return staffList;
+});
+
 export const getStaffDetail = createAsyncThunk(
   'staff/detail',
   async (staffId, thunkAPi) => {
@@ -125,6 +130,17 @@ const staffSlice = createSlice({
       state.error = action.payload;
     },
     [getStaffList.fulfilled]: (state, action) => {
+      state.loading = false;
+      // state.importOrderList = action.payload;
+    },
+    [getCreaterList.pending]: (state) => {
+      state.loading = true;
+    },
+    [getCreaterList.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getCreaterList.fulfilled]: (state, action) => {
       state.loading = false;
       // state.importOrderList = action.payload;
     },
