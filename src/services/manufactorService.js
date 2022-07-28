@@ -1,9 +1,10 @@
+import { API_URL } from '@/constants/apiUrl';
 import authHeader from '@/services/authHeader';
 import axiosClient from '@/utils/axiosCient';
 import axios from 'axios';
 
 // const API_URL = 'http://localhost:8080/api'
-const API_URL = process.env.REACT_APP_API_URL
+// const API_URL = process.env.REACT_APP_API_URL
 const ManufactorService = {
   getManufactorList: (params) => {
     const url = '/manufacturer';

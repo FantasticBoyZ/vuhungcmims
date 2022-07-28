@@ -9,11 +9,24 @@
 .right-container {
   width: 25%;
   margin-left: 8px;
+  
 }
 .card-container {
   padding: 16px;
   margin-bottom: 16px;
 }
+.order-detail-container {
+  padding: 16px;
+  margin-bottom: 16px;
+  min-height: 88vh;
+}
+
+.product-list-container {
+  padding: 16px;
+  margin-bottom: 16px;
+  min-height: 74vh;
+}
+
 .label {
   font-size: 24px;
   margin-bottom: 8px;

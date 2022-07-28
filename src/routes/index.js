@@ -1,5 +1,5 @@
 import NotFound from '@/components/Layout/NotFound/NotFound';
-import Profile from '@/components/TestComponent/Profile';
+
 import About from '@/pages/About/About';
 import Login from '@/pages/Auth/Login';
 import AddEditCategoryForm from '@/pages/Category/AddEditCategory/AddEditCategoryForm';
@@ -26,6 +26,16 @@ import UpdateImportOrderDetail from '@/pages/Transaction/ImportList/UpdateImport
 import ReturnGoods from '@/pages/Export/ReturnGoods/ReturnGoods';
 import UpdateExportOrderDetail from '@/pages/Transaction/ExportList/UpdateExportOrderDetail/UpdateExportOrderDetail';
 import ReturnList from '@/pages/Export/ReturnList/ReturnList';
+import ReturnOrderDetail from '@/pages/Export/ReturnList/ReturnOrderDetail/ReturnOrderDetail';
+import InventoryCheckingList from '@/pages/InventoryChecking/InventoryCheckingList/InventoryCheckingList';
+import CreateInventoryChecking from '@/pages/InventoryChecking/CreateInventoryChecking/CreateInventoryChecking';
+import InventoryCheckingDetail from '@/pages/InventoryChecking/InventoryCheckingList/InventoyCheckingDetail/InventoryCheckingDetail';
+import WarehouseList from '@/pages/Warehouse/wareHouseList';
+import AddStaff from '@/pages/Staff/AddStaff/AddStaff';
+import Profile from '@/pages/Profile/Profile';
+import ResetPassword from '@/pages/Profile/ResetPassword/ResetPassword';
+import UpdateProfile from '@/pages/Profile/UpdateProfile/UpdateProfile';
+import AccessDenied from '@/components/Layout/AccessDenied/AccessDenied';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -38,48 +48,65 @@ const publicRoutes = [
 ];
 
 const privateRoutes = [
-  { path: '/dashboard', component: HomePage },
-  { path: '/about', component: About },
-  { path: '/profile', component: Profile },
-  { path: 'post/add', component: TestPost },
-  { path: 'post/:postId', component: TestPost },
+  { path: '/dashboard', component: HomePage, acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/about', component: About, acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"]  },
+  { path: 'post/add', component: TestPost , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: 'post/:postId', component: TestPost, acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"]  },
 
   // Product route
-  { path: '/product', component: productList },
-  { path: '/product/detail/:productId', component: ProductDetail },
-  { path: '/product/add', component: AddEditProductForm },
-  { path: '/product/edit/:productId', component: AddEditProductForm },
+  { path: '/product', component: productList, acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"]  },
+  { path: '/product/detail/:productId', component: ProductDetail, acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"]  },
+  { path: '/product/add', component: AddEditProductForm , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/product/edit/:productId', component: AddEditProductForm , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
 
   // Category route
-  { path: '/category', component: CategoryList },
-  { path: '/category/detail/:categoryId', component: CategoryDetail },
-  { path: '/category/add', component: AddEditCategoryForm },
-  { path: '/category/edit/:categoryId', component: AddEditCategoryForm },
+  { path: '/category', component: CategoryList, acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"]  },
+  { path: '/category/detail/:categoryId', component: CategoryDetail , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/category/add', component: AddEditCategoryForm , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/category/edit/:categoryId', component: AddEditCategoryForm , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
 
   // Manufactor route
-  { path: '/manufacturer', component: ManufactorList },
-  { path: '/manufacturer/detail/:manufacturerId', component: ManufacturerDetail },
-  { path: '/manufacturer/add', component: AddEditManufacturerForm },
-  { path: '/manufacturer/edit/:manufacturerId', component: AddEditManufacturerForm },
+  { path: '/manufacturer', component: ManufactorList, acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"]  },
+  { path: '/manufacturer/detail/:manufacturerId', component: ManufacturerDetail, acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"]  },
+  { path: '/manufacturer/add', component: AddEditManufacturerForm , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/manufacturer/edit/:manufacturerId', component: AddEditManufacturerForm , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
 
   // importOrder route
-  { path: '/import/list', component: ImportList },
-  { path: '/import/create-order', component: ImportGoods },
-  { path: '/import/detail/:importOrderId', component: ImportOrderDetail },
-  { path: '/import/edit/:importOrderId', component: UpdateImportOrderDetail },
+  { path: '/import/list', component: ImportList, acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"]  },
+  { path: '/import/create-order', component: ImportGoods, acceptRole: ["ROLE_OWNER","ROLE_SELLER"]  },
+  { path: '/import/detail/:importOrderId', component: ImportOrderDetail , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/import/edit/:importOrderId', component: UpdateImportOrderDetail , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
 
   // exportOrder route
-  { path: '/export/list', component: ExportList },
-  { path: '/export/create-order', component: ExportGoods },
-  { path: '/export/detail/:exportOrderId', component: ExportOrderDetail },
-  { path: '/export/edit/:exportOrderId', component: UpdateExportOrderDetail },
-  { path: '/export/return/:exportOrderId', component: ReturnGoods },
-  { path: '/export/return/list', component: ReturnList },
+  { path: '/export/list', component: ExportList , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/export/create-order', component: ExportGoods , acceptRole: ["ROLE_OWNER","ROLE_SELLER"] },
+  { path: '/export/detail/:exportOrderId', component: ExportOrderDetail , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/export/edit/:exportOrderId', component: UpdateExportOrderDetail , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/export/return/:exportOrderId', component: ReturnGoods , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/export/return/list', component: ReturnList, acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"]  },
+  { path: '/export/return/detail/:returnOrderId', component: ReturnOrderDetail , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
 
-  { path: '/denied', component: Profile, layout: null },
-  { path: '*', component: NotFound, layout: null },
-  { path: 'staff/list', component: StaffList },
-  { path: 'staff/detail/:staffId', component: StaffDetail },
+  // inventoryChecking route
+  { path: '/inventory-checking/list', component: InventoryCheckingList, acceptRole: ["ROLE_OWNER", "ROLE_STOREKEEPER"]  },
+  { path: '/inventory-checking/detail/:inventoryCheckingId', component: InventoryCheckingDetail , acceptRole: ["ROLE_OWNER", "ROLE_STOREKEEPER"] },
+  { path: '/inventory-checking/create', component: CreateInventoryChecking , acceptRole: ["ROLE_OWNER", "ROLE_STOREKEEPER"] },
+
+  { path: '/denied', component: AccessDenied, layout: null, acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"]  },
+  { path: '*', component: NotFound, layout: null , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+
+  // staff route
+  { path: 'staff/list', component: StaffList , acceptRole: ["ROLE_OWNER"] },
+  { path: 'staff/detail/:staffId', component: StaffDetail, acceptRole: ["ROLE_OWNER"]  },
+  { path: 'staff/register', component: AddStaff , acceptRole: ["ROLE_OWNER"] },
+  { path: 'staff/:staffId', component: StaffDetail , acceptRole: ["ROLE_OWNER"] },
+
+  //warehouse route
+  { path: '/wareHouse', component: WarehouseList , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+
+  // profile route
+  { path: '/profile', component: Profile , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/reset-password', component: ResetPassword , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/profile/edit', component: UpdateProfile , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
 ];
 
 export { publicRoutes, privateRoutes };

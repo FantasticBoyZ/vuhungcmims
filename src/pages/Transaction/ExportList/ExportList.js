@@ -1,13 +1,19 @@
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
+import AuthService from '@/services/authService';
 import exportOrderService from '@/services/exportOrderService';
 import { getExportOrderList } from '@/slices/ExportOrderSlice';
+import { getCreaterList, getStaffList } from '@/slices/StaffSlice';
 import { Add, Search } from '@mui/icons-material';
 import {
   Box,
   Button,
   Card,
+  Checkbox,
   Container,
   FormControl,
+  FormControlLabel,
+  FormGroup,
   Grid,
   InputAdornment,
   InputLabel,
@@ -52,6 +58,9 @@ const useStyles = makeStyles({
   cardStyle: {
     padding: '12px',
   },
+  labelCheckbox: {
+    color: '#29A3E2',
+  },
 });
 const createrList = [
   { id: 1, name: 'Vũ Tiến Khôi' },
@@ -94,11 +103,14 @@ const ExportList = () => {
   const [totalRecord, setTotalRecord] = useState();
   const [creatorId, setCreatorId] = useState('');
   const [exportOrderList, setExportOrderList] = useState();
+  const [staffList, setStaffList] = useState([]);
+  const [selectPending, setSelectPending] = useState(false);
   const navigate = useNavigate();
+  const currentUserRole = AuthService.getCurrentUser().roles[0];
   const [searchParams, setSearchParams] = useState({
-    // billRefernceNumber: '',
-    // startDate: '',
-    // endDate: '',
+    billRefernceNumber: '',
+    startDate: '',
+    endDate: '',
   });
 
   const dispatch = useDispatch();
@@ -116,6 +128,13 @@ const ExportList = () => {
     navigate('/export/create-order');
   };
 
+  const handleChangeCheckboxPending = () => {
+    setPage(0);
+    setSearchParams({ ...searchParams, status: selectPending === false ? 1 : '' });
+    searchExportOrder({ ...searchParams, status: selectPending === false ? 1 : '' });
+    setSelectPending(!selectPending);
+  };
+
   const handleSearch = (e) => {
     if (e.keyCode === 13) {
       let target = e.target;
@@ -128,31 +147,37 @@ const ExportList = () => {
   };
 
   const handleChangeCreator = (event) => {
+    setPage(0);
     setCreatorId(event.target.value);
-    setSearchParams({ ...searchParams, userId: event.target.value });
-    searchExportOrder({ ...searchParams, userId: event.target.value });
+    setSearchParams({ ...searchParams, userId: event.target.value > 0 ? event.target.value : '' });
+    searchExportOrder({ ...searchParams, userId: event.target.value > 0 ? event.target.value : '' });
   };
 
   const handleChangeStartDate = (value) => {
     setStartDate(value);
+    setPage(0);
     console.log('startDate', format(new Date(value), 'dd-MM-yyyy'));
     setSearchParams({
       ...searchParams,
-      startDate: format(new Date(value), 'dd-MM-yyyy'),
+      startDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
     });
     searchExportOrder({
       ...searchParams,
-      startDate: format(new Date(value), 'dd-MM-yyyy'),
+      startDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
     });
   };
 
   const handleChangeEndDate = (value) => {
     setEndDate(value);
+    setPage(0);
     console.log('endDate', format(new Date(value), 'dd-MM-yyyy'));
-    setSearchParams({ ...searchParams, endDate: format(new Date(value), 'dd-MM-yyyy') });
+    setSearchParams({
+      ...searchParams,
+      endDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
+    });
     searchExportOrder({
       ...searchParams,
-      endDate: format(new Date(value), 'dd-MM-yyyy'),
+      endDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
     });
   };
 
@@ -192,26 +217,53 @@ const ExportList = () => {
       console.log('Failed to fetch exportOrder list: ', error);
     }
   };
+
+  const getAllStaff = async () => {
+    const params = {
+      // pageIndex: page + 1,
+      // pageSize: rowsPerPage,
+      keyWords: '',
+    };
+    try {
+      const actionResult = await dispatch(getCreaterList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('staff list', dataResult);
+      if (dataResult) {
+        setStaffList([{ id: 0, name: 'Tất cả' }].concat(dataResult));
+      }
+    } catch (error) {
+      console.log('Failed to fetch staff list: ', error);
+    }
+  };
+
+  useEffect(() => {
+    searchExportOrder(searchParams);
+    console.log('vào đây');
+  }, [page, rowsPerPage]);
+
   useEffect(() => {
     fetchExportOrderList();
-  }, [page, rowsPerPage]);
+    getAllStaff();
+  }, []);
   return (
     <Container maxWidth="xl">
-      <Stack
-        direction="row"
-        justifyContent="flex-end"
-        spacing={2}
-        p={2}
-      >
-        <Button
-          variant="contained"
-          color='success'
-          startIcon={<Add />}
-          onClick={handleOnClickCreateExportOrder}
+      {(currentUserRole === 'ROLE_OWNER' || currentUserRole === 'ROLE_SELLER') && (
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          spacing={2}
+          p={2}
         >
-          Tạo phiếu xuất kho
-        </Button>
-        {/* <Button
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<Add />}
+            onClick={handleOnClickCreateExportOrder}
+          >
+            Tạo phiếu xuất kho
+          </Button>
+
+          {/* <Button
           variant="contained"
           color="secondary"
         >
@@ -223,13 +275,14 @@ const ExportList = () => {
         >
           Nhập file excel
         </Button> */}
-      </Stack>
+        </Stack>
+      )}
       <Card className={classes.panelFilter}>
         <div className={classes.labelPanelFilter}>Tìm kiếm theo thông tin</div>
         <Toolbar className={classes.toolbar}>
           <TextField
             id="outlined-basic"
-            placeholder="Tìm kiếm phiếu nhập kho"
+            placeholder="Tìm kiếm phiếu xuất kho"
             label={null}
             variant="outlined"
             className={classes.searchField}
@@ -241,57 +294,81 @@ const ExportList = () => {
               ),
             }}
             onKeyDown={handleSearch}
-            // onChange={handleSearch}
+            onChange={(e) => {
+              setSearchParams({ ...searchParams, billReferenceNumber: e.target.value });
+            }}
           />
           <Box className={classes.selectBox}>
             <FormControl fullWidth>
               <InputLabel id="select-creator">Người tạo đơn</InputLabel>
-              <Select
-                id="creator"
-                value={1}
-                label="Người tạo"
-                onChange={handleChangeCreator}
-              >
-                {/* TODO: call api trả về list creator */}
-                {createrList.map((item) => (
-                  <MenuItem
-                    key={item.id}
-                    value={item.id}
-                  >
-                    {item.name}
-                  </MenuItem>
-                ))}
-              </Select>
+              {staffList && (
+                <Select
+                  id="creator"
+                  value={creatorId}
+                  label="Người tạo đơn"
+                  onChange={handleChangeCreator}
+                >
+                  {/* TODO: call api trả về list creator */}
+                  {staffList.map((item) => (
+                    <MenuItem
+                      key={item.id}
+                      value={item.id}
+                    >
+                      {item.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
             </FormControl>
           </Box>
         </Toolbar>
         <div>
           <div className={classes.labelDateRange}>Khoảng thời gian tạo đơn</div>
-          <Toolbar>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                id="startDate"
-                label="Ngày bắt đầu"
-                value={startDate}
-                inputFormat="dd/MM/yyyy"
-                onChange={(newValue) => {
-                  handleChangeStartDate(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-              <Box sx={{ mx: 2 }}> Đến </Box>
-              <DatePicker
-                id="endDate"
-                label="Ngày kết thúc"
-                inputFormat="dd/MM/yyyy"
-                value={endDate}
-                onChange={(newValue) => {
-                  handleChangeEndDate(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </LocalizationProvider>
-          </Toolbar>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Toolbar>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  id="startDate"
+                  label="Ngày bắt đầu"
+                  value={startDate}
+                  inputFormat="dd/MM/yyyy"
+                  onChange={(newValue) => {
+                    handleChangeStartDate(newValue);
+                  }}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+                <Box sx={{ mx: 2 }}> Đến </Box>
+                <DatePicker
+                  id="endDate"
+                  label="Ngày kết thúc"
+                  inputFormat="dd/MM/yyyy"
+                  value={endDate}
+                  onChange={(newValue) => {
+                    handleChangeEndDate(newValue);
+                  }}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
+            </Toolbar>
+            <Box>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectPending}
+                      onChange={() => handleChangeCheckboxPending()}
+                    />
+                  }
+                  label="Chỉ hiển thị đơn hàng đang được xử lý"
+                  className={classes.labelCheckbox}
+                />
+              </FormGroup>
+            </Box>
+          </Stack>
         </div>
       </Card>
       <Grid
@@ -308,7 +385,7 @@ const ExportList = () => {
         >
           <Card className={classes.cardStyle}>
             {loading ? (
-              <>Loading...</>
+              <ProgressCircleLoading/>
             ) : (
               <Box>
                 {totalRecord > 0 ? (

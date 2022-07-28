@@ -1,35 +1,56 @@
 import productService from '@/services/productService';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-export const getProductList = createAsyncThunk('product' , async (params, thunkAPi) => {
+export const getProductList = createAsyncThunk('product', async (params, thunkAPi) => {
   // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
   const productList = await productService.getAllProduct(params);
   return productList;
-})
+});
 
-export const getProductDetail = createAsyncThunk('product/get-one', async ( params) => {
-  const product = await productService.getProductById(params)
-  return product
-})
+export const getProductDetail = createAsyncThunk('product/get-one', async (params) => {
+  const product = await productService.getProductById(params);
+  return product;
+});
 
-export const saveProduct = createAsyncThunk('product/save', async (product) => {
-  return await productService.saveProduct(product)
-})
+export const saveProduct = createAsyncThunk(
+  'product/save',
+  async (product, { rejectWithValue }) => {
+    try {
+      const response = await productService.saveProduct(product);
+      return response;
+    } catch (err) {
+      if (!err.response) {
+        throw err;
+      }
+    
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
 
-export const uploadNewImageProduct = createAsyncThunk('product/upload-new-image', async (formData) => {
-  return await productService.uploadNewImage(formData)
-})
+export const uploadNewImageProduct = createAsyncThunk(
+  'product/upload-new-image',
+  async (formData) => {
+    return await productService.uploadNewImage(formData);
+  },
+);
 
-export const updateImageProduct = createAsyncThunk('product/update-image', async (params) => {
-  const {productId, formData} = params
-  return await productService.updateImage(productId, formData)
-})
+export const updateImageProduct = createAsyncThunk(
+  'product/update-image',
+  async (params) => {
+    const { productId, formData } = params;
+    return await productService.updateImage(productId, formData);
+  },
+);
 
-export const getProductByImportOrderId = createAsyncThunk('product/get-by-import-order' , async (params, thunkAPi) => {
-  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
-  const productList = await productService.getProductByImportOrderId(params);
-  return productList;
-})
+export const getProductByImportOrderId = createAsyncThunk(
+  'product/get-by-import-order',
+  async (params, thunkAPi) => {
+    // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+    const productList = await productService.getProductByImportOrderId(params);
+    return productList;
+  },
+);
 
 const productSlice = createSlice({
   name: 'products',
@@ -37,7 +58,7 @@ const productSlice = createSlice({
     products: [],
     loading: false,
     error: null,
-    uploadImage: false
+    uploadImage: false,
   },
   reducers: {
     addProduct: (state, action) => {
@@ -46,65 +67,65 @@ const productSlice = createSlice({
     },
   },
   extraReducers: {
-    [getProductList.pending] : (state) => {
+    [getProductList.pending]: (state) => {
       state.loading = true;
     },
-    [getProductList.rejected] :(state, action) => {
+    [getProductList.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
-    [getProductList.fulfilled] :(state, action) => {
+    [getProductList.fulfilled]: (state, action) => {
       state.loading = false;
       state.products = action.payload;
     },
-    [getProductDetail.pending] : (state) => {
+    [getProductDetail.pending]: (state) => {
       state.loading = true;
     },
-    [getProductDetail.rejected] :(state, action) => {
+    [getProductDetail.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
-    [getProductDetail.fulfilled] :(state, action) => {
+    [getProductDetail.fulfilled]: (state, action) => {
       state.loading = false;
     },
-    [saveProduct.pending] : (state) => {
+    [saveProduct.pending]: (state) => {
       state.loading = true;
     },
-    [saveProduct.rejected] :(state, action) => {
+    [saveProduct.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
-    [saveProduct.fulfilled] :(state, action) => {
+    [saveProduct.fulfilled]: (state, action) => {
       state.loading = false;
     },
-    [uploadNewImageProduct.pending] : (state) => {
+    [uploadNewImageProduct.pending]: (state) => {
       state.loading = true;
-      state.uploadImage = false
+      state.uploadImage = false;
     },
-    [uploadNewImageProduct.rejected] :(state, action) => {
+    [uploadNewImageProduct.rejected]: (state, action) => {
       state.loading = false;
       state.uploadImage = true;
       state.error = action.payload;
     },
-    [uploadNewImageProduct.fulfilled] :(state, action) => {
+    [uploadNewImageProduct.fulfilled]: (state, action) => {
       state.loading = false;
       state.uploadImage = true;
     },
-    [updateImageProduct.pending] : (state) => {
+    [updateImageProduct.pending]: (state) => {
       state.loading = true;
-      state.uploadImage = false
+      state.uploadImage = false;
     },
-    [updateImageProduct.rejected] :(state, action) => {
+    [updateImageProduct.rejected]: (state, action) => {
       state.loading = false;
       state.uploadImage = true;
       state.error = action.payload;
     },
-    [updateImageProduct.fulfilled] :(state, action) => {
+    [updateImageProduct.fulfilled]: (state, action) => {
       state.loading = false;
       state.uploadImage = true;
     },
-  }
+  },
 });
 
-const { reducer: productReducer} = productSlice;
+const { reducer: productReducer } = productSlice;
 export default productReducer;

@@ -1,4 +1,5 @@
 import AlertPopup from '@/components/Common/AlertPopup';
+import Label from '@/components/Common/Label';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import ExportProductTable from '@/pages/Transaction/ExportList/ExportOrderDetail/ExportProductTable';
 import AuthService from '@/services/authService';
@@ -41,7 +42,11 @@ const useStyles = makeStyles((theme) => ({
   orderNote: {
     minHeight: '20vh',
   },
-  totalAmount: {},
+  warehouseContainer: {
+    backgroundColor: 'rgba(220, 244, 252,0.5)',
+    padding: theme.spacing(1),
+    borderRadius: '10px',
+  },
 }));
 
 const exportOrder = {
@@ -119,11 +124,37 @@ const exportOrder = {
   ],
 };
 
+const getStatusLabel = (exportOrderStatus) => {
+  const map = {
+    canceled: {
+      text: 'Đã huỷ',
+      color: 'error',
+    },
+    completed: {
+      text: 'Đã xuất kho',
+      color: 'success',
+    },
+    pending: {
+      text: 'Đang chờ xử lý',
+      color: 'warning',
+    },
+    returned: {
+      text: 'Đã xuất kho',
+      color: 'success',
+    },
+  };
+
+  const { text, color } = map[exportOrderStatus];
+
+  return <Label color={color}>{text}</Label>;
+};
+
 const ExportOrderDetail = () => {
   const { exportOrderId } = useParams();
   const navigate = useNavigate();
   const [exportOrder, setExportOrder] = useState();
   const [listConsignments, setListConsignments] = useState([]);
+  const [addressWarehouse, setAddressWarehouse] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -135,6 +166,7 @@ const ExportOrderDetail = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.exportOrders }));
+  const currentUserRole = AuthService.getCurrentUser().roles[0];
 
   const calculateTotalAmount = () => {
     let totalAmount = 0;
@@ -219,6 +251,7 @@ const ExportOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setExportOrder(dataResult.data.inforExportDetail);
+        setAddressWarehouse(dataResult.data.addressWarehouse);
       }
       console.log('Export Order Detail', dataResult);
     } catch (error) {
@@ -276,7 +309,7 @@ const ExportOrderDetail = () => {
                         <strong>Phiếu xuất kho số:</strong> {exportOrder.billRefernce}
                       </Typography>{' '}
                       <span>
-                        {FormatDataUtils.getStatusLabel(exportOrder.statusName)}
+                        {exportOrder.statusName && getStatusLabel(exportOrder.statusName)}
                       </span>
                     </Box>
                     {exportOrder.statusName === 'pending' && (
@@ -286,24 +319,30 @@ const ExportOrderDetail = () => {
                         spacing={2}
                         className={classes.buttonAction}
                       >
-                        <Button
-                          variant="contained"
-                          startIcon={<Done />}
-                          color="success"
-                          onClick={() => handleOnClickConfirm()}
-                        >
-                          Xác nhận xuất kho
-                        </Button>
-                        <Button
-                          variant="contained"
-                          startIcon={<Edit />}
-                          color="warning"
-                          onClick={() => {
-                            navigate(`/export/edit/${exportOrderId}`);
-                          }}
-                        >
-                          Chỉnh sửa
-                        </Button>
+                        {(currentUserRole === 'ROLE_OWNER' ||
+                          currentUserRole === 'ROLE_STOREKEEPER') && (
+                          <Button
+                            variant="contained"
+                            startIcon={<Done />}
+                            color="success"
+                            onClick={() => handleOnClickConfirm()}
+                          >
+                            Xác nhận xuất kho
+                          </Button>
+                        )}
+                        {(currentUserRole === 'ROLE_OWNER' ||
+                          currentUserRole === 'ROLE_STOREKEEPER') && (
+                          <Button
+                            variant="contained"
+                            startIcon={<Edit />}
+                            color="warning"
+                            onClick={() => {
+                              navigate(`/export/edit/${exportOrderId}`);
+                            }}
+                          >
+                            Chỉnh sửa
+                          </Button>
+                        )}
                         <Button
                           variant="contained"
                           startIcon={<Close />}
@@ -314,23 +353,26 @@ const ExportOrderDetail = () => {
                         </Button>
                       </Stack>
                     )}
-                    {exportOrder.statusName === 'completed' && (
-                      <Stack
-                        direction="row"
-                        justifyContent="flex-end"
-                        spacing={2}
-                        className={classes.buttonAction}
-                      >
-                        <Button
-                          variant="contained"
-                          startIcon={<KeyboardReturn />}
-                          color="warning"
-                          onClick={() => navigate(`/export/return/${exportOrderId}`)}
+                    {exportOrder.statusName === 'completed' &&
+                      exportOrder.isReturn !== true &&
+                      (currentUserRole === 'ROLE_OWNER' ||
+                        currentUserRole === 'ROLE_SELLER') && (
+                        <Stack
+                          direction="row"
+                          justifyContent="flex-end"
+                          spacing={2}
+                          className={classes.buttonAction}
                         >
-                          Trả hàng
-                        </Button>
-                      </Stack>
-                    )}
+                          <Button
+                            variant="contained"
+                            startIcon={<KeyboardReturn />}
+                            color="warning"
+                            onClick={() => navigate(`/export/return/${exportOrderId}`)}
+                          >
+                            Trả hàng
+                          </Button>
+                        </Stack>
+                      )}
                   </Stack>
                 </Card>
               </Grid>
@@ -381,16 +423,39 @@ const ExportOrderDetail = () => {
                   >
                     <Card>
                       <CardContent className={classes.confirmInfo}>
-                        <Typography variant="h6">Thông tin xác nhận</Typography>
-                        <Typography>
-                          Người tạo đơn: <i>{exportOrder.createBy}</i>
-                        </Typography>
-                        <Typography>Ngày tạo đơn:</Typography>
-                        <Typography>
-                          {exportOrder.createDate
-                            ? FormatDataUtils.formatDateTime(exportOrder.createDate)
-                            : null}
-                        </Typography>
+                        <Stack spacing={2}>
+                          <Box>
+                            <Typography variant="h6">Thông tin xác nhận</Typography>
+                            <Typography>
+                              Người tạo đơn: <i>{exportOrder.createBy}</i>
+                            </Typography>
+                            <Typography>Ngày tạo đơn:</Typography>
+                            <Typography>
+                              <i>
+                                {exportOrder.createDate
+                                  ? FormatDataUtils.formatDateTime(exportOrder.createDate)
+                                  : null}
+                              </i>
+                            </Typography>
+                          </Box>
+                          {exportOrder.statusName === 'completed' && (
+                            <Box>
+                              <Typography>
+                                Người xác nhận: <i>{exportOrder.confirmBy}</i>
+                              </Typography>
+                              <Typography>Ngày xác nhận:</Typography>
+                              <Typography>
+                                <i>
+                                  {exportOrder.confirmDate
+                                    ? FormatDataUtils.formatDateTime(
+                                        exportOrder.confirmDate,
+                                      )
+                                    : null}
+                                </i>
+                              </Typography>
+                            </Box>
+                          )}
+                        </Stack>
                       </CardContent>
                     </Card>
                   </Grid>
@@ -401,13 +466,23 @@ const ExportOrderDetail = () => {
                     <Card>
                       <CardContent className={classes.warehourseInfo}>
                         <Typography variant="h6">Kho lấy hàng</Typography>
-                        <Typography>{exportOrder.wareHouseName}</Typography>
-                        <Divider />
-                        <Typography>{exportOrder.addressDetail}</Typography>
-                        <Typography>
-                          {exportOrder.wardName} - {exportOrder.districtName} -{' '}
-                          {exportOrder.provinceName}
-                        </Typography>
+                        <Stack spacing={2}>
+                          {addressWarehouse.length > 0 &&
+                            addressWarehouse.map((address, index) => (
+                              <Box
+                                key={index}
+                                className={classes.warehouseContainer}
+                              >
+                                <Typography>{address.warehouseName}</Typography>
+                                <Divider />
+                                <Typography>{address.detailAddress}</Typography>
+                                <Typography>
+                                  {address.wardName} - {address.districtName} -{' '}
+                                  {address.provinceName}
+                                </Typography>
+                              </Box>
+                            ))}
+                        </Stack>
                       </CardContent>
                     </Card>
                   </Grid>

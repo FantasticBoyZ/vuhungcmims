@@ -4,7 +4,7 @@ import React from 'react';
 const ProgressCircleLoading = () => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <CircularProgress style={{ marginLeft: '50%' }} />
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '2%', marginBottom: '2%' }} />
     </Box>
   );
 };

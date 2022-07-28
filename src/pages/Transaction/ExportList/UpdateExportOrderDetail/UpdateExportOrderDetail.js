@@ -79,6 +79,11 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: 'rgba(217, 217, 217, 0.5)',
     },
   },
+  warehouseContainer: {
+    backgroundColor: 'rgba(220, 244, 252,0.5)',
+    padding: theme.spacing(1),
+    borderRadius: '10px'
+  }
 }));
 
 const exportOrder = {
@@ -166,6 +171,7 @@ const UpdateExportOrderDetail = () => {
   const classes = useStyles();
   const [exportOrder, setExportOrder] = useState();
   const [productList, setProductList] = useState([]);
+  const [addressWarehouse, setAddressWarehouse] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -188,12 +194,14 @@ const UpdateExportOrderDetail = () => {
 
   const calculateTotalAmount = () => {
     let totalAmount = 0;
-    const productList = valueFormik.current.productList
-    console.log(valueFormik.current.productList)
+    const productList = valueFormik.current.productList;
+    console.log(valueFormik.current.productList);
     if (productList) {
       for (let index = 0; index < productList.length; index++) {
         totalAmount =
-          totalAmount + calculateTotalQuantityOfProduct(productList[index]) * +productList[index]?.unitPrice;
+          totalAmount +
+          calculateTotalQuantityOfProduct(productList[index]) *
+            +productList[index]?.unitPrice;
       }
     }
     return totalAmount;
@@ -202,7 +210,7 @@ const UpdateExportOrderDetail = () => {
   const handleOnClickConfirm = () => {
     setTitle('Bạn có chắc chắn muốn lưu lại chỉnh sửa không?');
     setMessage('Hãy kiểm tra kỹ thông tin trước khi xác nhận.');
-    setErrorMessage(null)
+    setErrorMessage(null);
     setIsConfirm(true);
     setOpenPopup(true);
   };
@@ -220,7 +228,7 @@ const UpdateExportOrderDetail = () => {
       let productList = values.productList;
       let consignmentExports = [];
       console.log('xác nhận', values);
-      
+
       for (let index = 0; index < productList.length; index++) {
         if (calculateTotalQuantityOfProduct(productList[index]) === 0) {
           setErrorMessage('Bạn có sản phẩm chưa nhập số lượng');
@@ -304,6 +312,7 @@ const UpdateExportOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setExportOrder(dataResult.data.inforExportDetail);
+        setAddressWarehouse(dataResult.data.addressWarehouse);
         if (dataResult.data.inforExportDetail?.statusName !== 'pending') {
           navigate(`/export/detail/${exportOrderId}`);
         }
@@ -449,7 +458,9 @@ const UpdateExportOrderDetail = () => {
                                             <TableCell>{product?.productName}</TableCell>
                                             <TableCell>{product?.unitMeasure}</TableCell>
                                             <TableCell align="center">
-                                              {calculateTotalQuantityOfProduct(values.productList[index])}
+                                              {calculateTotalQuantityOfProduct(
+                                                values.productList[index],
+                                              )}
                                             </TableCell>
                                             <TableCell align="center">
                                               {FormatDataUtils.formatCurrency(
@@ -458,7 +469,9 @@ const UpdateExportOrderDetail = () => {
                                             </TableCell>
                                             <TableCell align="center">
                                               {FormatDataUtils.formatCurrency(
-                                                calculateTotalQuantityOfProduct(values.productList[index]) * product?.unitPrice,
+                                                calculateTotalQuantityOfProduct(
+                                                  values.productList[index],
+                                                ) * product?.unitPrice,
                                               )}
                                             </TableCell>
                                           </TableRow>
@@ -582,13 +595,20 @@ const UpdateExportOrderDetail = () => {
                             <Card>
                               <CardContent className={classes.warehourseInfo}>
                                 <Typography variant="h6">Kho lấy hàng</Typography>
-                                <Typography>{exportOrder.wareHouseName}</Typography>
-                                <Divider />
-                                <Typography>{exportOrder.addressDetail}</Typography>
-                                <Typography>
-                                  {exportOrder.wardName} - {exportOrder.districtName} -{' '}
-                                  {exportOrder.provinceName}
-                                </Typography>
+                                <Stack spacing={2}>
+                                  {addressWarehouse.length > 0 &&
+                                    addressWarehouse.map((address) => (
+                                      <Box className={classes.warehouseContainer}>
+                                        <Typography>{address.warehouseName}</Typography>
+                                        <Divider />
+                                        <Typography>{address.detailAddress}</Typography>
+                                        <Typography>
+                                          {address.wardName} - {address.districtName} -{' '}
+                                          {address.provinceName}
+                                        </Typography>
+                                      </Box>
+                                    ))}
+                                </Stack>
                               </CardContent>
                             </Card>
                           </Grid>
@@ -603,7 +623,14 @@ const UpdateExportOrderDetail = () => {
                 /> */}
                               <CardContent className={classes.orderNote}>
                                 <Typography variant="h6">Ghi chú</Typography>
-                                <Typography>{exportOrder.description}</Typography>
+                                <TextfieldWrapper
+                                  id="description"
+                                  name="description"
+                                  variant="outlined"
+                                  multiline
+                                  rows={6}
+                                  fullWidth
+                                />
                               </CardContent>
                             </Card>
                           </Grid>
@@ -644,7 +671,7 @@ const UpdateExportOrderDetail = () => {
                           {errorMessage ? errorMessage : message}
                         </Box>
                       </AlertPopup>
-                      <pre>{JSON.stringify(values, null, 2)}</pre>
+                      {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
                     </Grid>
                   </Form>
                 );

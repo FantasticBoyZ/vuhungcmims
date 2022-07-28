@@ -2,10 +2,13 @@ import Popup from '@/components/Common/Popup';
 import {
   ArrowDropDownRounded,
   ArrowRightRounded,
+  Edit,
   EditTwoTone,
+  Info,
   InfoTwoTone,
 } from '@mui/icons-material';
 import {
+  Box,
   Collapse,
   IconButton,
   Stack,
@@ -16,18 +19,29 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { useTheme } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CategoryForm from '@/pages/Category/AddEditCategory/CategoryForm';
+import AlertPopup from '@/components/Common/AlertPopup';
+
+const useStyles = makeStyles({
+  tableCellChild: {
+    padding: '0 !important',
+  },
+});
 
 const CategoryRow = (props) => {
   const { category, allCategoryList } = props;
+  const classes = useStyles();
   const [openNested, setOpenNested] = useState(false);
   const theme = useTheme();
   const navigate = useNavigate();
   const [openPopup, setOpenPopup] = useState(false);
+  const [openPopupDescription, setOpenPopupDescription] = useState(false);
   const [editCategory, setEditCategory] = useState();
+  const [title, setTitle] = useState()
+  const [message, setMessage] = useState()
   //   const subCategory = [
   //     {id:1, name: 'gach men 6x6', description: 'data test'},
   //     {id:2, name: 'gach men 8x8', description: 'data test'},
@@ -37,15 +51,16 @@ const CategoryRow = (props) => {
     description: 'Hang đep',
     id: 1,
     name: 'Gach',
-    categoryId: 1
+    categoryId: 1,
   };
   const handleClick = () => {
     setOpenNested(!openNested);
   };
 
-  const handleOnClickDetailCategory = (categoryId) => {
-    console.log(categoryId);
-    navigate(`/category/detail/${categoryId}`);
+  const handleOnClickDetailCategory = (description) => {
+    setTitle('Mô tả danh mục')
+    setMessage(description)
+    setOpenPopupDescription(true)
   };
 
   const closePopup = () => {
@@ -68,7 +83,7 @@ const CategoryRow = (props) => {
     // render parent option
     return (
       <>
-        <TableRow hover>
+        <TableRow>
           <TableCell>
             {!!subCategory && subCategory.length > 0 && (
               <>
@@ -106,39 +121,39 @@ const CategoryRow = (props) => {
               spacing={2}
             >
               <Tooltip
-                title="Chi tiết danh mục"
+                title="Mô tả"
                 arrow
               >
                 <IconButton
                   sx={{
                     '&:hover': {
-                      background: theme.colors.info.lighter,
+                      background: 'rgba(255, 245, 0,0.1)',
                     },
-                    color: theme.palette.info.main,
+                    color: '#FFF500',
                   }}
                   color="inherit"
                   size="small"
-                  onClick={() => handleOnClickDetailCategory()}
+                  onClick={() => handleOnClickDetailCategory(description)}
                 >
-                  <InfoTwoTone fontSize="small" />
+                  <Info fontSize="small" />
                 </IconButton>
               </Tooltip>
               <Tooltip
-                title="Sửa danh mục"
+                title="Chỉnh sửa"
                 arrow
               >
                 <IconButton
                   sx={{
                     '&:hover': {
-                      background: theme.colors.primary.lighter,
+                      background: theme.colors.warning.lighter,
                     },
-                    color: theme.palette.primary.main,
+                    color: theme.palette.warning.main,
                   }}
-                  color="inherit"
+                  color="warning"
                   size="small"
                   onClick={() => handleOnClickEditCategory(category)}
                 >
-                  <EditTwoTone fontSize="small" />
+                  <Edit fontSize="small" />
                 </IconButton>
               </Tooltip>
             </Stack>
@@ -149,68 +164,59 @@ const CategoryRow = (props) => {
             {openNested && (
               <>
                 <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell colSpan="3">
+                  <TableCell className={classes.tableCellChild}></TableCell>
+                  <TableCell
+                    className={classes.tableCellChild}
+                    colSpan="3"
+                  >
                     <Collapse in={openNested}>
                       <Table>
-                        {/* <TableHead>
-                        <TableRow>
-                          <TableCell>Tên danh mục phụ</TableCell>
-
-                          <TableCell>
-                            Mô tả
-                          </TableCell>
-                          <TableCell>
-                            Hành động
-                          </TableCell>
-                        </TableRow>
-                      </TableHead> */}
                         <TableBody>
                           {subCategory.map((item, index) => {
                             return (
-                              <TableRow hover key={index}>
-                                <TableCell>{item?.name}</TableCell>
-                                <TableCell>{item?.description}</TableCell>
-                                <TableCell>
+                              <TableRow key={index}>
+                                <TableCell width="30%">{item?.name}</TableCell>
+                                <TableCell width="50%">{item?.description}</TableCell>
+                                <TableCell width="20%">
                                   <Stack
                                     direction="row"
                                     spacing={2}
                                     sx={{ width: '40px' }}
                                   >
                                     <Tooltip
-                                      title="Chi tiết danh mục phụ"
+                                      title="Mô tả"
                                       arrow
                                     >
                                       <IconButton
                                         sx={{
                                           '&:hover': {
-                                            background: theme.colors.info.lighter,
+                                            background: 'rgba(255, 245, 0,0.1)',
                                           },
-                                          color: theme.palette.info.main,
+                                          color: '#FFF500',
                                         }}
                                         color="inherit"
                                         size="small"
-                                        onClick={() => handleOnClickDetailCategory(id)}
+                                        onClick={() => handleOnClickDetailCategory(item?.description)}
                                       >
                                         <InfoTwoTone fontSize="small" />
                                       </IconButton>
                                     </Tooltip>
                                     <Tooltip
-                                      title="Sửa danh mục phụ"
+                                      title="Chỉnh sửa"
                                       arrow
                                     >
                                       <IconButton
                                         sx={{
                                           '&:hover': {
-                                            background: theme.colors.primary.lighter,
+                                            background: theme.colors.warning.lighter,
                                           },
-                                          color: theme.palette.primary.main,
+                                          color: theme.palette.warning.main,
                                         }}
                                         color="inherit"
                                         size="small"
                                         onClick={() => handleOnClickEditCategory(item)}
                                       >
-                                        <EditTwoTone fontSize="small" />
+                                        <Edit fontSize="small" />
                                       </IconButton>
                                     </Tooltip>
                                   </Stack>
@@ -238,6 +244,20 @@ const CategoryRow = (props) => {
             allCategoryList={allCategoryList}
           />
         </Popup>
+        <AlertPopup
+          maxWidth="sm"
+          title={title}
+          openPopup={openPopupDescription}
+          setOpenPopup={setOpenPopupDescription}
+          isConfirm={false}
+        >
+          <Box
+            component={'span'}
+            className="popupMessageContainer"
+          >
+            {message}
+          </Box>
+        </AlertPopup>
       </>
     );
   };

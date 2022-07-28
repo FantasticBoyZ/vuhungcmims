@@ -7,16 +7,30 @@ export const getCategoryList = createAsyncThunk('category' , async (params, thun
   return categoryList;
 })
 
+export const getSubCategoryByCategoryId = createAsyncThunk('subCategory' , async (params, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const subCategoryList = await categoryService.getSubCategoryByCategoryId(params);
+  return subCategoryList;
+})
+
 export const getCategoryDetail = createAsyncThunk('category/get-one' , async (params, thunkAPi) => {
   // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
   const category = await categoryService.getCategoryDetail(params);
   return category;
 })
 
-export const saveCategory = createAsyncThunk('category/save' , async (category, thunkAPi) => {
+export const saveCategory = createAsyncThunk('category/save' , async (category, { rejectWithValue }) => {
   // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
-  const response = await categoryService.saveCategory(category);
+  try {
+    const response = await categoryService.saveCategory(category);
   return response;
+  } catch (err) {
+    if (!err.response) {
+      throw err;
+    }
+    return rejectWithValue(err.response.data);
+  }
+  
 })
 
 const categorySlice = createSlice({

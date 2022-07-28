@@ -67,6 +67,7 @@ const ImportOrderDetail = () => {
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
   const navigate = useNavigate();
+  const currentUserRole = AuthService.getCurrentUser().roles[0];
   const dataTest = {
     id: 1,
     orderCode: 'Test001',
@@ -272,22 +273,28 @@ const ImportOrderDetail = () => {
                         spacing={2}
                         className={classes.buttonAction}
                       >
-                        <Button
-                          variant="contained"
-                          startIcon={<Done />}
-                          color="success"
-                          onClick={() => handleOnClickConfirm()}
-                        >
-                          Xác nhận nhập kho
-                        </Button>
-                        <Button
-                          variant="contained"
-                          startIcon={<Edit />}
-                          color="warning"
-                          onClick={() => handleOnClickEdit()}
-                        >
-                          Chỉnh sửa
-                        </Button>
+                        {(currentUserRole === 'ROLE_OWNER' ||
+                          currentUserRole === 'ROLE_STOREKEEPER') && (
+                            <Button
+                              variant="contained"
+                              startIcon={<Done />}
+                              color="success"
+                              onClick={() => handleOnClickConfirm()}
+                            >
+                              Xác nhận nhập kho
+                            </Button>
+                          )}
+                        {(currentUserRole === 'ROLE_OWNER' ||
+                          currentUserRole === 'ROLE_STOREKEEPER') && (
+                            <Button
+                              variant="contained"
+                              startIcon={<Edit />}
+                              color="warning"
+                              onClick={() => handleOnClickEdit()}
+                            >
+                              Chỉnh sửa
+                            </Button>
+                          )}
                         <Button
                           variant="contained"
                           startIcon={<Close />}
@@ -298,7 +305,7 @@ const ImportOrderDetail = () => {
                         </Button>
                       </Stack>
                     )}
-                    {importOrder.statusName === 'completed' && (
+                    {/* {importOrder.statusName === 'completed' && (
                       <Stack
                         direction="row"
                         justifyContent="flex-end"
@@ -313,7 +320,7 @@ const ImportOrderDetail = () => {
                           Trả hàng
                         </Button>
                       </Stack>
-                    )}
+                    )} */}
                   </Stack>
                 </Card>
               </Grid>

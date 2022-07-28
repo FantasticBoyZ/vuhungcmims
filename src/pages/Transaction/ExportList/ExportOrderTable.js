@@ -53,12 +53,16 @@ const getStatusLabel = (exportOrderStatus) => {
       color: 'error',
     },
     completed: {
-      text: 'Đã nhập kho',
+      text: 'Đã xuất kho',
       color: 'success',
     },
     pending: {
       text: 'Đang chờ xử lý',
       color: 'warning',
+    },
+    returned: {
+      text: 'Đã xuất kho',
+      color: 'primary',
     },
   };
 
@@ -68,7 +72,7 @@ const getStatusLabel = (exportOrderStatus) => {
 };
 
 const ExportOrderTable = ({ exportOrders }) => {
-    const [selectedExportOrders, setSelectedExportOrders] = useState([]);
+  const [selectedExportOrders, setSelectedExportOrders] = useState([]);
   const classes = useStyles();
   const theme = useTheme();
   const selectedBulkActions = selectedExportOrders.length > 0;
@@ -87,7 +91,7 @@ const ExportOrderTable = ({ exportOrders }) => {
 
   const handleOnClickTableRow = (id) => {
     navigate(`/export/detail/${id}`);
-  }
+  };
   return (
     <Box>
       {!!exportOrders && (
@@ -95,15 +99,10 @@ const ExportOrderTable = ({ exportOrders }) => {
           <Table className={classes.table}>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    color="primary"
-                    checked={selectedAllExportOrders}
-                    indeterminate={selectedSomeExportOrders}
-                  />
-                </TableCell>
                 <TableCell>Mã xuất kho</TableCell>
-                <TableCell>Thời gian</TableCell>
+                <TableCell>Mã tham chiếu</TableCell>
+                <TableCell>Ngày tạo</TableCell>
+                <TableCell>Ngày xuất</TableCell>
                 <TableCell align="center">Trạng thái</TableCell>
                 <TableCell align="center">Giá trị đơn hàng</TableCell>
               </TableRow>
@@ -121,19 +120,15 @@ const ExportOrderTable = ({ exportOrders }) => {
                     selected={false}
                     onClick={(value) => handleOnClickTableRow(exportOrder.orderId)}
                   >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        //   checked={isExportOrderSelected}
-                        checked={false}
-                        // TODO: create function handle onclick checkbox
-                        //   onChange={(event) =>
-                        //     handleSelectOneExportOrder(event, exportOrder.id)
-                        //   }
-
-                        //   value={isExportOrderSelected}
-                        value={false}
-                      />
+                    <TableCell>
+                      <Typography
+                        variant="body1"
+                        color="text.primary"
+                        gutterBottom
+                        noWrap
+                      >
+                        {'PX' + exportOrder.orderId}
+                      </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography
@@ -145,6 +140,7 @@ const ExportOrderTable = ({ exportOrders }) => {
                         {exportOrder.billRefernce}
                       </Typography>
                     </TableCell>
+
                     <TableCell>
                       <Typography
                         variant="body1"
@@ -152,7 +148,19 @@ const ExportOrderTable = ({ exportOrders }) => {
                         gutterBottom
                         noWrap
                       >
-                        {FormatDataUtils.formatDateTime(exportOrder.createDate)}
+                        {FormatDataUtils.formatDate(exportOrder.createDate)}
+                        {/* {exportOrder.createDate} */}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="body1"
+                        color="text.primary"
+                        gutterBottom
+                        noWrap
+                      >
+                        {exportOrder.confirmDate &&
+                          FormatDataUtils.formatDate(exportOrder.confirmDate)}
                         {/* {exportOrder.createDate} */}
                       </Typography>
                     </TableCell>

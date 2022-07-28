@@ -15,13 +15,18 @@ const formatDate = (date) => {
   });
 };
 
+const getRoundNumber = (value, precision) => {
+  var multiplier = Math.pow(10, precision || 0);
+  return Math.round(value * multiplier) / multiplier;
+};
+
 const convertUTCDateToLocalDate = (date) => {
-  var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+  var newDate = new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
 
-  var offset = date.getTimezoneOffset() / 60;
-  var hours = date.getHours();
+  // var offset = date.getTimezoneOffset() / 60;
+  // var hours = date.getHours();
 
-  newDate.setHours(hours - offset);
+  // newDate.setHours(hours - offset);
 
   return newDate;
 };
@@ -55,7 +60,16 @@ const getOptionProduct = (listData) => {
 
 const getSelectedOption = (array, value) => {
   const arrayOption = getOptionWithIdandName(array);
-  return arrayOption.find((item) => item.value === value);
+  if (value !== null) {
+    return arrayOption.find((item) => item.value === value);
+  } else {
+    return null;
+  }
+};
+
+const getSelectedOptionWithId = (array, id) => {
+  const arrayOption = getOption(array);
+  return arrayOption.find((item) => item.value.id === id);
 };
 
 const getStatusLabel = (exportOrderStatus) => {
@@ -87,6 +101,8 @@ const FormatDataUtils = {
   getOptionWithIdandName,
   getSelectedOption,
   getStatusLabel,
-  getOptionProduct
+  getOptionProduct,
+  getRoundNumber,
+  getSelectedOptionWithId,
 };
 export default FormatDataUtils;

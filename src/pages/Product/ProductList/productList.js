@@ -32,6 +32,7 @@ import Select from 'react-select';
 import { toast } from 'react-toastify';
 import FormatDataUtils from '@/utils/formatData';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import CustomTablePagination from '@/components/Common/TablePagination';
 
 const useStyles = makeStyles({
   searchField: {
@@ -556,7 +557,7 @@ const ProductList = () => {
                                     }),
                                   }}
                                   onChange={(e) => {
-                                    console.log(e.label);
+                                    // console.log(e.label);
                                     if (
                                       e.label === item.wrapUnitMeasure &&
                                       newSelectdUnitMeasureList[index] !==
@@ -564,10 +565,10 @@ const ProductList = () => {
                                     ) {
                                       newSelectdUnitMeasureList[index] =
                                         item.wrapUnitMeasure;
-                                      console.log(
-                                        'wrapUnitMeasure',
-                                        newSelectdUnitMeasureList[index],
-                                      );
+                                      // console.log(
+                                      //   'wrapUnitMeasure',
+                                      //   newSelectdUnitMeasureList[index],
+                                      // );
                                       setSelectedUnitMeasureList(
                                         newSelectdUnitMeasureList,
                                       );
@@ -578,22 +579,25 @@ const ProductList = () => {
                                         item.unitMeasure
                                     ) {
                                       newSelectdUnitMeasureList[index] = item.unitMeasure;
-                                      console.log(
-                                        'unitMeasure',
-                                        newSelectdUnitMeasureList[index],
-                                      );
+                                      // console.log(
+                                      //   'unitMeasure',
+                                      //   newSelectdUnitMeasureList[index],
+                                      // );
                                       setSelectedUnitMeasureList(
                                         newSelectdUnitMeasureList,
                                       );
                                     }
-                                    console.log(selectedUnitMeasureList);
+                                    // console.log(selectedUnitMeasureList);
                                   }}
                                 />
                               )}
                             </TableCell>
                             <TableCell align="center">
                               {selectedUnitMeasureList[index] === item.wrapUnitMeasure
-                                ? Math.floor(item.quantity / item.numberOfWrapUnitMeasure)
+                                ? FormatDataUtils.getRoundNumber(
+                                    item.quantity / item.numberOfWrapUnitMeasure,
+                                    1,
+                                  )
                                 : item.quantity}
                             </TableCell>
                           </TableRow>
@@ -601,14 +605,13 @@ const ProductList = () => {
                       })}
                     </TableBody>
                   </Table>
-                  <TablePagination
-                    component="div"
+                  <CustomTablePagination
                     page={page}
-                    rowsPerPageOptions={pages}
+                    pages={pages}
                     rowsPerPage={rowsPerPage}
-                    count={totalRecord}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    totalRecord={totalRecord}
+                    handleChangePage={handleChangePage}
+                    handleChangeRowsPerPage={handleChangeRowsPerPage}
                   />
                 </Box>
               ) : (

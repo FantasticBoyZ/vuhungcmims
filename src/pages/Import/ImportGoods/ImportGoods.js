@@ -5,6 +5,7 @@ import AuthService from '@/services/authService';
 import importOrderService from '@/services/importOrderService';
 import { getManufacturerList } from '@/slices/ManufacturerSlice';
 import { getProductList } from '@/slices/ProductSlice';
+import { getWarehouseList } from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
 import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -13,6 +14,7 @@ import {
   Card,
   FormHelperText,
   IconButton,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -39,6 +41,15 @@ import './style.css';
 const useStyles = makeStyles({
   unitMeasureSelect: {
     width: '100px',
+  },
+  table: {
+    textAlign: 'center',
+    '& thead th': {
+      backgroundColor: '#DCF4FC',
+    },
+    '& tbody tr:hover': {
+      // cursor: 'pointer',
+    },
   },
 });
 
@@ -79,6 +90,7 @@ const DependentField = ({ name, ...otherProps }) => {
 const ImportGoods = () => {
   const [manufacturerList, setManufacturerList] = useState();
   const [searchManufacturerParams, setSearchManufacturerParams] = useState();
+  const [warehouseList, setWarehouseList] = useState([]);
   const [productList, setProductList] = useState();
   const [selectedProduct, setSelectedProduct] = useState();
   const [openPopup, setOpenPopup] = useState(false);
@@ -238,10 +250,13 @@ const ImportGoods = () => {
         setOpenPopup(true);
         return;
       }
-
+      console.log('timezone', new Date().getTimezoneOffset() / 60);
       consignmentRequests.push({
         productId: consignments[index]?.productId,
-        expirationDate: consignments[index]?.expirationDate,
+        expirationDate: new Date(
+          consignments[index]?.expirationDate + new Date().getTimezoneOffset() / 60,
+        ).toJSON(),
+        // expirationDate: new Date(FormatDataUtils.convertUTCDateToLocalDate(consignments[index]?.expirationDate)).toJSON(),
         unitPrice: Math.round(
           consignments[index]?.selectedUnitMeasure ===
             consignments[index]?.wrapUnitMeasure
@@ -266,7 +281,7 @@ const ImportGoods = () => {
       wareHouseId: values.wareHouseId,
       consignmentRequests: consignmentRequests,
     };
-    console.log('test new',newImportOrder)
+    console.log('test new', newImportOrder);
     importOrderService.createImportOrder(newImportOrder).then(
       (response) => {
         toast.success('Tạo phiếu nhập hàng thành công');
@@ -278,7 +293,6 @@ const ImportGoods = () => {
         console.log(error);
       },
     );
-
   };
 
   const calculateTotalAmount = () => {
@@ -332,8 +346,22 @@ const ImportGoods = () => {
     }
   };
 
+  const getAllWarehouse = async () => {
+    try {
+      const actionResult = await dispatch(getWarehouseList());
+      const dataResult = unwrapResult(actionResult);
+      console.log('warehouse list', dataResult.data);
+      if (dataResult.data) {
+        setWarehouseList(dataResult.data.warehouse);
+      }
+    } catch (error) {
+      console.log('Failed to fetch warehouse list: ', error);
+    }
+  };
+
   useEffect(() => {
     fetchManufacturerList();
+    getAllWarehouse();
   }, []);
 
   return (
@@ -351,32 +379,35 @@ const ImportGoods = () => {
                 <Card className="card-container">
                   <div className="label">Thông tin nhà cung cấp</div>
                   {manufacturerList && (
-                    <Select
-                      classNamePrefix="select"
-                      placeholder="Chọn nhà cung cấp..."
-                      noOptionsMessage={() => <>Không có tìm thấy nhà cung cấp nào</>}
-                      isClearable={true}
-                      isSearchable={true}
-                      name="manufacturer"
-                      options={getOption(manufacturerList)}
-                      menuPortalTarget={document.body}
-                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                      onChange={(e) => {
-                        setFieldValue('manufactorId', e?.value.id || '');
-                        setFieldValue('consignmentRequests', []);
-                        handleOnChangeManufacturer(e);
-                      }}
-                    />
+                    <Box>
+                      <Select
+                        classNamePrefix="select"
+                        placeholder="Chọn nhà cung cấp..."
+                        noOptionsMessage={() => <>Không có tìm thấy nhà cung cấp nào</>}
+                        isClearable={true}
+                        isSearchable={true}
+                        name="manufacturer"
+                        options={FormatDataUtils.getOptionWithIdandName(manufacturerList)}
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                        onChange={(e) => {
+                          setFieldValue('manufactorId', e?.value);
+                          setFieldValue('consignmentRequests', []);
+                          handleOnChangeManufacturer(e);
+                        }}
+                      />
+                      <FormHelperText
+                        error={true}
+                        className="error-text-helper"
+                      >
+                        {errors.manufactorId}
+                      </FormHelperText>
+                    </Box>
                   )}
-                  <FormHelperText
-                    error={true}
-                    className="error-text-helper"
-                  >
-                    {errors.manufactorId}
-                  </FormHelperText>
+
                   {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
                 </Card>
-                <Card className="card-container">
+                <Card className="product-list-container">
                   <div className="label">Thông tin các sản phẩm</div>
                   {!!productList && !!values.manufactorId && (
                     <Select
@@ -398,7 +429,7 @@ const ImportGoods = () => {
 
                   <hr />
                   <TableContainer>
-                    <Table>
+                    <Table className={classes.table}>
                       <TableHead>
                         <TableRow>
                           <TableCell></TableCell>
@@ -647,40 +678,42 @@ const ImportGoods = () => {
                         ></FieldArray>
                       </TableBody>
                     </Table>
-                    <pre>{JSON.stringify(values, null, 2)}</pre>
+                    {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
                   </TableContainer>
                 </Card>
               </div>
               <div className="right-container">
-                <Card className="card-container">
+                <Card className="order-detail-container">
                   <div className="label">Thông tin đơn hàng</div>
                   <div className="time">
                     {/* chỗ này là createdDate */}
                     {FormatDataUtils.formatDate(today)}
                   </div>
                   <div className="label-field">Vị trí lưu kho</div>
-                  <Box className="selectbox-warehouse">
-                    <Select
-                      classNamePrefix="select"
-                      placeholder="Chọn kho hàng..."
-                      noOptionsMessage={() => <>Không có tìm thấy kho nào</>}
-                      isClearable={true}
-                      isSearchable={true}
-                      name="warehouse"
-                      options={getOption(warehouseData)}
-                      menuPortalTarget={document.body}
-                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                      onChange={(e) => {
-                        setFieldValue('wareHouseId', e?.value.id);
-                      }}
-                    />
-                    <FormHelperText
-                      error={true}
-                      className="error-text-helper"
-                    >
-                      {errors.wareHouseId}
-                    </FormHelperText>
-                  </Box>
+                  {warehouseList && (
+                    <Box className="selectbox-warehouse">
+                      <Select
+                        classNamePrefix="select"
+                        placeholder="Chọn kho hàng..."
+                        noOptionsMessage={() => <>Không có tìm thấy kho nào</>}
+                        isClearable={true}
+                        isSearchable={true}
+                        name="warehouse"
+                        options={FormatDataUtils.getOptionWithIdandName(warehouseList)}
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                        onChange={(e) => {
+                          setFieldValue('wareHouseId', e?.value);
+                        }}
+                      />
+                      <FormHelperText
+                        error={true}
+                        className="error-text-helper"
+                      >
+                        {errors.wareHouseId}
+                      </FormHelperText>
+                    </Box>
+                  )}
                   <div className="label-field">Tham chiếu</div>
                   <div className="margin-bottom-16">
                     <TextfieldWrapper
@@ -699,20 +732,26 @@ const ImportGoods = () => {
                     rows={6}
                     multiline
                   />
-                  <div className="total-amount">
-                    <div>Tổng tiền:</div>
-                    <div>{FormatDataUtils.formatCurrency(calculateTotalAmount())}</div>
-                  </div>
-                  <div className="button-import">
-                    <ButtonWrapper
-                      type="button"
-                      variant="contained"
-                      size="large"
-                      startIcon={<CheckIcon />}
-                    >
-                      Nhập hàng
-                    </ButtonWrapper>
-                  </div>
+                  <Stack
+                    mt={25}
+                    justifyContent="flex-end"
+                  >
+                    <div className="total-amount">
+                      <div>Tổng tiền:</div>
+                      <div>{FormatDataUtils.formatCurrency(calculateTotalAmount())}</div>
+                    </div>
+                    <div className="button-import">
+                      <ButtonWrapper
+                        type="button"
+                        variant="contained"
+                        size="large"
+                        startIcon={<CheckIcon />}
+                        color="success"
+                      >
+                        Tạo phiếu nhập kho
+                      </ButtonWrapper>
+                    </div>
+                  </Stack>
                 </Card>
               </div>
               <AlertPopup

@@ -1,9 +1,10 @@
 import axiosClient from '@/utils/axiosCient';
 import authHeader from '@/services/authHeader';
 import axios from 'axios';
+import { API_URL } from '@/constants/apiUrl';
 
 // const API_URL = 'http://localhost:8080/api'
-const API_URL = process.env.REACT_APP_API_URL
+// const API_URL = process.env.REACT_APP_API_URL
 const exportOrderService = {
   getExportOrderList: (params) => {
     const url = '/export-order/list';
@@ -39,7 +40,7 @@ const exportOrderService = {
 
   confirmExportOrder: (params) => {
     const {exportOrderId, confirmUserId} = params
-    const url = `/export-order/confirm/${exportOrderId}`;
+    const url = `/export-order/confirm/${exportOrderId}/${confirmUserId}`;
     return axiosClient.get(url, { headers: authHeader() });
   },
 
@@ -54,6 +55,23 @@ const exportOrderService = {
     // const url = process.env.REACT_APP_API_URL + '/import-order/update';
     return axios.put(url, exportOrder)
   },
+
+  getReturnOrderList: (params) => {
+    const url = '/return-order/list';
+    return axiosClient.get(url, { params, headers: authHeader() });
+  },
+
+  getReturnOrderDetail: (params) => {
+    console.log(params)
+    const url = `/return-order/detail`;
+    return axiosClient.get(url, { params, headers: authHeader() });
+  },
+
+  createReturnOrder: (params) => {
+    const {returnOrder, exportOrderId} = params
+    const url = API_URL + `/return-order/return/${exportOrderId}`;
+    return axios.post(url, returnOrder);
+  }
 };
 
 export default exportOrderService;

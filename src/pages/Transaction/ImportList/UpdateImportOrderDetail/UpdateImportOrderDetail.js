@@ -99,6 +99,7 @@ const UpdateImportOrderDetail = () => {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [isConfirm, setIsConfirm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState();
   const [createdDate] = useState(new Date().getTime());
   const [confirmedDate] = useState(new Date().getTime());
   const pages = [10, 20, 50];
@@ -146,6 +147,7 @@ const UpdateImportOrderDetail = () => {
   };
 
   const handleOnClickConfirm = () => {
+    setErrorMessage('');
     setTitle('Bạn có chắc chắn muốn lưu lại chỉnh sửa không?');
     setMessage('Hãy kiểm tra kỹ thông tin trước khi xác nhận.');
     setIsConfirm(true);
@@ -160,38 +162,61 @@ const UpdateImportOrderDetail = () => {
   };
 
   const handleConfirm = async () => {
-
     if (isConfirm) {
-      const values = valueFormik.current
-      console.log('Xác nhận');
-      const editedImportOrder = {
-        orderId: importOrderId,
-        billReferenceNumber: values.billRefernce,
-        createDate: values.createDate,
-        description: values.description,
-        userId: values.userId,
-        manufactorId: values.manufactorId,
-        wareHouseId: values.wareHouseId,
-        consignmentRequests: values.consignments,
-      };
-      console.log(editedImportOrder);
-      try {
-        const actionResult = await dispatch(updateImportOrder(editedImportOrder));
-        const result = unwrapResult(actionResult);
-        if (!!result) {
-          if (!!result.data.status && result.data.status === 200) {
-            toast.success(result.data.message);
-          } else {
-            toast.success('Sửa đơn nhập kho thành công!');
+      const values = valueFormik.current;
+      let consignmentRequests = [];
+      if (values.consignments) {
+        for (let index = 0; index < values.consignments.length; index++) {
+          const consignment = values.consignments[index];
+          if (consignment.quantity > 0) {
+            consignmentRequests.push({
+              consignmentId: consignment.consignmentId,
+              productId: consignment.productId,
+              expirationDate: new Date(consignment.expirationDate + (new Date().getTimezoneOffset()) / 60).toJSON(),
+              importDate: new Date(consignment.importDate).toJSON(),
+              unitPrice: consignment.unitPrice,
+              quantity: consignment.quantity,
+            });
           }
-          // fetchImportOrderDetail();
-          // fetchProductListByImportOrderId();
-          setOpenPopup(false);
-          navigate(`/import/detail/${importOrderId}`);
         }
-      } catch (error) {
-        console.log('Failed to update importOder: ', error);
-        toast.error(error)
+      }
+      if (consignmentRequests.length > 0) {
+        console.log('Xác nhận');
+        const editedImportOrder = {
+          orderId: importOrderId,
+          billReferenceNumber: values.billRefernce,
+          createDate: values.createDate,
+          description: values.description,
+          userId: values.userId,
+          manufactorId: values.manufactorId,
+          wareHouseId: values.wareHouseId,
+          consignmentRequests: consignmentRequests,
+        };
+        console.log(editedImportOrder);
+        try {
+          const actionResult = await dispatch(updateImportOrder(editedImportOrder));
+          const result = unwrapResult(actionResult);
+          if (!!result) {
+            if (!!result.data.status && result.data.status === 200) {
+              toast.success(result.data.message);
+            } else {
+              toast.success('Sửa đơn nhập kho thành công!');
+            }
+            // fetchImportOrderDetail();
+            // fetchProductListByImportOrderId();
+            setOpenPopup(false);
+            navigate(`/import/detail/${importOrderId}`);
+          }
+        } catch (error) {
+          console.log('Failed to update importOder: ', error);
+          toast.error(error);
+        }
+      } else {
+        // TODO: in ra lỗi vì không có sản phẩm hợp lệ
+        console.log('Vui lòng nhập số lượng sản phẩm trước khi lưu đơn nhập kho');
+        setErrorMessage('Vui lòng nhập số lượng sản phẩm trước khi lưu đơn nhập kho');
+        setOpenPopup(true);
+        return;
       }
     } else {
       console.log('Huỷ');
@@ -622,17 +647,17 @@ const UpdateImportOrderDetail = () => {
                     </Grid>
                     <AlertPopup
                       maxWidth="sm"
-                      title={title}
+                      title={errorMessage ? 'Chú ý' : title}
                       openPopup={openPopup}
                       setOpenPopup={setOpenPopup}
-                      isConfirm={true}
+                      isConfirm={!errorMessage}
                       handleConfirm={handleConfirm}
                     >
                       <Box
                         component={'span'}
                         className="popupMessageContainer"
                       >
-                        {message}
+                        {errorMessage ? errorMessage : message}
                       </Box>
                     </AlertPopup>
                   </Grid>

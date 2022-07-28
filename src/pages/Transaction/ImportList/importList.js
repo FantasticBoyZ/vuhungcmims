@@ -2,7 +2,16 @@ import SelectWrapper from '@/components/Common/FormsUI/Select';
 import ImportOrders from '@/pages/Transaction/ImportList/ImportOrders';
 import { Search } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
-import { Card, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import {
+  Card,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  InputLabel,
+  MenuItem,
+  Select,
+} from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -26,6 +35,9 @@ import { Form, Formik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import AuthService from '@/services/authService';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import { getCreaterList } from '@/slices/StaffSlice';
 
 const useStyles = makeStyles({
   searchField: {
@@ -48,6 +60,13 @@ const useStyles = makeStyles({
   cardStyle: {
     padding: '12px',
   },
+  labelCheckbox: {
+    color: '#29A3E2',
+  },
+  labelPanelFilter: {
+    fontSize: '24px',
+    margin: '0 24px 24px 24px',
+  },
 });
 
 const createrList = [
@@ -63,12 +82,15 @@ const ImportList = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [creatorId, setCreatorId] = useState('');
+  const [staffList, setStaffList] = useState([]);
   const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRecord, setTotalRecord] = useState();
   const [importOrderList, setImportOrderList] = useState();
   const navigate = useNavigate();
+  const currentUserRole = AuthService.getCurrentUser().roles[0];
+  const [selectPending, setSelectPending] = useState(false);
   const [searchParams, setSearchParams] = useState({
     billRefernceNumber: '',
     userId: '',
@@ -88,6 +110,13 @@ const ImportList = () => {
     setPage(0);
   };
 
+  const handleChangeCheckboxPending = () => {
+    setPage(0);
+    setSearchParams({ ...searchParams, status: selectPending === false ? 1 : '' });
+    searchImportOrder({ ...searchParams, status: selectPending === false ? 1 : '' });
+    setSelectPending(!selectPending);
+  };
+
   const handleSearch = (e) => {
     if (e.keyCode === 13) {
       let target = e.target;
@@ -101,27 +130,42 @@ const ImportList = () => {
 
   const handleChangeCreator = (event) => {
     setCreatorId(event.target.value);
-    setSearchParams({ ...searchParams, userId: event.target.value });
-    searchImportOrder({ ...searchParams, userId: event.target.value });
+    setPage(0);
+    setSearchParams({
+      ...searchParams,
+      userId: event.target.value > 0 ? event.target.value : '',
+    });
+    searchImportOrder({
+      ...searchParams,
+      userId: event.target.value > 0 ? event.target.value : '',
+    });
   };
 
   const handleChangeStartDate = (value) => {
     setStartDate(value);
+    setPage(0);
     console.log('startDate', format(new Date(value), 'dd-MM-yyyy'));
-    setSearchParams({ ...searchParams, startDate: format(new Date(value), 'dd-MM-yyyy') });
+    setSearchParams({
+      ...searchParams,
+      startDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
+    });
     searchImportOrder({
       ...searchParams,
-      startDate: format(new Date(value), 'dd-MM-yyyy'),
+      startDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
     });
   };
 
   const handleChangeEndDate = (value) => {
     setEndDate(value);
+    setPage(0);
     console.log('endDate', format(new Date(value), 'dd-MM-yyyy'));
-    setSearchParams({ ...searchParams, endDate: format(new Date(value), 'dd-MM-yyyy') });
+    setSearchParams({
+      ...searchParams,
+      endDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
+    });
     searchImportOrder({
       ...searchParams,
-      endDate: format(new Date(value), 'dd-MM-yyyy'),
+      endDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
     });
   };
 
@@ -148,6 +192,24 @@ const ImportList = () => {
     }
   };
 
+  const getAllStaff = async () => {
+    const params = {
+      // pageIndex: page + 1,
+      // pageSize: rowsPerPage,
+      keyWords: '',
+    };
+    try {
+      const actionResult = await dispatch(getCreaterList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('staff list', dataResult);
+      if (dataResult) {
+        setStaffList([{ id: 0, name: 'Tất cả' }].concat(dataResult));
+      }
+    } catch (error) {
+      console.log('Failed to fetch staff list: ', error);
+    }
+  };
+
   const fetchImportOrderList = async () => {
     try {
       const params = {
@@ -165,28 +227,34 @@ const ImportList = () => {
       console.log('Failed to fetch importOrder list: ', error);
     }
   };
-  // hook này để test biến thôi nha
+
   useEffect(() => {
-    console.log(startDate + ' ' + endDate);
-    fetchImportOrderList();
+    searchImportOrder(searchParams);
   }, [page, rowsPerPage]);
+
+  useEffect(() => {
+    fetchImportOrderList();
+    getAllStaff();
+  }, []);
 
   return (
     <Container maxWidth="xl">
-      <Stack
-        direction="row"
-        justifyContent="flex-end"
-        spacing={2}
-        p={2}
-      >
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleOnClickCreateImportOrder}
+      {(currentUserRole === 'ROLE_OWNER' || currentUserRole === 'ROLE_SELLER') && (
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          spacing={2}
+          p={2}
         >
-          Tạo phiếu nhập kho
-        </Button>
-        <Button
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<AddIcon />}
+            onClick={handleOnClickCreateImportOrder}
+          >
+            Tạo phiếu nhập kho
+          </Button>
+          {/* <Button
           variant="contained"
           color="secondary"
         >
@@ -197,9 +265,11 @@ const ImportList = () => {
           color="secondary"
         >
           Nhập file excel
-        </Button>
-      </Stack>
+        </Button> */}
+        </Stack>
+      )}
       <Card className={classes.panelFilter}>
+        <div className={classes.labelPanelFilter}>Tìm kiếm theo thông tin</div>
         <Toolbar className={classes.toolbar}>
           <TextField
             id="outlined-basic"
@@ -215,76 +285,80 @@ const ImportList = () => {
               ),
             }}
             onKeyDown={handleSearch}
-            // onChange={handleSearch}
+            onChange={(e) => {
+              setSearchParams({ ...searchParams, billReferenceNumber: e.target.value });
+            }}
           />
           <Box className={classes.selectBox}>
-            {/* <Formik
-              initialValues={{
-                creater: '1',
-              }}
-              // validationSchema={FORM_VALIDATION}
-              // onSubmit={handleLogin}
-            >
-              <Form>
-                <Stack
-                  direction="row"
-                  spacing={2}
+            {staffList && (
+              <FormControl fullWidth>
+                <InputLabel id="select-creator">Người tạo đơn</InputLabel>
+                <Select
+                  id="creator"
+                  value={creatorId}
+                  label="Người tạo đơn"
+                  onChange={handleChangeCreator}
                 >
-                  <SelectWrapper
-                    label="Người tạo"
-                    name="creater"
-                    options={createrList}
-                  />
-                </Stack>
-              </Form>
-            </Formik> */}
-            <FormControl fullWidth>
-              <InputLabel id="select-creator">Người tạo đơn</InputLabel>
-              <Select
-                id="creator"
-                value={creatorId}
-                label="Người tạo"
-                onChange={handleChangeCreator}
-              >
-                {createrList.map((item) => (
-                  <MenuItem
-                    key={item.id}
-                    value={item.id}
-                  >
-                    {item.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                  {staffList.map((item) => (
+                    <MenuItem
+                      key={item.id}
+                      value={item.id}
+                    >
+                      {item.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
           </Box>
         </Toolbar>
         <div>
           <div className={classes.labelDateRange}>Khoảng thời gian tạo đơn</div>
-          <Toolbar>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                id="startDate"
-                label="Ngày bắt đầu"
-                value={startDate}
-                inputFormat="dd/MM/yyyy"
-                onChange={(newValue) => {
-                  handleChangeStartDate(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-              <Box sx={{ mx: 2 }}> Đến </Box>
-              <DatePicker
-                id="endDate"
-                label="Ngày kết thúc"
-                inputFormat="dd/MM/yyyy"
-                value={endDate}
-                onChange={(newValue) => {
-                  handleChangeEndDate(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </LocalizationProvider>
-          </Toolbar>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Toolbar>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  id="startDate"
+                  label="Ngày bắt đầu"
+                  value={startDate}
+                  inputFormat="dd/MM/yyyy"
+                  onChange={(newValue) => {
+                    handleChangeStartDate(newValue);
+                  }}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+                <Box sx={{ mx: 2 }}> Đến </Box>
+                <DatePicker
+                  id="endDate"
+                  label="Ngày kết thúc"
+                  inputFormat="dd/MM/yyyy"
+                  value={endDate}
+                  onChange={(newValue) => {
+                    handleChangeEndDate(newValue);
+                  }}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
+            </Toolbar>
+            <Box>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectPending}
+                      onChange={() => handleChangeCheckboxPending()}
+                    />
+                  }
+                  label="Chỉ hiển thị đơn hàng đang được xử lý"
+                  className={classes.labelCheckbox}
+                />
+              </FormGroup>
+            </Box>
+          </Stack>
         </div>
       </Card>
 
@@ -302,7 +376,7 @@ const ImportList = () => {
         >
           <Card className={classes.cardStyle}>
             {loading ? (
-              <>Loading...</>
+              <ProgressCircleLoading />
             ) : (
               <Box>
                 {totalRecord > 0 ? (

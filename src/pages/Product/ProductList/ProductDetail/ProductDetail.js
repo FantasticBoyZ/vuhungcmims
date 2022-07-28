@@ -170,16 +170,16 @@ const ProductDetail = () => {
                                     if (e.label !== selectedUnitMeasure) {
                                       if (e.label === product.wrapUnitMeasure) {
                                         setSelectedUnitMeasure(product.wrapUnitMeasure);
-                                        console.log('wrap', product.wrapUnitMeasure);
+                                        // console.log('wrap', product.wrapUnitMeasure);
                                       }
 
                                       if (e.label === product.unitMeasure) {
                                         setSelectedUnitMeasure(product.unitMeasure);
-                                        console.log('unit', product.unitMeasure);
+                                        // console.log('unit', product.unitMeasure);
                                       }
                                     }
 
-                                    console.log('select', selectedUnitMeasure);
+                                    // console.log('select', selectedUnitMeasure);
                                   }}
                                 />
                               )}
@@ -210,7 +210,7 @@ const ProductDetail = () => {
                           >
                             <Typography className={classes.contentInfo}>
                               {selectedUnitMeasure === product.wrapUnitMeasure
-                                ? Math.floor(product.quantity/product.numberOfWrapUnitMeasure)
+                                ? FormatDataUtils.getRoundNumber(product.quantity/product.numberOfWrapUnitMeasure, 1)
                                 : product.quantity}
                             </Typography>
                           </Grid>
