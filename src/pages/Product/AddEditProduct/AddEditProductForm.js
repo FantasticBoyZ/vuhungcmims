@@ -1,6 +1,7 @@
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import IconRequired from '@/components/Common/IconRequired';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import { API_URL_IMAGE } from '@/constants/apiUrl';
 import CategoryService from '@/services/categoryService';
 import productService from '@/services/productService';
 import { getSubCategoryByCategoryId } from '@/slices/CategorySlice';
@@ -277,7 +278,7 @@ const AddEditProductForm = () => {
       categoryId: values.categoryId,
       manufactorId: values.manufactorId,
     };
-    console.log(values);
+    // console.log(values);
     saveProductDetail(newProduct);
   };
 
@@ -298,7 +299,7 @@ const AddEditProductForm = () => {
         setSubCategoryList(dataResult.data.subCategory);
       }
     } catch (error) {
-      console.log('Failed to fetch category list: ', error);
+      console.log('Failed to fetch subCategory list: ', error);
     }
   };
 
@@ -309,7 +310,7 @@ const AddEditProductForm = () => {
           categoryName: '',
         };
         const response = await CategoryService.getCategoryList(params);
-        console.log('response', response.data.category);
+        // console.log('response', response.data.category);
         const rawList = response.data.category;
         const result = rawList.reduce((obj, item) => {
           return {
@@ -318,7 +319,7 @@ const AddEditProductForm = () => {
           };
         }, {});
 
-        console.log('result', result);
+        // console.log('result', result);
         setCategoryList(response.data.category);
       } catch (error) {
         console.log('Failed to fetch category list: ', error);
@@ -351,18 +352,19 @@ const AddEditProductForm = () => {
         const actionResult = await dispatch(getProductDetail(params));
         const dataResult = unwrapResult(actionResult);
         if (dataResult.data) {
-          console.log(dataResult.data);
+          console.log(dataResult);
           setProduct(dataResult.data.product);
           setSelectedCategory(dataResult.data.product.categoryId);
-          setSelectedSubCategory(dataResult.data.product.categoryId);
+          setSelectedSubCategory(dataResult.data.product.subCategoryId);
           setSelectedManufacturer(dataResult.data.product.manufactorId);
           setIsUseWrapUnitMeasure(
             !!dataResult.data.product.wrapUnitMeasure &&
               !!dataResult.data.product.numberOfWrapUnitMeasure,
           );
+          fetchSubCategoryByCategoryId(dataResult.data.product.categoryId)
           // TODO: đổi sang api deploy khi push code lên nhánh master
           if (dataResult.data.product.image) {
-            setImageUrl(localhost + '/' + dataResult.data.product.image);
+            setImageUrl(API_URL_IMAGE + '/' + dataResult.data.product.image);
           }
         }
         console.log('dataResult', dataResult);

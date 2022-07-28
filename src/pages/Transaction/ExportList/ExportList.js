@@ -1,3 +1,4 @@
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
 import AuthService from '@/services/authService';
 import exportOrderService from '@/services/exportOrderService';
@@ -384,7 +385,7 @@ const ExportList = () => {
         >
           <Card className={classes.cardStyle}>
             {loading ? (
-              <>Loading...</>
+              <ProgressCircleLoading/>
             ) : (
               <Box>
                 {totalRecord > 0 ? (

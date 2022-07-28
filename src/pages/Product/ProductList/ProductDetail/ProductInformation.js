@@ -1,3 +1,4 @@
+import { API_URL_IMAGE } from '@/constants/apiUrl';
 import FormatDataUtils from '@/utils/formatData';
 import { Edit } from '@mui/icons-material';
 import { Button, Card, CardContent, Grid, Stack, Typography } from '@mui/material';
@@ -56,7 +57,7 @@ const ProductInformation = ({ product }) => {
 
   useEffect(() => {
     if (product.image) {
-      fetchImage(localhost + '/' + product.image);
+      fetchImage(API_URL_IMAGE + '/' + product.image);
     }
   }, []);
 
@@ -311,7 +312,7 @@ const ProductInformation = ({ product }) => {
                     // src={image}
                     loading="lazy"
                     src={
-                      product.image
+                      image
                         ? image
                         : require('@/assets/images/no-image-found.png')
                     }

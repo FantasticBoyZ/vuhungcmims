@@ -1,6 +1,7 @@
 import AlertPopup from '@/components/Common/AlertPopup';
 import Label from '@/components/Common/Label';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import { API_URL_IMAGE } from '@/constants/apiUrl';
 import {
   getStaffDetail,
   resetPassword,
@@ -296,7 +297,7 @@ const StaffDetail = () => {
       console.log('dataResult', dataResult);
       if (dataResult) {
         setStaff(dataResult.data);
-        fetchImage(localhost + '/' + dataResult.data.imageUrl);
+        fetchImage(API_URL_IMAGE + '/' + dataResult.data.imageUrl);
       }
     } catch (error) {
       console.log('Failed to fetch staff detail: ', error);

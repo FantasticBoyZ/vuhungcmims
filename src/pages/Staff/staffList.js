@@ -2,6 +2,7 @@ import AlertPopup from '@/components/Common/AlertPopup';
 import Label from '@/components/Common/Label';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
+import { API_URL_IMAGE } from '@/constants/apiUrl';
 import { getStaffList, setActiveForStaff } from '@/slices/StaffSlice';
 import { PersonSearch, Search } from '@mui/icons-material';
 import {
@@ -342,7 +343,7 @@ const StaffList = () => {
                                     loading="lazy"
                                     src={
                                       staff.imageUrl
-                                        ? localhost + '/' +  staff.imageUrl
+                                        ? API_URL_IMAGE + '/' +  staff.imageUrl
                                         : require('@/assets/images/default-avatar.jpg')
                                     }
                                   />
