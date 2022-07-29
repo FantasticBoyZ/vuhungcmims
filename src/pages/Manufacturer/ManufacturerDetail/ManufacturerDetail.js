@@ -1,5 +1,22 @@
 import { getManufacturerById } from '@/slices/ManufacturerSlice';
-import { Box, Button, Card, CardHeader, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardHeader,
+  CardContent,
+  Container,
+  Grid,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import React, { useEffect, useState } from 'react';
@@ -15,7 +32,7 @@ const useStyles = makeStyles({
     display: 'flex',
     padding: '20px 20px',
     marginBottom: '20px',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   infoContainer: {
     display: 'block',
@@ -23,19 +40,19 @@ const useStyles = makeStyles({
     marginBottom: '20px',
   },
   infoProduct: {
-    padding: '20px'
+    padding: '20px',
   },
   table: {
     '& thead th': {
       backgroundColor: '#DCF4FC',
-    }
-  }
+    },
+  },
 });
 const ManufacturerDetail = () => {
   const { manufacturerId } = useParams();
   const [manufacturer, setManufacturer] = useState();
   const classes = useStyles();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.manufacturers }));
   const [selectedUnitMeasureList, setSelectedUnitMeasureList] = useState([]);
@@ -54,8 +71,8 @@ const ManufacturerDetail = () => {
   };
 
   const handleOnClickEdit = () => {
-    navigate(`/manufacturer/edit/${manufacturerId}`)
-  }
+    navigate(`/manufacturer/edit/${manufacturerId}`);
+  };
 
   useEffect(() => {
     const fetchManufacturerDetail = async () => {
@@ -75,7 +92,7 @@ const ManufacturerDetail = () => {
     fetchManufacturerDetail();
   }, []);
 
-  console.log(manufacturer?.listProducts)
+  console.log(manufacturer?.listProducts);
   return (
     <Grid>
       <Card className={classes.cardHeader}>
@@ -88,62 +105,72 @@ const ManufacturerDetail = () => {
           </Typography>
         </Stack>
 
-        <Button onClick={() => handleOnClickEdit()} color='warning' variant="contained" startIcon={<CreateIcon />}>
+        <Button
+          onClick={() => handleOnClickEdit()}
+          color="warning"
+          variant="contained"
+          startIcon={<CreateIcon />}
+        >
           Chỉnh sửa
         </Button>
       </Card>
 
       <Card className={classes.infoContainer}>
-
         {loading ? (
           <ProgressCircleLoading />
         ) : (
-          <><CardHeader title="Thông tin chi tiết" /><CardContent>
-            <Stack paddingX={3} spacing={2}>
-              <Grid container>
-                <Grid
-                  xs={2}
-                  item
-                >
-                  <Typography color='#696969'>Số điện thoại</Typography>
+          <>
+            <CardHeader title="Thông tin chi tiết" />
+            <CardContent>
+              <Stack
+                paddingX={3}
+                spacing={2}
+              >
+                <Grid container>
+                  <Grid
+                    xs={2}
+                    item
+                  >
+                    <Typography color="#696969">Số điện thoại</Typography>
+                  </Grid>
+                  <Grid
+                    xs={10}
+                    item
+                  >
+                    <Typography>{manufacturer?.phone}</Typography>
+                  </Grid>
                 </Grid>
-                <Grid
-                  xs={10}
-                  item
-                >
-                  <Typography>{manufacturer?.phone}</Typography>
+                <Grid container>
+                  <Grid
+                    xs={2}
+                    item
+                  >
+                    <Typography color="#696969">Email</Typography>
+                  </Grid>
+                  <Grid
+                    xs={10}
+                    item
+                  >
+                    <Typography>{manufacturer?.email}</Typography>
+                  </Grid>
                 </Grid>
-              </Grid>
-              <Grid container>
-                <Grid
-                  xs={2}
-                  item
-                >
-                  <Typography color='#696969'>Email</Typography>
+                <Grid container>
+                  <Grid
+                    xs={2}
+                    item
+                  >
+                    <Typography color="#696969"> Địa chỉ</Typography>
+                  </Grid>
+                  <Grid
+                    xs={10}
+                    item
+                  >
+                    <Typography>{manufacturer?.addressManufactor}</Typography>
+                  </Grid>
                 </Grid>
-                <Grid
-                  xs={10}
-                  item
-                >
-                  <Typography>{manufacturer?.email}</Typography>
-                </Grid>
-              </Grid>
-              <Grid container>
-                <Grid
-                  xs={2}
-                  item
-                >
-                  <Typography color='#696969'> Địa chỉ</Typography>
-                </Grid>
-                <Grid
-                  xs={10}
-                  item
-                >
-                  <Typography>{manufacturer?.addressManufactor}</Typography>
-                </Grid>
-              </Grid>
-            </Stack>
-          </CardContent></>
+              </Stack>
+            </CardContent>
+          </>
         )}
       </Card>
 
@@ -151,127 +178,135 @@ const ManufacturerDetail = () => {
         {loading ? (
           <ProgressCircleLoading />
         ) : (
-          <> <CardHeader title="Các sản phẩm cung cấp" />
+          <>
+            {' '}
+            <CardHeader title="Các sản phẩm cung cấp" />
             <CardContent>
-              <TableContainer>
-                <Table className={classes.table}>
-                  <TableHead>
-                    <TableRow >
-                      <TableCell>Mã sản phẩm</TableCell>
-                      <TableCell>Tên sản phẩm</TableCell>
-                      <TableCell align="center">Danh mục</TableCell>
-                      <TableCell align="center">Đơn vị tính</TableCell>
-                      <TableCell align="center">Tồn kho</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody >
-                    {manufacturer?.listProducts.map((productByManufacturer, index) => {
-                      // TODO: làm selectedImportOrders
-                      const newSelectdUnitMeasureList = selectedUnitMeasureList.slice();
-                      return (
-                        <TableRow
-                          hover
-                          key={productByManufacturer.id}
-                          selected={false}
-                        >
-                          <TableCell>
-                            <Typography
-                              variant="body1"
-                              color="text.primary"
-                              gutterBottom
-                              noWrap
-                            >
-                              {productByManufacturer.productCode}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography
-                              variant="body1"
-                              color="text.primary"
-                              gutterBottom
-                              noWrap
-                            >
-                              {productByManufacturer.name}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="center">
-                            <Typography
-                              variant="body1"
-                              color="text.primary"
-                              gutterBottom
-                              noWrap
-                            >
-                              {productByManufacturer.categoryName}
-                            </Typography>
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }}
+              {totalRecord > 0 ? (
+                <TableContainer>
+                  <Table className={classes.table}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Mã sản phẩm</TableCell>
+                        <TableCell>Tên sản phẩm</TableCell>
+                        <TableCell align="center">Danh mục</TableCell>
+                        <TableCell align="center">Đơn vị tính</TableCell>
+                        <TableCell align="center">Tồn kho</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {manufacturer?.listProducts.map((productByManufacturer, index) => {
+                        // TODO: làm selectedImportOrders
+                        const newSelectdUnitMeasureList = selectedUnitMeasureList.slice();
+                        return (
+                          <TableRow
+                            hover
+                            key={productByManufacturer.id}
+                            selected={false}
                           >
-                            {productByManufacturer?.wrapUnitMeasure == null ? (
-                              productByManufacturer?.unitMeasure
-                            ) : (
-                              <Select
-                                classNamePrefix="select"
-                                isSearchable={false}
-                                defaultValue={
-                                  FormatDataUtils.getOption([
+                            <TableCell>
+                              <Typography
+                                variant="body1"
+                                color="text.primary"
+                                gutterBottom
+                                noWrap
+                              >
+                                {productByManufacturer.productCode}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography
+                                variant="body1"
+                                color="text.primary"
+                                gutterBottom
+                                noWrap
+                              >
+                                {productByManufacturer.name}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align="center">
+                              <Typography
+                                variant="body1"
+                                color="text.primary"
+                                gutterBottom
+                                noWrap
+                              >
+                                {productByManufacturer.categoryName}
+                              </Typography>
+                            </TableCell>
+                            <TableCell
+                              align="center"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              {productByManufacturer?.wrapUnitMeasure == null ? (
+                                productByManufacturer?.unitMeasure
+                              ) : (
+                                <Select
+                                  classNamePrefix="select"
+                                  isSearchable={false}
+                                  defaultValue={
+                                    FormatDataUtils.getOption([
+                                      {
+                                        number: 1,
+                                        name: productByManufacturer.unitMeasure,
+                                      },
+                                      {
+                                        number:
+                                          productByManufacturer.numberOfWrapUnitMeasure,
+                                        name: productByManufacturer.wrapUnitMeasure,
+                                      },
+                                    ])[0]
+                                  }
+                                  options={FormatDataUtils.getOption([
                                     {
                                       number: 1,
                                       name: productByManufacturer.unitMeasure,
                                     },
                                     {
-                                      number: productByManufacturer.numberOfWrapUnitMeasure,
+                                      number:
+                                        productByManufacturer.numberOfWrapUnitMeasure,
                                       name: productByManufacturer.wrapUnitMeasure,
                                     },
-                                  ])[0]
-                                }
-                                options={FormatDataUtils.getOption([
-                                  {
-                                    number: 1,
-                                    name: productByManufacturer.unitMeasure,
-                                  },
-                                  {
-                                    number: productByManufacturer.numberOfWrapUnitMeasure,
-                                    name: productByManufacturer.wrapUnitMeasure,
-                                  },
-                                ])}
-                                menuPortalTarget={document.body}
-                                styles={{
-                                  menuPortal: (base) => ({
-                                    ...base,
-                                    zIndex: 9999,
-                                  }),
-                                }}
-                              />
-                            )}
-                          </TableCell>
-                          <TableCell align="center">
-                            <Typography
-                              variant="body1"
-                              color="text.primary"
-                              gutterBottom
-                              noWrap
-                            >
-                              {productByManufacturer.quantity}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <CustomTablePagination
-                page={page}
-                pages={pages}
-                rowsPerPage={rowsPerPage}
-                totalRecord={totalRecord}
-                handleChangePage={handleChangePage}
-                handleChangeRowsPerPage={handleChangeRowsPerPage}
-              />
+                                  ])}
+                                  menuPortalTarget={document.body}
+                                  styles={{
+                                    menuPortal: (base) => ({
+                                      ...base,
+                                      zIndex: 9999,
+                                    }),
+                                  }}
+                                />
+                              )}
+                            </TableCell>
+                            <TableCell align="center">
+                              <Typography
+                                variant="body1"
+                                color="text.primary"
+                                gutterBottom
+                                noWrap
+                              >
+                                {productByManufacturer.quantity}
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                  <CustomTablePagination
+                    page={page}
+                    pages={pages}
+                    rowsPerPage={rowsPerPage}
+                    totalRecord={totalRecord}
+                    handleChangePage={handleChangePage}
+                    handleChangeRowsPerPage={handleChangeRowsPerPage}
+                  />
+                </TableContainer>
+              ) : (
+                <>Chưa có sản phẩm nào của nhà sản xuất này trong kho</>
+              )}
             </CardContent>
           </>
         )}
