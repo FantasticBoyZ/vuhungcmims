@@ -37,6 +37,7 @@ import Select from 'react-select';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import './style.css';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const useStyles = makeStyles({
   unitMeasureSelect: {
@@ -88,14 +89,15 @@ const DependentField = ({ name, ...otherProps }) => {
 };
 
 const ImportGoods = () => {
-  const [manufacturerList, setManufacturerList] = useState();
+  const [manufacturerList, setManufacturerList] = useState([]);
   const [searchManufacturerParams, setSearchManufacturerParams] = useState();
   const [warehouseList, setWarehouseList] = useState([]);
-  const [productList, setProductList] = useState();
+  const [productList, setProductList] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState();
   const [openPopup, setOpenPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const currentUser = AuthService.getCurrentUser();
+  const [loadingButton, setLoadingButton] = useState(false)
   const today = new Date();
   const classes = useStyles();
   const [initialProductList, setInitialProductList] = useState({
@@ -121,8 +123,8 @@ const ImportGoods = () => {
   });
 
   const FORM_VALIDATION = Yup.object().shape({
-    manufactorId: Yup.string().required('Bạn chưa chọn nhà cung cấp'),
     wareHouseId: Yup.number().required('Bạn chưa chọn kho để nhập hàng'),
+    manufactorId: Yup.number().required('Bạn chưa chọn nhà cung cấp'),
   });
 
   const arrayHelpersRef = useRef(null);
@@ -131,6 +133,7 @@ const ImportGoods = () => {
   const navigate = useNavigate();
 
   const { loading } = useSelector((state) => ({ ...state.products }));
+  const manufacturerState = useSelector((state) => ({ ...state.manufacturers }));
 
   const warehouseData = [
     {
@@ -187,10 +190,11 @@ const ImportGoods = () => {
   };
 
   const handleOnChangeManufacturer = (e) => {
-    // console.log(e.value);
-    if (e !== null) {
-      getProductListByManufacturerId(e.value.id);
-      setSelectedProduct(null);
+    console.log(e);
+    setProductList([])
+    setSelectedProduct(null);
+    if (e) {
+      getProductListByManufacturerId(e);
     }
   };
 
@@ -250,12 +254,25 @@ const ImportGoods = () => {
         setOpenPopup(true);
         return;
       }
+
+      if (!Number.isInteger(consignments[index]?.quantity)) {
+        setErrorMessage('Vui lòng nhập số lượng sản phẩm là số nguyên');
+        setOpenPopup(true);
+        return;
+      }
+
+      if (!Number.isInteger(consignments[index]?.unitPrice)) {
+        setErrorMessage('Vui lòng nhập đơn giá của sản phẩm là số nguyên');
+        setOpenPopup(true);
+        return;
+      }
+
       console.log('timezone', new Date().getTimezoneOffset() / 60);
       consignmentRequests.push({
         productId: consignments[index]?.productId,
-        expirationDate: new Date(
+        expirationDate: consignments[index]?.expirationDate ? new Date(
           consignments[index]?.expirationDate + new Date().getTimezoneOffset() / 60,
-        ).toJSON(),
+        ).toJSON() : null,
         // expirationDate: new Date(FormatDataUtils.convertUTCDateToLocalDate(consignments[index]?.expirationDate)).toJSON(),
         unitPrice: Math.round(
           consignments[index]?.selectedUnitMeasure ===
@@ -281,15 +298,18 @@ const ImportGoods = () => {
       wareHouseId: values.wareHouseId,
       consignmentRequests: consignmentRequests,
     };
-    console.log('test new', newImportOrder);
+    // console.log('test new', newImportOrder);
+    setLoadingButton(true)
     importOrderService.createImportOrder(newImportOrder).then(
       (response) => {
         toast.success('Tạo phiếu nhập hàng thành công');
+        setLoadingButton(false)
         console.log(response.data);
         navigate('/import/list');
       },
       (error) => {
         toast.error('Tạo phiếu nhập hàng thất bại');
+        setLoadingButton(false)
         console.log(error);
       },
     );
@@ -378,7 +398,7 @@ const ImportGoods = () => {
               <div className="left-container">
                 <Card className="card-container">
                   <div className="label">Thông tin nhà cung cấp</div>
-                  {manufacturerList && (
+                  {/* {manufacturerList && ( */}
                     <Box>
                       <Select
                         classNamePrefix="select"
@@ -386,14 +406,15 @@ const ImportGoods = () => {
                         noOptionsMessage={() => <>Không có tìm thấy nhà cung cấp nào</>}
                         isClearable={true}
                         isSearchable={true}
+                        isLoading={manufacturerState.loading}
                         name="manufacturer"
                         options={FormatDataUtils.getOptionWithIdandName(manufacturerList)}
                         menuPortalTarget={document.body}
                         styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                         onChange={(e) => {
                           setFieldValue('manufactorId', e?.value);
-                          setFieldValue('consignmentRequests', []);
-                          handleOnChangeManufacturer(e);
+                          setFieldValue('consignmentRequests', [], false);
+                          handleOnChangeManufacturer(e?.value);
                         }}
                       />
                       <FormHelperText
@@ -403,13 +424,13 @@ const ImportGoods = () => {
                         {errors.manufactorId}
                       </FormHelperText>
                     </Box>
-                  )}
+                  {/* )} */}
 
                   {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
                 </Card>
                 <Card className="product-list-container">
                   <div className="label">Thông tin các sản phẩm</div>
-                  {!!productList && !!values.manufactorId && (
+                  {/* {!!productList && !!values.manufactorId && ( */}
                     <Select
                       classNamePrefix="select"
                       placeholder="Chọn sản phẩm của nhà cung cấp phía trên..."
@@ -425,7 +446,7 @@ const ImportGoods = () => {
                       styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                       onChange={(e) => handleOnChangeProduct(e)}
                     />
-                  )}
+                  {/* )} */}
 
                   <hr />
                   <TableContainer>
@@ -510,20 +531,7 @@ const ImportGoods = () => {
                                         <Select
                                           className={classes.unitMeasureSelect}
                                           classNamePrefix="select"
-                                          // value={getOption([
-                                          //   {
-                                          //     number: 1,
-                                          //     name: item.unitMeasure,
-                                          //   },
-                                          //   {
-                                          //     number: item.numberOfWrapUnitMeasure,
-                                          //     name: item.wrapUnitMeasure,
-                                          //   },
-                                          // ]).filter((option) => {
-                                          //   return (
-                                          //     option.label === item.selectedUnitMeasure
-                                          //   );
-                                          // })}
+                                        
                                           onChange={(e) => {
                                             setFieldValue(
                                               `consignmentRequests[${index}].selectedUnitMeasure`,
@@ -741,15 +749,17 @@ const ImportGoods = () => {
                       <div>{FormatDataUtils.formatCurrency(calculateTotalAmount())}</div>
                     </div>
                     <div className="button-import">
-                      <ButtonWrapper
-                        type="button"
+                      <LoadingButton
+                        type="submit"
                         variant="contained"
                         size="large"
+                        loading={loadingButton}
+                        loadingPosition='start'
                         startIcon={<CheckIcon />}
                         color="success"
                       >
                         Tạo phiếu nhập kho
-                      </ButtonWrapper>
+                      </LoadingButton>
                     </div>
                   </Stack>
                 </Card>
