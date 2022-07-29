@@ -17,6 +17,7 @@ import React, { useEffect, useState } from 'react';
 import AuthService from '@/services/authService';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Label from '@/components/Common/Label';
+import { API_URL_IMAGE } from '@/constants/apiUrl';
 
 const StyledToolbar = styled(Toolbar)({
   display: 'flex',
@@ -61,7 +62,7 @@ const titles = [
   { url: '/export/return', title: 'Trả hàng' },
   { url: '/export/return/list', title: 'Phiếu trả hàng' },
   { url: '/export/return/detail', title: 'Thông tin phiếu trả hàng' },
-  { url: '/term-inventory/return', title: 'Tạo phiếu lưu kho' },
+  { url: '/term-inventory/return/create', title: 'Tạo phiếu lưu kho' },
   { url: '/term-inventory/return/list', title: 'Danh sách lưu kho' },
   { url: '/term-inventory/return/detail', title: 'Thông tin phiếu lưu kho' },
   { url: '/inventory-checking/create', title: 'Kiểm kho' },
@@ -106,7 +107,8 @@ const getRoleLabel = (exportOrderStatus) => {
 const Header = () => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
-  const [username, setUsername] = useState('');
+  const [fullname, setFullname] = useState('');
+  const [image, setImage] = useState();
   const [role, setRole] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
@@ -116,6 +118,13 @@ const Header = () => {
     navigate('/login');
   };
 
+  const fetchImage = async (imageUrl) => {
+    const res = await fetch(imageUrl);
+    const imageBlob = await res.blob();
+    const imageObjectURL = URL.createObjectURL(imageBlob);
+    setImage(imageObjectURL);
+  };
+
   useEffect(() => {
     titles.forEach((item) => {
       if (location.pathname.includes(item.url)) {
@@ -123,8 +132,11 @@ const Header = () => {
       }
     });
     const user = AuthService.getCurrentUser();
-    setUsername(user.username);
+    setFullname(user.fullName);
     setRole(user.roles[0])
+    if (user.imageUrl) {
+      fetchImage(API_URL_IMAGE + '/' + user.imageUrl);
+    }
   }, [location.pathname]);
   return (
     <AppBar
@@ -155,12 +167,12 @@ const Header = () => {
           </Badge> */}
           <UserBox onClick={(e) => setOpen(true)}>
             <Stack alignItems='flex-end'>
-              <Typography variant="h5">{username}</Typography>
+              <Typography variant="h5">{fullname}</Typography>
               {role && getRoleLabel(role)}
             </Stack>
             <Avatar
               sx={{ width: 45, height: 45 }}
-              src="https://www.w3schools.com/w3images/avatar2.png"
+              src={image ? image : require('@/assets/images/default-avatar.jpg')}
             />
           </UserBox>
         </Icons>
