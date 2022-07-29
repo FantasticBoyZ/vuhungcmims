@@ -18,6 +18,7 @@ import {
   CardContent,
   Divider,
   Grid,
+  Link,
   Stack,
   Typography,
 } from '@mui/material';
@@ -275,26 +276,26 @@ const ImportOrderDetail = () => {
                       >
                         {(currentUserRole === 'ROLE_OWNER' ||
                           currentUserRole === 'ROLE_STOREKEEPER') && (
-                            <Button
-                              variant="contained"
-                              startIcon={<Done />}
-                              color="success"
-                              onClick={() => handleOnClickConfirm()}
-                            >
-                              Xác nhận nhập kho
-                            </Button>
-                          )}
+                          <Button
+                            variant="contained"
+                            startIcon={<Done />}
+                            color="success"
+                            onClick={() => handleOnClickConfirm()}
+                          >
+                            Xác nhận nhập kho
+                          </Button>
+                        )}
                         {(currentUserRole === 'ROLE_OWNER' ||
                           currentUserRole === 'ROLE_STOREKEEPER') && (
-                            <Button
-                              variant="contained"
-                              startIcon={<Edit />}
-                              color="warning"
-                              onClick={() => handleOnClickEdit()}
-                            >
-                              Chỉnh sửa
-                            </Button>
-                          )}
+                          <Button
+                            variant="contained"
+                            startIcon={<Edit />}
+                            color="warning"
+                            onClick={() => handleOnClickEdit()}
+                          >
+                            Chỉnh sửa
+                          </Button>
+                        )}
                         <Button
                           variant="contained"
                           startIcon={<Close />}
@@ -340,7 +341,12 @@ const ImportOrderDetail = () => {
                       <CardContent>
                         <Typography variant="h6">Thông tin nhà cung cấp</Typography>
                         <Box className="manufacturer-info">
-                          {importOrder.manufactorName}
+                          <Link
+                            href={`/manufacturer/detail/${importOrder.manufactorId}`}
+                            underline="none"
+                          >
+                            {importOrder.manufactorName}
+                          </Link>
                         </Box>
                         <br />
                         <Divider />
