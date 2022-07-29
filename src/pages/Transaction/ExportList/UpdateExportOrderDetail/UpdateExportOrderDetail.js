@@ -32,6 +32,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import AlertPopup from '@/components/Common/AlertPopup';
 import { toast } from 'react-toastify';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import Select from 'react-select';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -82,8 +83,8 @@ const useStyles = makeStyles((theme) => ({
   warehouseContainer: {
     backgroundColor: 'rgba(220, 244, 252,0.5)',
     padding: theme.spacing(1),
-    borderRadius: '10px'
-  }
+    borderRadius: '10px',
+  },
 }));
 
 const exportOrder = {
@@ -195,7 +196,6 @@ const UpdateExportOrderDetail = () => {
   const calculateTotalAmount = () => {
     let totalAmount = 0;
     const productList = valueFormik.current.productList;
-    console.log(valueFormik.current.productList);
     if (productList) {
       for (let index = 0; index < productList.length; index++) {
         totalAmount =
@@ -242,22 +242,37 @@ const UpdateExportOrderDetail = () => {
           indexConsignment++
         ) {
           let consignment = consignments[indexConsignment];
-          if (consignment.quantity > consignment.quantityInstock) {
+          const quantity =
+            productList[index].selectedUnitMeasure === productList[index].wrapUnitMeasure
+              ? Math.round(
+                  consignment.quantity * productList[index].numberOfWrapUnitMeasure,
+                )
+              : consignment.quantity;
+          if (quantity > consignment.quantityInstock) {
             setErrorMessage(
               'Bạn không thể nhập số lượng lớn hơn số lượng tồn kho của lô hàng',
             );
             setOpenPopup(true);
             return;
           }
-          if (consignment.quantity < 0) {
+
+          if (!Number.isInteger(quantity) || !Number.isInteger(consignment.quantity * productList[index].numberOfWrapUnitMeasure)) {
+            setErrorMessage(
+              'Vui lòng nhập số lượng sản phẩm xuất đi là số nguyên',
+            );
+            setOpenPopup(true);
+            return;
+          }
+
+          if (quantity < 0) {
             setErrorMessage('Bạn không thể nhập số lượng nhỏ hơn 0');
             setOpenPopup(true);
             return;
           }
-          if (consignment.quantity >= 0) {
+          if (quantity >= 0) {
             consignmentExports.push({
               id: consignment.id,
-              quantity: consignment.quantity,
+              quantity: quantity,
               unitPrice: productList[index].unitPrice,
             });
           }
@@ -274,6 +289,7 @@ const UpdateExportOrderDetail = () => {
         consignmentExports: consignmentExports,
       };
       if (consignmentExports.length > 0) {
+        // console.log(editedExportOrder)
         try {
           const response = await dispatch(updateExportOrder(editedExportOrder));
           const resultResponse = unwrapResult(response);
@@ -312,7 +328,7 @@ const UpdateExportOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setExportOrder(dataResult.data.inforExportDetail);
-        setAddressWarehouse(dataResult.data.addressWarehouse);
+
         if (dataResult.data.inforExportDetail?.statusName !== 'pending') {
           navigate(`/export/detail/${exportOrderId}`);
         }
@@ -334,6 +350,7 @@ const UpdateExportOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setProductList(dataResult.data.productList);
+        setAddressWarehouse(dataResult.data.addressWarehouse);
         // setTotalRecord(dataResult.data.totalRecord);
       }
       console.log('consignments List', dataResult);
@@ -456,22 +473,152 @@ const UpdateExportOrderDetail = () => {
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{product?.productCode}</TableCell>
                                             <TableCell>{product?.productName}</TableCell>
-                                            <TableCell>{product?.unitMeasure}</TableCell>
+                                            <TableCell>
+                                              {product?.wrapUnitMeasure == null ? (
+                                                product?.unitMeasure
+                                              ) : (
+                                                <Box
+                                                  className={classes.selectBoxUnitMeasure}
+                                                >
+                                                  <Select
+                                                    classNamePrefix="select"
+                                                    defaultValue={
+                                                      FormatDataUtils.getOption([
+                                                        {
+                                                          number: 1,
+                                                          name: product?.unitMeasure,
+                                                        },
+                                                        {
+                                                          number:
+                                                            product?.numberOfWrapUnitMeasure,
+                                                          name: product?.wrapUnitMeasure,
+                                                        },
+                                                      ])[0]
+                                                    }
+                                                    options={FormatDataUtils.getOption([
+                                                      {
+                                                        number: 1,
+                                                        name: product?.unitMeasure,
+                                                      },
+                                                      {
+                                                        number:
+                                                          product?.numberOfWrapUnitMeasure,
+                                                        name: product?.wrapUnitMeasure,
+                                                      },
+                                                    ])}
+                                                    menuPortalTarget={document.body}
+                                                    styles={{
+                                                      menuPortal: (base) => ({
+                                                        ...base,
+                                                        zIndex: 9999,
+                                                      }),
+                                                    }}
+                                                    onChange={(e) => {
+                                                      setFieldValue(
+                                                        `productList[${index}].selectedUnitMeasure`,
+                                                        e.value.name,
+                                                      );
+                                                      // change quantity when change unitMeasure
+                                                      if (
+                                                        values.productList[index]
+                                                          .quantity > 0 &&
+                                                        e.value.name !==
+                                                          values.productList[index]
+                                                            .selectedUnitMeasure
+                                                      ) {
+                                                        if (
+                                                          e.value.name ===
+                                                          values.productList[index]
+                                                            .wrapUnitMeasure
+                                                        ) {
+                                                          const consignments =
+                                                            values.productList[index]
+                                                              .consignmentList;
+                                                          for (
+                                                            let indexConsignment = 0;
+                                                            indexConsignment <
+                                                            consignments.length;
+                                                            indexConsignment++
+                                                          ) {
+                                                            const consignment =
+                                                              consignments[
+                                                                indexConsignment
+                                                              ];
+                                                            setFieldValue(
+                                                              `productList[${index}].consignmentList[${indexConsignment}].quantity`,
+                                                              Math.round(
+                                                                consignment.quantity /
+                                                                  e.value.number,
+                                                              ),
+                                                            );
+                                                          }
+                                                        }
+
+                                                        if (
+                                                          e.value.name ===
+                                                          values.productList[index]
+                                                            .unitMeasure
+                                                        ) {
+                                                          const consignments =
+                                                            values.productList[index]
+                                                              .consignmentList;
+                                                          for (
+                                                            let indexConsignment = 0;
+                                                            indexConsignment <
+                                                            consignments.length;
+                                                            indexConsignment++
+                                                          ) {
+                                                            const consignment =
+                                                              consignments[
+                                                                indexConsignment
+                                                              ];
+
+                                                            setFieldValue(
+                                                              `productList[${index}].consignmentList[${indexConsignment}].quantity`,
+                                                              Math.round(
+                                                                consignment.quantity *
+                                                                  values.productList[
+                                                                    index
+                                                                  ]
+                                                                    .numberOfWrapUnitMeasure,
+                                                              ),
+                                                            );
+                                                          }
+                                                        }
+                                                      }
+                                                    }}
+                                                  />
+                                                </Box>
+                                              )}
+                                            </TableCell>
                                             <TableCell align="center">
                                               {calculateTotalQuantityOfProduct(
                                                 values.productList[index],
                                               )}
                                             </TableCell>
                                             <TableCell align="center">
-                                              {FormatDataUtils.formatCurrency(
-                                                product?.unitPrice || '0',
-                                              )}
+                                              {values.productList[index]
+                                                .selectedUnitMeasure ===
+                                              product.wrapUnitMeasure
+                                                ? FormatDataUtils.formatCurrency(
+                                                    product?.unitPrice *
+                                                      product.numberOfWrapUnitMeasure,
+                                                  )
+                                                : FormatDataUtils.formatCurrency(
+                                                    product?.unitPrice,
+                                                  )}
                                             </TableCell>
                                             <TableCell align="center">
                                               {FormatDataUtils.formatCurrency(
                                                 calculateTotalQuantityOfProduct(
                                                   values.productList[index],
-                                                ) * product?.unitPrice,
+                                                ) *
+                                                  (values.productList[index]
+                                                    .selectedUnitMeasure ===
+                                                  product.wrapUnitMeasure
+                                                    ? product?.unitPrice *
+                                                      product.numberOfWrapUnitMeasure
+                                                    : product?.unitPrice),
                                               )}
                                             </TableCell>
                                           </TableRow>
@@ -542,7 +689,15 @@ const UpdateExportOrderDetail = () => {
                                                           />
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                          {consignment?.quantityInstock}
+                                                          {values.productList[index]
+                                                            .selectedUnitMeasure ===
+                                                          product.wrapUnitMeasure
+                                                            ? FormatDataUtils.getRoundNumber(
+                                                                consignment?.quantityInstock /
+                                                                  product.numberOfWrapUnitMeasure,
+                                                                1,
+                                                              )
+                                                            : consignment?.quantityInstock}
                                                         </TableCell>
                                                       </TableRow>
                                                     ),
@@ -598,7 +753,10 @@ const UpdateExportOrderDetail = () => {
                                 <Stack spacing={2}>
                                   {addressWarehouse.length > 0 &&
                                     addressWarehouse.map((address) => (
-                                      <Box className={classes.warehouseContainer}>
+                                      <Box
+                                        key={address.id}
+                                        className={classes.warehouseContainer}
+                                      >
                                         <Typography>{address.warehouseName}</Typography>
                                         <Divider />
                                         <Typography>{address.detailAddress}</Typography>
@@ -671,7 +829,7 @@ const UpdateExportOrderDetail = () => {
                           {errorMessage ? errorMessage : message}
                         </Box>
                       </AlertPopup>
-                      {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
+                      <pre>{JSON.stringify(values, null, 2)}</pre>
                     </Grid>
                   </Form>
                 );
