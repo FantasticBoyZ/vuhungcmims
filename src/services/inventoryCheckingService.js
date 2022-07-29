@@ -29,7 +29,7 @@ const inventoryCheckingService = {
 
   createInventoryChecking: (inventoryChecking) => {
     const url = `${API_URL}/inventoryCheckingHistory/add`;
-    return axios.post(url, inventoryChecking);
+    return axios.post(url, inventoryChecking, { headers: authHeader() });
   },
 };
 

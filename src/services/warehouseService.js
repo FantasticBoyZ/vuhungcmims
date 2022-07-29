@@ -11,12 +11,12 @@ const WarehouseService = {
 
   getWarehouseDetail: (params) => {
     const url = `/warehouse/${params}`;
-    return axiosClient.get(url, params);
+    return axiosClient.get(url, params, { headers: authHeader() });
   },
 
   addWarehouse: (params) => {
     const url = API_URL + `/warehouse/add`;
-    return axios.post(url, params);
+    return axios.post(url, params, { headers: authHeader() });
   },
 
   deleteWarehouse: (params) => {

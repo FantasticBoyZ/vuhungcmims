@@ -29,7 +29,7 @@ const ManufactorService = {
         districtId: manufacturer.districtId,
         wardId: manufacturer.wardId,
         addressDetail: manufacturer.addressDetail
-      })
+      }, { headers: authHeader() })
   },
 };
 

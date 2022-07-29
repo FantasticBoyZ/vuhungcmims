@@ -35,7 +35,7 @@ const exportOrderService = {
     const url = `${API_URL}/export-order/create`;
     // const url = process.env.REACT_APP_API_URL + '/export-order/create';
     // console.log(exportOrder);
-    return axios.post(url, exportOrder);
+    return axios.post(url, exportOrder, { headers: authHeader() });
   },
 
   confirmExportOrder: (params) => {
@@ -53,7 +53,7 @@ const exportOrderService = {
   updateExportOrder: (exportOrder) => {
     const url = `${API_URL}/export-order/update`;
     // const url = process.env.REACT_APP_API_URL + '/import-order/update';
-    return axios.put(url, exportOrder)
+    return axios.put(url, exportOrder, { headers: authHeader() })
   },
 
   getReturnOrderList: (params) => {
@@ -70,7 +70,7 @@ const exportOrderService = {
   createReturnOrder: (params) => {
     const {returnOrder, exportOrderId} = params
     const url = API_URL + `/return-order/return/${exportOrderId}`;
-    return axios.post(url, returnOrder);
+    return axios.post(url, returnOrder, { headers: authHeader() });
   }
 };
 
