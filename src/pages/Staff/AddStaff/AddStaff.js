@@ -559,6 +559,7 @@ const AddStaff = () => {
                           )}
                           isClearable={true}
                           isSearchable={true}
+                          isLoading={loadingAddress}
                           name="provinceId"
                           value={FormatDataUtils.getSelectedOption(
                             provinceList,
@@ -608,6 +609,7 @@ const AddStaff = () => {
                           )}
                           isClearable={true}
                           isSearchable={true}
+                          isLoading={loadingAddress}
                           name="districtId"
                           isDisabled={!selectedProvince}
                           value={FormatDataUtils.getSelectedOption(
@@ -655,6 +657,7 @@ const AddStaff = () => {
                           noOptionsMessage={() => <>Không tìm thấy Xã/Phường phù hợp</>}
                           isClearable={true}
                           isSearchable={true}
+                          isLoading={loadingAddress}
                           name="wardId"
                           isDisabled={!selectedDistrict}
                           value={FormatDataUtils.getSelectedOption(
