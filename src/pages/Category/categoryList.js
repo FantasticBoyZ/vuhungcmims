@@ -1,4 +1,5 @@
 import Popup from '@/components/Common/Popup';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
 import CategoryTable from '@/pages/Category/CategoryTable/CategoryTable';
 import { getCategoryList } from '@/slices/CategorySlice';
@@ -220,7 +221,7 @@ const CategoryList = () => {
       <Box>
         <Card className={classes.cardTable}>
           {loading ? (
-            <>Loading...</>
+            <ProgressCircleLoading/>
           ) : (
             <Box>
               <CategoryTable
