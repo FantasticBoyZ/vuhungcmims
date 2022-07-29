@@ -35,6 +35,9 @@ import GetDistrict from '@/pages/Address/GetDistricts';
 import GetWard from '@/pages/Address/GetWard';
 import GetProvince from '@/pages/Address/GetProvince';
 import Popup from '@/components/Common/Popup';
+import AlertPopup from '@/components/Common/AlertPopup';
+import { getDistrictList, getProvinceList, getWardList } from '@/slices/addressSlice';
+import LoadingButton from '@mui/lab/LoadingButton';
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
     padding: '30px 20px',
@@ -81,33 +84,31 @@ const AddEditManufacturerForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.manufacturers }));
+  const { loadingAddress } = useSelector((state) => ({ ...state.address }));
   const [manufacturer, setManufacturer] = useState();
   const classes = useStyles();
   const isAdd = !manufacturerId;
-  const [openPopup, setopenPopup] = useState(false);
+  const [openPopup, setOpenPopup] = useState(false);
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState();
+  const [touchedProvinceId, setTouchedProvinceId] = useState(false);
+  const [touchedDistrictId, setTouchedDistrictId] = useState(false);
+  const [touchedWardId, setTouchedWardId] = useState(false);
+  const [provinceList, setProvinceList] = useState([]);
+  const [districtList, setDistrictList] = useState([]);
+  const [wardList, setWardList] = useState([]);
+  const [loadingButton, setLoadingButton] = useState(false);
 
-
-  const initialManufacturerValue = isAdd
-    ? {
-      name: '',
-      email: '',
-      phone: '',
-      provinceId: '',
-      districtId: '',
-      wardId: '',
-      addressDetail: '',
-    }
-    :
-    {
-      name: manufacturer?.name,
-      email: manufacturer?.email,
-      phone: manufacturer?.phone,
-      provinceId: manufacturer?.provinceId,
-      districtId: manufacturer?.districtId,
-      wardId: manufacturer?.wardId,
-      addressDetail: manufacturer?.addressDetail,
-    }
-
+  const initialManufacturerValue = {
+    name: '',
+    email: '',
+    phone: '',
+    provinceId: '',
+    districtId: '',
+    wardId: '',
+    addressDetail: '',
+  };
 
   const FORM_VALIDATION = Yup.object().shape({
     name: Yup.string()
@@ -124,15 +125,48 @@ const AddEditManufacturerForm = () => {
     // .matches(phoneRegExp, 'Số điện thoại không hợp lệ')
   });
 
+  const onChangeProvince = (e) => {
+    setDistrictList([]);
+    setWardList([]);
+    setSelectedDistrict(null);
+    setSelectedWard(null);
+    if (e !== null) {
+      setSelectedProvince(e.value);
+    } else {
+      setSelectedProvince(e);
+    }
+  };
+
+  const onChangeDistrict = (e) => {
+    setWardList([]);
+    setSelectedWard(null);
+    if (e !== null) {
+      setSelectedDistrict(e.value);
+    } else {
+      setSelectedDistrict(e);
+    }
+  };
+
+  const onChangeWard = (e) => {
+    if (e !== null) {
+      setSelectedWard(e.value);
+    } else {
+      setSelectedWard(e);
+    }
+  };
+
   const saveManufacturerDetail = async (manufacturer) => {
+    setLoadingButton(true);
     try {
       ManufactorService.saveManufacturer(manufacturer).then(
         (response) => {
           if (isAdd) {
             toast.success('Thêm nhà sản xuất thành công!');
+            setLoadingButton(false);
             navigate('/manufacturer');
           } else {
             toast.success('Sửa nhà sản xuất thành công!');
+            setLoadingButton(false);
             navigate(`/manufacturer/detail/${manufacturerId}`);
           }
           return response.data;
@@ -140,8 +174,10 @@ const AddEditManufacturerForm = () => {
         (error) => {
           if (isAdd) {
             toast.error('Thêm nhà sản xuất thất bại!');
+            setLoadingButton(false);
           } else {
             toast.error('Sửa nhà sản xuất thất bại!');
+            setLoadingButton(false);
           }
           console.log(error);
         },
@@ -153,7 +189,7 @@ const AddEditManufacturerForm = () => {
 
   const handleSubmit = (values) => {
     const newManufacturer = {
-      id: manufacturerId,
+      id: isAdd? '' : manufacturerId,
       name: values.name,
       email: values.email,
       phone: values.phone,
@@ -162,18 +198,78 @@ const AddEditManufacturerForm = () => {
       wardId: values.wardId,
       addressDetail: values.addressDetail,
     };
-    setopenPopup(true)
-    setManufacturer(values)
+    // setOpenPopup(true);
+    // setTitle(
+    //   isAdd
+    //     ? 'Bạn có chắc chắn muốn thêm nhà xuất không?'
+    //     : 'Bạn có chắc chắn muốn lưu lại chỉnh sửa không?',
+    // );
+    // setMessage('Hãy kiểm tra kỹ thông tin trước khi xác nhận.');
+    // setManufacturer(newManufacturer);
+    // Đang bị bug hiện popup nhưng ấn đóng thì trắng màn hình nên save luôn khi ấn nút
+    saveManufacturerDetail(newManufacturer);
   };
 
   const handleConfirm = () => {
     saveManufacturerDetail(manufacturer);
-    setopenPopup(false)
-  }
+    setOpenPopup(false);
+  };
 
   const handleOnClickExit = () => {
     navigate(isAdd ? '/manufacturer' : `/manufacturer/detail/${manufacturerId}`);
   };
+
+  const getProvince = async (keyword) => {
+    try {
+      const actionResult = await dispatch(getProvinceList());
+      const dataResult = unwrapResult(actionResult);
+      if (dataResult.data) {
+        setProvinceList(dataResult.data.province);
+      }
+    } catch (error) {
+      console.log('Failed to fetch setProvince list: ', error);
+    }
+  };
+
+  const getDistrict = async (keyword) => {
+    try {
+      const params = {
+        provinceId: selectedProvince,
+      };
+      const actionResult = await dispatch(getDistrictList(params));
+      const dataResult = unwrapResult(actionResult);
+      if (dataResult.data) {
+        setDistrictList(dataResult.data.district);
+      }
+    } catch (error) {
+      console.log('Failed to fetch setDistrict list: ', error);
+    }
+  };
+
+  const getWard = async (keyword) => {
+    try {
+      const params = {
+        districtId: selectedDistrict,
+      };
+      const actionResult = await dispatch(getWardList(params));
+      const dataResult = unwrapResult(actionResult);
+      if (dataResult.data) {
+        setWardList(dataResult.data.ward);
+      }
+    } catch (error) {
+      console.log('Failed to fetch setWard list: ', error);
+    }
+  };
+
+  useEffect(() => {
+    getProvince();
+    if (selectedProvince) {
+      getDistrict();
+    }
+    if (selectedDistrict) {
+      getWard();
+    }
+  }, [selectedProvince, selectedDistrict]);
 
   useEffect(() => {
     const fetchManufacturerDetail = async (manufacturerId) => {
@@ -182,9 +278,9 @@ const AddEditManufacturerForm = () => {
         const dataResult = unwrapResult(actionResult);
         if (dataResult.data) {
           setManufacturer(dataResult.data.manufactor);
-          setSelectedProvince(dataResult.data.manufactor.provinceId)
-          setSelectedDistrict(dataResult.data.manufactor.districtId)
-          setSelectedWard(dataResult.data.manufactor.wardId)
+          setSelectedProvince(dataResult.data.manufactor.provinceId);
+          setSelectedDistrict(dataResult.data.manufactor.districtId);
+          setSelectedWard(dataResult.data.manufactor.wardId);
         }
         console.log(dataResult.data.manufactor);
         console.log('dataResult', dataResult);
@@ -208,511 +304,607 @@ const AddEditManufacturerForm = () => {
   return (
     <Container maxWidth="lg">
       {/* Update manufacturer info */}
-      {manufacturer && (
-        <Formik
-          initialValues={{ ...manufacturer }}
-          validationSchema={FORM_VALIDATION}
-          onSubmit={(values) => handleSubmit(values)}
-        >
-          {({ values, errors, setFieldValue }) => (
-            <Form>
-              {!isAdd && loading ? (
-                <ProgressCircleLoading />
-              ) : (
-                <Box>
-                  <Card className={classes.cardInfo}>
-                    <CardHeader title="Thông tin nhà sản xuất" />
+      <Box>
+        {loading ? (
+          <ProgressCircleLoading />
+        ) : (
+          <Box>
+            {manufacturer && !isAdd && (
+              <Formik
+                initialValues={{ ...manufacturer }}
+                validationSchema={FORM_VALIDATION}
+                onSubmit={(values) => handleSubmit(values)}
+              >
+                {({ values, errors, setFieldValue }) => (
+                  <Form>
+                    <Box>
+                      <Card className={classes.cardInfo}>
+                        <CardHeader title="Thông tin nhà sản xuất" />
 
-                    <CardContent>
-                      {/* {!!manufacturer && ( */}
-                      <Grid
-                        container
-                        spacing={2}
-                        padding={2}
-                      >
-                        <Grid
-                          xs={12}
-                          item
-                        >
-                          <Typography className={classes.wrapIcon}>
-                            Tên nhà sản xuất <IconRequired />
-                          </Typography>
-                          <TextfieldWrapper
-                            name="name"
-                            fullWidth
-                            id="name"
-                            autoComplete="name"
-                            autoFocus
-                          />
-                        </Grid>
-                        <Grid
-                          xs={12}
-                          item
-                        >
-                          <Typography className={classes.wrapIcon}>
-                            Số điện thoại <IconRequired />
-                          </Typography>
-                          <TextfieldWrapper
-                            name="phone"
-                            fullWidth
-                            id="phone"
-                            autoComplete="phone"
-                          />
-                        </Grid>
-                        <Grid
-                          xs={12}
-                          item
-                        >
-                          <Typography className={classes.wrapIcon}>Email</Typography>
-                          <TextfieldWrapper
-                            name="email"
-                            fullWidth
-                            id="email"
-                            autoComplete="email"
-                          />
-                        </Grid>
-                      </Grid>
-                      {/* )} */}
-                      <Grid
-                        container
-                        spacing={2}
-                        paddingTop={2}
-                        paddingX={2}
-                      >
-                        <Grid
-                          xs={12}
-                          item
-                        >
-                          <Divider textAlign="left" style={{ fontSize: '18px' }}>Địa chỉ</Divider>
-                        </Grid>
-                      </Grid>
-
-                      <Grid
-                        container
-                        spacing={2}
-                        padding={2}
-                      >
-                        <Grid
-                          xs={4}
-                          item
-                        >
-                          <Typography className={classes.wrapIcon}>
-                            Tỉnh/Thành phố <IconRequired />
-                          </Typography>
-                          <Select
-                            classNamePrefix="select"
-                            placeholder="Chọn tỉnh thành."
-                            noOptionsMessage={() => (
-                              <>Không có tìm thấy tỉnh thành phù hợp</>
-                            )}
-                            isClearable={true}
-                            isSearchable={true}
-                            name="provinceId"
-                            value={FormatDataUtils.getOptionWithIdandName(GetProvince())?.filter(function (option) {
-                              return option.value === selectedProvince;
-                            })}
-                            options={FormatDataUtils.getOptionWithIdandName(GetProvince())}
-                            menuPortalTarget={document.body}
-                            styles={{
-                              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                              control: (base) => ({
-                                ...base,
-                                height: 56,
-                                minHeight: 56,
-                              }),
-                            }}
-                            onChange={(e) => {
-                              setFieldValue('provinceId', e?.value, setSelectedProvince(e?.value));
-                            }}
-                          />
-
-                          <FormHelperText
-                            error={true}
-                            className={classes.errorTextHelper}
+                        <CardContent>
+                          {/* {!!manufacturer && ( */}
+                          <Grid
+                            container
+                            spacing={2}
+                            padding={2}
                           >
-                            {errors.provinceId}
-                          </FormHelperText>
-                        </Grid>
-                        <Grid
-                          xs={4}
-                          item
-                        >
-                          <Typography className={classes.wrapIcon}>
-                            Quận/Huyện/Thành phố <IconRequired />
-                          </Typography>
-
-                          <Select
-                            classNamePrefix="select"
-                            placeholder="Chọn quận/huyện"
-                            noOptionsMessage={() => (
-                              <>Không có tìm thấy quận/huyện phù hợp</>
-                            )}
-                            isClearable={true}
-                            isSearchable={true}
-                            name="districtId"
-                            value={FormatDataUtils.getOptionWithIdandName(GetDistrict(selectedProvince))?.filter(function (option) {
-                              return option.value === selectedDistrict;
-                            })}
-                            options={FormatDataUtils.getOptionWithIdandName(GetDistrict(selectedProvince))}
-                            menuPortalTarget={document.body}
-                            styles={{
-                              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                              control: (base) => ({
-                                ...base,
-                                height: 56,
-                                minHeight: 56,
-                              }),
-                            }}
-                            onChange={(e) => {
-                              setFieldValue('districtId', e?.value, setSelectedDistrict(e?.value));
-                            }}
-                          />
-                          <FormHelperText
-                            error={true}
-                            className={classes.errorTextHelper}
+                            <Grid
+                              xs={12}
+                              item
+                            >
+                              <Typography className={classes.wrapIcon}>
+                                Tên nhà sản xuất <IconRequired />
+                              </Typography>
+                              <TextfieldWrapper
+                                name="name"
+                                fullWidth
+                                id="name"
+                                autoComplete="name"
+                                autoFocus
+                              />
+                            </Grid>
+                            <Grid
+                              xs={12}
+                              item
+                            >
+                              <Typography className={classes.wrapIcon}>
+                                Số điện thoại <IconRequired />
+                              </Typography>
+                              <TextfieldWrapper
+                                name="phone"
+                                fullWidth
+                                id="phone"
+                                autoComplete="phone"
+                              />
+                            </Grid>
+                            <Grid
+                              xs={12}
+                              item
+                            >
+                              <Typography className={classes.wrapIcon}>Email</Typography>
+                              <TextfieldWrapper
+                                name="email"
+                                fullWidth
+                                id="email"
+                                autoComplete="email"
+                              />
+                            </Grid>
+                          </Grid>
+                          {/* )} */}
+                          <Grid
+                            container
+                            spacing={2}
+                            paddingTop={2}
+                            paddingX={2}
                           >
-                            {errors.districtId}
-                          </FormHelperText>
-                        </Grid>
-                        <Grid
-                          xs={4}
-                          item
-                        >
-                          <Typography className={classes.wrapIcon}>
-                            Phường/Xã: <IconRequired />
-                          </Typography>
-                          <Select
-                            classNamePrefix="select"
-                            placeholder="Chọn xã/phường"
-                            noOptionsMessage={() => (
-                              <>Không có tìm thấy xã/phường thành phù hợp</>
-                            )}
-                            isClearable={true}
-                            isSearchable={true}
-                            name="wardId"
-                            value={FormatDataUtils.getOptionWithIdandName(GetWard(selectedDistrict))?.filter(function (option) {
-                              return option.value === selectedWard;
-                            })}
-                            options={FormatDataUtils.getOptionWithIdandName(GetWard(selectedDistrict))}
-                            menuPortalTarget={document.body}
-                            styles={{
-                              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                              control: (base) => ({
-                                ...base,
-                                height: 56,
-                                minHeight: 56,
-                              }),
-                            }}
-                            onChange={(e) => {
-                              setFieldValue('wardId', e?.value, setSelectedWard(e?.value));
-                            }}
-                          />
-                          <FormHelperText
-                            error={true}
-                            className={classes.errorTextHelper}
+                            <Grid
+                              xs={12}
+                              item
+                            >
+                              <Divider
+                                textAlign="left"
+                                style={{ fontSize: '18px' }}
+                              >
+                                Địa chỉ
+                              </Divider>
+                            </Grid>
+                          </Grid>
+
+                          <Grid
+                            container
+                            spacing={2}
+                            padding={2}
                           >
-                            {errors.wardId}
-                          </FormHelperText>
-                        </Grid>
-                        <Grid
-                          xs={12}
-                          item
-                        >
-                          <Typography className={classes.wrapIcon}>Địa chỉ chi tiết <IconRequired /></Typography>
-                          <TextfieldWrapper
-                            name="addressDetail"
-                            fullWidth
-                            id="addressDetail"
-                            autoComplete="addressDetail"
-                          />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
+                            <Grid
+                              xs={4}
+                              item
+                            >
+                              <Typography>
+                                Tỉnh/Thành phố
+                                <IconRequired />
+                              </Typography>
+                              {/* {!!provinceList && ( */}
+                              <Select
+                                classNamePrefix="select"
+                                placeholder="Chọn tỉnh/thành phố"
+                                noOptionsMessage={() => (
+                                  <>Không tìm thấy Tỉnh/Thành phố phù hợp</>
+                                )}
+                                isClearable={true}
+                                isSearchable={true}
+                                isLoading={loadingAddress && !selectedProvince}
+                                name="provinceId"
+                                value={FormatDataUtils.getSelectedOption(
+                                  provinceList,
+                                  selectedProvince,
+                                )}
+                                options={FormatDataUtils.getOptionWithIdandName(
+                                  provinceList,
+                                )}
+                                menuPortalTarget={document.body}
+                                styles={{
+                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                  control: (base) => ({
+                                    ...base,
+                                    height: 56,
+                                    minHeight: 56,
+                                  }),
+                                }}
+                                onFocus={() => setTouchedProvinceId(true)}
+                                onChange={(e) => {
+                                  setFieldValue('provinceId', e?.value);
+                                  onChangeProvince(e);
+                                }}
+                              />
+                              {touchedProvinceId && (
+                                <FormHelperText
+                                  className={classes.formHelperTextStyle}
+                                  error={true}
+                                  sx={{ height: '20px' }}
+                                >
+                                  {errors.provinceId}
+                                </FormHelperText>
+                              )}
+                              {/* )} */}
+                            </Grid>
+                            <Grid
+                              xs={4}
+                              item
+                            >
+                              <Typography>
+                                Quận/Huyện/Thành phố
+                                <IconRequired />
+                              </Typography>
+                              {/* {!!districtList && ( */}
+                              <Select
+                                classNamePrefix="select"
+                                placeholder="Chọn quận/huyện/thành phố"
+                                noOptionsMessage={() => (
+                                  <>Không tìm thấy Quận/Huyện/Thành phố phù hợp</>
+                                )}
+                                isClearable={true}
+                                isSearchable={true}
+                                isLoading={loadingAddress && !selectedDistrict}
+                                name="districtId"
+                                isDisabled={!selectedProvince}
+                                value={FormatDataUtils.getSelectedOption(
+                                  districtList,
+                                  selectedDistrict,
+                                )}
+                                options={FormatDataUtils.getOptionWithIdandName(
+                                  districtList,
+                                )}
+                                menuPortalTarget={document.body}
+                                styles={{
+                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                  control: (base) => ({
+                                    ...base,
+                                    height: 56,
+                                    minHeight: 56,
+                                  }),
+                                }}
+                                onFocus={() => setTouchedDistrictId(true)}
+                                onChange={(e) => {
+                                  setFieldValue('districtId', e?.value);
+                                  onChangeDistrict(e);
+                                }}
+                              />
+                              {touchedDistrictId && (
+                                <FormHelperText
+                                  className={classes.formHelperTextStyle}
+                                  error={true}
+                                  sx={{ height: '20px' }}
+                                >
+                                  {errors.districtId}
+                                </FormHelperText>
+                              )}
+                              {/* )} */}
+                            </Grid>
+                            <Grid
+                              xs={4}
+                              item
+                            >
+                              <Typography>
+                                Phường/Xã <IconRequired />
+                              </Typography>
+                              {/* {!!wardList && ( */}
+                              <Select
+                                classNamePrefix="select"
+                                placeholder="Chọn xã/phường"
+                                noOptionsMessage={() => (
+                                  <>Không tìm thấy Xã/Phường phù hợp</>
+                                )}
+                                isClearable={true}
+                                isSearchable={true}
+                                isLoading={loadingAddress && !selectedWard}
+                                name="wardId"
+                                isDisabled={!selectedDistrict}
+                                value={FormatDataUtils.getSelectedOption(
+                                  wardList,
+                                  selectedWard,
+                                )}
+                                options={FormatDataUtils.getOptionWithIdandName(wardList)}
+                                menuPortalTarget={document.body}
+                                styles={{
+                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                  control: (base) => ({
+                                    ...base,
+                                    height: 56,
+                                    minHeight: 56,
+                                  }),
+                                }}
+                                onFocus={() => setTouchedWardId(true)}
+                                onChange={(e) => {
+                                  setFieldValue('wardId', e !== null ? e?.value : null);
+                                  onChangeWard(e);
+                                }}
+                              />
+                              {touchedWardId && (
+                                <FormHelperText
+                                  className={classes.formHelperTextStyle}
+                                  error={true}
+                                  sx={{ height: '20px' }}
+                                >
+                                  {errors.wardId}
+                                </FormHelperText>
+                              )}
+                              {/* )} */}
+                            </Grid>
+                            <Grid
+                              xs={12}
+                              item
+                            >
+                              <Typography className={classes.wrapIcon}>
+                                Địa chỉ chi tiết <IconRequired />
+                              </Typography>
+                              <TextfieldWrapper
+                                name="addressDetail"
+                                fullWidth
+                                id="addressDetail"
+                                autoComplete="addressDetail"
+                              />
+                            </Grid>
+                          </Grid>
+                        </CardContent>
+                      </Card>
 
-                  <Card>
-                    <Stack
-                      direction="row"
-                      spacing={2}
-                      justifyContent="flex-end"
-                      padding="20px"
-                    >
-                      <ButtonWrapper
-                        color="warning"
-                        variant="contained"
-                        startIcon={<CheckIcon />}
-                      >
-                        Lưu chỉnh sửa
-                      </ButtonWrapper>
-                      <Button
-                        color="error"
-                        onClick={() => handleOnClickExit()}
-                        variant="contained"
-                        startIcon={<ClearIcon />}
-                      >
-                        Hủy chỉnh sửa
-                      </Button>
-                    </Stack>
-                  </Card>
-                </Box>
-              )}
-            </Form>
-          )}
-        </Formik>
-      )}
-      {/* Add new manufacturer info */}
-      {!manufacturer && isAdd && (
-        <Formik
-          initialValues={{ ...initialManufacturerValue }}
-          validationSchema={FORM_VALIDATION}
-          onSubmit={(values) => handleSubmit(values)}
-        >
-          {({ values, errors, setFieldValue }) => (
-            <Form>
-              <Box>
-                <Card className={classes.cardInfo}>
-                  <CardHeader title="Thông tin nhà sản xuất" />
-
-                  <CardContent>
-                    {/* {!!manufacturer && ( */}
-                    <Grid
-                      container
-                      spacing={2}
-                      padding={2}
-                    >
-                      <Grid
-                        xs={12}
-                        item
-                      >
-                        <Typography className={classes.wrapIcon}>
-                          Tên nhà sản xuất <IconRequired />
-                          {/* <Info className={classes.iconStyle} /> */}
-                        </Typography>
-                        <TextfieldWrapper
-                          name="name"
-                          fullWidth
-                          id="name"
-                          autoComplete="name"
-                          autoFocus
-                          className={classes.manufacturerName}
-                        />
-                      </Grid>
-                      <Grid
-                        xs={12}
-                        item
-                      >
-                        <Typography className={classes.wrapIcon}>
-                          Số điện thoại <IconRequired />
-                          {/* <Info className={classes.iconStyle} /> */}
-                        </Typography>
-                        <TextfieldWrapper
-                          name="phone"
-                          fullWidth
-                          id="phone"
-                          autoComplete="phone"
-                        // autoFocus
-                        />
-                      </Grid>
-                      <Grid
-                        xs={12}
-                        item
-                      >
-                        <Typography className={classes.wrapIcon}>
-                          Email
-                          {/* <Info className={classes.iconStyle} /> */}
-                        </Typography>
-                        <TextfieldWrapper
-                          name="email"
-                          fullWidth
-                          id="email"
-                          autoComplete="email"
-                        // autoFocus
-                        />
-                      </Grid>
-                    </Grid>
-                    {/* )} */}
-                    <Grid
-                      container
-                      spacing={2}
-                      paddingTop={2}
-                      paddingX={2}
-                    >
-                      <Grid
-                        xs={12}
-                        item
-                      >
-                        <Divider textAlign="left" style={{ fontSize: '18px' }}>Địa chỉ</Divider>
-                      </Grid>
-                    </Grid>
-                    <Grid
-                      container
-                      spacing={2}
-                      padding={2}
-                    >
-                      <Grid
-                        xs={4}
-                        item
-                      >
-                        <Typography className={classes.wrapIcon}>
-                          Tỉnh/Thành phố <IconRequired />
-                        </Typography>
-
-                        <Select
-                          classNamePrefix="select"
-                          placeholder="Chọn tỉnh thành."
-                          noOptionsMessage={() => (
-                            <>Không có tìm thấy tỉnh thành phù hợp</>
-                          )}
-                          isClearable={true}
-                          isSearchable={true}
-                          name="provinceId"
-                          options={FormatDataUtils.getOptionWithIdandName(GetProvince())}
-                          value={GetProvince()?.find(
-                            (obj) => obj.value === selectedProvince,
-                          )}
-                          menuPortalTarget={document.body}
-                          styles={{
-                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                            control: (base) => ({
-                              ...base,
-                              height: 56,
-                              minHeight: 56,
-                            }),
-                          }}
-                          onChange={(e) => {
-                            setFieldValue('provinceId', e?.value, setSelectedProvince(e?.value));
-                          }}
-                        />
-
-                        <FormHelperText
-                          error={true}
-                          className={classes.errorTextHelper}
+                      <Card>
+                        <Stack
+                          direction="row"
+                          spacing={2}
+                          justifyContent="flex-end"
+                          padding="20px"
                         >
-                          {errors.provinceId}
-                        </FormHelperText>
-                      </Grid>
-                      <Grid
-                        xs={4}
-                        item
-                      >
-                        <Typography className={classes.wrapIcon}>
-                          Quận/Huyện/Thành phố <IconRequired />
-                        </Typography>
-                        <Select
-                          classNamePrefix="select"
-                          placeholder="Chọn quận/huyện"
-                          noOptionsMessage={() => (
-                            <>Không có tìm thấy quận/huyện phù hợp</>
-                          )}
-                          isClearable={true}
-                          isSearchable={true}
-                          name="districtId"
-                          options={FormatDataUtils.getOptionWithIdandName(GetDistrict(selectedProvince))}
-                          menuPortalTarget={document.body}
-                          styles={{
-                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                            control: (base) => ({
-                              ...base,
-                              height: 56,
-                              minHeight: 56,
-                            }),
-                          }}
-                          onChange={(e) => {
-                            setFieldValue('districtId', e?.value, setSelectedDistrict(e?.value));
-                          }}
-                        />
-                        <FormHelperText
-                          error={true}
-                          className={classes.errorTextHelper}
+                          <LoadingButton
+                            color="warning"
+                            variant="contained"
+                            loading={loadingButton}
+                            type="submit"
+                            loadingPosition="start"
+                            startIcon={<CheckIcon />}
+                          >
+                            Lưu chỉnh sửa
+                          </LoadingButton>
+                          <Button
+                            color="error"
+                            onClick={() => handleOnClickExit()}
+                            disabled={loadingButton}
+                            variant="contained"
+                            startIcon={<ClearIcon />}
+                          >
+                            Hủy chỉnh sửa
+                          </Button>
+                        </Stack>
+                      </Card>
+                    </Box>
+                  </Form>
+                )}
+              </Formik>
+            )}
+            {/* Add new manufacturer info */}
+            {!manufacturer && !!isAdd && (
+              <Formik
+                initialValues={{ ...initialManufacturerValue }}
+                validationSchema={FORM_VALIDATION}
+                onSubmit={(values) => handleSubmit(values)}
+              >
+                {({ values, errors, setFieldValue }) => (
+                  <Form>
+                    <Box>
+                      <Card className={classes.cardInfo}>
+                        <CardHeader title="Thông tin nhà sản xuất" />
+
+                        <CardContent>
+                          {/* {!!manufacturer && ( */}
+                          <Grid
+                            container
+                            spacing={2}
+                            padding={2}
+                          >
+                            <Grid
+                              xs={12}
+                              item
+                            >
+                              <Typography className={classes.wrapIcon}>
+                                Tên nhà sản xuất <IconRequired />
+                                {/* <Info className={classes.iconStyle} /> */}
+                              </Typography>
+                              <TextfieldWrapper
+                                name="name"
+                                fullWidth
+                                id="name"
+                                autoComplete="name"
+                                autoFocus
+                                className={classes.manufacturerName}
+                              />
+                            </Grid>
+                            <Grid
+                              xs={12}
+                              item
+                            >
+                              <Typography className={classes.wrapIcon}>
+                                Số điện thoại <IconRequired />
+                                {/* <Info className={classes.iconStyle} /> */}
+                              </Typography>
+                              <TextfieldWrapper
+                                name="phone"
+                                fullWidth
+                                id="phone"
+                                autoComplete="phone"
+                                // autoFocus
+                              />
+                            </Grid>
+                            <Grid
+                              xs={12}
+                              item
+                            >
+                              <Typography className={classes.wrapIcon}>
+                                Email
+                                {/* <Info className={classes.iconStyle} /> */}
+                              </Typography>
+                              <TextfieldWrapper
+                                name="email"
+                                fullWidth
+                                id="email"
+                                autoComplete="email"
+                                // autoFocus
+                              />
+                            </Grid>
+                          </Grid>
+                          {/* )} */}
+                          <Grid
+                            container
+                            spacing={2}
+                            paddingTop={2}
+                            paddingX={2}
+                          >
+                            <Grid
+                              xs={12}
+                              item
+                            >
+                              <Divider
+                                textAlign="left"
+                                style={{ fontSize: '18px' }}
+                              >
+                                Địa chỉ
+                              </Divider>
+                            </Grid>
+                          </Grid>
+                          <Grid
+                            container
+                            spacing={2}
+                            padding={2}
+                          >
+                            <Grid
+                              xs={4}
+                              item
+                            >
+                              <Typography>
+                                Tỉnh/Thành phố
+                                <IconRequired />
+                              </Typography>
+                              {/* {!!provinceList && ( */}
+                              <Select
+                                classNamePrefix="select"
+                                placeholder="Chọn tỉnh/thành phố"
+                                noOptionsMessage={() => (
+                                  <>Không tìm thấy Tỉnh/Thành phố phù hợp</>
+                                )}
+                                isClearable={true}
+                                isSearchable={true}
+                                isLoading={loadingAddress && !selectedProvince}
+                                name="provinceId"
+                                value={FormatDataUtils.getSelectedOption(
+                                  provinceList,
+                                  selectedProvince,
+                                )}
+                                options={FormatDataUtils.getOptionWithIdandName(
+                                  provinceList,
+                                )}
+                                menuPortalTarget={document.body}
+                                styles={{
+                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                  control: (base) => ({
+                                    ...base,
+                                    height: 56,
+                                    minHeight: 56,
+                                  }),
+                                }}
+                                onFocus={() => setTouchedProvinceId(true)}
+                                onChange={(e) => {
+                                  setFieldValue('provinceId', e?.value);
+                                  onChangeProvince(e);
+                                }}
+                              />
+                              {touchedProvinceId && (
+                                <FormHelperText
+                                  className={classes.formHelperTextStyle}
+                                  error={true}
+                                  sx={{ height: '20px' }}
+                                >
+                                  {errors.provinceId}
+                                </FormHelperText>
+                              )}
+                              {/* )} */}
+                            </Grid>
+                            <Grid
+                              xs={4}
+                              item
+                            >
+                              <Typography>
+                                Quận/Huyện/Thành phố
+                                <IconRequired />
+                              </Typography>
+                              {/* {!!districtList && ( */}
+                              <Select
+                                classNamePrefix="select"
+                                placeholder="Chọn quận/huyện/thành phố"
+                                noOptionsMessage={() => (
+                                  <>Không tìm thấy Quận/Huyện/Thành phố phù hợp</>
+                                )}
+                                isClearable={true}
+                                isSearchable={true}
+                                isLoading={loadingAddress && !selectedDistrict}
+                                name="districtId"
+                                isDisabled={!selectedProvince}
+                                value={FormatDataUtils.getSelectedOption(
+                                  districtList,
+                                  selectedDistrict,
+                                )}
+                                options={FormatDataUtils.getOptionWithIdandName(
+                                  districtList,
+                                )}
+                                menuPortalTarget={document.body}
+                                styles={{
+                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                  control: (base) => ({
+                                    ...base,
+                                    height: 56,
+                                    minHeight: 56,
+                                  }),
+                                }}
+                                onFocus={() => setTouchedDistrictId(true)}
+                                onChange={(e) => {
+                                  setFieldValue('districtId', e?.value);
+                                  onChangeDistrict(e);
+                                }}
+                              />
+                              {touchedDistrictId && (
+                                <FormHelperText
+                                  className={classes.formHelperTextStyle}
+                                  error={true}
+                                  sx={{ height: '20px' }}
+                                >
+                                  {errors.districtId}
+                                </FormHelperText>
+                              )}
+                              {/* )} */}
+                            </Grid>
+                            <Grid
+                              xs={4}
+                              item
+                            >
+                              <Typography>
+                                Phường/Xã <IconRequired />
+                              </Typography>
+                              {/* {!!wardList && ( */}
+                              <Select
+                                classNamePrefix="select"
+                                placeholder="Chọn xã/phường"
+                                noOptionsMessage={() => (
+                                  <>Không tìm thấy Xã/Phường phù hợp</>
+                                )}
+                                isClearable={true}
+                                isSearchable={true}
+                                isLoading={loadingAddress && !selectedWard}
+                                name="wardId"
+                                isDisabled={!selectedDistrict}
+                                value={FormatDataUtils.getSelectedOption(
+                                  wardList,
+                                  selectedWard,
+                                )}
+                                options={FormatDataUtils.getOptionWithIdandName(wardList)}
+                                menuPortalTarget={document.body}
+                                styles={{
+                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                  control: (base) => ({
+                                    ...base,
+                                    height: 56,
+                                    minHeight: 56,
+                                  }),
+                                }}
+                                onFocus={() => setTouchedWardId(true)}
+                                onChange={(e) => {
+                                  setFieldValue('wardId', e !== null ? e?.value : null);
+                                  onChangeWard(e);
+                                }}
+                              />
+                              {touchedWardId && (
+                                <FormHelperText
+                                  className={classes.formHelperTextStyle}
+                                  error={true}
+                                  sx={{ height: '20px' }}
+                                >
+                                  {errors.wardId}
+                                </FormHelperText>
+                              )}
+                              {/* )} */}
+                            </Grid>
+                            <Grid
+                              xs={12}
+                              item
+                            >
+                              <Typography className={classes.wrapIcon}>
+                                Địa chỉ chi tiết <IconRequired />
+                              </Typography>
+                              <TextfieldWrapper
+                                name="addressDetail"
+                                fullWidth
+                                id="addressDetail"
+                                autoComplete="addressDetail"
+                              />
+                            </Grid>
+                          </Grid>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <Stack
+                          direction="row"
+                          spacing={2}
+                          justifyContent="flex-end"
+                          padding="20px"
                         >
-                          {errors.districtId}
-                        </FormHelperText>
-                      </Grid>
-                      <Grid
-                        xs={4}
-                        item
-                      >
-                        <Typography className={classes.wrapIcon}>
-                          Phường/Xã <IconRequired />
-                        </Typography>
-                        <Select
-                          classNamePrefix="select"
-                          placeholder="Chọn xã/phường"
-                          noOptionsMessage={() => (
-                            <>Không có tìm thấy xã/phường thành phù hợp</>
-                          )}
-                          isClearable={true}
-                          isSearchable={true}
-                          name="wardId"
-                          options={FormatDataUtils.getOptionWithIdandName(GetWard(selectedDistrict))}
-                          menuPortalTarget={document.body}
-                          styles={{
-                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                            control: (base) => ({
-                              ...base,
-                              height: 56,
-                              minHeight: 56,
-                            }),
-                          }}
-                          onChange={(e) => {
-                            setFieldValue('wardId', e?.value, setSelectedWard(e?.value));
-                          }}
-                        />
-                        <FormHelperText
-                          error={true}
-                          className={classes.errorTextHelper}
-                        >
-                          {errors.wardId}
-                        </FormHelperText>
-                      </Grid>
-                      <Grid
-                        xs={12}
-                        item
-                      >
-                        <Typography className={classes.wrapIcon}>Địa chỉ chi tiết <IconRequired /></Typography>
-                        <TextfieldWrapper
-                          name="addressDetail"
-                          fullWidth
-                          id="addressDetail"
-                          autoComplete="addressDetail"
-                        />
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <Stack
-                    direction="row"
-                    spacing={2}
-                    justifyContent="flex-end"
-                    padding="20px"
-                  >
-                    <ButtonWrapper
-                      color="success"
-                      variant="contained"
-                      startIcon={<CheckIcon />}
-                    >
-                      Thêm nhà sản xuất
-                    </ButtonWrapper>
-                    <Button
-                      color="error"
-                      onClick={() => handleOnClickExit()}
-                      variant="contained"
-                      startIcon={<ClearIcon />}
-                    >
-                      Hủy
-                    </Button>
-                  </Stack>
-                </Card>
-              </Box>
-            </Form>
-          )}
-        </Formik>
-      )}
-      <Popup
+                          <LoadingButton
+                            color="success"
+                            variant="contained"
+                            type="submit"
+                            loading={loadingButton}
+                            loadingPosition="start"
+                            startIcon={<CheckIcon />}
+                          >
+                            Thêm nhà sản xuất
+                          </LoadingButton>
+                          <Button
+                            color="error"
+                            onClick={() => handleOnClickExit()}
+                            variant="contained"
+                            disabled={loadingButton}
+                            startIcon={<ClearIcon />}
+                          >
+                            Hủy
+                          </Button>
+                        </Stack>
+                      </Card>
+                    </Box>
+                    {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
+                  </Form>
+                )}
+              </Formik>
+            )}
+            {/* <Popup
         title={isAdd ? 'Bạn có chắc chắn muốn thêm nhà xuất không?' : "Bạn có chắc chắn muốn lưu lại chỉnh sửa không?"}
         openPopup={openPopup}
-        setOpenPopup={setopenPopup}
+        setOpenPopup={setOpenPopup}
       >
         <Typography >
           Hãy kiểm tra kỹ thông tin trước khi xác nhận.
@@ -731,14 +923,31 @@ const AddEditManufacturerForm = () => {
             Xác nhận</Button>
           <Button
             variant="outlined"
-            onClick={() => setopenPopup(false)}
+            onClick={() => setOpenPopup(false)}
           >
             Hủy
           </Button>
         </Stack>
-      </Popup>
+      </Popup> */}
+          </Box>
+        )}
+      </Box>
+      {/* <AlertPopup
+        maxWidth="sm"
+        title={title}
+        openPopup={openPopup}
+        setOpenPopup={setOpenPopup}
+        isConfirm={!errorMessage}
+        handleConfirm={handleConfirm}
+      >
+        <Box
+          component={'span'}
+          className="popupMessageContainer"
+        >
+          {errorMessage ? errorMessage : message}
+        </Box>
+      </AlertPopup> */}
     </Container>
-
   );
 };
 
