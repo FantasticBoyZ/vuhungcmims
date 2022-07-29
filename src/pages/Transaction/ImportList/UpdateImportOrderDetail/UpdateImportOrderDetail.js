@@ -40,6 +40,7 @@ import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import { FieldArray, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import ButtonWrapper from '@/components/Common/FormsUI/Button';
+import { getWarehouseList } from '@/slices/WarehouseSlice';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -102,10 +103,12 @@ const UpdateImportOrderDetail = () => {
   const [errorMessage, setErrorMessage] = useState();
   const [createdDate] = useState(new Date().getTime());
   const [confirmedDate] = useState(new Date().getTime());
+  const [selectedWarehouse, setSelectedWarehouse] = useState()
   const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
+  const [warehouseList, setWarehouseList] = useState([]);
   const navigate = useNavigate();
   const today = new Date();
   const arrayHelpersRef = useRef(null);
@@ -168,14 +171,48 @@ const UpdateImportOrderDetail = () => {
       if (values.consignments) {
         for (let index = 0; index < values.consignments.length; index++) {
           const consignment = values.consignments[index];
+          if (consignment.quantity === '' || consignment.unitPrice === '') {
+            setErrorMessage('Bạn có sản phẩm chưa nhập số lượng hoặc đơn giá');
+            setOpenPopup(true);
+            return;
+          }
+          if (consignment.quantity === 0) {
+            setErrorMessage('Bạn không thể nhập sản phẩm với số lượng bằng 0');
+            setOpenPopup(true);
+            return;
+          }
+    
+          if (!Number.isInteger(consignment.quantity)) {
+            setErrorMessage('Vui lòng nhập số lượng sản phẩm là số nguyên');
+            setOpenPopup(true);
+            return;
+          }
+    
+          if (!Number.isInteger(consignment.unitPrice)) {
+            setErrorMessage('Vui lòng nhập đơn giá của sản phẩm là số nguyên');
+            setOpenPopup(true);
+            return;
+          }
           if (consignment.quantity > 0) {
             consignmentRequests.push({
               consignmentId: consignment.consignmentId,
               productId: consignment.productId,
-              expirationDate: new Date(consignment.expirationDate + (new Date().getTimezoneOffset()) / 60).toJSON(),
+              expirationDate: consignment.expirationDate
+                ? new Date(
+                    consignment.expirationDate + new Date().getTimezoneOffset() / 60,
+                  ).toJSON()
+                : null,
               importDate: new Date(consignment.importDate).toJSON(),
-              unitPrice: consignment.unitPrice,
-              quantity: consignment.quantity,
+              unitPrice: Math.round(
+                consignment.selectedUnitMeasure === consignment.wrapUnitMeasure
+                  ? consignment.unitPrice / consignment.numberOfWrapUnitMeasure
+                  : consignment.unitPrice,
+              ),
+              quantity: Math.round(
+                consignment.selectedUnitMeasure === consignment.wrapUnitMeasure
+                  ? consignment.quantity * consignment.numberOfWrapUnitMeasure
+                  : consignment.quantity,
+              ),
             });
           }
         }
@@ -233,6 +270,7 @@ const UpdateImportOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setImportOrder(dataResult.data.inforDetail);
+        setSelectedWarehouse(dataResult.data.inforDetail.wareHouseId)
       }
       console.log('Import Order Detail', dataResult);
     } catch (error) {
@@ -264,7 +302,21 @@ const UpdateImportOrderDetail = () => {
     }
   };
 
+  const getAllWarehouse = async () => {
+    try {
+      const actionResult = await dispatch(getWarehouseList());
+      const dataResult = unwrapResult(actionResult);
+      console.log('warehouse list', dataResult.data);
+      if (dataResult.data) {
+        setWarehouseList(dataResult.data.warehouse);
+      }
+    } catch (error) {
+      console.log('Failed to fetch warehouse list: ', error);
+    }
+  };
+
   useEffect(() => {
+    getAllWarehouse();
     fetchImportOrderDetail();
     fetchProductListByImportOrderId();
   }, [page, rowsPerPage]);
@@ -369,13 +421,20 @@ const UpdateImportOrderDetail = () => {
                                     isClearable={true}
                                     isSearchable={true}
                                     name="warehouse"
-                                    options={FormatDataUtils.getOption(warehouseData)}
+                                    value={FormatDataUtils.getSelectedOption(
+                                      warehouseList,
+                                      selectedWarehouse,
+                                    )}
+                                    options={FormatDataUtils.getOptionWithIdandName(
+                                      warehouseList,
+                                    )}
                                     menuPortalTarget={document.body}
                                     styles={{
                                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                                     }}
                                     onChange={(e) => {
-                                      setFieldValue('wareHouseId', e?.value.id);
+                                      setFieldValue('wareHouseId', e?.value);
+                                      setSelectedWarehouse(e?.value)
                                     }}
                                   />
                                   <FormHelperText
@@ -508,6 +567,106 @@ const UpdateImportOrderDetail = () => {
                                                                 ...base,
                                                                 zIndex: 9999,
                                                               }),
+                                                            }}
+                                                            onChange={(e) => {
+                                                              setFieldValue(
+                                                                `consignments[${index}].selectedUnitMeasure`,
+                                                                e.value.name,
+                                                              );
+                                                              // change quantity when change unitMeasure
+                                                              if (
+                                                                values.consignments[index]
+                                                                  .quantity > 0 &&
+                                                                e.value.name !==
+                                                                  values.consignments[
+                                                                    index
+                                                                  ].selectedUnitMeasure
+                                                              ) {
+                                                                if (
+                                                                  e.value.name ===
+                                                                  values.consignments[
+                                                                    index
+                                                                  ].wrapUnitMeasure
+                                                                ) {
+                                                                  setFieldValue(
+                                                                    `consignments[${index}].quantity`,
+                                                                    Math.round(
+                                                                      values.consignments[
+                                                                        index
+                                                                      ].quantity /
+                                                                        e.value.number,
+                                                                    ),
+                                                                  );
+                                                                }
+
+                                                                if (
+                                                                  e.value.name ===
+                                                                  values.consignments[
+                                                                    index
+                                                                  ].unitMeasure
+                                                                ) {
+                                                                  setFieldValue(
+                                                                    `consignments[${index}].quantity`,
+                                                                    Math.round(
+                                                                      values.consignments[
+                                                                        index
+                                                                      ].quantity *
+                                                                        values
+                                                                          .consignments[
+                                                                          index
+                                                                        ]
+                                                                          .numberOfWrapUnitMeasure,
+                                                                    ),
+                                                                  );
+                                                                }
+                                                              }
+                                                              // change unitPrice when change unitMeasure
+                                                              if (
+                                                                values.consignments[index]
+                                                                  .unitPrice > 0 &&
+                                                                e.value.name !==
+                                                                  values.consignments[
+                                                                    index
+                                                                  ].selectedUnitMeasure
+                                                              ) {
+                                                                if (
+                                                                  e.value.name ===
+                                                                  values.consignments[
+                                                                    index
+                                                                  ].wrapUnitMeasure
+                                                                ) {
+                                                                  setFieldValue(
+                                                                    `consignments[${index}].unitPrice`,
+                                                                    Math.round(
+                                                                      values.consignments[
+                                                                        index
+                                                                      ].unitPrice *
+                                                                        e.value.number,
+                                                                    ),
+                                                                  );
+                                                                }
+
+                                                                if (
+                                                                  e.value.name ===
+                                                                  values.consignments[
+                                                                    index
+                                                                  ].unitMeasure
+                                                                ) {
+                                                                  setFieldValue(
+                                                                    `consignments[${index}].unitPrice`,
+                                                                    Math.round(
+                                                                      values.consignments[
+                                                                        index
+                                                                      ].unitPrice /
+                                                                        values
+                                                                          .consignments[
+                                                                          index
+                                                                        ]
+                                                                          .numberOfWrapUnitMeasure,
+                                                                    ),
+                                                                  );
+                                                                }
+                                                              }
                                                             }}
                                                           />
                                                         </Box>

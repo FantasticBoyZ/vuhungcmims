@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ConsignmentsTable = ({ listConsignments }) => {
   const classes = useStyles();
+  const [selectedUnitMeasureList, setSelectedUnitMeasureList] = useState([]);
   const dataTest = {
     id: 1,
     productCode: 'GACH23',
@@ -52,32 +53,47 @@ const ConsignmentsTable = ({ listConsignments }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {listConsignments.map((consignment, index) => (
-            <TableRow
-              hover
-              key={index}
-              //   selected={islistConsignmentselected}
-              selected={false}
-            >
-              {/* TODO: Sửa phần index khi phân trang */}
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{consignment?.productCode}</TableCell>
-              <TableCell>{consignment?.productName}</TableCell>
-              <TableCell>
-                {FormatDataUtils.formatDate(consignment?.expirationDate)}
-              </TableCell>
-              <TableCell
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
+          {listConsignments.map((consignment, index) => {
+            const newSelectdUnitMeasureList = selectedUnitMeasureList.slice();
+            return (
+              <TableRow
+                hover
+                key={index}
+                //   selected={islistConsignmentselected}
+                selected={false}
               >
-                {consignment.wrapUnitMeasure == null ? (
-                  consignment.unitMeasure
-                ) : (
-                  <Select
-                    classNamePrefix="select"
-                    defaultValue={
-                      FormatDataUtils.getOption([
+                {/* TODO: Sửa phần index khi phân trang */}
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{consignment?.productCode}</TableCell>
+                <TableCell>{consignment?.productName}</TableCell>
+                <TableCell>
+                  {consignment?.expirationDate
+                    ? FormatDataUtils.formatDate(consignment?.expirationDate)
+                    : 'Không có'}
+                </TableCell>
+                <TableCell
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  {consignment.wrapUnitMeasure == null ? (
+                    consignment.unitMeasure
+                  ) : (
+                    <Select
+                      classNamePrefix="select"
+                      defaultValue={
+                        FormatDataUtils.getOption([
+                          {
+                            number: 1,
+                            name: consignment.unitMeasure,
+                          },
+                          {
+                            number: consignment.numberOfWrapUnitMeasure,
+                            name: consignment.wrapUnitMeasure,
+                          },
+                        ])[0]
+                      }
+                      options={FormatDataUtils.getOption([
                         {
                           number: 1,
                           name: consignment.unitMeasure,
@@ -86,44 +102,64 @@ const ConsignmentsTable = ({ listConsignments }) => {
                           number: consignment.numberOfWrapUnitMeasure,
                           name: consignment.wrapUnitMeasure,
                         },
-                      ])[0]
-                    }
-                    options={FormatDataUtils.getOption([
-                      {
-                        number: 1,
-                        name: consignment.unitMeasure,
-                      },
-                      {
-                        number: consignment.numberOfWrapUnitMeasure,
-                        name: consignment.wrapUnitMeasure,
-                      },
-                    ])}
-                    menuPortalTarget={document.body}
-                    styles={{
-                      menuPortal: (base) => ({
-                        ...base,
-                        zIndex: 9999,
-                      }),
-                    }}
-                    onChange={(e) => {
-                      console.log(e.value.number);
-                      // if (e.value.number === consignment.numberOfWrapUnitMeasure) {
-                      //   productQuantity = productQuantity / e.value.number;
-                      // } else {
-                      //   productQuantity = consignment.quantity;
-                      // }
-                      // console.log(productQuantity);
-                    }}
-                  />
-                )}
-              </TableCell>
-              <TableCell>{consignment?.quantity}</TableCell>
-              <TableCell>{formatCurrency(consignment?.unitPrice || 0)}</TableCell>
-              <TableCell>
-                {formatCurrency(consignment?.quantity * consignment?.unitPrice)}
-              </TableCell>
-            </TableRow>
-          ))}
+                      ])}
+                      menuPortalTarget={document.body}
+                      styles={{
+                        menuPortal: (base) => ({
+                          ...base,
+                          zIndex: 9999,
+                        }),
+                      }}
+                      onChange={(e) => {
+                        // console.log(e.label);
+                        if (
+                          e.label === consignment.wrapUnitMeasure &&
+                          newSelectdUnitMeasureList[index] !== consignment.wrapUnitMeasure
+                        ) {
+                          newSelectdUnitMeasureList[index] = consignment.wrapUnitMeasure;
+                          // console.log(
+                          //   'wrapUnitMeasure',
+                          //   newSelectdUnitMeasureList[index],
+                          // );
+                          setSelectedUnitMeasureList(newSelectdUnitMeasureList);
+                        }
+                        if (
+                          e.label === consignment.unitMeasure &&
+                          newSelectdUnitMeasureList[index] !== consignment.unitMeasure
+                        ) {
+                          newSelectdUnitMeasureList[index] = consignment.unitMeasure;
+                          // console.log(
+                          //   'unitMeasure',
+                          //   newSelectdUnitMeasureList[index],
+                          // );
+                          setSelectedUnitMeasureList(newSelectdUnitMeasureList);
+                        }
+                        // console.log(selectedUnitMeasureList);
+                      }}
+                    />
+                  )}
+                </TableCell>
+                <TableCell>
+                  {selectedUnitMeasureList[index] === consignment.wrapUnitMeasure
+                    ? FormatDataUtils.getRoundNumber(
+                        consignment?.quantity / consignment.numberOfWrapUnitMeasure,
+                        1,
+                      )
+                    : consignment?.quantity}
+                </TableCell>
+                <TableCell>
+                  {selectedUnitMeasureList[index] === consignment.wrapUnitMeasure
+                    ? formatCurrency(
+                        consignment?.unitPrice * consignment.numberOfWrapUnitMeasure,
+                      )
+                    : formatCurrency(consignment?.unitPrice)}
+                </TableCell>
+                <TableCell>
+                  {formatCurrency(consignment?.quantity * consignment?.unitPrice)}
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </TableContainer>
