@@ -1,7 +1,7 @@
 import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
-import { getCategoryList, saveCategory } from '@/slices/CategorySlice';
+import { getCategoryList, saveCategory, saveSubCategory } from '@/slices/CategorySlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -105,11 +105,12 @@ const CategoryForm = (props) => {
   const saveCategoryDetail = async (category) => {
     try {
       let actionResult;
-      if(!!category.categoryId){
+      console.log(category)
+      if(category.categoryId){
         // TODO: call api create subCategory
-        // actionResult = await dispatch(saveSubCategory(category));
+        actionResult = await dispatch(saveSubCategory(category));
       }else{
-        actionResult = await dispatch(saveCategory(category));
+        // actionResult = await dispatch(saveCategory(category));
       }
       
       const dataResult = unwrapResult(actionResult);
@@ -144,6 +145,7 @@ const CategoryForm = (props) => {
       id: category?.id,
       name: values.name,
       description: values.description,
+      categoryId: values.categoryId
     };
     console.log(values);
     saveCategoryDetail(newCategory);

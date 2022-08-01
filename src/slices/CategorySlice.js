@@ -33,6 +33,20 @@ export const saveCategory = createAsyncThunk('category/save' , async (category, 
   
 })
 
+export const saveSubCategory = createAsyncThunk('sub-category/save' , async (category, { rejectWithValue }) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  try {
+    const response = await categoryService.saveSubCategory(category);
+  return response;
+  } catch (err) {
+    if (!err.response) {
+      throw err;
+    }
+    return rejectWithValue(err.response.data);
+  }
+  
+})
+
 const categorySlice = createSlice({
   name: 'categories',
   initialState: {
@@ -62,6 +76,26 @@ const categorySlice = createSlice({
       state.error = action.payload;
     },
     [getCategoryDetail.fulfilled] :(state, action) => {
+      state.loading = false;
+    },
+    [saveCategory.pending] : (state) => {
+      state.loading = true;
+    },
+    [saveCategory.rejected] :(state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [saveCategory.fulfilled] :(state, action) => {
+      state.loading = false;
+    },
+    [saveSubCategory.pending] : (state) => {
+      state.loading = true;
+    },
+    [saveSubCategory.rejected] :(state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [saveSubCategory.fulfilled] :(state, action) => {
       state.loading = false;
     },
   }

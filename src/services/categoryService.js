@@ -32,7 +32,26 @@ const CategoryService = {
       })
       .then(
         (response) => {
-          return response.data;
+          return response;
+        },
+        (error) => {
+          console.log(error);
+        },
+      );
+  },
+
+  saveSubCategory: (category) => {
+    const url = API_URL + '/subCategory/add';
+    // const url = process.env.REACT_APP_API_URL + '/category/add'
+    axios
+      .post(url, {
+        id: category.id,
+        name: category.name,
+        description: category.description,
+      })
+      .then(
+        (response) => {
+          return response;
         },
         (error) => {
           console.log(error);

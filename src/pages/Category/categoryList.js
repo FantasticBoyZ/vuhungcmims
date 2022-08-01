@@ -8,6 +8,7 @@ import {
   Box,
   Button,
   Card,
+  CardContent,
   InputAdornment,
   Stack,
   TextField,
@@ -44,8 +45,8 @@ const useStyles = makeStyles({
     padding: '0 20px',
   },
   buttonAdd: {
-    height: '36px !important'
-  }
+    height: '36px !important',
+  },
 });
 
 const CategoryList = () => {
@@ -85,6 +86,7 @@ const CategoryList = () => {
 
   const handleOnclickAddNewProduct = () => {
     // navigate('/category/add');
+    getAllCategory();
     setOpenPopup(true);
   };
 
@@ -187,7 +189,7 @@ const CategoryList = () => {
           <Stack
             direction="row"
             justifyContent="space-between"
-            alignItems='center'
+            alignItems="center"
             spacing={2}
             p={2}
           >
@@ -221,21 +223,27 @@ const CategoryList = () => {
       <Box>
         <Card className={classes.cardTable}>
           {loading ? (
-            <ProgressCircleLoading/>
+            <ProgressCircleLoading />
           ) : (
             <Box>
-              <CategoryTable
-                categoryList={categoryList}
-                allCategoryList={allCategoryList}
-              />
-              <CustomTablePagination
-                page={page}
-                pages={pages}
-                rowsPerPage={rowsPerPage}
-                totalRecord={totalRecord}
-                handleChangePage={handleChangePage}
-                handleChangeRowsPerPage={handleChangeRowsPerPage}
-              />
+              {totalRecord > 0 ? (
+                <Box>
+                  <CategoryTable
+                    categoryList={categoryList}
+                    allCategoryList={allCategoryList}
+                  />
+                  <CustomTablePagination
+                    page={page}
+                    pages={pages}
+                    rowsPerPage={rowsPerPage}
+                    totalRecord={totalRecord}
+                    handleChangePage={handleChangePage}
+                    handleChangeRowsPerPage={handleChangeRowsPerPage}
+                  />
+                </Box>
+              ) : (
+                <CardContent>Không tìm thấy danh mục nào</CardContent>
+              )}
             </Box>
           )}
         </Card>
