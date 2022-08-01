@@ -38,27 +38,18 @@ const productService = {
     const url = API_URL + '/product/add';
     // const url = process.env.REACT_APP_API_URL + '/product/add';
 
-    axios
-      .post(url, {
-        id: product.id,
-        name: product.name,
-        productCode: product.productCode,
-        unitMeasure: product.unitMeasure,
-        wrapUnitMeasure: product.wrapUnitMeasure,
-        numberOfWrapUnitMeasure: product.numberOfWrapUnitMeasure,
-        color: product.color,
-        categoryId: product.categoryId,
-        manufactorId: product.manufactorId,
-        description: product.description,
-      })
-      .then(
-        (response) => {
-          return response.data;
-        },
-        (error) => {
-          console.log(error);
-        },
-      );
+    return axios.post(url, {
+      id: product.id,
+      name: product.name,
+      productCode: product.productCode,
+      unitMeasure: product.unitMeasure,
+      wrapUnitMeasure: product.wrapUnitMeasure,
+      numberOfWrapUnitMeasure: product.numberOfWrapUnitMeasure,
+      color: product.color,
+      categoryId: product.categoryId,
+      manufactorId: product.manufactorId,
+      description: product.description,
+    });
   },
 
   uploadNewImage: (formData) => {
@@ -79,13 +70,11 @@ const productService = {
     const url = API_URL + `/product/update/image/${productId}`;
     // const url = process.env.REACT_APP_API_URL + `/product/update/image/${productId}`;
 
-    return axios
-      .put(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      
+    return axios.put(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
 };
 

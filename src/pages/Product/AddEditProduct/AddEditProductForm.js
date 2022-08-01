@@ -221,9 +221,11 @@ const AddEditProductForm = () => {
       console.log('dataResult', dataResult);
       if (formData.has('file')) {
         if (!productId) {
-          const uploadNewImage = await dispatch(uploadNewImageProduct(formData));
-          toast.success('Thêm sản phẩm thành công!');
-          navigate('/product');
+          if (dataResult.status === 200) {
+            const uploadNewImage = await dispatch(uploadNewImageProduct(formData));
+            toast.success('Thêm sản phẩm thành công!');
+            navigate('/product');
+          }
         } else {
           const uploadNewImage = productService.updateImage(productId, formData).then(
             (res) => {
@@ -361,7 +363,7 @@ const AddEditProductForm = () => {
             !!dataResult.data.product.wrapUnitMeasure &&
               !!dataResult.data.product.numberOfWrapUnitMeasure,
           );
-          fetchSubCategoryByCategoryId(dataResult.data.product.categoryId)
+          fetchSubCategoryByCategoryId(dataResult.data.product.categoryId);
           // TODO: đổi sang api deploy khi push code lên nhánh master
           if (dataResult.data.product.image) {
             setImageUrl(API_URL_IMAGE + '/' + dataResult.data.product.image);
@@ -1044,6 +1046,7 @@ const AddEditProductForm = () => {
                                 }}
                                 onChange={(e) => {
                                   setFieldValue('categoryId', e?.value);
+                                  onChangeCategory(e);
                                 }}
                               />
                               {/* )} */}
@@ -1062,32 +1065,35 @@ const AddEditProductForm = () => {
                                 Danh mục phụ:
                               </Typography>
                               {/* {selectedCategory && ( */}
-                              <Select
-                                classNamePrefix="select"
-                                placeholder="Chọn danh mục phụ"
-                                noOptionsMessage={() => (
-                                  <>Không có tìm thấy danh mục phù hợp</>
-                                )}
-                                isClearable={true}
-                                isSearchable={true}
-                                name="subCategoryId"
-                                // value={selectedSubCategory}
-                                options={FormatDataUtils.getOptionWithIdandName(
-                                  subCategoryListTest,
-                                )}
-                                menuPortalTarget={document.body}
-                                styles={{
-                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                                  control: (base) => ({
-                                    ...base,
-                                    height: 56,
-                                    minHeight: 56,
-                                  }),
-                                }}
-                                onChange={(e) => {
-                                  setFieldValue('subCategoryId', e?.value);
-                                }}
-                              />
+                              {!!subCategoryList && (
+                                <Select
+                                  classNamePrefix="select"
+                                  placeholder="Chọn danh mục phụ"
+                                  noOptionsMessage={() => (
+                                    <>Không có tìm thấy danh mục phù hợp</>
+                                  )}
+                                  isClearable={true}
+                                  isSearchable={true}
+                                  name="subCategoryId"
+                                  value={selectedSubCategory}
+                                  options={FormatDataUtils.getOptionWithIdandName(
+                                    subCategoryList,
+                                  )}
+                                  menuPortalTarget={document.body}
+                                  styles={{
+                                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                    control: (base) => ({
+                                      ...base,
+                                      height: 56,
+                                      minHeight: 56,
+                                    }),
+                                  }}
+                                  onChange={(e) => {
+                                    setFieldValue('subCategoryId', e?.value);
+                                    setSelectedSubCategory(e);
+                                  }}
+                                />
+                              )}
                               {/* )} */}
                             </Grid>
                             <Grid
