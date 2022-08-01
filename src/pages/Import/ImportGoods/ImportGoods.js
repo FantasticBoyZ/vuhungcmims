@@ -110,15 +110,7 @@ const ImportGoods = () => {
     manufactorId: '',
     wareHouseId: '',
     consignmentRequests: [
-      // {
-      //   productId: '',
-      //   productCode: '',
-      //   importDate: null,
-      //   name: '',
-      //   expirationDate: '',
-      //   quantity: '',
-      //   unitPrice: '',
-      // },
+      
     ],
   });
 
