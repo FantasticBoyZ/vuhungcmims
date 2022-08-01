@@ -10,6 +10,7 @@ import {
   getProductDetail,
   saveProduct,
   updateImageProduct,
+  updateProduct,
   uploadNewImageProduct,
 } from '@/slices/ProductSlice';
 import FormatDataUtils from '@/utils/formatData';
@@ -70,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
   },
   preview: {
     width: '250px',
-    height: '250px',
+    aspectRatio: '1/1',
     border: '2px dashed black',
     borderRadius: '5px',
     display: 'block',
@@ -216,38 +217,39 @@ const AddEditProductForm = () => {
 
   const saveProductDetail = async (product) => {
     try {
-      const actionResult = await dispatch(saveProduct(product));
-      const dataResult = unwrapResult(actionResult);
-      console.log('dataResult', dataResult);
-      if (formData.has('file')) {
-        if (!productId) {
-          if (dataResult.status === 200) {
+      if (!productId) {
+        const actionResult = await dispatch(saveProduct(product));
+        const dataResult = unwrapResult(actionResult);
+        if (dataResult.status === 200) {
+          if (formData.has('file')) {
             const uploadNewImage = await dispatch(uploadNewImageProduct(formData));
             toast.success('Thêm sản phẩm thành công!');
             navigate('/product');
+          } else {
+            navigate('/product');
+            toast.success('Thêm sản phẩm thành công!');
           }
-        } else {
-          const uploadNewImage = productService.updateImage(productId, formData).then(
-            (res) => {
-              console.log(res.data.message);
-              toast.success('Sửa sản phẩm thành công!');
-              navigate(`/product/detail/${productId}`);
-            },
-            (err) => {
-              console.log(err);
-            },
-          );
         }
       } else {
-        if (!productId) {
-          navigate('/product');
-          toast.success('Thêm sản phẩm thành công!');
-        } else {
-          navigate(`/product/detail/${productId}`);
-          toast.success('Sửa sản phẩm thành công!');
+        const actionResult = await dispatch(updateProduct(product));
+        const dataResult = unwrapResult(actionResult);
+        if (dataResult.status === 200) {
+          if (formData.has('file')) {
+            const uploadNewImage = productService.updateImage(productId, formData).then(
+              (res) => {
+                toast.success('Sửa sản phẩm thành công!');
+                navigate(`/product/detail/${productId}`);
+              },
+              (err) => {
+                console.log(err);
+              },
+            );
+          } else {
+            navigate(`/product/detail/${productId}`);
+            toast.success('Sửa sản phẩm thành công!');
+          }
         }
       }
-      console.log('outside', ...formData);
     } catch (error) {
       console.log('Failed to save product: ', error);
       if (isAdd) {
@@ -279,6 +281,7 @@ const AddEditProductForm = () => {
       description: values.description,
       categoryId: values.categoryId,
       manufactorId: values.manufactorId,
+      subCategoryId: values.subCategoryId
     };
     // console.log(values);
     saveProductDetail(newProduct);

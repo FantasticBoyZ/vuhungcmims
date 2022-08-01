@@ -22,24 +22,10 @@ const productService = {
   },
 
   saveProduct: (product) => {
-    // console.log(product)
-
-    // const product1 = {
-    //   name: 'Add dc roi nhe',
-    //   productCode: 'abc',
-    //   unitMeasure: 'abcv',
-    //   wrapUnitMeasure: 'hop',
-    //   numberOfWrapUnitMeasure: 2,
-    //   color: 'ss',
-    //   description: 'ss',
-    //   categoryId: "1",
-    //   manufactorId: "1",
-    // };
     const url = API_URL + '/product/add';
-    // const url = process.env.REACT_APP_API_URL + '/product/add';
 
     return axios.post(url, {
-      id: product.id,
+      // id: product.id,
       name: product.name,
       productCode: product.productCode,
       unitMeasure: product.unitMeasure,
@@ -49,7 +35,12 @@ const productService = {
       categoryId: product.categoryId,
       manufactorId: product.manufactorId,
       description: product.description,
-    });
+    }, { headers: authHeader() });
+  },
+
+  updateProduct: (product) => {
+    const url = API_URL + '/product/update';
+    return axios.put(url, product, { headers: authHeader() });
   },
 
   uploadNewImage: (formData) => {

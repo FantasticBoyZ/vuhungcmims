@@ -28,6 +28,22 @@ export const saveProduct = createAsyncThunk(
   },
 );
 
+export const updateProduct = createAsyncThunk(
+  'product/save',
+  async (product, { rejectWithValue }) => {
+    try {
+      const response = await productService.updateProduct(product);
+      return response;
+    } catch (err) {
+      if (!err.response) {
+        throw err;
+      }
+    
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
 export const uploadNewImageProduct = createAsyncThunk(
   'product/upload-new-image',
   async (formData) => {
@@ -96,6 +112,16 @@ const productSlice = createSlice({
       state.error = action.payload;
     },
     [saveProduct.fulfilled]: (state, action) => {
+      state.loading = false;
+    },
+    [updateProduct.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateProduct.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [updateProduct.fulfilled]: (state, action) => {
       state.loading = false;
     },
     [uploadNewImageProduct.pending]: (state) => {
