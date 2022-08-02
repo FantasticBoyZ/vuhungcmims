@@ -40,12 +40,12 @@ const staffService = {
 
   signUpStaff: (staff) => {
     const url = API_URL + '/auth/signup';
-    return axios.post(url, staff);
+    return axios.post(url, staff, { headers: authHeader() });
   },
 
   updateStaff: (staff) => {
     const url = API_URL + `/staff/update`;
-    return axios.put(url, staff);
+    return axios.put(url, staff, { headers: authHeader() });
   },
 
   uploadImageNewStaff: (formData) => {

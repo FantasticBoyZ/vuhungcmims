@@ -208,12 +208,12 @@ const UpdateProfile = () => {
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
       if (dataResult) {
-        setStaff(dataResult);
-        setDob(dataResult.dateOfBirth);
-        setGender(dataResult.gender);
-        setSelectedProvince(dataResult.provinceId);
-        setSelectedDistrict(dataResult.districtId);
-        setSelectedWard(dataResult.wardId);
+        setStaff(dataResult.data);
+        setDob(dataResult.data.dateOfBirth);
+        setGender(dataResult.data.gender);
+        setSelectedProvince(dataResult.data.provinceId);
+        setSelectedDistrict(dataResult.data.districtId);
+        setSelectedWard(dataResult.data.wardId);
       }
     } catch (error) {
       console.log('Failed to fetch staff detail: ', error);
@@ -239,7 +239,7 @@ const UpdateProfile = () => {
         <ProgressCircleLoading />
       ) : (
         <Container maxWidth="lg">
-          {staff && (
+          {!!staff && (
             <Formik
               initialValues={{ ...staff }}
               validationSchema={FORM_VALIDATION}
@@ -584,7 +584,7 @@ const UpdateProfile = () => {
                       </Stack>
                     </CardContent>
                   </Card>
-                  <pre>{JSON.stringify(errors, null, 2)}</pre>
+                  {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
                 </Form>
               )}
             </Formik>

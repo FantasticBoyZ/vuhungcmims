@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 const ManufacturerTable = ({ manufacturerList }) => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const theme = useTheme()
+  const theme = useTheme();
 
   const handleOnClickDetailManufacturer = (manufacturerId) => {
     console.log(manufacturerId);
@@ -49,7 +49,7 @@ const ManufacturerTable = ({ manufacturerList }) => {
 
   const handleOnClickEditCategory = (manufacturerId) => {
     navigate(`/manufacturer/edit/${manufacturerId}`);
-  }
+  };
 
   return (
     <TableContainer>
@@ -66,7 +66,7 @@ const ManufacturerTable = ({ manufacturerList }) => {
             <TableCell>Tên nhà cung cấp</TableCell>
             <TableCell>Số điện thoại</TableCell>
             <TableCell>Email</TableCell>
-            <TableCell align="left">Địa chỉ</TableCell>
+            <TableCell align="center">Địa chỉ</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -80,7 +80,7 @@ const ManufacturerTable = ({ manufacturerList }) => {
                 key={manufacturer.id}
                 //   selected={isImportOrderSelected}
                 selected={false}
-              // onClick={(value) => handleOnClickTableRow(importOrder.orderId)}
+                // onClick={(value) => handleOnClickTableRow(importOrder.orderId)}
               >
                 {/* <TableCell padding="checkbox">
                   <Checkbox
@@ -126,50 +126,7 @@ const ManufacturerTable = ({ manufacturerList }) => {
                     {manufacturer.email}
                   </Typography>
                 </TableCell>
-                <TableCell align="center">
-                  {/* <Stack
-                    direction="row"
-                    spacing={2}
-                    sx={{ width: '40px' }}
-                  >
-                    <Tooltip
-                      title="Chi tiết nhà cung cấp"
-                      arrow
-                    >
-                      <IconButton
-                        sx={{
-                          '&:hover': {
-                            background: theme.colors.info.lighter,
-                          },
-                          color: theme.palette.info.main,
-                        }}
-                        color="inherit"
-                        size="small"
-                        onClick={() => handleOnClickDetailManufacturer(manufacturer.id)}
-                      >
-                        <InfoTwoTone fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip
-                      title="Sửa nhà cung cấp"
-                      arrow
-                    >
-                      <IconButton
-                        sx={{
-                          '&:hover': {
-                            background: theme.colors.primary.lighter,
-                          },
-                          color: theme.palette.primary.main,
-                        }}
-                        color="inherit"
-                        size="small"
-                        onClick={() => handleOnClickEditCategory(manufacturer.id)}
-                      >
-                        <EditTwoTone fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </Stack> */}
-                </TableCell>
+                <TableCell align="center">{manufacturer.manufactureAddress}</TableCell>
               </TableRow>
             );
           })}

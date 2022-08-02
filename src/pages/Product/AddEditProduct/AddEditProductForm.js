@@ -10,6 +10,7 @@ import {
   getProductDetail,
   saveProduct,
   updateImageProduct,
+  updateProduct,
   uploadNewImageProduct,
 } from '@/slices/ProductSlice';
 import FormatDataUtils from '@/utils/formatData';
@@ -70,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
   },
   preview: {
     width: '250px',
-    height: '250px',
+    aspectRatio: '1/1',
     border: '2px dashed black',
     borderRadius: '5px',
     display: 'block',
@@ -216,36 +217,39 @@ const AddEditProductForm = () => {
 
   const saveProductDetail = async (product) => {
     try {
-      const actionResult = await dispatch(saveProduct(product));
-      const dataResult = unwrapResult(actionResult);
-      console.log('dataResult', dataResult);
-      if (formData.has('file')) {
-        if (!productId) {
-          const uploadNewImage = await dispatch(uploadNewImageProduct(formData));
-          toast.success('Thêm sản phẩm thành công!');
-          navigate('/product');
-        } else {
-          const uploadNewImage = productService.updateImage(productId, formData).then(
-            (res) => {
-              console.log(res.data.message);
-              toast.success('Sửa sản phẩm thành công!');
-              navigate(`/product/detail/${productId}`);
-            },
-            (err) => {
-              console.log(err);
-            },
-          );
+      if (!productId) {
+        const actionResult = await dispatch(saveProduct(product));
+        const dataResult = unwrapResult(actionResult);
+        if (dataResult.status === 200) {
+          if (formData.has('file')) {
+            const uploadNewImage = await dispatch(uploadNewImageProduct(formData));
+            toast.success('Thêm sản phẩm thành công!');
+            navigate('/product');
+          } else {
+            navigate('/product');
+            toast.success('Thêm sản phẩm thành công!');
+          }
         }
       } else {
-        if (!productId) {
-          navigate('/product');
-          toast.success('Thêm sản phẩm thành công!');
-        } else {
-          navigate(`/product/detail/${productId}`);
-          toast.success('Sửa sản phẩm thành công!');
+        const actionResult = await dispatch(updateProduct(product));
+        const dataResult = unwrapResult(actionResult);
+        if (dataResult.status === 200) {
+          if (formData.has('file')) {
+            const uploadNewImage = productService.updateImage(productId, formData).then(
+              (res) => {
+                toast.success('Sửa sản phẩm thành công!');
+                navigate(`/product/detail/${productId}`);
+              },
+              (err) => {
+                console.log(err);
+              },
+            );
+          } else {
+            navigate(`/product/detail/${productId}`);
+            toast.success('Sửa sản phẩm thành công!');
+          }
         }
       }
-      console.log('outside', ...formData);
     } catch (error) {
       console.log('Failed to save product: ', error);
       if (isAdd) {
@@ -277,6 +281,7 @@ const AddEditProductForm = () => {
       description: values.description,
       categoryId: values.categoryId,
       manufactorId: values.manufactorId,
+      subCategoryId: values.subCategoryId
     };
     // console.log(values);
     saveProductDetail(newProduct);
@@ -361,7 +366,7 @@ const AddEditProductForm = () => {
             !!dataResult.data.product.wrapUnitMeasure &&
               !!dataResult.data.product.numberOfWrapUnitMeasure,
           );
-          fetchSubCategoryByCategoryId(dataResult.data.product.categoryId)
+          fetchSubCategoryByCategoryId(dataResult.data.product.categoryId);
           // TODO: đổi sang api deploy khi push code lên nhánh master
           if (dataResult.data.product.image) {
             setImageUrl(API_URL_IMAGE + '/' + dataResult.data.product.image);
@@ -1044,6 +1049,7 @@ const AddEditProductForm = () => {
                                 }}
                                 onChange={(e) => {
                                   setFieldValue('categoryId', e?.value);
+                                  onChangeCategory(e);
                                 }}
                               />
                               {/* )} */}
@@ -1062,32 +1068,35 @@ const AddEditProductForm = () => {
                                 Danh mục phụ:
                               </Typography>
                               {/* {selectedCategory && ( */}
-                              <Select
-                                classNamePrefix="select"
-                                placeholder="Chọn danh mục phụ"
-                                noOptionsMessage={() => (
-                                  <>Không có tìm thấy danh mục phù hợp</>
-                                )}
-                                isClearable={true}
-                                isSearchable={true}
-                                name="subCategoryId"
-                                // value={selectedSubCategory}
-                                options={FormatDataUtils.getOptionWithIdandName(
-                                  subCategoryListTest,
-                                )}
-                                menuPortalTarget={document.body}
-                                styles={{
-                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                                  control: (base) => ({
-                                    ...base,
-                                    height: 56,
-                                    minHeight: 56,
-                                  }),
-                                }}
-                                onChange={(e) => {
-                                  setFieldValue('subCategoryId', e?.value);
-                                }}
-                              />
+                              {!!subCategoryList && (
+                                <Select
+                                  classNamePrefix="select"
+                                  placeholder="Chọn danh mục phụ"
+                                  noOptionsMessage={() => (
+                                    <>Không có tìm thấy danh mục phù hợp</>
+                                  )}
+                                  isClearable={true}
+                                  isSearchable={true}
+                                  name="subCategoryId"
+                                  value={selectedSubCategory}
+                                  options={FormatDataUtils.getOptionWithIdandName(
+                                    subCategoryList,
+                                  )}
+                                  menuPortalTarget={document.body}
+                                  styles={{
+                                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                    control: (base) => ({
+                                      ...base,
+                                      height: 56,
+                                      minHeight: 56,
+                                    }),
+                                  }}
+                                  onChange={(e) => {
+                                    setFieldValue('subCategoryId', e?.value);
+                                    setSelectedSubCategory(e);
+                                  }}
+                                />
+                              )}
                               {/* )} */}
                             </Grid>
                             <Grid

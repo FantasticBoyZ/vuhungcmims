@@ -10,6 +10,7 @@ import warehouseReducer from '@/slices/WarehouseSlice';
 import staffReducer from '@/slices/StaffSlice';
 import inventoryCheckingReducer from '@/slices/InventoryCheckingSlice';
 import addressReducer from '@/slices/addressSlice';
+import tempInventoryReturnReducer from '@/slices/TempInventoryReturnSlice';
 
 const rootReducer = {
     users: userReducer,
@@ -22,7 +23,8 @@ const rootReducer = {
     warehouse: warehouseReducer,
     staff: staffReducer,
     inventoryChecking: inventoryCheckingReducer,
-    address: addressReducer
+    address: addressReducer,
+    tempInventoryReturn: tempInventoryReturnReducer,
 }
 
 const store = configureStore({

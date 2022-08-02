@@ -8,7 +8,8 @@ import {
   TableRow,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
+import Select from 'react-select';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -46,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ExportProductTable = ({ productList }) => {
   const classes = useStyles();
+  const [selectedUnitMeasureList, setSelectedUnitMeasureList] = useState([]);
   return (
     <TableContainer>
       <Table className={classes.table}>
@@ -61,61 +63,158 @@ const ExportProductTable = ({ productList }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {productList.map((product, index) => (
-            <Fragment key={index}>
-              <TableRow
-                hover
-                //   selected={islistProductselected}
-                selected={false}
-              >
-                {/* TODO: Sửa phần index khi phân trang */}
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{product?.productCode}</TableCell>
-                <TableCell>{product?.productName}</TableCell>
-                <TableCell>{product?.unitMeasure}</TableCell>
-                <TableCell align="center">{product?.quantity}</TableCell>
-                <TableCell align="center">
-                  {FormatDataUtils.formatCurrency(product?.unitPrice || '0')}
-                </TableCell>
-                <TableCell align="center">
-                  {FormatDataUtils.formatCurrency(product?.quantity * product?.unitPrice)}
-                </TableCell>
-              </TableRow>
-              <TableRow className={classes.rowConsignment}>
-                <TableCell className={classes.tableCellConsignment}></TableCell>
-                <TableCell
-                  colSpan={5}
-                  className={classes.tableCellConsignment}
+          {productList.map((product, index) => {
+            const newSelectdUnitMeasureList = selectedUnitMeasureList.slice();
+            return (
+              <Fragment key={index}>
+                <TableRow
+                  hover
+                  //   selected={islistProductselected}
+                  selected={false}
                 >
-                  <Table className={classes.tableCosignment}>
-                    {/* <TableHead> */}
+                  {/* TODO: Sửa phần index khi phân trang */}
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{product?.productCode}</TableCell>
+                  <TableCell>{product?.productName}</TableCell>
+                  <TableCell
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    {product.wrapUnitMeasure == null ? (
+                      product.unitMeasure
+                    ) : (
+                      <Select
+                        classNamePrefix="select"
+                        defaultValue={
+                          FormatDataUtils.getOption([
+                            {
+                              number: 1,
+                              name: product.unitMeasure,
+                            },
+                            {
+                              number: product.numberOfWrapUnitMeasure,
+                              name: product.wrapUnitMeasure,
+                            },
+                          ])[0]
+                        }
+                        options={FormatDataUtils.getOption([
+                          {
+                            number: 1,
+                            name: product.unitMeasure,
+                          },
+                          {
+                            number: product.numberOfWrapUnitMeasure,
+                            name: product.wrapUnitMeasure,
+                          },
+                        ])}
+                        menuPortalTarget={document.body}
+                        styles={{
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999,
+                          }),
+                        }}
+                        onChange={(e) => {
+                          // console.log(e.label);
+                          if (
+                            e.label === product.wrapUnitMeasure &&
+                            newSelectdUnitMeasureList[index] !== product.wrapUnitMeasure
+                          ) {
+                            newSelectdUnitMeasureList[index] = product.wrapUnitMeasure;
+                            // console.log(
+                            //   'wrapUnitMeasure',
+                            //   newSelectdUnitMeasureList[index],
+                            // );
+                            setSelectedUnitMeasureList(newSelectdUnitMeasureList);
+                          }
+                          if (
+                            e.label === product.unitMeasure &&
+                            newSelectdUnitMeasureList[index] !== product.unitMeasure
+                          ) {
+                            newSelectdUnitMeasureList[index] = product.unitMeasure;
+                            // console.log(
+                            //   'unitMeasure',
+                            //   newSelectdUnitMeasureList[index],
+                            // );
+                            setSelectedUnitMeasureList(newSelectdUnitMeasureList);
+                          }
+                          // console.log(selectedUnitMeasureList);
+                        }}
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell align="center">
+                    {selectedUnitMeasureList[index] === product.wrapUnitMeasure
+                      ? FormatDataUtils.getRoundNumber(
+                          product?.quantity / product.numberOfWrapUnitMeasure,
+                          1,
+                        )
+                      : product?.quantity}
+                  </TableCell>
+                  <TableCell align="center">
+                    {selectedUnitMeasureList[index] === product.wrapUnitMeasure
+                      ? FormatDataUtils.formatCurrency(
+                          product?.unitPrice * product.numberOfWrapUnitMeasure,
+                        )
+                      : FormatDataUtils.formatCurrency(product?.unitPrice)}
+                  </TableCell>
+                  <TableCell align="center">
+                    {FormatDataUtils.formatCurrency(
+                      product?.quantity * product?.unitPrice,
+                    )}
+                  </TableCell>
+                </TableRow>
+                <TableRow className={classes.rowConsignment}>
+                  <TableCell className={classes.tableCellConsignment}></TableCell>
+                  <TableCell
+                    colSpan={5}
+                    className={classes.tableCellConsignment}
+                  >
+                    <Table className={classes.tableCosignment}>
+                      {/* <TableHead> */}
 
-                    {/* </TableHead> */}
-                    <TableBody>
-                      <TableRow>
-                        <TableCell>Vị trí</TableCell>
-                        <TableCell>Ngày nhập</TableCell>
-                        <TableCell>Hạn lưu kho</TableCell>
-                        <TableCell align="center">Số lượng</TableCell>
-                      </TableRow>
-                      {product?.consignmentList.map((consignment, indexConsignment) => (
-                        <TableRow
-                          key={indexConsignment}
-                          // hover
-                        >
-                          <TableCell>{consignment?.warehouseName}</TableCell>
-                          <TableCell>{FormatDataUtils.formatDate(consignment?.importDate)}</TableCell>
-                          <TableCell>{ consignment?.expirationDate ? FormatDataUtils.formatDate(consignment?.expirationDate) : "Không có"}</TableCell>
-                          <TableCell align="center">{consignment?.quantity}</TableCell>
+                      {/* </TableHead> */}
+                      <TableBody>
+                        <TableRow>
+                          <TableCell>Vị trí</TableCell>
+                          <TableCell>Ngày nhập</TableCell>
+                          <TableCell>Hạn lưu kho</TableCell>
+                          <TableCell align="center">Số lượng</TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableCell>
-                <TableCell className={classes.tableCellConsignment}></TableCell>
-              </TableRow>
-            </Fragment>
-          ))}
+                        {product?.consignmentList.map((consignment, indexConsignment) => (
+                          <TableRow
+                            key={indexConsignment}
+                            // hover
+                          >
+                            <TableCell>{consignment?.warehouseName}</TableCell>
+                            <TableCell>
+                              {FormatDataUtils.formatDate(consignment?.importDate)}
+                            </TableCell>
+                            <TableCell>
+                              {consignment?.expirationDate
+                                ? FormatDataUtils.formatDate(consignment?.expirationDate)
+                                : 'Không có'}
+                            </TableCell>
+                            <TableCell align="center">
+                              {selectedUnitMeasureList[index] === product.wrapUnitMeasure
+                                ? FormatDataUtils.getRoundNumber(
+                                    consignment?.quantity /
+                                      product.numberOfWrapUnitMeasure,
+                                    1,
+                                  )
+                                : consignment?.quantity}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableCell>
+                  <TableCell className={classes.tableCellConsignment}></TableCell>
+                </TableRow>
+              </Fragment>
+            );
+          })}
         </TableBody>
       </Table>
     </TableContainer>

@@ -45,13 +45,9 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'space-between',
     // backgroundColor:'blue',
-    padding: '10px',
   },
   selectBoxContainer: {
     width: '40%',
-    display: 'flex',
-    justifyContent: 'space-around',
-    // backgroundColor: 'red',
   },
   selectBox: {
     // backgroundColor: 'green',
@@ -85,6 +81,11 @@ const useStyles = makeStyles({
       cursor: 'pointer',
     },
   },
+  filterTitle: {
+    fontSize: '24px',
+    padding: '0 24px',
+    marginBottom: '8px'
+  }
 });
 
 const customStyles = {
@@ -327,29 +328,20 @@ const ProductList = () => {
           direction="row"
           justifyContent="flex-end"
           spacing={2}
-          p={2}
+          py={2}
         >
           <Button
             variant="contained"
             startIcon={<Add />}
             onClick={() => handleOnclickAddNewProduct()}
           >
-            Thêm mới
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-          >
-            Xuất file excel
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-          >
-            Nhập file excel
+            Thêm sản phẩm mới
           </Button>
         </Stack>
         <Card className={classes.panelFilter}>
+          <Box className={classes.filterTitle}>
+          <Typography variant='p'>Tìm kiếm thông tin sản phẩm</Typography>
+          </Box>
           <Toolbar>
             {/* <Box
             backgroundColor="green"
@@ -391,23 +383,12 @@ const ProductList = () => {
                         // onChange={handleSearchChange}
                       />
                     </Box>
-                    <Box className={classes.selectBoxContainer}>
-                      {/* <AsyncSelect
-                        className={classes.selectBox}
-                        styles={customStyles}
-                        placeholder="Danh mục"
-                        cacheOptions
-                        defaultOptions
-                        isSearchable={false}
-                        components={<Select />}
-                        value={selectedCategory}
-                        menuPortalTarget={document.body}
-                        getOptionLabel={(e) => e.name}
-                        getOptionValue={(e) => e.id}
-                        loadOptions={() => fetchCategoryList()}
-                        onInputChange={handleInputChangeCategory}
-                        onChange={(e) => handleChangeCategory(e)}
-                      /> */}
+                    <Stack
+                      direction="row"
+                      spacing={2}
+                      justifyContent="flex-end"
+                      className={classes.selectBoxContainer}
+                    >
                       {categoryList && (
                         <Select
                           classNamePrefix="select"
@@ -431,22 +412,6 @@ const ProductList = () => {
                           onChange={(e) => handleChangeCategory(e)}
                         />
                       )}
-                      {/* <AsyncSelect
-                        className={classes.selectBox}
-                        styles={customStyles}
-                        placeholder="Nhà cung cấp"
-                        cacheOptions
-                        defaultOptions
-                        isSearchable={false}
-                        // components={<Select />}
-                        value={selectedManufactor}
-                        menuPortalTarget={document.body}
-                        getOptionLabel={(e) => e.name}
-                        getOptionValue={(e) => e.id}
-                        loadOptions={() => fetchManufactorList()}
-                        onInputChange={handleInputChangeManufactor}
-                        onChange={(e) => handleChangeManufactor(e)}
-                      /> */}
                       {manufacturerList && (
                         <Select
                           classNamePrefix="select"
@@ -474,7 +439,7 @@ const ProductList = () => {
                           onChange={(e) => handleChangeManufactor(e)}
                         />
                       )}
-                    </Box>
+                    </Stack>
                   </Box>
                 </Form>
               </Formik>

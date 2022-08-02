@@ -26,10 +26,10 @@ const useStyles = makeStyles({
   },
   imageStyle: {
     height: '250px',
-    width: '250px',
     objectFit: 'cover',
     borderRadius: '15px',
     border: '1px solid black',
+    aspectRatio: '1/1'
   },
 });
 

@@ -463,7 +463,7 @@ const CreateInventoryChecking = () => {
                               }}
                               onChange={(e) => {
                                 setFieldValue('warehouseId', e?.value.id || '');
-                                setFieldValue('productList', []);
+                                setFieldValue('productList', [], false);
                                 handleChangeWarehouse(e);
                               }}
                             />

@@ -5,13 +5,16 @@ import {
   Box,
   Button,
   Card,
-  InputAdornment, Stack,
+  InputAdornment,
+  Stack,
   TextField,
   Toolbar,
   Typography,
   Grid,
-  FormControl, InputLabel, CardHeader,
-
+  FormControl,
+  InputLabel,
+  CardHeader,
+  CardContent,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Container } from '@mui/system';
@@ -26,7 +29,7 @@ import SearchIcon from '@mui/icons-material/Search';
 const useStyles = makeStyles({
   searchField: {
     width: '60%',
-    padding: '10px 14px'
+    padding: '10px 14px',
   },
   toolbar: {
     display: 'flex',
@@ -44,8 +47,9 @@ const useStyles = makeStyles({
   },
   cardFilter: {
     padding: '20px 0',
-    boxShadow: '0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)',
-    background: '#fff'
+    boxShadow:
+      '0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)',
+    background: '#fff',
   },
   cardTable: {
     padding: '0 20px',
@@ -53,14 +57,19 @@ const useStyles = makeStyles({
   btnSearch: {
     width: '200px',
     // minHeight: '56px',
-  }
+  },
 });
 
-const optionSelect = [{
-  value: 1, label: "Tên"
-}, {
-  value: 2, label: "Khu vực"
-}]
+const optionSelect = [
+  {
+    value: 'manufactorName',
+    label: 'Tên',
+  },
+  {
+    value: 'provinceName',
+    label: 'Khu vực',
+  },
+];
 
 const ManufacturerList = () => {
   const pages = [10, 20, 50];
@@ -68,9 +77,11 @@ const ManufacturerList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
   const [manufacturerList, setManufacturerList] = useState([]);
+  const [keyword, setKeyword] = useState();
   const [searchParams, setSearchParams] = useState({
     manufactorName: '',
   });
+  const [searchBy, setSearchBy] = useState('manufactorName');
   const navigate = useNavigate();
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -85,13 +96,14 @@ const ManufacturerList = () => {
     setPage(0);
   };
 
+  const handleSearchChange = (e) => {
+    setKeyword(e.target.value);
+  };
+
   const handleSearch = (e) => {
-    if (e.keyCode === 13) {
-      let target = e.target;
-      console.log(e.target.value);
-      setPage(0);
-      searchManufacurer({ ...searchParams, manufactorName: target.value });
-    }
+    setPage(0);
+    searchManufacurer({ ...searchParams, manufactorName: keyword, searchBy: searchBy });
+    setSearchParams({ ...searchParams, manufactorName: keyword, searchBy: searchBy });
   };
 
   const handleOnclickAddNewManufacturer = () => {
@@ -110,7 +122,7 @@ const ManufacturerList = () => {
       console.log('dataResult', dataResult);
       if (dataResult.data) {
         setTotalRecord(dataResult.data.totalRecord);
-        setManufacturerList(dataResult.data.manufactor);
+        setManufacturerList(dataResult.data.manufacturer);
       }
     } catch (error) {
       console.log('Failed to fetch manufacturer list: ', error);
@@ -137,8 +149,12 @@ const ManufacturerList = () => {
   };
 
   useEffect(() => {
-    fetchManufacturerList();
+    searchManufacurer(searchParams);
   }, [page, rowsPerPage]);
+
+  useEffect(() => {
+    fetchManufacturerList();
+  }, []);
 
   return (
     <Grid
@@ -184,10 +200,12 @@ const ManufacturerList = () => {
                   </InputAdornment>
                 ),
               }}
+              onChange={handleSearchChange}
             />
             <Select
               classNamePrefix="select"
               className={classes.btnSearch}
+              value={optionSelect.filter((option) => option.value === searchBy)}
               defaultValue={optionSelect[0]}
               name="searchBy"
               options={optionSelect}
@@ -200,11 +218,13 @@ const ManufacturerList = () => {
                   minHeight: 56,
                 }),
               }}
+              onChange={(e) => setSearchBy(e.value)}
             />
             <Button
               variant="contained"
               startIcon={<SearchIcon />}
               className={classes.btnSearch}
+              onClick={handleSearch}
             >
               Tìm kiếm
             </Button>
@@ -221,22 +241,28 @@ const ManufacturerList = () => {
               <ProgressCircleLoading />
             ) : (
               <Box>
-                <ManufacturerTable manufacturerList={manufacturerList} />
-                <CustomTablePagination
-                  page={page}
-                  pages={pages}
-                  rowsPerPage={rowsPerPage}
-                  totalRecord={totalRecord}
-                  handleChangePage={handleChangePage}
-                  handleChangeRowsPerPage={handleChangeRowsPerPage}
-                />
+                {totalRecord > 0 ? (
+                  <Box>
+                    <ManufacturerTable manufacturerList={manufacturerList} />
+                    <CustomTablePagination
+                      page={page}
+                      pages={pages}
+                      rowsPerPage={rowsPerPage}
+                      totalRecord={totalRecord}
+                      handleChangePage={handleChangePage}
+                      handleChangeRowsPerPage={handleChangeRowsPerPage}
+                    />
+                  </Box>
+                ) : (
+                  <Stack py={2}>
+                    <Typography>Không tìm thấy nhà cung cấp phù hợp</Typography>
+                  </Stack>
+                )}
               </Box>
             )}
           </Card>
         </Box>
-
       </Grid>
-
     </Grid>
   );
 };

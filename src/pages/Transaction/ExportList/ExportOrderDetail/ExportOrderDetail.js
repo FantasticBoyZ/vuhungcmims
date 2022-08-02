@@ -251,7 +251,7 @@ const ExportOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setExportOrder(dataResult.data.inforExportDetail);
-        setAddressWarehouse(dataResult.data.addressWarehouse);
+        
       }
       console.log('Export Order Detail', dataResult);
     } catch (error) {
@@ -270,6 +270,7 @@ const ExportOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setListConsignments(dataResult.data.productList);
+        setAddressWarehouse(dataResult.data.addressWarehouse);
         setTotalRecord(dataResult.data.totalRecord);
       }
       console.log('consignments List', dataResult);

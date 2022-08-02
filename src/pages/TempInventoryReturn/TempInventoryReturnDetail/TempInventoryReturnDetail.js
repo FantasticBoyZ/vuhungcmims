@@ -2,15 +2,9 @@ import AlertPopup from '@/components/Common/AlertPopup';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
 import AuthService from '@/services/authService';
-import importOrderService from '@/services/importOrderService';
-import {
-  cancelImportOrder,
-  confirmImportOrder,
-  getImportOrderById,
-} from '@/slices/ImportOrderSlice';
-import { getProductByImportOrderId } from '@/slices/ProductSlice';
+import { cancelTempInventoryReturn, confirmTempInventoryReturn, getTempInventoryReturnById } from '@/slices/TempInventoryReturnSlice';
 import FormatDataUtils from '@/utils/formatData';
-import { Close, Done, Edit, KeyboardReturn } from '@mui/icons-material';
+import { Close, Done, Edit } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -28,8 +22,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import ConsignmentsTable from './ConsignmentsTable';
-import './style.css';
+import TempReturnTable from './TempReturnTable';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -52,10 +45,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ImportOrderDetail = () => {
+const TempInventoryReturnDetail = () => {
   const classes = useStyles();
-  const { importOrderId } = useParams();
-  const [importOrder, setImportOrder] = useState();
+  const { tempInventoryReturnId } = useParams();
+  const [tempInventoryReturn, setTempInventoryReturn] = useState();
   const [listConsignments, setListConsignments] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [title, setTitle] = useState('');
@@ -106,7 +99,7 @@ const ImportOrderDetail = () => {
   };
 
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => ({ ...state.importOrders }));
+  const { loading } = useSelector((state) => ({ ...state.tempInventoryReturn }));
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -136,18 +129,18 @@ const ImportOrderDetail = () => {
   };
 
   const handleOnClickConfirm = () => {
-    setTitle('Bạn có chắc chắn muốn xác nhận rằng nhập kho thành công?');
+    setTitle('Bạn có chắc chắn muốn xác nhận trả hàng không?');
     setMessage('Hãy kiểm tra kỹ hàng hóa trước khi xác nhận.');
     setIsConfirm(true);
     setOpenPopup(true);
   };
 
   const handleOnClickEdit = () => {
-    navigate(`/import/edit/${importOrderId}`);
+    navigate(`/term-inventory/return/edit/${tempInventoryReturnId}`);
   };
 
   const handleOnClickCancel = () => {
-    setTitle('Bạn có chắc chắn muốn hủy phiếu nhập này không?');
+    setTitle('Bạn có chắc chắn muốn hủy phiếu lưu kho này không?');
     setMessage('');
     setIsConfirm(false);
     setOpenPopup(true);
@@ -157,38 +150,36 @@ const ImportOrderDetail = () => {
     if (isConfirm) {
       console.log('Xác nhận');
       try {
-        const confirmUserId = AuthService.getCurrentUser().id;
-        const params = { importOrderId, confirmUserId };
-        const actionResult = await dispatch(confirmImportOrder(params));
+        const userConfirmedId = AuthService.getCurrentUser().id;
+        const params = { tempInventoryReturnId, userConfirmedId };
+        const actionResult = await dispatch(confirmTempInventoryReturn(params));
         const result = unwrapResult(actionResult);
         if (!!result) {
           if (!!result.message) {
             toast.success(result.message);
           } else {
-            toast.success('Xác nhận nhập kho thành công!');
+            toast.success('Xác nhận trả hàng thành công!');
           }
-          fetchImportOrderDetail();
-          fetchProductListByImportOrderId();
+          fetchTempInventoryReturnDetail();
           setOpenPopup(false);
         }
       } catch (error) {
-        console.log('Failed to confirm importOder: ', error);
+        console.log('Failed to confirm tempInventoryReturn: ', error);
       }
     } else {
       console.log('Huỷ');
       try {
-        const confirmUserId = AuthService.getCurrentUser().id;
-        const params = { importOrderId, confirmUserId };
-        const actionResult = await dispatch(cancelImportOrder(params));
+        const userDeleteId = AuthService.getCurrentUser().id;
+        const params = { tempInventoryReturnId, userDeleteId };
+        const actionResult = await dispatch(cancelTempInventoryReturn(params));
         const result = unwrapResult(actionResult);
         if (!!result) {
           if (!!result.message) {
             toast.success(result.message);
           } else {
-            toast.success('Huỷ nhập kho thành công!');
+            toast.success('Huỷ lưu kho thành công!');
           }
-          fetchImportOrderDetail();
-          fetchProductListByImportOrderId();
+          fetchTempInventoryReturnDetail();
           setOpenPopup(false);
         }
       } catch (error) {
@@ -197,45 +188,27 @@ const ImportOrderDetail = () => {
     }
   };
 
-  const fetchImportOrderDetail = async () => {
+  const fetchTempInventoryReturnDetail = async () => {
     try {
       // const params = {
-      //   orderId: importOrderId,
+      //   orderId: tempInventoryReturnId,
       // };
-      const actionResult = await dispatch(getImportOrderById(importOrderId));
+      const actionResult = await dispatch(
+        getTempInventoryReturnById(tempInventoryReturnId),
+      );
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
-        setImportOrder(dataResult.data.inforDetail);
+        setTempInventoryReturn(dataResult.data.returnToManufacturerDetail);
+        setListConsignments(dataResult.data.returnToManufacturerDetail.listReturnToManufacturerDetail)
       }
-      console.log('Import Order Detail', dataResult);
+      console.log('tempInventory Detail', dataResult);
     } catch (error) {
-      console.log('Failed to fetch importOrder detail: ', error);
-    }
-  };
-
-  const fetchProductListByImportOrderId = async () => {
-    try {
-      const params = {
-        pageIndex: page,
-        pageSize: rowsPerPage,
-        orderId: importOrderId,
-      };
-      const actionResult = await dispatch(getProductByImportOrderId(params));
-      const dataResult = unwrapResult(actionResult);
-      if (dataResult.data) {
-        setListConsignments(dataResult.data.listProduct);
-        setTotalRecord(dataResult.data.totalRecord);
-        console.log('totalRecord', dataResult.data.totalRecord);
-      }
-      console.log('Product List', dataResult);
-    } catch (error) {
-      console.log('Failed to fetch product list by importOder: ', error);
+      console.log('Failed to fetch tempInventory detail: ', error);
     }
   };
 
   useEffect(() => {
-    fetchImportOrderDetail();
-    fetchProductListByImportOrderId();
+    fetchTempInventoryReturnDetail();
   }, [page, rowsPerPage]);
 
   return (
@@ -244,7 +217,7 @@ const ImportOrderDetail = () => {
         <ProgressCircleLoading />
       ) : (
         <>
-          {importOrder && (
+          {tempInventoryReturn && (
             <Grid
               container
               spacing={2}
@@ -261,13 +234,14 @@ const ImportOrderDetail = () => {
                   >
                     <Box className={classes.billReferenceContainer}>
                       <Typography variant="span">
-                        <strong>Phiếu nhập kho số:</strong> {'NHAP' + importOrderId}
+                        <strong>Phiếu lưu kho số:</strong>{' '}
+                        {'LUUKHO' + tempInventoryReturnId}
                       </Typography>{' '}
                       <span>
-                        {FormatDataUtils.getStatusLabel(importOrder.statusName)}
+                        {FormatDataUtils.getStatusLabel(tempInventoryReturn.statusName)}
                       </span>
                     </Box>
-                    {importOrder.statusName === 'pending' && (
+                    {tempInventoryReturn.statusName === 'pending' && (
                       <Stack
                         direction="row"
                         justifyContent="flex-end"
@@ -282,7 +256,7 @@ const ImportOrderDetail = () => {
                             color="success"
                             onClick={() => handleOnClickConfirm()}
                           >
-                            Xác nhận nhập kho
+                            Xác nhận trả hàng
                           </Button>
                         )}
                         {(currentUserRole === 'ROLE_OWNER' ||
@@ -302,11 +276,11 @@ const ImportOrderDetail = () => {
                           color="error"
                           onClick={() => handleOnClickCancel()}
                         >
-                          Huỷ phiếu nhập kho
+                          Huỷ phiếu trả hàng
                         </Button>
                       </Stack>
                     )}
-                    {/* {importOrder.statusName === 'completed' && (
+                    {/* {tempInventoryReturn.statusName === 'completed' && (
                       <Stack
                         direction="row"
                         justifyContent="flex-end"
@@ -339,24 +313,48 @@ const ImportOrderDetail = () => {
                   >
                     <Card>
                       <CardContent>
-                        <Typography variant="h6">Thông tin nhà cung cấp</Typography>
-                        <Box className="manufacturer-info">
-                          <Link
-                            href={`/manufacturer/detail/${importOrder.manufactorId}`}
-                            underline="none"
+                        <Typography variant="h6">Thông tin trả hàng</Typography>
+                        <Stack py={1}>
+                          <Stack
+                            direction="row"
+                            spacing={2}
                           >
-                            {importOrder.manufactorName}
-                          </Link>
-                        </Box>
-                        <br />
+                            <Stack flex={2}>
+                              <Typography>Nhà cung cấp:</Typography>
+                            </Stack>
+                            <Stack flex={8}>
+                              <Link
+                                href={`/manufacturer/detail/${tempInventoryReturn.manufacturerId}`}
+                                underline="none"
+                              >
+                                {tempInventoryReturn.manufacturerName}
+                              </Link>
+                            </Stack>
+                          </Stack>
+                          <Stack
+                            direction="row"
+                            spacing={2}
+                          >
+                            <Stack flex={2}>
+                              <Typography>Ngày dự kiến trả:</Typography>
+                            </Stack>
+                            <Stack flex={8}>
+                              <Typography>{FormatDataUtils.formatDate(tempInventoryReturn.expectedReturnDate)}</Typography>
+                            </Stack>
+                          </Stack>
+                        </Stack>
+                      
                         <Divider />
-                        <br />
+                        
+                        <Stack py={1}>
                         <Typography variant="h6">Thông tin lưu kho</Typography>
-                        <Typography>Vị trí: {importOrder.wareHouseName}</Typography>
                         <Typography>
-                          Địa chỉ: {importOrder.wardName} - {importOrder.districtName} -{' '}
-                          {importOrder.provinceName}
+                          Vị trí: {tempInventoryReturn.wareHouseName}
                         </Typography>
+                        <Typography>
+                          Địa chỉ: {tempInventoryReturn.wareHouseAddress}
+                        </Typography>
+                        </Stack>
                       </CardContent>
                     </Card>
                   </Grid>
@@ -367,7 +365,7 @@ const ImportOrderDetail = () => {
                     <Card className={classes.cardTable}>
                       {!!listConsignments && listConsignments.length > 0 ? (
                         <Box>
-                          <ConsignmentsTable listConsignments={listConsignments} />
+                          <TempReturnTable listConsignments={listConsignments} />
                           {totalRecord > 10 && (
                             <CustomTablePagination
                               page={page}
@@ -403,29 +401,27 @@ const ImportOrderDetail = () => {
                         <Typography variant="h6">Thông tin xác nhận</Typography>
                         {/* <br /> */}
                         <Typography>
-                          Người tạo đơn: <i>{importOrder.createBy}</i>
+                          Người tạo đơn: <i>{tempInventoryReturn.userCreateName}</i>
                         </Typography>
                         <Typography>Ngày tạo đơn:</Typography>
                         <Typography>
-                          {FormatDataUtils.formatDateTime(importOrder.createDate)}
+                          {FormatDataUtils.formatDateTime(tempInventoryReturn.createDate)}
                         </Typography>
 
-                        {importOrder.confirmDate && (
+                        {tempInventoryReturn.confirmedDate && (
                           <Box>
                             <br />
                             <Typography>
-                              Người xác nhận: <i>{importOrder.confirmBy}</i>
+                              Người xác nhận: <i>{tempInventoryReturn.userConfirmedName}</i>
                             </Typography>
                             <Typography>Ngày xác nhận:</Typography>
                             <Typography>
-                              {FormatDataUtils.formatDateTime(importOrder.confirmDate)}
+                              {FormatDataUtils.formatDateTime(
+                                tempInventoryReturn.confirmedDate,
+                              )}
                             </Typography>
                           </Box>
                         )}
-                        <br />
-                        <Typography>
-                          Tham chiếu: <i>{importOrder.billRefernce}</i>
-                        </Typography>
                       </CardContent>
                     </Card>
                   </Grid>
@@ -434,10 +430,9 @@ const ImportOrderDetail = () => {
                     item
                   >
                     <Card>
-  
                       <CardContent className={classes.orderNote}>
                         <Typography variant="h6">Ghi chú</Typography>
-                        <Typography>{importOrder.description}</Typography>
+                        <Typography>{tempInventoryReturn.description}</Typography>
                       </CardContent>
                     </Card>
                   </Grid>
@@ -447,7 +442,6 @@ const ImportOrderDetail = () => {
                   >
                     <Card>
                       <CardContent className={classes.totalAmount}>
-
                         <Typography variant="h6">Tổng giá trị đơn hàng</Typography>
                         <br />
                         <Typography align="right">
@@ -474,7 +468,6 @@ const ImportOrderDetail = () => {
                 </Box>
               </AlertPopup>
             </Grid>
-            
           )}
         </>
       )}
@@ -482,4 +475,4 @@ const ImportOrderDetail = () => {
   );
 };
 
-export default ImportOrderDetail;
+export default TempInventoryReturnDetail;

@@ -350,7 +350,7 @@ const Profile = () => {
                 item
               >
                 <Card>
-                  <CardHeader title="Thông tin nhân viên" />
+                  <CardHeader title="Thông tin cá nhân" />
                   <CardContent>
                     <Stack
                       padding={2}

@@ -19,6 +19,9 @@ const useStyles = makeStyles({
     color: '#000000',
     fontWeight: '400 !important',
   },
+  cardTable: {
+    minHeight: '40vh',
+  },
 });
 
 const ProductDetail = () => {
@@ -104,8 +107,8 @@ const ProductDetail = () => {
             xs={12}
           >
             {/* <Typography variant='h5'>Danh sách lô hàng </Typography> */}
-            {!!totalRecord && totalRecord > 0 ? (
-              <Card>
+            <Card className={classes.cardTable}>
+              {!!totalRecord && totalRecord > 0 ? (
                 <CardContent>
                   <Typography variant="h6">Thông tin kho hàng</Typography>
                   <CardContent>
@@ -210,7 +213,10 @@ const ProductDetail = () => {
                           >
                             <Typography className={classes.contentInfo}>
                               {selectedUnitMeasure === product.wrapUnitMeasure
-                                ? FormatDataUtils.getRoundNumber(product.quantity/product.numberOfWrapUnitMeasure, 1)
+                                ? FormatDataUtils.getRoundNumber(
+                                    product.quantity / product.numberOfWrapUnitMeasure,
+                                    1,
+                                  )
                                 : product.quantity}
                             </Typography>
                           </Grid>
@@ -219,7 +225,11 @@ const ProductDetail = () => {
                     </Grid>
                   </CardContent>
 
-                  <SubProductTable selectedUnitMeasure={selectedUnitMeasure} product={product} subProductList={subProductList} />
+                  <SubProductTable
+                    selectedUnitMeasure={selectedUnitMeasure}
+                    product={product}
+                    subProductList={subProductList}
+                  />
                   {/* <CustomTablePagination
                   page={page}
                   pages={pages}
@@ -229,10 +239,10 @@ const ProductDetail = () => {
                   handleChangeRowsPerPage={handleChangeRowsPerPage}
                 /> */}
                 </CardContent>
-              </Card>
-            ) : (
-              <Card> Sản phẩm chưa có lô hàng nào</Card>
-            )}
+              ) : (
+                <CardContent> Sản phẩm chưa có lô hàng nào</CardContent>
+              )}
+            </Card>
           </Grid>
         </Grid>
         // <Container maxWidth="lg">

@@ -190,7 +190,11 @@ const StaffDetail = () => {
 
   const handleResetPasswordStaff = () => {
     console.log('reset mật khẩu nhân viên');
-    setTitle('Thao tác này sẽ cài lại mật khẩu và gửi mật khẩu cài lại về email “'+ staff.email +'”.');
+    setTitle(
+      'Thao tác này sẽ cài lại mật khẩu và gửi mật khẩu cài lại về email “' +
+        staff.email +
+        '”.',
+    );
     setConfirmTask('resetPassword');
     setMessage('');
     setErrorMessage(null);
@@ -297,7 +301,9 @@ const StaffDetail = () => {
       console.log('dataResult', dataResult);
       if (dataResult) {
         setStaff(dataResult.data);
-        fetchImage(API_URL_IMAGE + '/' + dataResult.data.imageUrl);
+        if (dataResult.data.imageUrl) {
+          fetchImage(API_URL_IMAGE + '/' + dataResult.data.imageUrl);
+        }
       }
     } catch (error) {
       console.log('Failed to fetch staff detail: ', error);
@@ -524,6 +530,7 @@ const StaffDetail = () => {
                         <Button
                           variant="contained"
                           startIcon={<MarkEmailUnread />}
+                          disabled={!Boolean(staff.active)}
                           onClick={() => handleResetPasswordStaff()}
                         >
                           Cài lại mật khẩu
@@ -542,6 +549,7 @@ const StaffDetail = () => {
                           variant="contained"
                           startIcon={<ChangeCircleOutlined />}
                           color="warning"
+                          disabled={!Boolean(staff.active)}
                           onClick={() => handleChangeRole()}
                         >
                           Đổi chức vụ

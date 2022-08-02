@@ -1,7 +1,7 @@
 import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
-import { getCategoryList, saveCategory } from '@/slices/CategorySlice';
+import { getCategoryList, saveCategory, saveSubCategory } from '@/slices/CategorySlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -84,30 +84,14 @@ const CategoryForm = (props) => {
     setSelectedCategory(categoryList.find((item) => item.value == category?.categoryId));
   };
 
-  // const searchCategory = async (keyword) => {
-  //   try {
-  //     const params = {
-  //       // pageIndex: page + 1,
-  //       // pageSize: rowsPerPage,
-  //       categoryName: keyword,
-  //     };
-  //     const actionResult = await dispatch(getCategoryList(params));
-  //     const dataResult = unwrapResult(actionResult);
-  //     console.log('dataResult', dataResult);
-  //     if (dataResult.data) {
-  //       setCategoryList(dataResult.data.category);
-  //     }
-  //   } catch (error) {
-  //     console.log('Failed to fetch category list: ', error);
-  //   }
-  // };
 
   const saveCategoryDetail = async (category) => {
     try {
       let actionResult;
-      if(!!category.categoryId){
+      console.log(category)
+      if(category.categoryId){
         // TODO: call api create subCategory
-        // actionResult = await dispatch(saveSubCategory(category));
+        actionResult = await dispatch(saveSubCategory(category));
       }else{
         actionResult = await dispatch(saveCategory(category));
       }
@@ -144,8 +128,8 @@ const CategoryForm = (props) => {
       id: category?.id,
       name: values.name,
       description: values.description,
+      categoryId: values.categoryId
     };
-    console.log(values);
     saveCategoryDetail(newCategory);
     closePopup();
   };
@@ -322,7 +306,7 @@ const CategoryForm = (props) => {
             Thoát
           </Button> */}
           </Stack>
-          <pre>{JSON.stringify(values, null, 2)}</pre>
+          {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
         </Form>
       )}
     </Formik>

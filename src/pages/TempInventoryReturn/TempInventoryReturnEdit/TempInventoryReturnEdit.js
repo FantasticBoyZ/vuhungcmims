@@ -16,6 +16,7 @@ import {
   Divider,
   FormHelperText,
   Grid,
+  Link,
   Stack,
   Table,
   TableBody,
@@ -41,6 +42,10 @@ import { FieldArray, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import { getWarehouseList } from '@/slices/WarehouseSlice';
+import {
+  getTempInventoryReturnById,
+  updateTempInventoryReturn,
+} from '@/slices/TempInventoryReturnSlice';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -91,10 +96,10 @@ const warehouseData = [
   },
 ];
 
-const UpdateImportOrderDetail = () => {
+const TempInventoryReturnEdit = () => {
   const classes = useStyles();
-  const { importOrderId } = useParams();
-  const [importOrder, setImportOrder] = useState();
+  const { tempInventoryReturnId } = useParams();
+  const [tempInventoryReturn, setTempInventoryReturn] = useState();
   const [listConsignments, setListConsignments] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [title, setTitle] = useState('');
@@ -103,7 +108,7 @@ const UpdateImportOrderDetail = () => {
   const [errorMessage, setErrorMessage] = useState();
   const [createdDate] = useState(new Date().getTime());
   const [confirmedDate] = useState(new Date().getTime());
-  const [selectedWarehouse, setSelectedWarehouse] = useState()
+  const [selectedWarehouse, setSelectedWarehouse] = useState();
   const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
@@ -113,14 +118,15 @@ const UpdateImportOrderDetail = () => {
   const today = new Date();
   const arrayHelpersRef = useRef(null);
   const valueFormik = useRef();
+  const [expectedReturnDate, setExpectedReturnDate] = useState();
 
   const FORM_VALIDATION = Yup.object().shape({
     // manufactorId: Yup.string().required('Bạn chưa chọn nhà cung cấp'),
-    wareHouseId: Yup.number().required('Bạn chưa chọn kho để nhập hàng'),
+    warehouseId: Yup.number().required('Bạn chưa chọn kho để trả hàng'),
   });
 
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => ({ ...state.importOrders }));
+  const { loading } = useSelector((state) => ({ ...state.tempInventoryReturn }));
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -132,7 +138,7 @@ const UpdateImportOrderDetail = () => {
   };
 
   const handleOnClickBack = () => {
-    navigate('/import');
+    navigate('/term-inventory/return/list');
   };
 
   const calculateTotalAmount = () => {
@@ -181,13 +187,13 @@ const UpdateImportOrderDetail = () => {
             setOpenPopup(true);
             return;
           }
-    
+
           if (!Number.isInteger(consignment.quantity)) {
             setErrorMessage('Vui lòng nhập số lượng sản phẩm là số nguyên');
             setOpenPopup(true);
             return;
           }
-    
+
           if (!Number.isInteger(consignment.unitPrice)) {
             setErrorMessage('Vui lòng nhập đơn giá của sản phẩm là số nguyên');
             setOpenPopup(true);
@@ -195,110 +201,98 @@ const UpdateImportOrderDetail = () => {
           }
           if (consignment.quantity > 0) {
             consignmentRequests.push({
-              consignmentId: consignment.consignmentId,
-              productId: consignment.productId,
-              expirationDate: consignment.expirationDate
-                ? new Date(
-                    consignment.expirationDate + new Date().getTimezoneOffset() / 60,
-                  ).toJSON()
-                : null,
-              importDate: new Date(consignment.importDate).toJSON(),
-              unitPrice: Math.round(
-                consignment.selectedUnitMeasure === consignment.wrapUnitMeasure
-                  ? consignment.unitPrice / consignment.numberOfWrapUnitMeasure
-                  : consignment.unitPrice,
-              ),
-              quantity: Math.round(
-                consignment.selectedUnitMeasure === consignment.wrapUnitMeasure
-                  ? consignment.quantity * consignment.numberOfWrapUnitMeasure
-                  : consignment.quantity,
-              ),
+              id: consignment.id,
+              productName: consignment.productName,
+              unitPrice: consignment.selectedUnitMeasure
+                ? Math.round(
+                    consignment.selectedUnitMeasure === consignment.wrapUnitMeasure
+                      ? consignment.unitPrice / consignment.numberOfWrapUnitMeasure
+                      : consignment.unitPrice,
+                  )
+                : consignment.unitPrice,
+              quantity: consignment.selectedUnitMeasure
+                ? Math.round(
+                    consignment.selectedUnitMeasure === consignment.wrapUnitMeasure
+                      ? consignment.quantity * consignment.numberOfWrapUnitMeasure
+                      : consignment.quantity,
+                  )
+                : consignment.quantity,
             });
           }
         }
       }
       if (consignmentRequests.length > 0) {
         console.log('Xác nhận');
-        const editedImportOrder = {
-          orderId: importOrderId,
-          billReferenceNumber: values.billRefernce,
-          createDate: values.createDate,
+        const expectedReturnDate = new Date(values.expectedReturnDate);
+        const editedTempInventoryReturn = {
+          expectedReturnDate: new Date(
+            expectedReturnDate.getTime() -
+              expectedReturnDate.getTimezoneOffset() * 60 * 1000,
+          ).toJSON(),
           description: values.description,
-          userId: values.userId,
-          manufactorId: values.manufactorId,
-          wareHouseId: values.wareHouseId,
-          consignmentRequests: consignmentRequests,
+          warehouseId: values.warehouseId,
+          listReturnToManufacturerDetailRequest: consignmentRequests,
         };
-        console.log(editedImportOrder);
+        console.log(editedTempInventoryReturn);
         try {
-          const actionResult = await dispatch(updateImportOrder(editedImportOrder));
+          const params = {
+            tempInventoryReturnId,
+            tempInventoryReturn: editedTempInventoryReturn,
+          };
+          const actionResult = await dispatch(updateTempInventoryReturn(params));
           const result = unwrapResult(actionResult);
           if (!!result) {
             if (!!result.data.status && result.data.status === 200) {
               toast.success(result.data.message);
             } else {
-              toast.success('Sửa đơn nhập kho thành công!');
+              toast.success('Sửa đơn lưu kho thành công!');
             }
-            // fetchImportOrderDetail();
-            // fetchProductListByImportOrderId();
+            // fetchTempInventoryReturnDetail();
             setOpenPopup(false);
-            navigate(`/import/detail/${importOrderId}`);
+            navigate(`/term-inventory/return/detail/${tempInventoryReturnId}`);
           }
         } catch (error) {
-          console.log('Failed to update importOder: ', error);
+          console.log('Failed to update tempInventoryReturn: ', error);
           toast.error(error);
         }
       } else {
         // TODO: in ra lỗi vì không có sản phẩm hợp lệ
-        console.log('Vui lòng nhập số lượng sản phẩm trước khi lưu đơn nhập kho');
-        setErrorMessage('Vui lòng nhập số lượng sản phẩm trước khi lưu đơn nhập kho');
+        console.log('Vui lòng nhập số lượng sản phẩm trước khi lưu đơn lưu kho');
+        setErrorMessage('Vui lòng nhập số lượng sản phẩm trước khi lưu đơn lưu kho');
         setOpenPopup(true);
         return;
       }
     } else {
       console.log('Huỷ');
-      navigate(`/import/detail/${importOrderId}`);
+      navigate(`/term-inventory/return/detail/${tempInventoryReturnId}`);
     }
   };
 
-  const fetchImportOrderDetail = async () => {
+  const fetchTempInventoryReturnDetail = async () => {
     try {
       // const params = {
-      //   orderId: importOrderId,
+      //   orderId: tempInventoryReturnId,
       // };
-      const actionResult = await dispatch(getImportOrderById(importOrderId));
+      const actionResult = await dispatch(
+        getTempInventoryReturnById(tempInventoryReturnId),
+      );
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
-        setImportOrder(dataResult.data.inforDetail);
-        setSelectedWarehouse(dataResult.data.inforDetail.wareHouseId)
+        setTempInventoryReturn({
+          ...dataResult.data.returnToManufacturerDetail,
+          warehouseId: dataResult.data.returnToManufacturerDetail.wareHouseId,
+        });
+        setExpectedReturnDate(
+          new Date(dataResult.data.returnToManufacturerDetail.expectedReturnDate),
+        );
+        setListConsignments(
+          dataResult.data.returnToManufacturerDetail.listReturnToManufacturerDetail,
+        );
+        setSelectedWarehouse(dataResult.data.returnToManufacturerDetail.wareHouseId);
       }
-      console.log('Import Order Detail', dataResult);
+      console.log('tempInventoryReturn Order Detail', dataResult);
     } catch (error) {
-      console.log('Failed to fetch importOrder detail: ', error);
-    }
-  };
-
-  const fetchProductListByImportOrderId = async () => {
-    try {
-      const params = {
-        pageIndex: page,
-        pageSize: rowsPerPage,
-        orderId: importOrderId,
-      };
-      const actionResult = await dispatch(getProductByImportOrderId(params));
-      const dataResult = unwrapResult(actionResult);
-      if (dataResult.data) {
-        setListConsignments(dataResult.data.listProduct);
-        // dataResult.data.listProduct?.forEach((consignment) => {
-        //   arrayHelpersRef.current?.push(consignment);
-        // });
-
-        // setTotalRecord(dataResult.data.totalRecord);
-        // console.log('totalRecord', dataResult.data.totalRecord);
-      }
-      console.log('Product List', dataResult);
-    } catch (error) {
-      console.log('Failed to fetch product list by importOder: ', error);
+      console.log('Failed to fetch tempInventoryReturn detail: ', error);
     }
   };
 
@@ -317,8 +311,7 @@ const UpdateImportOrderDetail = () => {
 
   useEffect(() => {
     getAllWarehouse();
-    fetchImportOrderDetail();
-    fetchProductListByImportOrderId();
+    fetchTempInventoryReturnDetail();
   }, [page, rowsPerPage]);
 
   return (
@@ -327,10 +320,13 @@ const UpdateImportOrderDetail = () => {
         <ProgressCircleLoading />
       ) : (
         <>
-          {importOrder && listConsignments && (
+          {tempInventoryReturn && listConsignments && (
             <Formik
               enableReinitialize={true}
-              initialValues={{ ...importOrder, consignments: [...listConsignments] }}
+              initialValues={{
+                ...tempInventoryReturn,
+                consignments: [...listConsignments],
+              }}
               validationSchema={FORM_VALIDATION}
               onSubmit={(values) => handleConfirm(values)}
             >
@@ -353,13 +349,15 @@ const UpdateImportOrderDetail = () => {
                           <Box className={classes.billReferenceContainer}>
                             <Typography variant="span">
                               <strong>Phiếu nhập kho số:</strong>{' '}
-                              {importOrder.billRefernce}
+                              {tempInventoryReturn.billRefernce}
                             </Typography>{' '}
                             <span>
-                              {FormatDataUtils.getStatusLabel(importOrder.statusName)}
+                              {FormatDataUtils.getStatusLabel(
+                                tempInventoryReturn.statusName,
+                              )}
                             </span>
                           </Box>
-                          {importOrder.statusName === 'pending' && (
+                          {tempInventoryReturn.statusName === 'pending' && (
                             <Stack
                               direction="row"
                               justifyContent="flex-end"
@@ -401,17 +399,68 @@ const UpdateImportOrderDetail = () => {
                         >
                           <Card>
                             <CardContent>
-                              <Typography variant="h6">Thông tin nhà cung cấp</Typography>
-                              <Box className="manufacturer-info">
-                                {importOrder.manufactorName}
-                              </Box>
-                              <br />
+                              <Typography variant="h6">Thông tin trả hàng</Typography>
+                              <Stack py={1}>
+                                <Stack
+                                  direction="row"
+                                  spacing={2}
+                                >
+                                  <Stack flex={2}>
+                                    <Typography>Nhà cung cấp:</Typography>
+                                  </Stack>
+                                  <Stack flex={8}>
+                                    <Link
+                                      href={`/manufacturer/detail/${tempInventoryReturn.manufacturerId}`}
+                                      underline="none"
+                                    >
+                                      {tempInventoryReturn.manufacturerName}
+                                    </Link>
+                                  </Stack>
+                                </Stack>
+                                <Stack
+                                  direction="row"
+                                  spacing={2}
+                                >
+                                  <Stack flex={2}>
+                                    <Typography>Ngày dự kiến trả:</Typography>
+                                  </Stack>
+                                  <Stack flex={8}>
+                                    <Box>
+                                      <LocalizationProvider
+                                        // locale={vi}
+                                        dateAdapter={AdapterDateFns}
+                                      >
+                                        <DatePicker
+                                          value={expectedReturnDate}
+                                          onChange={(value) => {
+                                            // fix bug date
+                                            setFieldValue(`expectedReturnDate`, value);
+                                            setExpectedReturnDate(value);
+                                          }}
+                                          inputFormat="dd/MM/yyyy"
+                                          minDate={today}
+                                          renderInput={(params) => (
+                                            <TextField
+                                              variant="standard"
+                                              {...params}
+                                              helperText={null}
+                                            />
+                                          )}
+                                        />
+                                      </LocalizationProvider>
+                                    </Box>
+                                  </Stack>
+                                </Stack>
+                              </Stack>
+
                               <Divider />
-                              <br />
-                              <Typography variant="h6">Thông tin lưu kho</Typography>
-                              <br />
-                              {!!warehouseData && (
-                                <Box className="selectbox-warehouse">
+
+                              <Stack py={1}>
+                                <Typography variant="h6">Thông tin lưu kho</Typography>
+                                <Stack
+                                  pt={2}
+                                  className={classes.comboboxWarehouse}
+                                >
                                   <Select
                                     classNamePrefix="select"
                                     placeholder="Chọn kho hàng..."
@@ -433,18 +482,17 @@ const UpdateImportOrderDetail = () => {
                                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                                     }}
                                     onChange={(e) => {
-                                      setFieldValue('wareHouseId', e?.value);
-                                      setSelectedWarehouse(e?.value)
+                                      setFieldValue('warehouseId', e?.value);
                                     }}
                                   />
                                   <FormHelperText
                                     error={true}
                                     className="error-text-helper"
                                   >
-                                    {errors.wareHouseId}
+                                    {errors.warehouseId}
                                   </FormHelperText>
-                                </Box>
-                              )}
+                                </Stack>
+                              </Stack>
                             </CardContent>
                           </Card>
                         </Grid>
@@ -460,9 +508,7 @@ const UpdateImportOrderDetail = () => {
                                     <TableHead>
                                       <TableRow>
                                         <TableCell>STT</TableCell>
-                                        <TableCell>Mã sản phẩm</TableCell>
                                         <TableCell>Tên sản phẩm</TableCell>
-                                        <TableCell>Hạn lưu kho</TableCell>
                                         <TableCell>Đơn vị</TableCell>
                                         <TableCell>Số lượng</TableCell>
                                         <TableCell>Đơn giá</TableCell>
@@ -487,40 +533,9 @@ const UpdateImportOrderDetail = () => {
                                                   >
                                                     <TableCell>{index + 1}</TableCell>
                                                     <TableCell>
-                                                      {consignment?.productCode}
-                                                    </TableCell>
-                                                    <TableCell>
                                                       {consignment?.productName}
                                                     </TableCell>
-                                                    <TableCell>
-                                                      <LocalizationProvider
-                                                        className="date-picker"
-                                                        locale={vi}
-                                                        dateAdapter={AdapterDateFns}
-                                                      >
-                                                        <DatePicker
-                                                          onChange={(value) => {
-                                                            setFieldValue(
-                                                              `consignments[${index}].expirationDate`,
-                                                              value,
-                                                              false,
-                                                            );
-                                                          }}
-                                                          minDate={today}
-                                                          value={
-                                                            values.consignments[index]
-                                                              .expirationDate
-                                                          }
-                                                          renderInput={(params) => (
-                                                            <TextField
-                                                              variant="standard"
-                                                              {...params}
-                                                              helperText={null}
-                                                            />
-                                                          )}
-                                                        />
-                                                      </LocalizationProvider>
-                                                    </TableCell>
+
                                                     <TableCell>
                                                       {consignment?.wrapUnitMeasure ==
                                                       null ? (
@@ -742,22 +757,24 @@ const UpdateImportOrderDetail = () => {
                               <Typography variant="h6">Thông tin xác nhận</Typography>
                               <br />
                               <Typography>
-                                Người tạo đơn: <i>{importOrder.createBy}</i>
+                                Người tạo đơn: <i>{tempInventoryReturn.createBy}</i>
                               </Typography>
                               <Typography>Ngày tạo đơn:</Typography>
                               <Typography>
-                                {FormatDataUtils.formatDateTime(importOrder.createDate)}
+                                {FormatDataUtils.formatDateTime(
+                                  tempInventoryReturn.createDate,
+                                )}
                               </Typography>
                               <br />
-                              {importOrder.confirmDate && (
+                              {tempInventoryReturn.confirmDate && (
                                 <Box>
                                   <Typography>
-                                    Người xác nhận: <i>{importOrder.confirmBy}</i>
+                                    Người xác nhận: <i>{tempInventoryReturn.confirmBy}</i>
                                   </Typography>
                                   <Typography>Ngày xác nhận:</Typography>
                                   <Typography>
                                     {FormatDataUtils.formatDateTime(
-                                      importOrder.confirmDate,
+                                      tempInventoryReturn.confirmDate,
                                     )}
                                   </Typography>
                                 </Box>
@@ -830,4 +847,4 @@ const UpdateImportOrderDetail = () => {
   );
 };
 
-export default UpdateImportOrderDetail;
+export default TempInventoryReturnEdit;

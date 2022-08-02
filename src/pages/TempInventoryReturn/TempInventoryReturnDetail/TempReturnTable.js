@@ -24,17 +24,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ConsignmentsTable = ({ listConsignments }) => {
+const TempReturnTable = ({ listConsignments }) => {
   const classes = useStyles();
   const [selectedUnitMeasureList, setSelectedUnitMeasureList] = useState([]);
-  const dataTest = {
-    id: 1,
-    productCode: 'GACH23',
-    productName: 'Gạch men 60x60',
-    unitMeasure: 'Viên',
-    quantity: 54,
-    unitPrice: 100000,
-  };
+
   const formatCurrency = (value) =>
     value.toLocaleString('it-IT', { style: 'currency', currency: 'VND' });
   return (
@@ -43,13 +36,11 @@ const ConsignmentsTable = ({ listConsignments }) => {
         <TableHead>
           <TableRow>
             <TableCell>STT</TableCell>
-            <TableCell>Mã sản phẩm</TableCell>
             <TableCell>Tên sản phẩm</TableCell>
-            <TableCell>Hạn lưu kho</TableCell>
-            <TableCell>Đơn vị</TableCell>
-            <TableCell>Số lượng</TableCell>
-            <TableCell>Đơn giá</TableCell>
-            <TableCell>Thành tiền</TableCell>
+            <TableCell align='center'>Đơn vị</TableCell>
+            <TableCell align='center'>Số lượng</TableCell>
+            <TableCell align='center'>Đơn giá</TableCell>
+            <TableCell align='center'>Thành tiền</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -64,17 +55,12 @@ const ConsignmentsTable = ({ listConsignments }) => {
               >
                 {/* TODO: Sửa phần index khi phân trang */}
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{consignment?.productCode}</TableCell>
                 <TableCell>{consignment?.productName}</TableCell>
-                <TableCell>
-                  {consignment?.expirationDate
-                    ? FormatDataUtils.formatDate(consignment?.expirationDate)
-                    : 'Không có'}
-                </TableCell>
                 <TableCell
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
+                  align='center'
                 >
                   {consignment.wrapUnitMeasure == null ? (
                     consignment.unitMeasure
@@ -139,22 +125,13 @@ const ConsignmentsTable = ({ listConsignments }) => {
                     />
                   )}
                 </TableCell>
-                <TableCell>
-                  {selectedUnitMeasureList[index] === consignment.wrapUnitMeasure
-                    ? FormatDataUtils.getRoundNumber(
-                        consignment?.quantity / consignment.numberOfWrapUnitMeasure,
-                        1,
-                      )
-                    : consignment?.quantity}
+                <TableCell align='center'>
+                  {consignment?.quantity}
                 </TableCell>
-                <TableCell>
-                  {selectedUnitMeasureList[index] === consignment.wrapUnitMeasure
-                    ? formatCurrency(
-                        consignment?.unitPrice * consignment.numberOfWrapUnitMeasure,
-                      )
-                    : formatCurrency(consignment?.unitPrice)}
+                <TableCell align='center'>
+                  {formatCurrency(consignment?.unitPrice)}
                 </TableCell>
-                <TableCell>
+                <TableCell align='center'>
                   {formatCurrency(consignment?.quantity * consignment?.unitPrice)}
                 </TableCell>
               </TableRow>
@@ -166,4 +143,4 @@ const ConsignmentsTable = ({ listConsignments }) => {
   );
 };
 
-export default ConsignmentsTable;
+export default TempReturnTable;

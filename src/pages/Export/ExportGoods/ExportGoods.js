@@ -38,6 +38,7 @@ import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const useStyles = makeStyles({
   cardInfo: { minHeight: '69vh' },
@@ -47,7 +48,7 @@ const useStyles = makeStyles({
   totalAmount: {
     marginBottom: '24px',
     display: 'flex',
-    justifyContent:'space-between'
+    justifyContent: 'space-between',
   },
   table: {
     textAlign: 'center',
@@ -194,7 +195,7 @@ const initialExportOrder = {
 };
 
 const ExportGoods = () => {
-  const [productList, setProductList] = useState();
+  const [productList, setProductList] = useState([]);
   const [consignmentList, setConsignmentList] = useState();
   const [openPopup, setOpenPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -305,6 +306,11 @@ const ExportGoods = () => {
         indexConsignment++
       ) {
         let consignment = consignments[indexConsignment];
+        if (!Number.isInteger(consignment.quantity)) {
+          setErrorMessage('Vui lòng nhập số lượng sản phẩm là số nguyên');
+          setOpenPopup(true);
+          return;
+        }
         if (consignment.quantity > consignment.quantityInstock) {
           setErrorMessage(
             'Bạn không thể nhập số lượng lớn hơn số lượng tồn kho của lô hàng',
@@ -587,7 +593,7 @@ const ExportGoods = () => {
                                                       )}
                                                     </TableCell>
                                                     <TableCell>
-                                                      {consignment?.expirationDate}
+                                                      {consignment?.expirationDate ? FormatDataUtils.formatDate(consignment?.expirationDate) : "Không có"}
                                                     </TableCell>
                                                     <TableCell align="center">
                                                       <TextfieldWrapper
@@ -684,15 +690,17 @@ const ExportGoods = () => {
                       </Typography>
                     </Box>
                     <Box className={classes.buttonCreate}>
-                      <ButtonWrapper
-                        type="button"
+                      <LoadingButton
+                        type="submit"
                         variant="contained"
                         size="large"
+                        loading={loading}
+                        loadingPosition='start'
                         startIcon={<Done />}
                         color="success"
                       >
                         Tạo phiếu xuất kho
-                      </ButtonWrapper>
+                      </LoadingButton>
                     </Box>
                   </CardContent>
                 </Card>

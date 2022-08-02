@@ -267,7 +267,7 @@ const Sidebar = () => {
         {
           primary: 'Tạo phiếu lưu kho',
           icon: '',
-          path: '/storage/create',
+          path: '/term-inventory/return/create',
           acceptRole: ['ROLE_OWNER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,
@@ -275,7 +275,7 @@ const Sidebar = () => {
         {
           primary: 'Danh sách lưu kho',
           icon: '',
-          path: '/storage/list',
+          path: '/term-inventory/return/list',
           acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
           children: [],
           hasParent: true,

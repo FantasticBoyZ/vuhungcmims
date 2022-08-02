@@ -36,6 +36,10 @@ import Profile from '@/pages/Profile/Profile';
 import ResetPassword from '@/pages/Profile/ResetPassword/ResetPassword';
 import UpdateProfile from '@/pages/Profile/UpdateProfile/UpdateProfile';
 import AccessDenied from '@/components/Layout/AccessDenied/AccessDenied';
+import TempInventoryReturnCreate from '@/pages/TempInventoryReturn/TempInventoryReturnCreate/TempInventoryReturnCreate';
+import TempInventoryReturnList from '@/pages/TempInventoryReturn/TempInventoryReturnList/TempInventoryReturnList';
+import TempInventoryReturnDetail from '@/pages/TempInventoryReturn/TempInventoryReturnDetail/TempInventoryReturnDetail';
+import TempInventoryReturnEdit from '@/pages/TempInventoryReturn/TempInventoryReturnEdit/TempInventoryReturnEdit';
 
 const publicRoutes = [
   { path: '/login', component: Login, layout: null },
@@ -100,13 +104,19 @@ const privateRoutes = [
   { path: 'staff/register', component: AddStaff , acceptRole: ["ROLE_OWNER"] },
   { path: 'staff/:staffId', component: StaffDetail , acceptRole: ["ROLE_OWNER"] },
 
-  //warehouse route
+  // warehouse route
   { path: '/wareHouse', component: WarehouseList , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
 
   // profile route
   { path: '/profile', component: Profile , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
   { path: '/reset-password', component: ResetPassword , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
   { path: '/profile/edit', component: UpdateProfile , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+
+  // tempInventoryReturn route
+  { path: '/term-inventory/return/create', component: TempInventoryReturnCreate , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/term-inventory/return/list', component: TempInventoryReturnList , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/term-inventory/return/detail/:tempInventoryReturnId', component: TempInventoryReturnDetail , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/term-inventory/return/edit/:tempInventoryReturnId', component: TempInventoryReturnEdit , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
 ];
 
 export { publicRoutes, privateRoutes };

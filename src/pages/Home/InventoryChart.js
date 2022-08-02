@@ -16,37 +16,37 @@ const data = [
   {
     name: '7-2022',
     totalAmount: 24,
-    amt: 2400,
+    // amt: 2400,
   },
   {
     name: '8-2022',
     totalAmount: 13.98,
-    amt: 2210,
+    // amt: 2210,
   },
   {
     name: '8-2022',
     totalAmount: 98,
-    amt: 2290,
+    // amt: 2290,
   },
   {
     name: '9-2022',
     totalAmount: 39,
-    amt: 2000,
+    // amt: 2000,
   },
   {
     name: '10-2022',
     totalAmount: 48,
-    amt: 2181,
+    // amt: 2181,
   },
   {
     name: '11-2022',
     totalAmount: 38,
-    amt: 2500,
+    // amt: 2500,
   },
   {
     name: '12-2022',
     totalAmount: 43,
-    amt: 2100,
+    // amt: 2100,
   },
 ];
 
