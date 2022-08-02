@@ -101,7 +101,15 @@ const getRoleLabel = (exportOrderStatus) => {
 
   const { text, color, fontSize, padding } = map[exportOrderStatus];
 
-  return <Label padding={padding} fontSize={fontSize} color={color}>{text}</Label>;
+  return (
+    <Label
+      padding={padding}
+      fontSize={fontSize}
+      color={color}
+    >
+      {text}
+    </Label>
+  );
 };
 
 const Header = () => {
@@ -112,6 +120,7 @@ const Header = () => {
   const [role, setRole] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+  const user = AuthService.getCurrentUser();
 
   const logOut = () => {
     AuthService.logout();
@@ -126,17 +135,20 @@ const Header = () => {
   };
 
   useEffect(() => {
+    if (user.imageUrl) {
+      fetchImage(API_URL_IMAGE + '/' + user.imageUrl);
+    }
+  }, []);
+
+  useEffect(() => {
     titles.forEach((item) => {
       if (location.pathname.includes(item.url)) {
         setTitle(item.title);
       }
     });
-    const user = AuthService.getCurrentUser();
+
     setFullname(user.fullName);
-    setRole(user.roles[0])
-    if (user.imageUrl) {
-      fetchImage(API_URL_IMAGE + '/' + user.imageUrl);
-    }
+    setRole(user.roles[0]);
   }, [location.pathname]);
   return (
     <AppBar
@@ -166,7 +178,7 @@ const Header = () => {
             <Notifications />
           </Badge> */}
           <UserBox onClick={(e) => setOpen(true)}>
-            <Stack alignItems='flex-end'>
+            <Stack alignItems="flex-end">
               <Typography variant="h5">{fullname}</Typography>
               {role && getRoleLabel(role)}
             </Stack>
