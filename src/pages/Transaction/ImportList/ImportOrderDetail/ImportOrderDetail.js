@@ -434,10 +434,7 @@ const ImportOrderDetail = () => {
                     item
                   >
                     <Card>
-                      {/* <CardHeader
-                  titleTypographyProps={{ variant: 'h6' }}
-                  title="Tổng giá trị đơn hàng"
-                /> */}
+  
                       <CardContent className={classes.orderNote}>
                         <Typography variant="h6">Ghi chú</Typography>
                         <Typography>{importOrder.description}</Typography>
@@ -450,10 +447,7 @@ const ImportOrderDetail = () => {
                   >
                     <Card>
                       <CardContent className={classes.totalAmount}>
-                        {/* <CardHeader
-                  titleTypographyProps={{ variant: 'h6' }}
-                  title="Tổng giá trị đơn hàng"
-                /> */}
+
                         <Typography variant="h6">Tổng giá trị đơn hàng</Typography>
                         <br />
                         <Typography align="right">
@@ -480,134 +474,7 @@ const ImportOrderDetail = () => {
                 </Box>
               </AlertPopup>
             </Grid>
-            // <Container maxWidth="xl">
-            //   <div className="title-container">
-            //     <div className="title-order">
-            //       <div className="button-back">
-            //         <Button
-            //           variant="text"
-            //           startIcon={<ArrowBackIosNewIcon />}
-            //           color="inherit"
-            //           onClick={handleOnClickBack}
-            //         >
-            //           Quay trở lại
-            //         </Button>
-            //       </div>
-            //       <Box className="label-order-code">
-            //         <b>Phiếu nhập kho số: </b>
-            //         {importOrder.billRefernce}{' '}
-            //       </Box>
-            //     </div>
-            //     <div className="status-oder">
-            //       {getStatusLabel(importOrder.statusName)}
-            //     </div>
-            //   </div>
-            //   <div className="container">
-            //     <div className="left-panel">
-            //       <Card className="panel-information ">
-            //         <Typography>Thông tin nhà cung cấp</Typography>
-            //         <Box className="manufacturer-info">{importOrder.manufactorName}</Box>
-            //         <hr />
-
-            //         <Typography>
-            //           VỊ TRÍ NHẬP: <strong>{importOrder.wareHouseName}</strong>
-            //         </Typography>
-            //         <Box>ĐỊA CHỈ:</Box>
-            //         <Typography>
-            //           <strong>
-            //             {importOrder.wardName} - {importOrder.districtName} -{' '}
-            //             {importOrder.provinceName}
-            //           </strong>
-            //         </Typography>
-            //       </Card>
-            //       <Card className="panel-information">
-            //         <Grid
-            //           container
-            //           direction="row"
-            //           justifyContent="center"
-            //           alignItems="stretch"
-            //           marginTop={1}
-            //           spacing={3}
-            //         >
-            //           <Grid
-            //             item
-            //             xs={12}
-            //           >
-            //             {!!listConsignments && listConsignments.length > 0 ? (
-            //               <Box>
-            //                 <ConsignmentsTable listConsignments={listConsignments} />
-            //                 <CustomTablePagination
-            //                   page={page}
-            //                   pages={pages}
-            //                   rowsPerPage={rowsPerPage}
-            //                   totalRecord={totalRecord}
-            //                   handleChangePage={handleChangePage}
-            //                   handleChangeRowsPerPage={handleChangeRowsPerPage}
-            //                 />
-            //               </Box>
-            //             ) : (
-            //               <Box> Phiếu nhập chưa có lô hàng nào </Box>
-            //             )}
-            //           </Grid>
-            //         </Grid>
-            //       </Card>
-            //     </div>
-            //     <div className="right-panel">
-            //       <Card className="panel-information">
-            //         <div className="panel-user-creates-order">
-            //           <Box>
-            //             Người tạo đơn: <i> {importOrder.createBy}</i>
-            //           </Box>
-            //           <LocalizationProvider
-            //             locale={vi}
-            //             dateAdapter={AdapterDateFns}
-            //           >
-            //             <Typography>Ngày tạo đơn</Typography>
-            //             <DateTimePicker
-            //               readOnly
-            //               value={importOrder.createDate}
-            //               renderInput={(params) => (
-            //                 <TextField
-            //                   variant="standard"
-            //                   {...params}
-            //                   helperText={null}
-            //                 />
-            //               )}
-            //             />
-            //           </LocalizationProvider>
-            //         </div>
-            //         <div className="panel-user-confirms-order">
-            //           <Box>
-            //             Người xác nhận: <i> {dataTest.confirmUser}</i>
-            //           </Box>
-            //           {importOrder.confirmDate && (
-            //             <LocalizationProvider
-            //               locale={vi}
-            //               dateAdapter={AdapterDateFns}
-            //             >
-            //               <Typography>Ngày nhập kho</Typography>
-            //               <DateTimePicker
-            //                 readOnly
-            //                 value={importOrder.confirmDate}
-            //                 renderInput={(params) => (
-            //                   <TextField
-            //                     variant="standard"
-            //                     {...params}
-            //                     helperText={null}
-            //                   />
-            //                 )}
-            //               />
-            //             </LocalizationProvider>
-            //           )}
-            //         </div>
-            //       </Card>
-            //       <Card className="panel-information">
-            //         <Typography>GHI CHÚ</Typography>
-            //         <div>{importOrder.description}</div>
-            //       </Card>
-            //     </div>
-            //   </div>
-            // </Container>
+            
           )}
         </>
       )}

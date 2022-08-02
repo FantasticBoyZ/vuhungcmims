@@ -84,23 +84,6 @@ const CategoryForm = (props) => {
     setSelectedCategory(categoryList.find((item) => item.value == category?.categoryId));
   };
 
-  // const searchCategory = async (keyword) => {
-  //   try {
-  //     const params = {
-  //       // pageIndex: page + 1,
-  //       // pageSize: rowsPerPage,
-  //       categoryName: keyword,
-  //     };
-  //     const actionResult = await dispatch(getCategoryList(params));
-  //     const dataResult = unwrapResult(actionResult);
-  //     console.log('dataResult', dataResult);
-  //     if (dataResult.data) {
-  //       setCategoryList(dataResult.data.category);
-  //     }
-  //   } catch (error) {
-  //     console.log('Failed to fetch category list: ', error);
-  //   }
-  // };
 
   const saveCategoryDetail = async (category) => {
     try {
@@ -110,7 +93,7 @@ const CategoryForm = (props) => {
         // TODO: call api create subCategory
         actionResult = await dispatch(saveSubCategory(category));
       }else{
-        // actionResult = await dispatch(saveCategory(category));
+        actionResult = await dispatch(saveCategory(category));
       }
       
       const dataResult = unwrapResult(actionResult);
@@ -147,7 +130,6 @@ const CategoryForm = (props) => {
       description: values.description,
       categoryId: values.categoryId
     };
-    console.log(values);
     saveCategoryDetail(newCategory);
     closePopup();
   };
@@ -324,7 +306,7 @@ const CategoryForm = (props) => {
             Thoát
           </Button> */}
           </Stack>
-          <pre>{JSON.stringify(values, null, 2)}</pre>
+          {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
         </Form>
       )}
     </Formik>
