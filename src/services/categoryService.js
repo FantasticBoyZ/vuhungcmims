@@ -44,11 +44,7 @@ const CategoryService = {
     const url = API_URL + '/subCategory/add';
     // const url = process.env.REACT_APP_API_URL + '/category/add'
     axios
-      .post(url, {
-        id: category.id,
-        name: category.name,
-        description: category.description,
-      })
+      .post(url, category)
       .then(
         (response) => {
           return response;
