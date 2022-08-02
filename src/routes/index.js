@@ -115,8 +115,8 @@ const privateRoutes = [
   // tempInventoryReturn route
   { path: '/term-inventory/return/create', component: TempInventoryReturnCreate , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
   { path: '/term-inventory/return/list', component: TempInventoryReturnList , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
-  { path: '/term-inventory/return/detail/:orderId', component: TempInventoryReturnDetail , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
-  { path: '/term-inventory/return/edit/:orderId', component: TempInventoryReturnEdit , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/term-inventory/return/detail/:tempInventoryReturnId', component: TempInventoryReturnDetail , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
+  { path: '/term-inventory/return/edit/:tempInventoryReturnId', component: TempInventoryReturnEdit , acceptRole: ["ROLE_OWNER","ROLE_SELLER", "ROLE_STOREKEEPER"] },
 ];
 
 export { publicRoutes, privateRoutes };

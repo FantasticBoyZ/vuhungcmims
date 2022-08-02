@@ -66,8 +66,8 @@ axiosClient.interceptors.response.use(
       return Promise.reject(error);
     }
     if (errResponse.status === 403) {
-      alert('Phiên làm việc hết hạn');
-      localStorage.clear();
+      alert('Bạn không có quyền thực hiện chức năng này');
+      // localStorage.clear();
       window.location = '/';
     }
     if (errResponse.status === 401) {
