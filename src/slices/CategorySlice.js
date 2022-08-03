@@ -47,6 +47,34 @@ export const saveSubCategory = createAsyncThunk('sub-category/save' , async (cat
   
 })
 
+export const updateCategory = createAsyncThunk('category/update' , async (category, { rejectWithValue }) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  try {
+    const response = await categoryService.updateCategory(category);
+  return response;
+  } catch (err) {
+    if (!err.response) {
+      throw err;
+    }
+    return rejectWithValue(err.response.data);
+  }
+  
+})
+
+export const updateSubCategory = createAsyncThunk('sub-category/update' , async (category, { rejectWithValue }) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  try {
+    const response = await categoryService.updateSubCategory(category);
+  return response;
+  } catch (err) {
+    if (!err.response) {
+      throw err;
+    }
+    return rejectWithValue(err.response.data);
+  }
+  
+})
+
 const categorySlice = createSlice({
   name: 'categories',
   initialState: {
@@ -96,6 +124,26 @@ const categorySlice = createSlice({
       state.error = action.payload;
     },
     [saveSubCategory.fulfilled] :(state, action) => {
+      state.loading = false;
+    },
+    [updateCategory.pending] : (state) => {
+      state.loading = true;
+    },
+    [updateCategory.rejected] :(state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [updateCategory.fulfilled] :(state, action) => {
+      state.loading = false;
+    },
+    [updateSubCategory.pending] : (state) => {
+      state.loading = true;
+    },
+    [updateSubCategory.rejected] :(state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [updateSubCategory.fulfilled] :(state, action) => {
       state.loading = false;
     },
   }

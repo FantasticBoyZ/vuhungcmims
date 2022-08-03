@@ -7,6 +7,12 @@ export const getWarehouseList = createAsyncThunk('warehouse', async (thunkAPi) =
     return warehouseList;
 })
 
+export const getAllWarehouseNotPaging = createAsyncThunk('warehouse/not-paging', async (thunkAPi) => {
+    // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+    const warehouseList = await warehouseService.getAllWarehouse();
+    return warehouseList;
+})
+
 export const getWarehouseDetail = createAsyncThunk('warehouse/get-one', async (params, thunkAPi) => {
     // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
     const warehouse = await warehouseService.getWarehouseDetail(params);
@@ -62,6 +68,16 @@ const warehouseSlice = createSlice({
             state.error = action.payload;
         },
         [getWarehouseList.fulfilled]: (state, action) => {
+            state.loading = false;
+        },
+        [getAllWarehouseNotPaging.pending]: (state) => {
+            state.loading = true;
+        },
+        [getAllWarehouseNotPaging.rejected]: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        },
+        [getAllWarehouseNotPaging.fulfilled]: (state, action) => {
             state.loading = false;
         },
         [getWarehouseDetail.pending]: (state) => {

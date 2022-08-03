@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import { makeStyles } from '@mui/styles';
 import { Stack } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const useStyles = makeStyles({
   styleBox: {
@@ -69,7 +70,7 @@ const Login = () => {
           (error.response && error.response.data && error.response.data.message) ||
           error.message ||
           error.toString();
-        // toast.error(resMessage);
+        toast.error(resMessage);
         setLoading(false);
         setMessage(resMessage);
       },
@@ -148,14 +149,16 @@ const Login = () => {
                   </Link>
                 </Stack>
 
-                <Button
+                <LoadingButton
                   fullWidth
+                  type='submit'
                   variant="contained"
+                  loading={loading}
                   disabled={disabled}
                   sx={{ mt: 3, mb: 2 }}
                 >
                   Đăng nhập
-                </Button>
+                </LoadingButton>
               </Form>
             </Formik>
             {/* <Grid container>

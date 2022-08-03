@@ -11,6 +11,11 @@ const ManufactorService = {
     return axiosClient.get(url, { params, headers: authHeader() });
   },
 
+  getAllManufacturer: (params) => {
+    const url = '/manufacturer/notPaging';
+    return axiosClient.get(url, { params, headers: authHeader() });
+  },
+  
   getManufacturerById: (id) => {
     const url = `/manufacturer/${id}`;
     return axiosClient.get(url, { headers: authHeader() });

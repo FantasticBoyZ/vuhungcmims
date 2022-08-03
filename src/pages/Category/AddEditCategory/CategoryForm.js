@@ -1,7 +1,13 @@
 import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
-import { getCategoryList, saveCategory, saveSubCategory } from '@/slices/CategorySlice';
+import {
+  getCategoryList,
+  saveCategory,
+  saveSubCategory,
+  updateCategory,
+  updateSubCategory,
+} from '@/slices/CategorySlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -84,33 +90,84 @@ const CategoryForm = (props) => {
     setSelectedCategory(categoryList.find((item) => item.value == category?.categoryId));
   };
 
-
   const saveCategoryDetail = async (category) => {
     try {
       let actionResult;
-      console.log(category)
-      if(category.categoryId){
+      console.log(category);
+      if (category.categoryId) {
         // TODO: call api create subCategory
         actionResult = await dispatch(saveSubCategory(category));
-      }else{
+      } else {
         actionResult = await dispatch(saveCategory(category));
       }
-      
+
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
-      if (isAdd) {
-        toast.success('Thêm danh mục thành công!');
-        navigate('/category');
-      } else {
-        toast.success('Sửa danh mục thành công!');
-        // navigate(`/category/detail/${categoryId}`);
+      if (dataResult.status === 200) {
+        if (isAdd) {
+          toast.success('Thêm danh mục thành công!');
+          navigate('/category');
+        } else {
+          toast.success('Sửa danh mục thành công!');
+          navigate('/category');
+          
+        }
+        closePopup()
       }
     } catch (error) {
       console.log('Failed to save category: ', error);
       if (isAdd) {
-        toast.error('Thêm danh mục thất bại!');
+        if (error.message) {
+          toast.error(error.message);
+        } else {
+          toast.error('Thêm danh mục thất bại!');
+        }
       } else {
-        toast.success('Sửa danh mục thất bại!');
+        if (error.message) {
+          toast.error(error.message);
+        } else {
+          toast.error('Sửa danh mục thất bại!');
+        }
+      }
+    }
+  };
+
+  const updateCategoryDetail = async (category) => {
+    try {
+      console.log(category);
+      if (category.categoryId) {
+        const actionResult = await dispatch(updateSubCategory(category));
+        const dataResult = unwrapResult(actionResult);
+        console.log('dataResult', dataResult);
+        if (dataResult) {
+          if (dataResult.data.message) {
+            toast.success(dataResult.data.message);
+          } else {
+            toast.success('Sửa danh mục con thành công!');
+          }
+          navigate('/category');
+          closePopup();
+        }
+      } else {
+        const actionResult = await dispatch(updateCategory(category));
+        const dataResult = unwrapResult(actionResult);
+        console.log('dataResult', dataResult);
+        if (dataResult) {
+          if (dataResult.data.message) {
+            toast.success(dataResult.data.message);
+          } else {
+            toast.success('Sửa danh mục thành công!');
+          }
+          navigate('/category');
+          closePopup();
+        }
+      }
+    } catch (error) {
+      console.log('Failed to save category: ', error);
+      if (error.message) {
+        toast.error(error.message);
+      } else {
+        toast.error('Sửa danh mục thất bại!');
       }
     }
   };
@@ -128,10 +185,13 @@ const CategoryForm = (props) => {
       id: category?.id,
       name: values.name,
       description: values.description,
-      categoryId: values.categoryId
+      categoryId: values.categoryId,
     };
-    saveCategoryDetail(newCategory);
-    closePopup();
+    if (!!category?.id) {
+      updateCategoryDetail(newCategory);
+    } else {
+      saveCategoryDetail(newCategory);
+    }
   };
 
   const handleOnClickExit = () => {
@@ -152,7 +212,7 @@ const CategoryForm = (props) => {
       {({ values, setFieldValue }) => (
         <Form>
           {loading && !isAdd ? (
-            <ProgressCircleLoading/>
+            <ProgressCircleLoading />
           ) : (
             <Grid
               container

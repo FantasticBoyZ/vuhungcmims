@@ -311,7 +311,7 @@ const About = () => {
     try {
       const params = {
         pageIndex: page,
-        // productName: searchQuery,
+        productName: searchQuery,
         // pageSize: rowsPerPage,
         // ...searchProductParams,
       };
@@ -337,15 +337,16 @@ const About = () => {
   return (
     <Box>
       <AsyncPaginate
-        value={currentProduct}
+        // value={currentProduct}
         loadOptions={loadOptions}
+        defaultOptions={true}
         debounceTimeout={300}
         getOptionValue={(option) => option}
         getOptionLabel={(option) => option.name}
-        onChange={(product) => {
-          setCurrentProduct(product);
-          console.log(product)
-        }}
+        // onChange={(product) => {
+        //   setCurrentProduct(product);
+        //   console.log(product)
+        // }}
         isSearchable={true}
         placeholder="Select House"
         additional={{

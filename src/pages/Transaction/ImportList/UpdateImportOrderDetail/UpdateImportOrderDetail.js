@@ -103,7 +103,7 @@ const UpdateImportOrderDetail = () => {
   const [errorMessage, setErrorMessage] = useState();
   const [createdDate] = useState(new Date().getTime());
   const [confirmedDate] = useState(new Date().getTime());
-  const [selectedWarehouse, setSelectedWarehouse] = useState()
+  const [selectedWarehouse, setSelectedWarehouse] = useState();
   const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
@@ -181,25 +181,26 @@ const UpdateImportOrderDetail = () => {
             setOpenPopup(true);
             return;
           }
-    
+
           if (!Number.isInteger(consignment.quantity)) {
             setErrorMessage('Vui lòng nhập số lượng sản phẩm là số nguyên');
             setOpenPopup(true);
             return;
           }
-    
+
           if (!Number.isInteger(consignment.unitPrice)) {
             setErrorMessage('Vui lòng nhập đơn giá của sản phẩm là số nguyên');
             setOpenPopup(true);
             return;
           }
+
           if (consignment.quantity > 0) {
             consignmentRequests.push({
               consignmentId: consignment.consignmentId,
               productId: consignment.productId,
-              expirationDate: consignment.expirationDate
+              expirationDate: !!consignment.expirationDate
                 ? new Date(
-                    consignment.expirationDate + new Date().getTimezoneOffset() / 60,
+                    new Date(consignment.expirationDate) - new Date().getTimezoneOffset() / 60,
                   ).toJSON()
                 : null,
               importDate: new Date(consignment.importDate).toJSON(),
@@ -270,7 +271,7 @@ const UpdateImportOrderDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setImportOrder(dataResult.data.inforDetail);
-        setSelectedWarehouse(dataResult.data.inforDetail.wareHouseId)
+        setSelectedWarehouse(dataResult.data.inforDetail.wareHouseId);
       }
       console.log('Import Order Detail', dataResult);
     } catch (error) {
@@ -434,7 +435,7 @@ const UpdateImportOrderDetail = () => {
                                     }}
                                     onChange={(e) => {
                                       setFieldValue('wareHouseId', e?.value);
-                                      setSelectedWarehouse(e?.value)
+                                      setSelectedWarehouse(e?.value);
                                     }}
                                   />
                                   <FormHelperText

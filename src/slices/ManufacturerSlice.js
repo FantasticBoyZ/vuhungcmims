@@ -10,6 +10,15 @@ export const getManufacturerList = createAsyncThunk(
   },
 );
 
+export const getAllManufacturer = createAsyncThunk(
+  'manufacturer/get-list',
+  async (params, thunkAPi) => {
+    // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+    const manufacturerList = await manufactorService.getAllManufacturer(params);
+    return manufacturerList;
+  },
+);
+
 export const getManufacturerById = createAsyncThunk(
   'manufacturer/get-one',
   async (id, thunkAPi) => {
@@ -52,6 +61,16 @@ const manufacturerSlice = createSlice({
       state.error = action.payload;
     },
     [getManufacturerList.fulfilled]: (state, action) => {
+      state.loading = false;
+    },
+    [getAllManufacturer.pending]: (state) => {
+      state.loading = true;
+    },
+    [getAllManufacturer.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getAllManufacturer.fulfilled]: (state, action) => {
       state.loading = false;
     },
     [getManufacturerById.pending]: (state) => {

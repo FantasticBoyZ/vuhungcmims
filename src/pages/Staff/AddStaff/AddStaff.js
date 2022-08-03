@@ -173,8 +173,12 @@ const AddStaff = () => {
   const FORM_VALIDATION = Yup.object().shape({
     username: Yup.string().required('Chưa nhập mã nhân viên'),
     fullName: Yup.string().required('Chưa nhập Họ và tên nhân viên'),
-    identityCard: Yup.number().typeError('Vui lòng nhập CCCD/CMND là chữ số').required('Chưa nhập Số CCCD/CMND'),
-    phone: Yup.string().required('Chưa nhập Số điện thoại'),
+    identityCard: Yup.string()
+      .required('Chưa nhập Số CCCD/CMND')
+      .matches(/^(\d{9}|\d{12})$/, 'Số CCCD/CMND của bạn không hợp lệ'),
+    phone: Yup.string()
+      .required('Chưa nhập Số điện thoại')
+      .matches(/^(0[3|5|7|8|9])+([0-9]{8})$/, 'Số điện thoại của bạn không hợp lệ'),
     email: Yup.string()
       .email('Vui lòng nhập đúng định dạng email. VD abc@xyz.com')
       .required('Chưa nhập Email'),
@@ -223,7 +227,9 @@ const AddStaff = () => {
       username: values.username,
       fullName: values.fullName,
       identityCard: values.identityCard,
-      dateOfBirth: new Date(new Date(values.dateOfBirth) + (new Date().getTimezoneOffset()) / 60).toJSON(),
+      dateOfBirth: new Date(
+        new Date(values.dateOfBirth) + new Date().getTimezoneOffset() / 60,
+      ).toJSON(),
       gender: Boolean(+values.gender),
       phone: values.phone,
       email: values.email,
@@ -247,7 +253,6 @@ const AddStaff = () => {
                 navigate('/staff/list');
               },
               (err) => {
-                
                 console.log(err);
               },
             );
@@ -740,7 +745,7 @@ const AddStaff = () => {
                 </CardContent>
               </Card>
             </Grid>
-            <pre>{JSON.stringify(values, null, 2)}</pre>
+            {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
           </Grid>
         </Form>
       )}

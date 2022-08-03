@@ -32,7 +32,7 @@ const useStyles = makeStyles({
 });
 
 const CategoryRow = (props) => {
-  const { category, allCategoryList } = props;
+  const { category, allCategoryList, searchCategory } = props;
   const classes = useStyles();
   const [openNested, setOpenNested] = useState(false);
   const theme = useTheme();
@@ -65,6 +65,7 @@ const CategoryRow = (props) => {
 
   const closePopup = () => {
     setOpenPopup(false);
+    searchCategory()
   };
 
   const handleOnClickEditCategory = (item) => {
@@ -175,8 +176,8 @@ const CategoryRow = (props) => {
                           {subCategory.map((item, index) => {
                             return (
                               <TableRow key={index}>
-                                <TableCell width="30%">{item?.name}</TableCell>
-                                <TableCell width="50%">{item?.description}</TableCell>
+                                <TableCell width="30%"><Stack ml={2}>{item?.name}</Stack></TableCell>
+                                <TableCell width="50%"><Stack ml={2}>{item?.description}</Stack></TableCell>
                                 <TableCell width="20%">
                                   <Stack
                                     direction="row"

@@ -11,6 +11,11 @@ const productService = {
     return axiosClient.get(url, { params, headers: authHeader() });
   },
 
+  getAllProductNotPaging: (manufacturerId) => {
+    const url = `/product/manufacturer/${manufacturerId}`;
+    return axiosClient.get(url, { headers: authHeader() });
+  },
+
   getProductById: (params) => {
     const url = `/product/${params.productId}`;
     return axiosClient.get(url, { params, headers: authHeader() });
