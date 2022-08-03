@@ -7,6 +7,12 @@ export const getProductList = createAsyncThunk('product', async (params, thunkAP
   return productList;
 });
 
+export const getAllProductNotPaging = createAsyncThunk('product/not-paging', async (manufacturerId, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const productList = await productService.getAllProductNotPaging(manufacturerId);
+  return productList;
+});
+
 export const getProductDetail = createAsyncThunk('product/get-one', async (params) => {
   const product = await productService.getProductById(params);
   return product;
@@ -91,6 +97,17 @@ const productSlice = createSlice({
       state.error = action.payload;
     },
     [getProductList.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.products = action.payload;
+    },
+    [getAllProductNotPaging.pending]: (state) => {
+      state.loading = true;
+    },
+    [getAllProductNotPaging.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [getAllProductNotPaging.fulfilled]: (state, action) => {
       state.loading = false;
       state.products = action.payload;
     },

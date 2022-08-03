@@ -4,7 +4,7 @@ import {
   getConsignmentByProductId,
   getProductByWarehouseId,
 } from '@/slices/InventoryCheckingSlice';
-import { getWarehouseList } from '@/slices/WarehouseSlice';
+import { getAllWarehouseNotPaging, getWarehouseList } from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
 import { CloudUpload, Delete, Done, FileDownload, Input } from '@mui/icons-material';
 import {
@@ -317,7 +317,7 @@ const CreateInventoryChecking = () => {
 
   const getAllWarehouse = async (keyword) => {
     try {
-      const actionResult = await dispatch(getWarehouseList());
+      const actionResult = await dispatch(getAllWarehouseNotPaging());
       const dataResult = unwrapResult(actionResult);
       console.log('warehouse list', dataResult.data);
       if (dataResult.data) {

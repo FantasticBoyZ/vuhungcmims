@@ -9,6 +9,11 @@ const WarehouseService = {
     return axiosClient.get(url, { params, headers: authHeader() });
   },
 
+  getAllWarehouse: (params) => {
+    const url = '/warehouse/notPaging';
+    return axiosClient.get(url, { params, headers: authHeader() });
+  },
+
   getWarehouseDetail: (params) => {
     const url = `/warehouse/${params}`;
     return axiosClient.get(url, params, { headers: authHeader() });

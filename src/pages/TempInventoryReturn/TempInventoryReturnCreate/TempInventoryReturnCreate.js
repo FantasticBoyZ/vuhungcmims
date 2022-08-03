@@ -3,9 +3,9 @@ import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import AuthService from '@/services/authService';
 import importOrderService from '@/services/importOrderService';
-import { getManufacturerList } from '@/slices/ManufacturerSlice';
-import { getProductList } from '@/slices/ProductSlice';
-import { getWarehouseList } from '@/slices/WarehouseSlice';
+import { getAllManufacturer, getManufacturerList } from '@/slices/ManufacturerSlice';
+import { getAllProductNotPaging, getProductList } from '@/slices/ProductSlice';
+import { getAllWarehouseNotPaging, getWarehouseList } from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
 import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -326,7 +326,7 @@ const TempInventoryReturnCreate = () => {
         // pageSize: rowsPerPage,
         ...searchManufacturerParams,
       };
-      const actionResult = await dispatch(getManufacturerList(params));
+      const actionResult = await dispatch(getAllManufacturer(params));
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
       if (dataResult.data) {
@@ -340,12 +340,8 @@ const TempInventoryReturnCreate = () => {
 
   const getProductListByManufacturerId = async (manufacturerId) => {
     try {
-      const params = {
-        // pageIndex: page + 1,
-        // pageSize: rowsPerPage,
-        manufactorId: manufacturerId,
-      };
-      const actionResult = await dispatch(getProductList(params));
+   
+      const actionResult = await dispatch(getAllProductNotPaging(manufacturerId));
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
       if (dataResult.data) {
@@ -358,7 +354,7 @@ const TempInventoryReturnCreate = () => {
 
   const getAllWarehouse = async () => {
     try {
-      const actionResult = await dispatch(getWarehouseList());
+      const actionResult = await dispatch(getAllWarehouseNotPaging());
       const dataResult = unwrapResult(actionResult);
       console.log('warehouse list', dataResult.data);
       if (dataResult.data) {
