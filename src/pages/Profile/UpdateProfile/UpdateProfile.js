@@ -85,8 +85,12 @@ const UpdateProfile = () => {
 
   const FORM_VALIDATION = Yup.object().shape({
     fullName: Yup.string().required('Chưa nhập Họ và tên nhân viên'),
-    identityCard: Yup.string().required('Chưa nhập Số CCCD/CMND'),
-    phone: Yup.string().required('Chưa nhập Số điện thoại'),
+    identityCard: Yup.string()
+      .required('Chưa nhập Số CCCD/CMND')
+      .matches(/^(\d{9}|\d{12})$/, 'Số CCCD/CMND của bạn không hợp lệ'),
+    phone: Yup.string()
+      .required('Chưa nhập Số điện thoại')
+      .matches(/^(0[3|5|7|8|9])+([0-9]{8})$/, 'Số điện thoại của bạn không hợp lệ'),
     email: Yup.string()
       .email('Vui lòng nhập đúng định dạng email. VD abc@xyz.com')
       .required('Chưa nhập Email'),
@@ -148,15 +152,15 @@ const UpdateProfile = () => {
     };
 
     try {
-        const actionResult = await dispatch(updateProfile(staff));
-        const dataResult = unwrapResult(actionResult);
-        if (dataResult) {
-            toast.success('Cập nhật hồ sơ cá nhân thành công')
-            navigate('/profile')
-        }
-      } catch (error) {
-        console.log('Failed to update profile: ', error);
+      const actionResult = await dispatch(updateProfile(staff));
+      const dataResult = unwrapResult(actionResult);
+      if (dataResult) {
+        toast.success('Cập nhật hồ sơ cá nhân thành công');
+        navigate('/profile');
       }
+    } catch (error) {
+      console.log('Failed to update profile: ', error);
+    }
   };
 
   const getProvince = async (keyword) => {
@@ -210,7 +214,7 @@ const UpdateProfile = () => {
       if (dataResult) {
         setStaff(dataResult.data);
         setDob(dataResult.data.dateOfBirth);
-        setGender(dataResult.data.gender);
+        setGender(dataResult.data.gender ? 1 : 0);
         setSelectedProvince(dataResult.data.provinceId);
         setSelectedDistrict(dataResult.data.districtId);
         setSelectedWard(dataResult.data.wardId);

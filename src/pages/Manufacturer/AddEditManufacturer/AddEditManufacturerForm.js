@@ -118,7 +118,9 @@ const AddEditManufacturerForm = () => {
       .email('Email không hợp lệ')
       .required('Chưa nhập email nhà sản xuất'),
 
-    phone: Yup.number().required('Chưa nhập số điện thoại nhà sản xuất'),
+    phone: Yup.string()
+      .required('Chưa nhập số điện thoại nhà sản xuất')
+      .matches(/^(0[3|5|7|8|9])+([0-9]{8})$/, 'Số điện thoại của bạn không hợp lệ'),
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố'),
     districtId: Yup.number().required('Chưa chọn quận/huyện/thành phố'),
     wardId: Yup.number().required('Chưa chọn phường/xã'),
@@ -189,7 +191,7 @@ const AddEditManufacturerForm = () => {
 
   const handleSubmit = (values) => {
     const newManufacturer = {
-      id: isAdd? '' : manufacturerId,
+      id: isAdd ? '' : manufacturerId,
       name: values.name,
       email: values.email,
       phone: values.phone,
