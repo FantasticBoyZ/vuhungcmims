@@ -24,35 +24,29 @@ const CategoryService = {
   saveCategory: (category) => {
     const url = API_URL + '/category/add';
     // const url = process.env.REACT_APP_API_URL + '/category/add'
-    axios
-      .post(url, {
-        id: category.id,
-        name: category.name,
-        description: category.description,
-      })
-      .then(
-        (response) => {
-          return response;
-        },
-        (error) => {
-          console.log(error);
-        },
-      );
+    return axios.post(url, {
+      id: category.id,
+      name: category.name,
+      description: category.description,
+    });
   },
 
   saveSubCategory: (category) => {
     const url = API_URL + '/subCategory/add';
     // const url = process.env.REACT_APP_API_URL + '/category/add'
-    axios
-      .post(url, category)
-      .then(
-        (response) => {
-          return response;
-        },
-        (error) => {
-          console.log(error);
-        },
-      );
+    return axios.post(url, category);
+  },
+
+  updateCategory: (category) => {
+    const url = API_URL + '/category/update';
+
+    return axios.put(url, category, { headers: authHeader() });
+  },
+
+  updateSubCategory: (category) => {
+    const url = API_URL + '/subCategory/update';
+
+    return axios.put(url, category, { headers: authHeader() });
   },
 };
 

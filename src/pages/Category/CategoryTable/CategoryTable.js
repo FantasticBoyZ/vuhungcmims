@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CategoryTable = (props) => {
-  const { categoryList,allCategoryList } = props
+  const { categoryList,allCategoryList, searchCategory } = props
   const classes = useStyles();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -74,7 +74,7 @@ const CategoryTable = (props) => {
             // TODO: làm selectedImportOrders
             //   const isImportOrderSelected = selectedImportOrders.includes(importOrder.id);
             return (
-                <CategoryRow key={category.id} category={category} allCategoryList={allCategoryList}/>
+                <CategoryRow key={category.id} category={category} allCategoryList={allCategoryList} searchCategory={searchCategory}/>
             );
           })}
         </TableBody>

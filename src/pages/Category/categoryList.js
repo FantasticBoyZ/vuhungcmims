@@ -231,6 +231,7 @@ const CategoryList = () => {
                   <CategoryTable
                     categoryList={categoryList}
                     allCategoryList={allCategoryList}
+                    searchCategory={() => searchCategory(searchParams)}
                   />
                   <CustomTablePagination
                     page={page}
