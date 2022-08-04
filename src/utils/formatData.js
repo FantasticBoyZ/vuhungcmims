@@ -20,6 +20,11 @@ const getRoundNumber = (value, precision) => {
   return Math.round(value * multiplier) / multiplier;
 };
 
+const getRoundFloorNumber = (value, precision) => {
+  var multiplier = Math.pow(10, precision || 0);
+  return Math.floor(value * multiplier) / multiplier;
+};
+
 const convertUTCDateToLocalDate = (date) => {
   var newDate = new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
 
@@ -103,6 +108,7 @@ const FormatDataUtils = {
   getStatusLabel,
   getOptionProduct,
   getRoundNumber,
+  getRoundFloorNumber,
   getSelectedOptionWithId,
 };
 export default FormatDataUtils;
