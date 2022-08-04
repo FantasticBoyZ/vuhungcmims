@@ -1,6 +1,7 @@
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
 import { getReturnOrderList } from '@/slices/ExportOrderSlice';
+import { getCreaterList } from '@/slices/StaffSlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Search } from '@mui/icons-material';
 import {
@@ -27,6 +28,7 @@ import { makeStyles } from '@mui/styles';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -66,7 +68,10 @@ const createrList = [
 
 const ReturnList = () => {
   const classes = useStyles();
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [returnOrderList, setReturnOrderList] = useState([]);
+  const [staffList, setStaffList] = useState([]);
   const [searchParams, setSearchParams] = useState({});
   const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
@@ -79,7 +84,48 @@ const ReturnList = () => {
   const { loading } = useSelector((state) => ({ ...state.exportOrders }));
 
   const handleChangeCreator = (event) => {
+    setPage(0);
     setCreatorId(event.target.value);
+    setSearchParams({ ...searchParams, userId: event.target.value > 0 ? event.target.value : '' });
+    searchReturnOrderList({ ...searchParams, userId: event.target.value > 0 ? event.target.value : '' });
+  };
+
+  const handleSearch = (e) => {
+    if (e.keyCode === 13) {
+      let target = e.target;
+      console.log(e.target.value);
+      setPage(0);
+      setSearchParams({ ...searchParams, billReferenceNumber: target.value });
+      searchReturnOrderList({ ...searchParams, billReferenceNumber: target.value });
+    }
+  };
+
+  const handleChangeStartDate = (value) => {
+    setStartDate(value);
+    setPage(0);
+    console.log('startDate', format(new Date(value), 'dd-MM-yyyy'));
+    setSearchParams({
+      ...searchParams,
+      startDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
+    });
+    searchReturnOrderList({
+      ...searchParams,
+      startDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
+    });
+  };
+
+  const handleChangeEndDate = (value) => {
+    setEndDate(value);
+    setPage(0);
+    console.log('endDate', format(new Date(value), 'dd-MM-yyyy'));
+    setSearchParams({
+      ...searchParams,
+      endDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
+    });
+    searchReturnOrderList({
+      ...searchParams,
+      endDate: value !== null ? format(new Date(value), 'dd-MM-yyyy') : null,
+    });
   };
 
   const handleOnClickTableRow = (returnOrderId) => {
@@ -95,6 +141,25 @@ const ReturnList = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
     // fetchProductList(page, parseInt(event.target.value, 10), searchParams);
+  };
+
+  const searchReturnOrderList = async (searchParams) => {
+    try {
+      const params = {
+        pageIndex: page,
+        pageSize: rowsPerPage,
+        ...searchParams,
+      };
+      const actionResult = await dispatch(getReturnOrderList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        setTotalRecord(dataResult.data.totalRecord);
+        setReturnOrderList(dataResult.data.returnOrderList);
+      }
+    } catch (error) {
+      console.log('Failed to fetch returnOrder list: ', error);
+    }
   };
 
   const fetchReturnOrderList = async () => {
@@ -116,9 +181,32 @@ const ReturnList = () => {
     }
   };
 
+  const getAllStaff = async () => {
+    const params = {
+      // pageIndex: page + 1,
+      // pageSize: rowsPerPage,
+      keyWords: '',
+    };
+    try {
+      const actionResult = await dispatch(getCreaterList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('staff list', dataResult);
+      if (dataResult) {
+        setStaffList([{ id: 0, name: 'Tất cả' }].concat(dataResult));
+      }
+    } catch (error) {
+      console.log('Failed to fetch staff list: ', error);
+    }
+  };
+
+  useEffect(() => {
+    searchReturnOrderList(searchParams);
+  }, [page, rowsPerPage]);
+
   useEffect(() => {
     fetchReturnOrderList();
-  }, [page, rowsPerPage]);
+    getAllStaff()
+  }, []);
   return (
     <Grid
       container
@@ -150,8 +238,10 @@ const ReturnList = () => {
                     </InputAdornment>
                   ),
                 }}
-                // onKeyDown={handleSearch}
-                // onChange={handleSearchChange}
+                onKeyDown={handleSearch}
+                onChange={(e) => {
+                  setSearchParams({ ...searchParams, billReferenceNumber: e.target.value });
+                }}
               />
               <Box className={classes.selectBox}>
                 <FormControl fullWidth>
@@ -159,10 +249,10 @@ const ReturnList = () => {
                   <Select
                     id="creator"
                     value={creatorId}
-                    label="Người tạo"
+                    label="Người tạo đơn"
                     onChange={handleChangeCreator}
                   >
-                    {createrList.map((item) => (
+                    {staffList.map((item) => (
                       <MenuItem
                         key={item.id}
                         value={item.id}
@@ -178,15 +268,16 @@ const ReturnList = () => {
             <Stack
               direction="row"
               py={2}
+              alignItems='center'
             >
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
                   id="startDate"
                   label="Ngày bắt đầu"
-                  // value={startDate}
+                  value={startDate}
                   inputFormat="dd/MM/yyyy"
                   onChange={(newValue) => {
-                    // handleChangeStartDate(newValue);
+                    handleChangeStartDate(newValue);
                   }}
                   renderInput={(params) => <TextField {...params} />}
                 />
@@ -195,9 +286,9 @@ const ReturnList = () => {
                   id="endDate"
                   label="Ngày kết thúc"
                   inputFormat="dd/MM/yyyy"
-                  // value={endDate}
+                  value={endDate}
                   onChange={(newValue) => {
-                    // handleChangeEndDate(newValue);
+                    handleChangeEndDate(newValue);
                   }}
                   renderInput={(params) => <TextField {...params} />}
                 />
