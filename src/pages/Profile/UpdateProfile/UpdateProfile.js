@@ -155,6 +155,9 @@ const UpdateProfile = () => {
       const actionResult = await dispatch(updateProfile(staff));
       const dataResult = unwrapResult(actionResult);
       if (dataResult) {
+        let currentUser = AuthService.getCurrentUser()
+        currentUser.fullName = staff.fullName
+        localStorage.setItem('user', JSON.stringify(currentUser));
         toast.success('Cập nhật hồ sơ cá nhân thành công');
         navigate('/profile');
       }
