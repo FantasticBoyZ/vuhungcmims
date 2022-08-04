@@ -474,7 +474,7 @@ const ExportOrderDetail = () => {
                                 key={index}
                                 className={classes.warehouseContainer}
                               >
-                                <Typography>{address.warehouseName}</Typography>
+                                <Typography>{address.name}</Typography>
                                 <Divider />
                                 <Typography>{address.detailAddress}</Typography>
                                 <Typography>

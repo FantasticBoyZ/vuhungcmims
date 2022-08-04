@@ -757,7 +757,7 @@ const UpdateExportOrderDetail = () => {
                                         key={address.id}
                                         className={classes.warehouseContainer}
                                       >
-                                        <Typography>{address.warehouseName}</Typography>
+                                        <Typography>{address.name}</Typography>
                                         <Divider />
                                         <Typography>{address.detailAddress}</Typography>
                                         <Typography>
