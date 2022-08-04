@@ -66,17 +66,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Dropzone(props) {
-  const { imageUrl, setImageUrl, setFormData } = props;
+  const { imageUrl, setImageUrl, setFormData, setErrorImage } = props;
   const onDrop = useCallback((acceptedFiles, fileRejections) => {
     // console.log(fileRejections[0]);
+    setErrorImage('');
     if (!!fileRejections[0]) {
       //   console.log(fileRejections[0].errors);
       if (fileRejections[0].errors[0].code === 'file-invalid-type') {
         console.log('Bạn vui lòng chọn file đuôi .jpg, .png để tải lên');
+        setErrorImage('Bạn vui lòng chọn file đuôi .jpg, .png để tải lên');
         return;
       }
       if (fileRejections[0].errors[0].code === 'file-too-large') {
         console.log('Bạn vui lòng chọn file ảnh dưới 5MB để tải lên');
+        setErrorImage('Bạn vui lòng chọn file ảnh dưới 5MB để tải lên');
+        return;
       }
     } else {
       // Do something with the files
@@ -155,6 +159,7 @@ const AddStaff = () => {
   const [selectedProvince, setSelectedProvince] = useState();
   const [selectedDistrict, setSelectedDistrict] = useState();
   const [selectedWard, setSelectedWard] = useState();
+  const [errorImage, setErrorImage] = useState('');
   const initialFormValue = {
     username: '',
     fullName: '',
@@ -356,8 +361,16 @@ const AddStaff = () => {
                         imageUrl={imageUrl}
                         setImageUrl={setImageUrl}
                         setFormData={setFormData}
+                        setErrorImage={setErrorImage}
                       />
                     </Stack>
+                    <FormHelperText
+                      className={classes.formHelperTextStyle}
+                      error={true}
+                      sx={{ height: '20px' }}
+                    >
+                      {errorImage}
+                    </FormHelperText>
                   </CardContent>
                 </Card>
                 <Card>
