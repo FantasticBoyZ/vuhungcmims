@@ -270,15 +270,15 @@ const ReturnOrderDetail = () => {
                   >
                     <Card>
                       <CardContent className={classes.warehourseInfo}>
-                        <Typography variant="h6">Kho lấy hàng</Typography>
+                        <Typography variant="h6">Trả về kho</Typography>
                         <Stack spacing={2}>
                           {addressWarehouse.length > 0 &&
-                            addressWarehouse.map((address, index) => (
+                            addressWarehouse.map((address) => (
                               <Box
-                                key={index}
+                                key={address.id}
                                 className={classes.warehouseContainer}
                               >
-                                <Typography>{address.warehouseName}</Typography>
+                                <Typography>{address.name}</Typography>
                                 <Divider />
                                 <Typography>{address.detailAddress}</Typography>
                                 <Typography>
