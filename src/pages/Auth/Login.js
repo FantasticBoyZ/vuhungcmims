@@ -70,7 +70,9 @@ const Login = () => {
           (error.response && error.response.data && error.response.data.message) ||
           error.message ||
           error.toString();
-        toast.error(resMessage);
+        if (error.response.status !== 401) {
+          toast.error(resMessage);
+        }
         setLoading(false);
         setMessage(resMessage);
       },
@@ -91,7 +93,7 @@ const Login = () => {
             component="h1"
             variant="h5"
           >
-            Sign in
+            Đăng nhập
           </Typography>
 
           <Box sx={{ mt: 1 }}>
@@ -105,7 +107,7 @@ const Login = () => {
               <Form>
                 <Textfield
                   name="username"
-                  label="Tên đăng nhập"
+                  label="Mã nhân viên"
                   margin="normal"
                   fullWidth
                   id="username"
