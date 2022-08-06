@@ -427,7 +427,7 @@ const ImportGoods = () => {
                       isLoading={loading}
                       loadingMessage={() => <>Đang tìm kiếm sản phẩm...</>}
                       name="product"
-                      value={selectedProduct}
+                      value={null}
                       options={getOption(productList)}
                       menuPortalTarget={document.body}
                       styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
