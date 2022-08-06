@@ -127,6 +127,13 @@ const TempInventoryReturnCreate = () => {
   const FORM_VALIDATION = Yup.object().shape({
     warehouseId: Yup.number().required('Bạn chưa chọn kho để nhập hàng'),
     manufacturerId: Yup.number().required('Bạn chưa chọn nhà cung cấp'),
+    expectedReturnDate: Yup.date()
+      .typeError('Ngày trả hàng không hợp lệ')
+      .min(
+        new Date(Date.now() - 86400000),
+        'Bạn không thể chọn ngày trả hàng trong quá khứ',
+      )
+      .required('Bạn chưa nhập ngày trả hàng dự kiến').nullable(),
   });
 
   const arrayHelpersRef = useRef(null);
@@ -138,7 +145,7 @@ const TempInventoryReturnCreate = () => {
   const manufacturerState = useSelector((state) => ({ ...state.manufacturers }));
 
   const handleOnChangeManufacturer = (e) => {
-    console.log(e);
+    // console.log(e);
     setProductList([]);
     setSelectedProduct(null);
     if (e) {
@@ -147,7 +154,7 @@ const TempInventoryReturnCreate = () => {
   };
 
   const handleOnChangeProduct = (e) => {
-    console.log(e);
+    // console.log(e);
     setSelectedProduct(e);
     // console.log('value 211',e.value);
     // console.log(valueFormik.current);
@@ -269,9 +276,12 @@ const TempInventoryReturnCreate = () => {
       // expectedReturnDate: new Date(
       //   values.expectedReturnDate + new Date().getTimezoneOffset() / 60,
       // ).toJSON(),
-      expectedReturnDate: new Date(
-        expectedReturnDate.getTime() - expectedReturnDate.getTimezoneOffset() * 60 * 1000,
-      ).toJSON(),
+      expectedReturnDate: values.expectedReturnDate
+        ? new Date(
+            expectedReturnDate.getTime() -
+              expectedReturnDate.getTimezoneOffset() * 60 * 1000,
+          ).toJSON()
+        : null,
       totalAmout: calculateTotalAmount(),
       description: values.description,
       userCreateId: values.userCreateId,
@@ -340,12 +350,13 @@ const TempInventoryReturnCreate = () => {
 
   const getProductListByManufacturerId = async (manufacturerId) => {
     try {
-   
       const actionResult = await dispatch(getAllProductNotPaging(manufacturerId));
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
       if (dataResult.data) {
-        setProductList(dataResult.data.product);
+        if (!!dataResult.data.product) {
+          setProductList(dataResult.data.product);
+        }
       }
     } catch (error) {
       console.log('Failed to fetch product list: ', error);
@@ -723,7 +734,7 @@ const TempInventoryReturnCreate = () => {
                     </Box>
                     <Box>
                       <Typography variant="p">
-                        <strong>Ngày trả hàng dự kiến</strong>
+                        <strong>Ngày trả hàng dự kiến</strong><IconRequired/>
                       </Typography>
                       <LocalizationProvider
                         // locale={vi}
@@ -748,6 +759,12 @@ const TempInventoryReturnCreate = () => {
                           )}
                         />
                       </LocalizationProvider>
+                      <FormHelperText
+                        error={true}
+                        className="error-text-helper"
+                      >
+                        {errors.expectedReturnDate}
+                      </FormHelperText>
                     </Box>
                     <Box className={classes.descriptionContainer}>
                       <Typography variant="p">
