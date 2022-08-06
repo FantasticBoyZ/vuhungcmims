@@ -284,13 +284,13 @@ const Sidebar = () => {
       hasParent: false,
     },
     {
-      primary: 'Kiểm hàng',
+      primary: 'Kiểm kho',
       icon: <TableView />,
       path: '/customer',
       acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER'],
       children: [
         {
-          primary: 'Tạo phiếu kiểm hàng',
+          primary: 'Tạo phiếu kiểm kho',
           icon: '',
           path: '/inventory-checking/create',
           acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
@@ -298,7 +298,7 @@ const Sidebar = () => {
           hasParent: true,
         },
         {
-          primary: 'Lịch sử kiểm hàng',
+          primary: 'Lịch sử kiểm kho',
           icon: '',
           path: '/inventory-checking/list',
           acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
