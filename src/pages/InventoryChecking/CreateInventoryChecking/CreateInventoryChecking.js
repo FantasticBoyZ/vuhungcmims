@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     width: '35%',
   },
   selectBox: {
-    width: '50%',
+    width: '100%',
   },
   table: {
     textAlign: 'center',
@@ -445,6 +445,56 @@ const CreateInventoryChecking = () => {
               spacing={2}
             >
               <Grid
+                xs={12}
+                item
+              >
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6">Chọn kho kiểm</Typography>
+                    <Stack
+                      direction="row"
+                      py={2}
+                      justifyContent="space-between"
+                    >
+                      <Box className={classes.selectBox}>
+                        {warehouseList && (
+                          <Box>
+                            <Select
+                              classNamePrefix="select"
+                              placeholder="Chọn kho"
+                              noOptionsMessage={() => <>Không có tìm thấy kho nào</>}
+                              isClearable={true}
+                              isSearchable={true}
+                              isLoading={warehouseState.loading}
+                              loadingMessage={() => <>Đang tìm kiếm kho...</>}
+                              name="warehouse"
+                              // value={warehouseId}
+                              options={FormatDataUtils.getOption(warehouseList)}
+                              menuPortalTarget={document.body}
+                              styles={{
+                                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                              }}
+                              onChange={(e) => {
+                                setFieldValue('warehouseId', e?.value.id || '');
+                                setFieldValue('productList', [], false);
+                                handleChangeWarehouse(e);
+                              }}
+                            />
+                            <FormHelperText
+                              error={true}
+                              className="error-text-helper"
+                            >
+                              {errors.warehouseId}
+                            </FormHelperText>
+                          </Box>
+                        )}
+                      </Box>
+               
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+              {/* <Grid
                 xs={6}
                 item
               >
@@ -457,7 +507,8 @@ const CreateInventoryChecking = () => {
                       justifyContent="space-between"
                     >
                       <Box className={classes.selectBox}>
-                        {/* <AsyncPaginate
+                        comment thang asyncPaginate nay di
+                        <AsyncPaginate
                           value={warehouseId}
                           loadOptions={loadWarehouseOptions}
                           getOptionValue={(option) => option.id}
@@ -472,7 +523,7 @@ const CreateInventoryChecking = () => {
                           additional={{
                             page: 1,
                           }}
-                        /> */}
+                        />
                         {warehouseList && (
                           <Box>
                             <Select
@@ -515,8 +566,8 @@ const CreateInventoryChecking = () => {
                     </Stack>
                   </CardContent>
                 </Card>
-              </Grid>
-              <Grid
+              </Grid> */}
+              {/* <Grid
                 xs={6}
                 item
               >
@@ -564,7 +615,7 @@ const CreateInventoryChecking = () => {
                     </Stack>
                   </CardContent>
                 </Card>
-              </Grid>
+              </Grid> */}
               <Grid
                 xs={12}
                 item

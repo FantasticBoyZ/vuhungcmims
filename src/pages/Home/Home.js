@@ -134,12 +134,12 @@ const HomePage = () => {
       acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER', 'ROLE_SELLER'],
     },
     {
-      label: 'Tạo phiếu kiểm hàng',
+      label: 'Tạo phiếu kiểm kho',
       path: '/inventory-checking/create',
       acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER'],
     },
     {
-      label: 'Lịch sử kiểm hàng',
+      label: 'Lịch sử kiểm kho',
       path: '/inventory-checking/list',
       acceptRole: ['ROLE_OWNER', 'ROLE_STOREKEEPER'],
     },

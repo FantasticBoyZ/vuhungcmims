@@ -195,7 +195,7 @@ const InventoryCheckingDetail = () => {
                           item
                         >
                           <Typography className={classes.contentInfo}>
-                            {'Trịnh Bá Minh Ninh' +
+                            {inventoryChecking.fullName +
                               (inventoryChecking.userName
                                 ? '(' + inventoryChecking.userName + ')'
                                 : '')}
