@@ -219,7 +219,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                       <Typography>{getStatusLabel(importOrder.statusName)}</Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <Typography>{importOrder.totalPrice}</Typography>
+                      <Typography>{FormatDataUtils.formatCurrency(importOrder.totalPrice)}</Typography>
                     </TableCell>
                   </TableRow>
                 );
