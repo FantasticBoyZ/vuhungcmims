@@ -356,10 +356,11 @@ const Sidebar = () => {
           >
             <Typography
               variant="h6"
-              fontSize={14}
+              fontSize={24}
               sx={{ color: 'white' }}
+              
             >
-              Vu Hung Company's CMIMS
+              Vũ Hưng CMIMS
             </Typography>
           </Link>
         )}
