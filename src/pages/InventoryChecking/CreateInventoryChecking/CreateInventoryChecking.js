@@ -6,7 +6,15 @@ import {
 } from '@/slices/InventoryCheckingSlice';
 import { getAllWarehouseNotPaging, getWarehouseList } from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
-import { CloudUpload, Delete, Done, FileDownload, Input } from '@mui/icons-material';
+import {
+  CloudUpload,
+  Delete,
+  Done,
+  FileDownload,
+  Info,
+  InfoOutlined,
+  Input,
+} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -24,6 +32,7 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -304,7 +313,7 @@ const CreateInventoryChecking = () => {
           : FormatDataUtils.getRoundFloorNumber(
               product.listConsignment[indexConsignment].quantity /
                 product.numberOfWrapUnitMeasure,
-              1,
+              2,
             );
       totalDifferent = Math.round(
         (product.listConsignment[indexConsignment].realityQuantity - quantity) *
@@ -675,7 +684,7 @@ const CreateInventoryChecking = () => {
                                                           FormatDataUtils.getRoundFloorNumber(
                                                             consignment.realityQuantity /
                                                               e.value.number,
-                                                            1,
+                                                            2,
                                                           ),
                                                         );
                                                       }
@@ -852,7 +861,7 @@ const CreateInventoryChecking = () => {
                                                         : FormatDataUtils.getRoundFloorNumber(
                                                             consignment?.quantity /
                                                               product.numberOfWrapUnitMeasure,
-                                                            1,
+                                                            2,
                                                           )}
                                                     </TableCell>
                                                     <TableCell align="center">
@@ -868,7 +877,7 @@ const CreateInventoryChecking = () => {
                                                               product.selectedUnitMeasure ===
                                                               product.unitMeasure
                                                                 ? 1
-                                                                : 0.1,
+                                                                : 0.01,
                                                             // max: consignment?.quantity,
                                                           },
                                                         }}
@@ -879,29 +888,30 @@ const CreateInventoryChecking = () => {
                                                         //   );
                                                         // }}
                                                       />
-                                                      {/* <TextField
-                                                        variant="standard"
-                                                        type="number"
-                                                        value={
-                                                          consignment.realityQuantity
-                                                        }
-                                                        InputProps={{
-                                                          inputProps: {
-                                                            min: 0,
-                                                          },
-                                                        }}
-                                                        onChange={(e) => {
-                                                          setFieldValue(
-                                                            `productList[${index}].listConsignment[${indexConsignment}].realityQuantity`,
-                                                            e?.target.value > 0
-                                                              ? FormatDataUtils.getRoundFloorNumber(
-                                                                  e?.target.value,
-                                                                  1,
-                                                                )
-                                                              : '',
-                                                          );
-                                                        }}
-                                                      /> */}
+                                                      {product.selectedUnitMeasure !==
+                                                        product.unitMeasure && (
+                                                        <Tooltip
+                                                          title={
+                                                            consignment.realityQuantity -
+                                                            (consignment.realityQuantity %
+                                                              1) +
+                                                            ' ' +
+                                                            product.wrapUnitMeasure +
+                                                            ' ' +
+                                                            Math.floor(
+                                                              (consignment.realityQuantity %
+                                                                1) *
+                                                                product.numberOfWrapUnitMeasure,
+                                                            ) +
+                                                            ' ' +
+                                                            product.unitMeasure
+                                                          }
+                                                        >
+                                                          <IconButton>
+                                                            <InfoOutlined />
+                                                          </IconButton>
+                                                        </Tooltip>
+                                                      )}
                                                     </TableCell>
                                                     <TableCell align="center">
                                                       {FormatDataUtils.formatCurrency(
