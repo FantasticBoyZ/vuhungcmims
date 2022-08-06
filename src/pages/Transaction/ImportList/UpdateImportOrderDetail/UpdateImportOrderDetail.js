@@ -200,7 +200,8 @@ const UpdateImportOrderDetail = () => {
               productId: consignment.productId,
               expirationDate: !!consignment.expirationDate
                 ? new Date(
-                    new Date(consignment.expirationDate) - new Date().getTimezoneOffset() / 60,
+                    new Date(consignment.expirationDate) -
+                      new Date().getTimezoneOffset() / 60,
                   ).toJSON()
                 : null,
               importDate: new Date(consignment.importDate).toJSON(),
@@ -354,7 +355,7 @@ const UpdateImportOrderDetail = () => {
                           <Box className={classes.billReferenceContainer}>
                             <Typography variant="span">
                               <strong>Phiếu nhập kho số:</strong>{' '}
-                              {importOrder.billRefernce}
+                              {'NHAP' + importOrderId}
                             </Typography>{' '}
                             <span>
                               {FormatDataUtils.getStatusLabel(importOrder.statusName)}
@@ -722,7 +723,7 @@ const UpdateImportOrderDetail = () => {
                               <Box> Phiếu nhập chưa có lô hàng nào </Box>
                             )}
                           </Card>
-                          <pre>{JSON.stringify(values, null, 2)}</pre>
+                          {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
                         </Grid>
                       </Grid>
                     </Grid>

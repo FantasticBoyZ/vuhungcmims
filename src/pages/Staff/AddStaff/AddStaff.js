@@ -32,6 +32,8 @@ import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { differenceInYears } from 'date-fns';
 
 const useStyles = makeStyles((theme) => ({
   preview: {
@@ -66,17 +68,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Dropzone(props) {
-  const { imageUrl, setImageUrl, setFormData } = props;
+  const { imageUrl, setImageUrl, setFormData, setErrorImage } = props;
   const onDrop = useCallback((acceptedFiles, fileRejections) => {
     // console.log(fileRejections[0]);
+    setErrorImage('');
     if (!!fileRejections[0]) {
       //   console.log(fileRejections[0].errors);
       if (fileRejections[0].errors[0].code === 'file-invalid-type') {
         console.log('Bạn vui lòng chọn file đuôi .jpg, .png để tải lên');
+        setErrorImage('Bạn vui lòng chọn file đuôi .jpg, .png để tải lên');
         return;
       }
       if (fileRejections[0].errors[0].code === 'file-too-large') {
         console.log('Bạn vui lòng chọn file ảnh dưới 5MB để tải lên');
+        setErrorImage('Bạn vui lòng chọn file ảnh dưới 5MB để tải lên');
+        return;
       }
     } else {
       // Do something with the files
@@ -142,6 +148,7 @@ const AddStaff = () => {
   const navigate = useNavigate();
   const today = new Date();
   const { loadingAddress } = useSelector((state) => ({ ...state.address }));
+  const { loading } = useSelector((state) => ({ ...state.staff }));
   const [imageUrl, setImageUrl] = useState();
   const [formData, setFormData] = useState(new FormData());
   const [touchedDob, setTouchedDob] = useState(false);
@@ -155,6 +162,7 @@ const AddStaff = () => {
   const [selectedProvince, setSelectedProvince] = useState();
   const [selectedDistrict, setSelectedDistrict] = useState();
   const [selectedWard, setSelectedWard] = useState();
+  const [errorImage, setErrorImage] = useState('');
   const initialFormValue = {
     username: '',
     fullName: '',
@@ -170,6 +178,7 @@ const AddStaff = () => {
     addressDetail: '',
   };
 
+  const regexPhone = /^(0[3|5|7|8|9])+([0-9]{8})$/
   const FORM_VALIDATION = Yup.object().shape({
     username: Yup.string().required('Chưa nhập mã nhân viên'),
     fullName: Yup.string().required('Chưa nhập Họ và tên nhân viên'),
@@ -178,11 +187,21 @@ const AddStaff = () => {
       .matches(/^(\d{9}|\d{12})$/, 'Số CCCD/CMND của bạn không hợp lệ'),
     phone: Yup.string()
       .required('Chưa nhập Số điện thoại')
-      .matches(/^(0[3|5|7|8|9])+([0-9]{8})$/, 'Số điện thoại của bạn không hợp lệ'),
+      .test('phone', 'Vui lòng xoá các khoảng trắng', function (value) {
+        if(value) {
+          return !value.includes(' ');
+        }
+      })
+      .matches(/^([\+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})$/, 'Số điện thoại của bạn không hợp lệ'),
     email: Yup.string()
       .email('Vui lòng nhập đúng định dạng email. VD abc@xyz.com')
       .required('Chưa nhập Email'),
-    dateOfBirth: Yup.string().required('Chưa nhập ngày sinh').nullable(),
+    dateOfBirth: Yup.string()
+      .required('Chưa nhập ngày sinh')
+      .nullable()
+      .test('dateOfBirth', 'Nhân viên phải ít nhất 18 tuổi', function (value) {
+        return differenceInYears(new Date(), new Date(value)) >= 18;
+      }),
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố').nullable(),
     districtId: Yup.number().required('Chưa chọn quận/huyện').nullable(),
     wardId: Yup.number().required('Chưa chọn xã/phường').nullable(),
@@ -356,8 +375,16 @@ const AddStaff = () => {
                         imageUrl={imageUrl}
                         setImageUrl={setImageUrl}
                         setFormData={setFormData}
+                        setErrorImage={setErrorImage}
                       />
                     </Stack>
+                    <FormHelperText
+                      className={classes.formHelperTextStyle}
+                      error={true}
+                      sx={{ height: '20px' }}
+                    >
+                      {errorImage}
+                    </FormHelperText>
                   </CardContent>
                 </Card>
                 <Card>
@@ -564,7 +591,7 @@ const AddStaff = () => {
                           )}
                           isClearable={true}
                           isSearchable={true}
-                          isLoading={loadingAddress}
+                          isLoading={loadingAddress && !selectedProvince}
                           name="provinceId"
                           value={FormatDataUtils.getSelectedOption(
                             provinceList,
@@ -583,6 +610,7 @@ const AddStaff = () => {
                           onFocus={() => setTouchedProvinceId(true)}
                           onChange={(e) => {
                             setFieldValue('provinceId', e?.value);
+                            setFieldValue('districtId', '', false);
                             onChangeProvince(e);
                           }}
                         />
@@ -614,9 +642,8 @@ const AddStaff = () => {
                           )}
                           isClearable={true}
                           isSearchable={true}
-                          isLoading={loadingAddress}
                           name="districtId"
-                          isDisabled={!selectedProvince}
+                          isLoading={loadingAddress && !selectedDistrict}
                           value={FormatDataUtils.getSelectedOption(
                             districtList,
                             selectedDistrict,
@@ -634,6 +661,7 @@ const AddStaff = () => {
                           onFocus={() => setTouchedDistrictId(true)}
                           onChange={(e) => {
                             setFieldValue('districtId', e?.value);
+                            setFieldValue('wardId', '', false);
                             onChangeDistrict(e);
                           }}
                         />
@@ -662,7 +690,7 @@ const AddStaff = () => {
                           noOptionsMessage={() => <>Không tìm thấy Xã/Phường phù hợp</>}
                           isClearable={true}
                           isSearchable={true}
-                          isLoading={loadingAddress}
+                          isLoading={loadingAddress && !selectedWard}
                           name="wardId"
                           isDisabled={!selectedDistrict}
                           value={FormatDataUtils.getSelectedOption(
@@ -719,10 +747,12 @@ const AddStaff = () => {
                     spacing={2}
                     p={2}
                   >
-                    <Button
+                    <LoadingButton
                       variant="contained"
                       startIcon={<Done />}
                       color="success"
+                      loading={loading}
+                      loadingPosition="start"
                       type="submit"
                       onClick={() => {
                         setTouchedDob(true);
@@ -732,11 +762,12 @@ const AddStaff = () => {
                       }}
                     >
                       Thêm nhân viên
-                    </Button>
+                    </LoadingButton>
                     <Button
                       variant="contained"
                       startIcon={<Close />}
                       color="error"
+                      disabled={loading}
                       onClick={() => navigate('/staff/list')}
                     >
                       Huỷ

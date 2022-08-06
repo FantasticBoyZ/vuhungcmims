@@ -120,7 +120,15 @@ const AddEditManufacturerForm = () => {
 
     phone: Yup.string()
       .required('Chưa nhập số điện thoại nhà sản xuất')
-      .matches(/^(0[3|5|7|8|9])+([0-9]{8})$/, 'Số điện thoại của bạn không hợp lệ'),
+      .test('phone', 'Vui lòng xoá các khoảng trắng', function (value) {
+        if (value) {
+          return !value.includes(' ');
+        }
+      })
+      .matches(
+        /^[\+84|84|0]+([0-9]{10})$/,
+        'Số điện thoại của nhà cung cấp không hợp lệ',
+      ),
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố'),
     districtId: Yup.number().required('Chưa chọn quận/huyện/thành phố'),
     wardId: Yup.number().required('Chưa chọn phường/xã'),
@@ -735,6 +743,7 @@ const AddEditManufacturerForm = () => {
                                 onFocus={() => setTouchedProvinceId(true)}
                                 onChange={(e) => {
                                   setFieldValue('provinceId', e?.value);
+                                  setFieldValue('districtId', '', false);
                                   onChangeProvince(e);
                                 }}
                               />
@@ -788,6 +797,7 @@ const AddEditManufacturerForm = () => {
                                 onFocus={() => setTouchedDistrictId(true)}
                                 onChange={(e) => {
                                   setFieldValue('districtId', e?.value);
+                                  setFieldValue('wardId', '', false);
                                   onChangeDistrict(e);
                                 }}
                               />

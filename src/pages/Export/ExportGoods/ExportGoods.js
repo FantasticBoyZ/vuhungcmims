@@ -206,7 +206,7 @@ const ExportGoods = () => {
   const { loading } = useSelector((state) => ({ ...state.exportOrders }));
 
   const FORM_VALIDATION = Yup.object().shape({
-    billReferenceNumber: Yup.string().required('Bạn chưa nhập mã phiếu tham chiếu'),
+    // billReferenceNumber: Yup.string().required('Bạn chưa nhập mã phiếu tham chiếu'),
   });
 
   const arrayHelpersRef = useRef(null);
@@ -438,6 +438,7 @@ const ExportGoods = () => {
                         isLoading={loading}
                         loadingMessage={() => <>Đang tìm kiếm sản phẩm...</>}
                         name="product"
+                        value={null}
                         //   value={selectedProduct}
                         options={FormatDataUtils.getOptionProduct(productList)}
                         // options={FormatDataUtils.getOption(productListDataTest)}
@@ -593,7 +594,11 @@ const ExportGoods = () => {
                                                       )}
                                                     </TableCell>
                                                     <TableCell>
-                                                      {consignment?.expirationDate ? FormatDataUtils.formatDate(consignment?.expirationDate) : "Không có"}
+                                                      {consignment?.expirationDate
+                                                        ? FormatDataUtils.formatDate(
+                                                            consignment?.expirationDate,
+                                                          )
+                                                        : 'Không có'}
                                                     </TableCell>
                                                     <TableCell align="center">
                                                       <TextfieldWrapper
@@ -654,7 +659,7 @@ const ExportGoods = () => {
                     <Typography>{FormatDataUtils.formatDateTime(new Date())}</Typography>
                     <br />
                     <Typography>
-                      <strong>Tham chiếu</strong> <IconRequired />
+                      <strong>Tham chiếu</strong>
                     </Typography>
                     <TextfieldWrapper
                       id="referenceNumber"
@@ -695,7 +700,7 @@ const ExportGoods = () => {
                         variant="contained"
                         size="large"
                         loading={loading}
-                        loadingPosition='start'
+                        loadingPosition="start"
                         startIcon={<Done />}
                         color="success"
                       >

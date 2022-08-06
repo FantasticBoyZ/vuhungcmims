@@ -212,11 +212,13 @@ const ProductDetail = () => {
                             item
                           >
                             <Typography className={classes.contentInfo}>
-                              {selectedUnitMeasure === product.wrapUnitMeasure
-                                ? FormatDataUtils.getRoundNumber(
-                                    product.quantity / product.numberOfWrapUnitMeasure,
-                                    1,
-                                  )
+                              {selectedUnitMeasure
+                                ? selectedUnitMeasure === product.wrapUnitMeasure
+                                  ? FormatDataUtils.getRoundNumber(
+                                      product.quantity / product.numberOfWrapUnitMeasure,
+                                      1,
+                                    )
+                                  : product.quantity
                                 : product.quantity}
                             </Typography>
                           </Grid>

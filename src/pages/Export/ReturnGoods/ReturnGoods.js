@@ -22,7 +22,7 @@ import ExportProductTable from '@/pages/Transaction/ExportList/ExportOrderDetail
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { Form, Formik } from 'formik';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   createReturnOrder,
   getConsignmentsByExportOrderId,
@@ -31,6 +31,7 @@ import {
 import { unwrapResult } from '@reduxjs/toolkit';
 import AlertPopup from '@/components/Common/AlertPopup';
 import { toast } from 'react-toastify';
+import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -77,6 +78,11 @@ const useStyles = makeStyles((theme) => ({
       // color: theme.palette.primary.main,
       backgroundColor: 'rgba(217, 217, 217, 0.5)',
     },
+  },
+  warehouseContainer: {
+    backgroundColor: 'rgba(220, 244, 252,0.5)',
+    padding: theme.spacing(1),
+    borderRadius: '10px',
   },
 }));
 
@@ -163,6 +169,7 @@ const ReturnGoods = () => {
   const { exportOrderId } = useParams();
   const [exportOrder, setExportOrder] = useState();
   const [productList, setProductList] = useState([]);
+  const [addressWarehouse, setAddressWarehouse] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const classes = useStyles();
@@ -173,6 +180,8 @@ const ReturnGoods = () => {
   const [isConfirm, setIsConfirm] = useState(false);
   const valueFormik = useRef();
   // const productList = exportOrder.productList;
+
+  const { loading } = useSelector((state) => ({ ...state.exportOrders }));
 
   const calculateTotalAmount = () => {
     let totalAmount = 0;
@@ -263,8 +272,8 @@ const ReturnGoods = () => {
         try {
           const params = {
             returnOrder: returnOrder,
-            exportOrderId: exportOrderId
-          }
+            exportOrderId: exportOrderId,
+          };
           const response = await dispatch(createReturnOrder(params));
           const resultResponse = unwrapResult(response);
           console.log(resultResponse);
@@ -323,6 +332,7 @@ const ReturnGoods = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setProductList(dataResult.data.productList);
+        setAddressWarehouse(dataResult.data.addressWarehouse);
         // setTotalRecord(dataResult.data.totalRecord);
       }
       console.log('consignments List', dataResult);
@@ -337,324 +347,343 @@ const ReturnGoods = () => {
   }, []);
 
   return (
-    <Box>
-      {!!exportOrder && productList.length > 0 && (
-        <Formik
-          initialValues={{ ...exportOrder, productList: [...productList] }}
-          // validationSchema={FORM_VALIDATION}
-          // onSubmit={(values) => handleSubmit(values)}
-        >
-          {({ values, errors, setFieldValue }) => {
-            valueFormik.current = values;
-            return (
-              <Form>
-                <Grid
-                  container
-                  spacing={2}
-                >
-                  <Grid
-                    xs={12}
-                    item
-                  >
-                    <Card>
-                      <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        p={2}
-                      >
-                        <Box className={classes.billReferenceContainer}>
-                          <Typography variant="span">
-                            <strong>Phiếu xuất kho số:</strong> {exportOrder.billRefernce}
-                          </Typography>
-                        </Box>
-                        {exportOrder.statusName === 'completed' && (
-                          <Stack
-                            direction="row"
-                            justifyContent="flex-end"
-                            spacing={2}
-                            className={classes.buttonAction}
-                          >
-                            <Button
-                              variant="contained"
-                              startIcon={<KeyboardReturn />}
-                              color="warning"
-                              onClick={() => handleOnClickConfirm()}
-                            >
-                              Trả hàng
-                            </Button>
-                            <Button
-                              variant="contained"
-                              startIcon={<Close />}
-                              color="error"
-                              onClick={() => handleOnClickCancel()}
-                            >
-                              Huỷ phiếu trả hàng
-                            </Button>
-                          </Stack>
-                        )}
-                      </Stack>
-                    </Card>
-                  </Grid>
-                  <Grid
-                    xs={9}
-                    item
-                  >
+    <>
+      {loading ? (
+        <ProgressCircleLoading />
+      ) : (
+        <Box>
+          {!!exportOrder && productList.length > 0 && (
+            <Formik
+              initialValues={{ ...exportOrder, productList: [...productList] }}
+              // validationSchema={FORM_VALIDATION}
+              // onSubmit={(values) => handleSubmit(values)}
+            >
+              {({ values, errors, setFieldValue }) => {
+                valueFormik.current = values;
+                return (
+                  <Form>
                     <Grid
                       container
                       spacing={2}
                     >
-                      {/* <Grid
+                      <Grid
+                        xs={12}
+                        item
+                      >
+                        <Card>
+                          <Stack
+                            direction="row"
+                            justifyContent="space-between"
+                            p={2}
+                          >
+                            <Box className={classes.billReferenceContainer}>
+                              <Typography variant="span">
+                                <strong>Phiếu xuất kho số:</strong>{' '}
+                                {exportOrder.billRefernce}
+                              </Typography>
+                            </Box>
+                            {exportOrder.statusName === 'completed' && (
+                              <Stack
+                                direction="row"
+                                justifyContent="flex-end"
+                                spacing={2}
+                                className={classes.buttonAction}
+                              >
+                                <Button
+                                  variant="contained"
+                                  startIcon={<KeyboardReturn />}
+                                  color="warning"
+                                  onClick={() => handleOnClickConfirm()}
+                                >
+                                  Trả hàng
+                                </Button>
+                                <Button
+                                  variant="contained"
+                                  startIcon={<Close />}
+                                  color="error"
+                                  onClick={() => handleOnClickCancel()}
+                                >
+                                  Huỷ phiếu trả hàng
+                                </Button>
+                              </Stack>
+                            )}
+                          </Stack>
+                        </Card>
+                      </Grid>
+                      <Grid
+                        xs={9}
+                        item
+                      >
+                        <Grid
+                          container
+                          spacing={2}
+                        >
+                          {/* <Grid
             xs={12}
             item
           >
             <Card>Thông tin phiếu xuất kho</Card>
           </Grid> */}
-                      <Grid
-                        xs={12}
-                        item
-                      >
-                        <Card className={classes.cardTable}>
-                          <TableContainer>
-                            <Table className={classes.table}>
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell>STT</TableCell>
-                                  <TableCell>Mã sản phẩm</TableCell>
-                                  <TableCell>Tên sản phẩm</TableCell>
-                                  <TableCell>Đơn vị</TableCell>
-                                  <TableCell align="center">Số lượng</TableCell>
-                                  <TableCell align="center">Đơn giá</TableCell>
-                                  <TableCell align="center">Thành tiền</TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {productList.length > 0 &&
-                                  productList.map((product, index) => (
-                                    <Fragment key={index}>
-                                      <TableRow
-                                        hover
-                                        //   selected={islistProductselected}
-                                        selected={false}
-                                      >
-                                        {/* TODO: Sửa phần index khi phân trang */}
-                                        <TableCell>{index + 1}</TableCell>
-                                        <TableCell>{product?.productCode}</TableCell>
-                                        <TableCell>{product?.productName}</TableCell>
-                                        <TableCell>{product?.unitMeasure}</TableCell>
-                                        <TableCell align="center">
-                                          {calculateTotalQuantityOfProduct(
-                                            values?.productList[index],
-                                          )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                          {FormatDataUtils.formatCurrency(
-                                            product?.unitPrice || '0',
-                                          )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                          {FormatDataUtils.formatCurrency(
-                                            calculateTotalQuantityOfProduct(
-                                              values.productList[index],
-                                            ) * product?.unitPrice,
-                                          )}
-                                        </TableCell>
-                                      </TableRow>
-                                      <TableRow className={classes.rowConsignment}>
-                                        <TableCell
-                                          className={classes.tableCellConsignment}
-                                        ></TableCell>
-                                        <TableCell
-                                          colSpan={5}
-                                          className={classes.tableCellConsignment}
-                                        >
-                                          <Table className={classes.tableCosignment}>
-                                            {/* <TableHead> */}
+                          <Grid
+                            xs={12}
+                            item
+                          >
+                            <Card className={classes.cardTable}>
+                              <TableContainer>
+                                <Table className={classes.table}>
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell>STT</TableCell>
+                                      <TableCell>Mã sản phẩm</TableCell>
+                                      <TableCell>Tên sản phẩm</TableCell>
+                                      <TableCell>Đơn vị</TableCell>
+                                      <TableCell align="center">Số lượng</TableCell>
+                                      <TableCell align="center">Đơn giá</TableCell>
+                                      <TableCell align="center">Thành tiền</TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {productList.length > 0 &&
+                                      productList.map((product, index) => (
+                                        <Fragment key={index}>
+                                          <TableRow
+                                            hover
+                                            //   selected={islistProductselected}
+                                            selected={false}
+                                          >
+                                            {/* TODO: Sửa phần index khi phân trang */}
+                                            <TableCell>{index + 1}</TableCell>
+                                            <TableCell>{product?.productCode}</TableCell>
+                                            <TableCell>{product?.productName}</TableCell>
+                                            <TableCell>{product?.unitMeasure}</TableCell>
+                                            <TableCell align="center">
+                                              {calculateTotalQuantityOfProduct(
+                                                values?.productList[index],
+                                              )}
+                                            </TableCell>
+                                            <TableCell align="center">
+                                              {FormatDataUtils.formatCurrency(
+                                                product?.unitPrice || '0',
+                                              )}
+                                            </TableCell>
+                                            <TableCell align="center">
+                                              {FormatDataUtils.formatCurrency(
+                                                calculateTotalQuantityOfProduct(
+                                                  values.productList[index],
+                                                ) * product?.unitPrice,
+                                              )}
+                                            </TableCell>
+                                          </TableRow>
+                                          <TableRow className={classes.rowConsignment}>
+                                            <TableCell
+                                              className={classes.tableCellConsignment}
+                                            ></TableCell>
+                                            <TableCell
+                                              colSpan={5}
+                                              className={classes.tableCellConsignment}
+                                            >
+                                              <Table className={classes.tableCosignment}>
+                                                {/* <TableHead> */}
 
-                                            {/* </TableHead> */}
-                                            <TableBody>
-                                              <TableRow>
-                                                <TableCell>Vị trí</TableCell>
-                                                <TableCell>Ngày nhập</TableCell>
-                                                <TableCell>Hạn lưu kho</TableCell>
-                                                <TableCell align="center">
-                                                  Trả về
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                  Số lượng trên đơn hàng
-                                                </TableCell>
-                                              </TableRow>
-                                              {product?.consignmentList.map(
-                                                (consignment, indexConsignment) => (
-                                                  <TableRow
-                                                    key={indexConsignment}
-                                                    // hover
-                                                  >
-                                                    <TableCell>
-                                                      {consignment?.warehouseName}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                      {consignment?.importDate
-                                                        ? FormatDataUtils.formatDate(
-                                                            consignment?.importDate,
-                                                          )
-                                                        : 'Không có'}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                      {consignment?.expirationDate
-                                                        ? FormatDataUtils.formatDate(
-                                                            consignment?.expirationDate,
-                                                          )
-                                                        : 'Không có'}
+                                                {/* </TableHead> */}
+                                                <TableBody>
+                                                  <TableRow>
+                                                    <TableCell>Vị trí</TableCell>
+                                                    <TableCell>Ngày nhập</TableCell>
+                                                    <TableCell>Hạn lưu kho</TableCell>
+                                                    <TableCell align="center">
+                                                      Trả về
                                                     </TableCell>
                                                     <TableCell align="center">
-                                                      <TextfieldWrapper
-                                                        name={`productList[${index}].consignmentList[${indexConsignment}].quantityReturn`}
-                                                        variant="standard"
-                                                        className="text-field-quantity"
-                                                        type={'number'}
-                                                        InputProps={{
-                                                          inputProps: {
-                                                            min: 0,
-                                                            max: consignment?.quantity,
-                                                          },
-                                                        }}
-                                                        // onChange={(e) => {
-                                                        //   setFieldValue(
-                                                        //     `productList[${index}].consignments[${indexConsignment}].quantityReturn`,
-                                                        //     e?.target.value,
-                                                        //   );
-                                                        // }}
-                                                      />
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                      {consignment?.quantity}
+                                                      Số lượng trên đơn hàng
                                                     </TableCell>
                                                   </TableRow>
-                                                ),
-                                              )}
-                                            </TableBody>
-                                          </Table>
-                                        </TableCell>
-                                        <TableCell
-                                          className={classes.tableCellConsignment}
-                                        ></TableCell>
-                                      </TableRow>
-                                    </Fragment>
-                                  ))}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-                        </Card>
+                                                  {product?.consignmentList.map(
+                                                    (consignment, indexConsignment) => (
+                                                      <TableRow
+                                                        key={indexConsignment}
+                                                        // hover
+                                                      >
+                                                        <TableCell>
+                                                          {consignment?.warehouseName}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                          {consignment?.importDate
+                                                            ? FormatDataUtils.formatDate(
+                                                                consignment?.importDate,
+                                                              )
+                                                            : 'Không có'}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                          {consignment?.expirationDate
+                                                            ? FormatDataUtils.formatDate(
+                                                                consignment?.expirationDate,
+                                                              )
+                                                            : 'Không có'}
+                                                        </TableCell>
+                                                        <TableCell align="center">
+                                                          <TextfieldWrapper
+                                                            name={`productList[${index}].consignmentList[${indexConsignment}].quantityReturn`}
+                                                            variant="standard"
+                                                            className="text-field-quantity"
+                                                            type={'number'}
+                                                            InputProps={{
+                                                              inputProps: {
+                                                                min: 0,
+                                                                max: consignment?.quantity,
+                                                              },
+                                                            }}
+                                                            // onChange={(e) => {
+                                                            //   setFieldValue(
+                                                            //     `productList[${index}].consignments[${indexConsignment}].quantityReturn`,
+                                                            //     e?.target.value,
+                                                            //   );
+                                                            // }}
+                                                          />
+                                                        </TableCell>
+                                                        <TableCell align="center">
+                                                          {consignment?.quantity}
+                                                        </TableCell>
+                                                      </TableRow>
+                                                    ),
+                                                  )}
+                                                </TableBody>
+                                              </Table>
+                                            </TableCell>
+                                            <TableCell
+                                              className={classes.tableCellConsignment}
+                                            ></TableCell>
+                                          </TableRow>
+                                        </Fragment>
+                                      ))}
+                                  </TableBody>
+                                </Table>
+                              </TableContainer>
+                            </Card>
+                          </Grid>
+                        </Grid>
                       </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid
-                    xs={3}
-                    item
-                  >
-                    <Grid
-                      container
-                      spacing={2}
-                    >
                       <Grid
-                        xs={12}
+                        xs={3}
                         item
                       >
-                        <Card>
-                          <CardContent className={classes.confirmInfo}>
-                            <Typography variant="h6">Thông tin xác nhận</Typography>
-                            <Typography>
-                              Người tạo đơn: <i>{exportOrder.createBy}</i>
-                            </Typography>
-                            <Typography>Ngày tạo đơn:</Typography>
-                            <Typography>
-                              {FormatDataUtils.formatDateTime(exportOrder.createDate)}
-                            </Typography>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                      <Grid
-                        xs={12}
-                        item
-                      >
-                        <Card>
-                          <CardContent className={classes.warehourseInfo}>
-                            <Typography variant="h6">Kho lấy hàng</Typography>
-                            <Typography>{exportOrder.wareHouseName}</Typography>
-                            <Divider />
-                            <Typography>{exportOrder.addressDetail}</Typography>
-                            <Typography>
-                              {exportOrder.wardName} - {exportOrder.districtName} -{' '}
-                              {exportOrder.provinceName}
-                            </Typography>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                      <Grid
-                        xs={12}
-                        item
-                      >
-                        <Card>
-                          {/* <CardHeader
+                        <Grid
+                          container
+                          spacing={2}
+                        >
+                          <Grid
+                            xs={12}
+                            item
+                          >
+                            <Card>
+                              <CardContent className={classes.confirmInfo}>
+                                <Typography variant="h6">Thông tin xác nhận</Typography>
+                                <Typography>
+                                  Người tạo đơn: <i>{exportOrder.createBy}</i>
+                                </Typography>
+                                <Typography>Ngày tạo đơn:</Typography>
+                                <Typography>
+                                  {FormatDataUtils.formatDateTime(exportOrder.createDate)}
+                                </Typography>
+                              </CardContent>
+                            </Card>
+                          </Grid>
+                          <Grid
+                            xs={12}
+                            item
+                          >
+                            <Card>
+                              <CardContent className={classes.warehourseInfo}>
+                                <Typography variant="h6">Trả về kho</Typography>
+                                <Stack spacing={2}>
+                                  {addressWarehouse.length > 0 &&
+                                    addressWarehouse.map((address) => (
+                                      <Box
+                                        key={address.id}
+                                        className={classes.warehouseContainer}
+                                      >
+                                        <Typography>{address.name}</Typography>
+                                        <Divider />
+                                        <Typography>{address.detailAddress}</Typography>
+                                        <Typography>
+                                          {address.wardName} - {address.districtName} -{' '}
+                                          {address.provinceName}
+                                        </Typography>
+                                      </Box>
+                                    ))}
+                                </Stack>
+                              </CardContent>
+                            </Card>
+                          </Grid>
+                          <Grid
+                            xs={12}
+                            item
+                          >
+                            <Card>
+                              {/* <CardHeader
                   titleTypographyProps={{ variant: 'h6' }}
                   title="Tổng giá trị đơn hàng"
                 /> */}
-                          <CardContent className={classes.orderNote}>
-                            <Typography variant="h6">Ghi chú</Typography>
-                            <TextfieldWrapper
-                              id="description"
-                              name="description"
-                              variant="outlined"
-                              multiline
-                              rows={6}
-                              fullWidth
-                            />
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                      <Grid
-                        xs={12}
-                        item
-                      >
-                        <Card>
-                          <CardContent className={classes.totalAmount}>
-                            {/* <CardHeader
+                              <CardContent className={classes.orderNote}>
+                                <Typography variant="h6">Ghi chú</Typography>
+                                <TextfieldWrapper
+                                  id="description"
+                                  name="description"
+                                  variant="outlined"
+                                  multiline
+                                  rows={6}
+                                  fullWidth
+                                />
+                              </CardContent>
+                            </Card>
+                          </Grid>
+                          <Grid
+                            xs={12}
+                            item
+                          >
+                            <Card>
+                              <CardContent className={classes.totalAmount}>
+                                {/* <CardHeader
                   titleTypographyProps={{ variant: 'h6' }}
                   title="Tổng giá trị đơn hàng"
                 /> */}
-                            <Typography variant="h6">Tổng giá trị đơn hàng</Typography>
-                            <br />
-                            <Typography align="right">
-                              {FormatDataUtils.formatCurrency(calculateTotalAmount())}
-                            </Typography>
-                          </CardContent>
-                        </Card>
+                                <Typography variant="h6">
+                                  Tổng giá trị đơn hàng
+                                </Typography>
+                                <br />
+                                <Typography align="right">
+                                  {FormatDataUtils.formatCurrency(calculateTotalAmount())}
+                                </Typography>
+                              </CardContent>
+                            </Card>
+                          </Grid>
+                        </Grid>
                       </Grid>
+                      <AlertPopup
+                        maxWidth="sm"
+                        title={errorMessage ? 'Chú ý' : title}
+                        openPopup={openPopup}
+                        setOpenPopup={setOpenPopup}
+                        isConfirm={!errorMessage}
+                        handleConfirm={handleConfirm}
+                      >
+                        <Box
+                          component={'span'}
+                          className="popupMessageContainer"
+                        >
+                          {errorMessage ? errorMessage : message}
+                        </Box>
+                      </AlertPopup>
+                      <pre>{JSON.stringify(values, null, 2)}</pre>
                     </Grid>
-                  </Grid>
-                  <AlertPopup
-                    maxWidth="sm"
-                    title={errorMessage ? 'Chú ý' : title}
-                    openPopup={openPopup}
-                    setOpenPopup={setOpenPopup}
-                    isConfirm={!errorMessage}
-                    handleConfirm={handleConfirm}
-                  >
-                    <Box
-                      component={'span'}
-                      className="popupMessageContainer"
-                    >
-                      {errorMessage ? errorMessage : message}
-                    </Box>
-                  </AlertPopup>
-                  <pre>{JSON.stringify(values, null, 2)}</pre>
-                </Grid>
-              </Form>
-            );
-          }}
-        </Formik>
+                  </Form>
+                );
+              }}
+            </Formik>
+          )}
+        </Box>
       )}
-    </Box>
+    </>
   );
 };
 

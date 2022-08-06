@@ -1,12 +1,14 @@
 import SelectWrapper from '@/components/Common/FormsUI/Select';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import FormatDataUtils from '@/utils/formatData';
-import { CloudUpload, Delete } from '@mui/icons-material';
+import { CloudUpload, Delete, Search } from '@mui/icons-material';
 import {
+  Autocomplete,
   Box,
   Button,
   FormControl,
   IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Table,
@@ -15,6 +17,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -169,6 +172,7 @@ const About = () => {
   const valueFormik = useRef();
   const classes = useStyles();
   const dispatch = useDispatch();
+
   const categoryList = {
     1: 'Gạch',
     2: 'Sơn',
@@ -321,7 +325,7 @@ const About = () => {
       if (dataResult.data) {
         // setTotalRecord(dataResult.data.totalRecord);
         // setProductList(dataResult.data);
-        console.log(page)
+        console.log(page);
         return {
           options: dataResult.data.product,
           hasMore: dataResult.data.product.length >= 1,
@@ -336,6 +340,33 @@ const About = () => {
   };
   return (
     <Box>
+      <Autocomplete
+      disablePortal
+      id="combo-box-demo"
+      options={categorys}
+      sx={{ width: 300 }}
+      renderInput={(params) => <TextField {...params} label="Movie" />}
+    />
+      <Autocomplete
+        id="free-solo-2-demo"
+        options={categorys.map((option) => option.label)}
+        noOptionsText="Không tìm thấy Danh mục"
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Search input"
+            InputProps={{
+              ...params.InputProps,
+              
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+        )}
+      />
       <AsyncPaginate
         // value={currentProduct}
         loadOptions={loadOptions}

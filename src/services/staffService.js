@@ -52,14 +52,7 @@ const staffService = {
     const url = API_URL + '/staff/add/image';
     // const url = process.env.REACT_APP_API_URL + '/staff/add/image';
 
-    axios.post(url, formData).then(
-      (response) => {
-        return response;
-      },
-      (error) => {
-        console.log(error);
-      },
-    );
+    return axios.post(url, formData)
   },
 
   updateImageStaff: (staffId, formData) => {

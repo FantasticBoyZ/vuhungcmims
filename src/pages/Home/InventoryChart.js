@@ -1,3 +1,4 @@
+import FormatDataUtils from '@/utils/formatData';
 import { Box } from '@mui/material';
 import {
   Area,
@@ -14,12 +15,12 @@ import {
 
 const data = [
   {
-    name: '7-2022',
+    name: '6-2022',
     totalAmount: 24,
     // amt: 2400,
   },
   {
-    name: '8-2022',
+    name: '7-2022',
     totalAmount: 13.98,
     // amt: 2210,
   },
@@ -51,12 +52,13 @@ const data = [
 ];
 
 
-const InventoryChart = () => {
+const InventoryChart = (props) => {
+  const { chartData } = props
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <div className="custom-tooltip">
-          <p >{`${label} : ${payload[0].value} triệu`}</p>
+          <p >{`${label} : ${FormatDataUtils.getRoundNumber(payload[0].value,2)} triệu`}</p>
           {/* <p className="intro">{getIntroOfPage(label)}</p>
           <p className="desc">Anything you want can be displayed here.</p> */}
         </div>
@@ -74,7 +76,7 @@ const InventoryChart = () => {
       <AreaChart
         width={730}
         height={250}
-        data={data}
+        data={chartData}
         margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
       >
         <defs>
@@ -97,7 +99,7 @@ const InventoryChart = () => {
             />
           </linearGradient>
         </defs>
-        <XAxis dataKey="name"></XAxis>
+        <XAxis dataKey="saveDate"></XAxis>
         <YAxis >
           {/* <Label
             value="Triệu"
@@ -112,7 +114,7 @@ const InventoryChart = () => {
         /> */}
         <Area
           type="monotone"
-          dataKey="totalAmount"
+          dataKey="amout"
           stroke="#82ca9d"
           fillOpacity={1}
           fill="url(#colorTotalAmount)"

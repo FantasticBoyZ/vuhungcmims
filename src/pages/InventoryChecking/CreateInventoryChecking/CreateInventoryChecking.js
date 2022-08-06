@@ -6,7 +6,15 @@ import {
 } from '@/slices/InventoryCheckingSlice';
 import { getAllWarehouseNotPaging, getWarehouseList } from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
-import { CloudUpload, Delete, Done, FileDownload, Input } from '@mui/icons-material';
+import {
+  CloudUpload,
+  Delete,
+  Done,
+  FileDownload,
+  Info,
+  InfoOutlined,
+  Input,
+} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -23,6 +31,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -160,6 +170,7 @@ const CreateInventoryChecking = () => {
   const navigate = useNavigate();
   const user = AuthService.getCurrentUser();
   const { loading } = useSelector((state) => ({ ...state.inventoryChecking }));
+  const warehouseState = useSelector((state) => ({ ...state.warehouse }));
   const arrayHelpersRef = useRef(null);
   const valueFormik = useRef();
 
@@ -185,7 +196,7 @@ const CreateInventoryChecking = () => {
   };
 
   const handleChangeWarehouse = (event) => {
-    setProductList(null);
+    setProductList([]);
     if (event !== null) {
       fetchProductByWarehouseId(event.value.id);
       setSelectedProduct(null);
@@ -211,9 +222,8 @@ const CreateInventoryChecking = () => {
         return;
       } else {
         // productSelected.consignments = consignmentList
-        arrayHelpersRef.current.push(
-          await fetchConsignmentByProductId(productSelected.productId),
-        );
+        const product = await fetchConsignmentByProductId(productSelected.productId);
+        arrayHelpersRef.current.push(product);
         // console.log('productList', valueFormik.current);
       }
     }
@@ -231,13 +241,30 @@ const CreateInventoryChecking = () => {
           indexConsignment++
         ) {
           const consignment = consignments[indexConsignment];
+
+          if (!consignment.realityQuantity) {
+            setErrorMessage('Bạn có sản phẩm chưa nhập số lượng thực tế');
+            setOpenPopup(true);
+            return;
+          }
+
+          if (
+            FormatDataUtils.getRoundFloorNumber(consignment.realityQuantity, 1) !==
+            consignment.realityQuantity
+          ) {
+            setErrorMessage(
+              'Vui lòng nhập số lượng thực tế với chỉ 1 chữ số sau số thập phân',
+            );
+            setOpenPopup(true);
+            return;
+          }
           listCheckingHistory.push({
             consignmentId: consignment.id,
             instockQuantity: consignment.quantity,
             realityQuantity:
               product.selectedUnitMeasure === product.unitMeasure
                 ? consignment.realityQuantity
-                : Math.round(
+                : FormatDataUtils.getRoundFloorNumber(
                     consignment.realityQuantity * product.numberOfWrapUnitMeasure,
                   ),
             differentAmout: calculateTotalDifferentAmountOfConsignment(
@@ -283,13 +310,15 @@ const CreateInventoryChecking = () => {
       const quantity =
         product.selectedUnitMeasure === product.unitMeasure
           ? product.listConsignment[indexConsignment].quantity
-          : Math.round(
+          : FormatDataUtils.getRoundFloorNumber(
               product.listConsignment[indexConsignment].quantity /
                 product.numberOfWrapUnitMeasure,
+              2,
             );
-      totalDifferent =
+      totalDifferent = Math.round(
         (product.listConsignment[indexConsignment].realityQuantity - quantity) *
-        product.unitPrice;
+          product.unitPrice,
+      );
     }
     return totalDifferent;
   };
@@ -452,7 +481,7 @@ const CreateInventoryChecking = () => {
                               noOptionsMessage={() => <>Không có tìm thấy kho nào</>}
                               isClearable={true}
                               isSearchable={true}
-                              //   isLoading={loading}
+                              isLoading={warehouseState.loading}
                               loadingMessage={() => <>Đang tìm kiếm kho...</>}
                               name="warehouse"
                               // value={warehouseId}
@@ -544,7 +573,7 @@ const CreateInventoryChecking = () => {
                   <CardContent className={classes.cardTable}>
                     <Typography variant="h6">Các sản phẩm kiểm kho</Typography>
                     <br />
-                    {!!productList && productList.length > 0 && (
+                    {productList && (
                       <Select
                         classNamePrefix="select"
                         placeholder="Chọn sản phẩm từ kho trên"
@@ -652,9 +681,10 @@ const CreateInventoryChecking = () => {
                                                         // console.log('alo',consignment)
                                                         setFieldValue(
                                                           `productList[${index}].listConsignment[${indexConsignment}].realityQuantity`,
-                                                          Math.round(
+                                                          FormatDataUtils.getRoundFloorNumber(
                                                             consignment.realityQuantity /
                                                               e.value.number,
+                                                            2,
                                                           ),
                                                         );
                                                       }
@@ -688,7 +718,7 @@ const CreateInventoryChecking = () => {
 
                                                         setFieldValue(
                                                           `productList[${index}].listConsignment[${indexConsignment}].realityQuantity`,
-                                                          Math.round(
+                                                          FormatDataUtils.getRoundFloorNumber(
                                                             consignment.realityQuantity *
                                                               values.productList[index]
                                                                 .numberOfWrapUnitMeasure,
@@ -712,7 +742,7 @@ const CreateInventoryChecking = () => {
                                                     ) {
                                                       setFieldValue(
                                                         `productList[${index}].unitPrice`,
-                                                        Math.round(
+                                                        FormatDataUtils.getRoundFloorNumber(
                                                           values.productList[index]
                                                             .unitPrice * e.value.number,
                                                         ),
@@ -726,7 +756,7 @@ const CreateInventoryChecking = () => {
                                                     ) {
                                                       setFieldValue(
                                                         `productList[${index}].unitPrice`,
-                                                        Math.round(
+                                                        FormatDataUtils.getRoundFloorNumber(
                                                           values.productList[index]
                                                             .unitPrice /
                                                             values.productList[index]
@@ -828,9 +858,10 @@ const CreateInventoryChecking = () => {
                                                       {product.selectedUnitMeasure ===
                                                       product.unitMeasure
                                                         ? consignment?.quantity
-                                                        : Math.round(
+                                                        : FormatDataUtils.getRoundFloorNumber(
                                                             consignment?.quantity /
                                                               product.numberOfWrapUnitMeasure,
+                                                            2,
                                                           )}
                                                     </TableCell>
                                                     <TableCell align="center">
@@ -838,10 +869,15 @@ const CreateInventoryChecking = () => {
                                                         name={`productList[${index}].listConsignment[${indexConsignment}].realityQuantity`}
                                                         variant="standard"
                                                         className="text-field-quantity"
-                                                        type={'number'}
+                                                        type="number"
                                                         InputProps={{
                                                           inputProps: {
                                                             min: 0,
+                                                            step:
+                                                              product.selectedUnitMeasure ===
+                                                              product.unitMeasure
+                                                                ? 1
+                                                                : 0.01,
                                                             // max: consignment?.quantity,
                                                           },
                                                         }}
@@ -852,6 +888,30 @@ const CreateInventoryChecking = () => {
                                                         //   );
                                                         // }}
                                                       />
+                                                      {product.selectedUnitMeasure !==
+                                                        product.unitMeasure && (
+                                                        <Tooltip
+                                                          title={
+                                                            consignment.realityQuantity -
+                                                            (consignment.realityQuantity %
+                                                              1) +
+                                                            ' ' +
+                                                            product.wrapUnitMeasure +
+                                                            ' ' +
+                                                            Math.floor(
+                                                              (consignment.realityQuantity %
+                                                                1) *
+                                                                product.numberOfWrapUnitMeasure,
+                                                            ) +
+                                                            ' ' +
+                                                            product.unitMeasure
+                                                          }
+                                                        >
+                                                          <IconButton>
+                                                            <InfoOutlined />
+                                                          </IconButton>
+                                                        </Tooltip>
+                                                      )}
                                                     </TableCell>
                                                     <TableCell align="center">
                                                       {FormatDataUtils.formatCurrency(
