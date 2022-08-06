@@ -33,6 +33,7 @@ import { makeStyles } from '@mui/styles';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { differenceInYears } from 'date-fns';
 import { Form, Formik } from 'formik';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -83,6 +84,7 @@ const UpdateProfile = () => {
     addressDetail: '',
   };
 
+  const regexPhone = /^(0[3|5|7|8|9])+([0-9]{8})$/;
   const FORM_VALIDATION = Yup.object().shape({
     fullName: Yup.string().required('Chưa nhập Họ và tên nhân viên'),
     identityCard: Yup.string()
@@ -90,11 +92,24 @@ const UpdateProfile = () => {
       .matches(/^(\d{9}|\d{12})$/, 'Số CCCD/CMND của bạn không hợp lệ'),
     phone: Yup.string()
       .required('Chưa nhập Số điện thoại')
-      .matches(/^(0[3|5|7|8|9])+([0-9]{8})$/, 'Số điện thoại của bạn không hợp lệ'),
+      .test('phone', 'Vui lòng xoá các khoảng trắng', function (value) {
+        if (value) {
+          return !value.includes(' ');
+        }
+      })
+      .matches(
+        /^([\+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})$/,
+        'Số điện thoại của bạn không hợp lệ',
+      ),
     email: Yup.string()
       .email('Vui lòng nhập đúng định dạng email. VD abc@xyz.com')
       .required('Chưa nhập Email'),
-    dateOfBirth: Yup.string().required('Chưa nhập ngày sinh').nullable(),
+    dateOfBirth: Yup.string()
+      .required('Chưa nhập ngày sinh')
+      .nullable()
+      .test('dateOfBirth', 'Nhân viên phải ít nhất 18 tuổi', function (value) {
+        return differenceInYears(new Date(), new Date(value)) >= 18;
+      }),
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố').nullable(),
     districtId: Yup.number().required('Chưa chọn quận/huyện').nullable(),
     wardId: Yup.number().required('Chưa chọn xã/phường').nullable(),
@@ -155,8 +170,8 @@ const UpdateProfile = () => {
       const actionResult = await dispatch(updateProfile(staff));
       const dataResult = unwrapResult(actionResult);
       if (dataResult) {
-        let currentUser = AuthService.getCurrentUser()
-        currentUser.fullName = staff.fullName
+        let currentUser = AuthService.getCurrentUser();
+        currentUser.fullName = staff.fullName;
         localStorage.setItem('user', JSON.stringify(currentUser));
         toast.success('Cập nhật hồ sơ cá nhân thành công');
         navigate('/profile');
@@ -408,6 +423,7 @@ const UpdateProfile = () => {
                               )}
                               isClearable={true}
                               isSearchable={true}
+                              isLoading={loadingAddress && !selectedProvince}
                               name="provinceId"
                               value={FormatDataUtils.getSelectedOption(
                                 provinceList,
@@ -428,6 +444,7 @@ const UpdateProfile = () => {
                               onFocus={() => setTouchedProvinceId(true)}
                               onChange={(e) => {
                                 setFieldValue('provinceId', e?.value);
+                                setFieldValue('districtId', '', false);
                                 onChangeProvince(e);
                               }}
                             />
@@ -459,6 +476,7 @@ const UpdateProfile = () => {
                               )}
                               isClearable={true}
                               isSearchable={true}
+                              isLoading={loadingAddress && !selectedDistrict}
                               name="districtId"
                               isDisabled={!selectedProvince}
                               value={FormatDataUtils.getSelectedOption(
@@ -480,6 +498,7 @@ const UpdateProfile = () => {
                               onFocus={() => setTouchedDistrictId(true)}
                               onChange={(e) => {
                                 setFieldValue('districtId', e?.value);
+                                setFieldValue('wardId', '', false);
                                 onChangeDistrict(e);
                               }}
                             />
@@ -510,6 +529,7 @@ const UpdateProfile = () => {
                               )}
                               isClearable={true}
                               isSearchable={true}
+                              isLoading={loadingAddress && !selectedWard}
                               name="wardId"
                               isDisabled={!selectedDistrict}
                               value={FormatDataUtils.getSelectedOption(
