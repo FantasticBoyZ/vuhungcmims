@@ -103,7 +103,7 @@ const SubProductTable = ({ selectedUnitMeasure,product, subProductList }) => {
                   </TableCell>
                   <TableCell align="center">
                     {selectedUnitMeasure === product.wrapUnitMeasure
-                      ? FormatDataUtils.getRoundNumber(subProduct.quantity / product.numberOfWrapUnitMeasure, 1)
+                      ? FormatDataUtils.getRoundFloorNumber(subProduct.quantity / product.numberOfWrapUnitMeasure, 2)
                       : subProduct.quantity}
                   </TableCell>
                   <TableCell align="center">{subProduct.wareHouseName}</TableCell>

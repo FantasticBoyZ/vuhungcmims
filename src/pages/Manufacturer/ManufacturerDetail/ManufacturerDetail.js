@@ -56,7 +56,7 @@ const ManufacturerDetail = () => {
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.manufacturers }));
   const [selectedUnitMeasureList, setSelectedUnitMeasureList] = useState([]);
-  const pages = [10, 20, 50];
+  const pages = [5, 10, 15];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
@@ -76,6 +76,10 @@ const ManufacturerDetail = () => {
 
   useEffect(() => {
     const fetchManufacturerDetail = async () => {
+      const params = {
+        pageIndex: page + 1,
+        pageSize: rowsPerPage,
+      };
       try {
         const actionResult = await dispatch(getManufacturerById(manufacturerId));
         const dataResult = unwrapResult(actionResult);

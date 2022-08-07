@@ -197,10 +197,10 @@ const HomePage = () => {
               <Card className={classes.cardInfo}>
                 <CardContent className={classes.contentContainer}>
                   <Box className={classes.widget}>
-                    <p className={classes.title}>Số nhân viên hiện tại</p>
+                    <p className={classes.title}>{role === 'ROLE_OWNER' ? 'Số nhân viên hiện tại' : 'Số mặt hàng đang có trong kho'}</p>
                   </Box>
                   <Box className={classes.widget}>
-                    <p className={classes.number}>{dashBoardData?.numberUser}</p>
+                    <p className={classes.number}>{role === 'ROLE_OWNER' ? dashBoardData?.numberUser : dashBoardData?.numberProduct}</p>
                   </Box>
                 </CardContent>
               </Card>

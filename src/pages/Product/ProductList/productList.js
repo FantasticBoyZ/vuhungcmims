@@ -559,9 +559,9 @@ const ProductList = () => {
                             </TableCell>
                             <TableCell align="center">
                               {selectedUnitMeasureList[index] === item.wrapUnitMeasure
-                                ? FormatDataUtils.getRoundNumber(
+                                ? FormatDataUtils.getRoundFloorNumber(
                                     item.quantity / item.numberOfWrapUnitMeasure,
-                                    1,
+                                    2,
                                   )
                                 : item.quantity}
                             </TableCell>
