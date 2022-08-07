@@ -421,20 +421,20 @@ const InventoryCheckingDetail = () => {
                                                 <TableCell align="center">
                                                   {selectedUnitMeasureList[index] ===
                                                   product.wrapUnitMeasure
-                                                    ? FormatDataUtils.getRoundNumber(
+                                                    ? FormatDataUtils.getRoundFloorNumber(
                                                         consignment?.instockQuantity /
                                                           product.numberOfWrapUnitMeasure,
-                                                        1,
+                                                        2,
                                                       )
                                                     : consignment?.instockQuantity}
                                                 </TableCell>
                                                 <TableCell align="center">
                                                   {selectedUnitMeasureList[index] ===
                                                   product.wrapUnitMeasure
-                                                    ? FormatDataUtils.getRoundNumber(
+                                                    ? FormatDataUtils.getRoundFloorNumber(
                                                         consignment?.realityQuantity /
                                                           product.numberOfWrapUnitMeasure,
-                                                        1,
+                                                        2,
                                                       )
                                                     : consignment?.realityQuantity}
                                                 </TableCell>
