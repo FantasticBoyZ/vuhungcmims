@@ -7,6 +7,12 @@ export const getCategoryList = createAsyncThunk('category' , async (params, thun
   return categoryList;
 })
 
+export const getAllCategoryList = createAsyncThunk('category/all' , async (params, thunkAPi) => {
+  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+  const categoryList = await categoryService.getAllCategoryList(params);
+  return categoryList;
+})
+
 export const getSubCategoryByCategoryId = createAsyncThunk('subCategory' , async (params, thunkAPi) => {
   // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
   const subCategoryList = await categoryService.getSubCategoryByCategoryId(params);
