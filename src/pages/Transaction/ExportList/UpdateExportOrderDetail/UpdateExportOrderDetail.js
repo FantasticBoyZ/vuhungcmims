@@ -202,19 +202,46 @@ const UpdateExportOrderDetail = () => {
     return FormatDataUtils.getRoundFloorNumber(totalQuantity, 2);
   };
 
+  const calculateTotalQuantityOfProduct2 = (product) => {
+    let totalQuantity = 0;
+    if (product.consignmentList !== undefined && product.consignmentList?.length > 0) {
+      product?.consignmentList.forEach((consignment) => {
+        const quantity = product.selectedUnitMeasure
+          ? product.selectedUnitMeasure !== product.unitMeasure
+            ? FormatDataUtils.getRoundFloorNumber(
+                consignment.quantity * product.numberOfWrapUnitMeasure,
+              )
+            : consignment.quantity
+          : FormatDataUtils.getRoundFloorNumber(
+              consignment.quantity
+            );
+        totalQuantity = +totalQuantity + quantity;
+      });
+    }
+    return product.selectedUnitMeasure
+      ? product.selectedUnitMeasure !== product.unitMeasure
+        ? FormatDataUtils.getRoundFloorNumber(
+            totalQuantity / product.numberOfWrapUnitMeasure,
+            2,
+          )
+        : totalQuantity
+      : totalQuantity;
+  };
+
   const calculateTotalAmount = () => {
     let totalAmount = 0;
     const productList = valueFormik.current.productList;
     if (productList) {
       for (let index = 0; index < productList.length; index++) {
         const product = productList[index];
-        const quantity =
-          product.selectedUnitMeasure === product.unitMeasure
-            ? calculateTotalQuantityOfProduct(product)
+        const quantity = product.selectedUnitMeasure
+          ? product.selectedUnitMeasure === product.unitMeasure
+            ? calculateTotalQuantityOfProduct2(product)
             : FormatDataUtils.getRoundFloorNumber(
-                calculateTotalQuantityOfProduct(product) *
+                calculateTotalQuantityOfProduct2(product) *
                   product.numberOfWrapUnitMeasure,
-              );
+              )
+          : calculateTotalQuantityOfProduct2(product);
         totalAmount = totalAmount + quantity * +product?.unitPrice;
       }
     }
@@ -256,12 +283,13 @@ const UpdateExportOrderDetail = () => {
           indexConsignment++
         ) {
           let consignment = consignments[indexConsignment];
-          const quantity =
-            productList[index].selectedUnitMeasure === productList[index].unitMeasure
+          const quantity = productList[index].selectedUnitMeasure
+            ? productList[index].selectedUnitMeasure === productList[index].unitMeasure
               ? consignment.quantity
               : FormatDataUtils.getRoundFloorNumber(
                   consignment.quantity * productList[index].numberOfWrapUnitMeasure,
-                );
+                )
+            : consignment.quantity;
           if (quantity > consignment.quantityInstock) {
             setErrorMessage(
               'Bạn không thể nhập số lượng lớn hơn số lượng tồn kho của lô hàng',
@@ -270,13 +298,10 @@ const UpdateExportOrderDetail = () => {
             return;
           }
 
-          if (
-            !Number.isInteger(quantity) ||
-            !Number.isInteger(
-              consignment.quantity * productList[index].numberOfWrapUnitMeasure,
-            )
-          ) {
-            setErrorMessage('Vui lòng nhập số lượng sản phẩm xuất đi là số nguyên');
+          if (!Number.isInteger(quantity)) {
+            setErrorMessage(
+              'Vui lòng nhập số lượng sản phẩm với đơn vị nhỏ nhất là số nguyên',
+            );
             setOpenPopup(true);
             return;
           }
@@ -306,7 +331,7 @@ const UpdateExportOrderDetail = () => {
         consignmentExports: consignmentExports,
       };
       if (consignmentExports.length > 0) {
-        // console.log(editedExportOrder)
+        console.log(editedExportOrder)
         try {
           const response = await dispatch(updateExportOrder(editedExportOrder));
           const resultResponse = unwrapResult(response);
@@ -317,7 +342,6 @@ const UpdateExportOrderDetail = () => {
             } else {
               toast.success('Sửa phiếu xuất hàng thành công');
             }
-
             console.log(resultResponse);
             navigate(`/export/detail/${exportOrderId}`);
           }
@@ -610,7 +634,7 @@ const UpdateExportOrderDetail = () => {
                                               )}
                                             </TableCell>
                                             <TableCell align="center">
-                                              {calculateTotalQuantityOfProduct(
+                                              {calculateTotalQuantityOfProduct2(
                                                 values.productList[index],
                                               )}
 
@@ -620,23 +644,15 @@ const UpdateExportOrderDetail = () => {
                                                 !!product.wrapUnitMeasure && (
                                                   <Tooltip
                                                     title={
-                                                      calculateTotalQuantityOfProduct(
-                                                        product,
-                                                      ) /
-                                                        product.numberOfWrapUnitMeasure -
-                                                      ((calculateTotalQuantityOfProduct(
-                                                        product,
-                                                      ) /
-                                                        product.numberOfWrapUnitMeasure) %
-                                                        1) +
+                                                      ((calculateTotalQuantityOfProduct2(values.productList[index],) ) -
+                                                      (calculateTotalQuantityOfProduct2(values.productList[index],)  % 1)) +
                                                       ' ' +
                                                       product.wrapUnitMeasure +
                                                       ' ' +
-                                                      Math.floor(
-                                                        ((calculateTotalQuantityOfProduct(
-                                                          product,
-                                                        ) /
-                                                          product.numberOfWrapUnitMeasure) %
+                                                      Math.round(
+                                                        ((calculateTotalQuantityOfProduct2(
+                                                          values.productList[index],
+                                                        ) ) %
                                                           1) *
                                                           product.numberOfWrapUnitMeasure,
                                                       ) +
@@ -668,11 +684,11 @@ const UpdateExportOrderDetail = () => {
                                                   .selectedUnitMeasure ===
                                                 product.wrapUnitMeasure
                                                   ? FormatDataUtils.getRoundFloorNumber(
-                                                      calculateTotalQuantityOfProduct(
+                                                      calculateTotalQuantityOfProduct2(
                                                         values.productList[index],
                                                       ) * product.numberOfWrapUnitMeasure,
                                                     )
-                                                  : calculateTotalQuantityOfProduct(
+                                                  : calculateTotalQuantityOfProduct2(
                                                       values.productList[index],
                                                     )) * product.unitPrice,
                                               )}

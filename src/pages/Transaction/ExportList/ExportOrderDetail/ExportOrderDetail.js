@@ -307,7 +307,7 @@ const ExportOrderDetail = () => {
                   >
                     <Box className={classes.billReferenceContainer}>
                       <Typography variant="span">
-                        <strong>Phiếu xuất kho số:</strong> {exportOrder.billRefernce}
+                        <strong>Phiếu xuất kho số:</strong> {'PX' + exportOrderId}
                       </Typography>{' '}
                       <span>
                         {exportOrder.statusName && getStatusLabel(exportOrder.statusName)}
