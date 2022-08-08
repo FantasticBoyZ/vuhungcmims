@@ -281,7 +281,7 @@ const AddEditProductForm = () => {
       description: values.description,
       categoryId: values.categoryId,
       manufactorId: values.manufactorId,
-      subCategoryId: values.subCategoryId
+      subCategoryId: values.subCategoryId,
     };
     // console.log(values);
     saveProductDetail(newProduct);
