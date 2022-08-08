@@ -1,5 +1,5 @@
 import FormatDataUtils from '@/utils/formatData';
-import { Add, Close, Edit, KeyboardReturn } from '@mui/icons-material';
+import { Add, Close, Edit, InfoOutlined, KeyboardReturn } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -7,6 +7,7 @@ import {
   CardContent,
   Divider,
   Grid,
+  IconButton,
   Stack,
   Table,
   TableBody,
@@ -14,6 +15,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -32,6 +34,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import AlertPopup from '@/components/Common/AlertPopup';
 import { toast } from 'react-toastify';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import Select from 'react-select';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -183,29 +186,73 @@ const ReturnGoods = () => {
 
   const { loading } = useSelector((state) => ({ ...state.exportOrders }));
 
-  const calculateTotalAmount = () => {
-    let totalAmount = 0;
-    const productList = valueFormik.current.productList;
-    // console.log(valueFormik.current.productList);
-    if (productList) {
-      for (let index = 0; index < productList.length; index++) {
-        totalAmount =
-          totalAmount +
-          calculateTotalQuantityOfProduct(productList[index]) *
-            +productList[index]?.unitPrice;
-      }
-    }
-    return totalAmount;
-  };
+  // const calculateTotalAmount = () => {
+  //   let totalAmount = 0;
+  //   const productList = valueFormik.current.productList;
+  //   // console.log(valueFormik.current.productList);
+  //   if (productList) {
+  //     for (let index = 0; index < productList.length; index++) {
+  //       totalAmount =
+  //         totalAmount +
+  //         calculateTotalQuantityOfProduct(productList[index]) *
+  //           +productList[index]?.unitPrice;
+  //     }
+  //   }
+  //   return totalAmount;
+  // };
+
+  // const calculateTotalQuantityOfProduct = (product) => {
+  //   let totalQuantity = 0;
+  //   if (product.consignmentList !== undefined && product.consignmentList?.length > 0) {
+  //     product?.consignmentList.forEach((consignment) => {
+  //       totalQuantity = +totalQuantity + +consignment.quantityReturn;
+  //     });
+  //   }
+  //   return totalQuantity;
+  // };
 
   const calculateTotalQuantityOfProduct = (product) => {
     let totalQuantity = 0;
     if (product.consignmentList !== undefined && product.consignmentList?.length > 0) {
       product?.consignmentList.forEach((consignment) => {
-        totalQuantity = +totalQuantity + +consignment.quantityReturn;
+        const quantity = product.selectedUnitMeasure
+          ? product.selectedUnitMeasure !== product.unitMeasure
+            ? FormatDataUtils.getRoundFloorNumber(
+                consignment.quantityReturn * product.numberOfWrapUnitMeasure,
+              )
+            : consignment.quantityReturn
+          : consignment.quantityReturn;
+        totalQuantity = +totalQuantity + quantity;
       });
     }
-    return totalQuantity;
+    return product.selectedUnitMeasure
+      ? product.selectedUnitMeasure !== product.unitMeasure
+        ? FormatDataUtils.getRoundNumber(
+            totalQuantity / product.numberOfWrapUnitMeasure,
+            2,
+          )
+        : FormatDataUtils.getRoundFloorNumber(totalQuantity)
+      : FormatDataUtils.getRoundFloorNumber(totalQuantity);
+  };
+
+  const calculateTotalAmount = () => {
+    let totalAmount = 0;
+    const productList = valueFormik.current.productList;
+    if (productList) {
+      for (let index = 0; index < productList.length; index++) {
+        const product = productList[index];
+        const quantity = product.selectedUnitMeasure
+          ? product.selectedUnitMeasure === product.unitMeasure
+            ? calculateTotalQuantityOfProduct(product)
+            : FormatDataUtils.getRoundFloorNumber(
+                calculateTotalQuantityOfProduct(product) *
+                  product.numberOfWrapUnitMeasure,
+              )
+          : calculateTotalQuantityOfProduct(product);
+        totalAmount = totalAmount + quantity * +product?.unitPrice;
+      }
+    }
+    return totalAmount;
   };
 
   const handleOnClickConfirm = () => {
@@ -238,6 +285,13 @@ const ReturnGoods = () => {
           indexConsignment++
         ) {
           let consignment = consignments[indexConsignment];
+          const quantityReturn = !!productList[index].selectedUnitMeasure
+            ? productList[index].selectedUnitMeasure === productList[index].unitMeasure
+              ? consignment.quantityReturn
+              : FormatDataUtils.getRoundFloorNumber(
+                  consignment.quantityReturn * productList[index].numberOfWrapUnitMeasure,
+                )
+            : consignment.quantityReturn;
           if (consignment.quantityReturn > consignment.quantity) {
             setErrorMessage(
               'Bạn không thể trả về số lượng lớn hơn số lượng trên đơn hàng',
@@ -250,18 +304,27 @@ const ReturnGoods = () => {
             setOpenPopup(true);
             return;
           }
+
+          if (!Number.isInteger(quantityReturn)) {
+            setErrorMessage(
+              'Vui lòng nhập số lượng trả về với đơn vị nhỏ nhất là số nguyên',
+            );
+            setOpenPopup(true);
+            return;
+          }
+
           if (consignment.quantityReturn > 0) {
             consignmentReturns.push({
               id: consignment.id,
               productId: productList[index].productId,
-              quantity: consignment.quantityReturn,
+              quantity: quantityReturn,
               unitPrice: productList[index].unitPrice,
             });
           }
         }
       }
       const returnOrder = {
-        billReferenceNumber: values.billRefernce,
+        billReferenceNumber: 'PX' + exportOrderId,
         createdDate: new Date().toJSON(),
         description: values.description,
         userId: values.userId,
@@ -283,7 +346,6 @@ const ReturnGoods = () => {
             } else {
               toast.success('Tạo phiếu trả hàng thành công');
             }
-
             console.log(resultResponse);
             navigate(`/export/detail/${exportOrderId}`);
           }
@@ -354,7 +416,10 @@ const ReturnGoods = () => {
         <Box>
           {!!exportOrder && productList.length > 0 && (
             <Formik
-              initialValues={{ ...exportOrder, productList: [...productList] }}
+              initialValues={{
+                ...exportOrder,
+                productList: [...productList],
+              }}
               // validationSchema={FORM_VALIDATION}
               // onSubmit={(values) => handleSubmit(values)}
             >
@@ -378,8 +443,7 @@ const ReturnGoods = () => {
                           >
                             <Box className={classes.billReferenceContainer}>
                               <Typography variant="span">
-                                <strong>Phiếu xuất kho số:</strong>{' '}
-                                {exportOrder.billRefernce}
+                                <strong>Phiếu xuất kho số:</strong> {'PX' + exportOrderId}
                               </Typography>
                             </Box>
                             {exportOrder.statusName === 'completed' && (
@@ -455,22 +519,185 @@ const ReturnGoods = () => {
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{product?.productCode}</TableCell>
                                             <TableCell>{product?.productName}</TableCell>
-                                            <TableCell>{product?.unitMeasure}</TableCell>
+                                            <TableCell>
+                                              {product?.wrapUnitMeasure == null ? (
+                                                product?.unitMeasure
+                                              ) : (
+                                                <Box
+                                                  className={classes.selectBoxUnitMeasure}
+                                                >
+                                                  <Select
+                                                    classNamePrefix="select"
+                                                    defaultValue={
+                                                      FormatDataUtils.getOption([
+                                                        {
+                                                          number: 1,
+                                                          name: product?.unitMeasure,
+                                                        },
+                                                        {
+                                                          number:
+                                                            product?.numberOfWrapUnitMeasure,
+                                                          name: product?.wrapUnitMeasure,
+                                                        },
+                                                      ])[0]
+                                                    }
+                                                    options={FormatDataUtils.getOption([
+                                                      {
+                                                        number: 1,
+                                                        name: product?.unitMeasure,
+                                                      },
+                                                      {
+                                                        number:
+                                                          product?.numberOfWrapUnitMeasure,
+                                                        name: product?.wrapUnitMeasure,
+                                                      },
+                                                    ])}
+                                                    menuPortalTarget={document.body}
+                                                    styles={{
+                                                      menuPortal: (base) => ({
+                                                        ...base,
+                                                        zIndex: 9999,
+                                                      }),
+                                                    }}
+                                                    onChange={(e) => {
+                                                      setFieldValue(
+                                                        `productList[${index}].selectedUnitMeasure`,
+                                                        e.value.name,
+                                                      );
+                                                      // change quantity when change unitMeasure
+                                                      if (
+                                                        e.value.name !==
+                                                        values.productList[index]
+                                                          .selectedUnitMeasure
+                                                      ) {
+                                                        if (
+                                                          e.value.name ===
+                                                          values.productList[index]
+                                                            .wrapUnitMeasure
+                                                        ) {
+                                                          const consignments =
+                                                            values.productList[index]
+                                                              .consignmentList;
+                                                          for (
+                                                            let indexConsignment = 0;
+                                                            indexConsignment <
+                                                            consignments.length;
+                                                            indexConsignment++
+                                                          ) {
+                                                            const consignment =
+                                                              consignments[
+                                                                indexConsignment
+                                                              ];
+                                                            setFieldValue(
+                                                              `productList[${index}].consignmentList[${indexConsignment}].quantityReturn`,
+                                                              FormatDataUtils.getRoundFloorNumber(
+                                                                consignment.quantityReturn /
+                                                                  e.value.number,
+                                                                2,
+                                                              ),
+                                                            );
+                                                          }
+                                                        }
+
+                                                        if (
+                                                          e.value.name ===
+                                                          values.productList[index]
+                                                            .unitMeasure
+                                                        ) {
+                                                          const consignments =
+                                                            values.productList[index]
+                                                              .consignmentList;
+                                                          for (
+                                                            let indexConsignment = 0;
+                                                            indexConsignment <
+                                                            consignments.length;
+                                                            indexConsignment++
+                                                          ) {
+                                                            const consignment =
+                                                              consignments[
+                                                                indexConsignment
+                                                              ];
+
+                                                            setFieldValue(
+                                                              `productList[${index}].consignmentList[${indexConsignment}].quantityReturn`,
+                                                              FormatDataUtils.getRoundFloorNumber(
+                                                                consignment.quantityReturn *
+                                                                  values.productList[
+                                                                    index
+                                                                  ]
+                                                                    .numberOfWrapUnitMeasure,
+                                                              ),
+                                                            );
+                                                          }
+                                                        }
+                                                      }
+                                                    }}
+                                                  />
+                                                </Box>
+                                              )}
+                                            </TableCell>
                                             <TableCell align="center">
                                               {calculateTotalQuantityOfProduct(
                                                 values?.productList[index],
                                               )}
+                                              {values.productList[index]
+                                                .selectedUnitMeasure ===
+                                                product.wrapUnitMeasure &&
+                                                !!product.wrapUnitMeasure && (
+                                                  <Tooltip
+                                                    title={
+                                                      calculateTotalQuantityOfProduct(
+                                                        values?.productList[index],
+                                                      ) -
+                                                      (calculateTotalQuantityOfProduct(
+                                                        values?.productList[index],
+                                                      ) %
+                                                        1) +
+                                                      ' ' +
+                                                      product.wrapUnitMeasure +
+                                                      ' ' +
+                                                      Math.round(
+                                                        (calculateTotalQuantityOfProduct(
+                                                          values?.productList[index],
+                                                        ) %
+                                                          1) *
+                                                          product.numberOfWrapUnitMeasure,
+                                                      ) +
+                                                      ' ' +
+                                                      product.unitMeasure
+                                                    }
+                                                  >
+                                                    <IconButton>
+                                                      <InfoOutlined />
+                                                    </IconButton>
+                                                  </Tooltip>
+                                                )}
+                                            </TableCell>
+                                            <TableCell align="center">
+                                              {values.productList[index]
+                                                .selectedUnitMeasure ===
+                                              product.wrapUnitMeasure
+                                                ? FormatDataUtils.formatCurrency(
+                                                    product?.unitPrice *
+                                                      product.numberOfWrapUnitMeasure,
+                                                  )
+                                                : FormatDataUtils.formatCurrency(
+                                                    product?.unitPrice,
+                                                  )}
                                             </TableCell>
                                             <TableCell align="center">
                                               {FormatDataUtils.formatCurrency(
-                                                product?.unitPrice || '0',
-                                              )}
-                                            </TableCell>
-                                            <TableCell align="center">
-                                              {FormatDataUtils.formatCurrency(
-                                                calculateTotalQuantityOfProduct(
-                                                  values.productList[index],
-                                                ) * product?.unitPrice,
+                                                (values.productList[index]
+                                                  .selectedUnitMeasure ===
+                                                product.wrapUnitMeasure
+                                                  ? FormatDataUtils.getRoundFloorNumber(
+                                                      calculateTotalQuantityOfProduct(
+                                                        values.productList[index],
+                                                      ) * product.numberOfWrapUnitMeasure,
+                                                    )
+                                                  : calculateTotalQuantityOfProduct(
+                                                      values.productList[index],
+                                                    )) * product.unitPrice,
                                               )}
                                             </TableCell>
                                           </TableRow>
@@ -531,6 +758,14 @@ const ReturnGoods = () => {
                                                               inputProps: {
                                                                 min: 0,
                                                                 max: consignment?.quantity,
+                                                                step:
+                                                                  values.productList[
+                                                                    index
+                                                                  ]
+                                                                    .selectedUnitMeasure !==
+                                                                  product.wrapUnitMeasure
+                                                                    ? 1
+                                                                    : 0.01,
                                                               },
                                                             }}
                                                             // onChange={(e) => {
@@ -540,9 +775,84 @@ const ReturnGoods = () => {
                                                             //   );
                                                             // }}
                                                           />
+                                                          {values.productList[index]
+                                                            .selectedUnitMeasure ===
+                                                            product.wrapUnitMeasure &&
+                                                            !!product.wrapUnitMeasure && (
+                                                              <Tooltip
+                                                                title={
+                                                                  values.productList[
+                                                                    index
+                                                                  ].consignmentList[
+                                                                    indexConsignment
+                                                                  ].quantityReturn -
+                                                                  (values.productList[
+                                                                    index
+                                                                  ].consignmentList[
+                                                                    indexConsignment
+                                                                  ].quantityReturn %
+                                                                    1) +
+                                                                  ' ' +
+                                                                  product.wrapUnitMeasure +
+                                                                  ' ' +
+                                                                  Math.floor(
+                                                                    (values.productList[
+                                                                      index
+                                                                    ].consignmentList[
+                                                                      indexConsignment
+                                                                    ].quantityReturn %
+                                                                      1) *
+                                                                      product.numberOfWrapUnitMeasure,
+                                                                  ) +
+                                                                  ' ' +
+                                                                  product.unitMeasure
+                                                                }
+                                                              >
+                                                                <IconButton>
+                                                                  <InfoOutlined />
+                                                                </IconButton>
+                                                              </Tooltip>
+                                                            )}
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                          {consignment?.quantity}
+                                                          {values.productList[index]
+                                                            .selectedUnitMeasure ===
+                                                          product.wrapUnitMeasure
+                                                            ? FormatDataUtils.getRoundFloorNumber(
+                                                                consignment?.quantity /
+                                                                  product.numberOfWrapUnitMeasure,
+                                                                2,
+                                                              )
+                                                            : consignment?.quantity}
+                                                          {values.productList[index]
+                                                            .selectedUnitMeasure ===
+                                                            product.wrapUnitMeasure &&
+                                                            !!product.wrapUnitMeasure && (
+                                                              <Tooltip
+                                                                title={
+                                                                  consignment?.quantity /
+                                                                    product.numberOfWrapUnitMeasure -
+                                                                  ((consignment?.quantity /
+                                                                    product.numberOfWrapUnitMeasure) %
+                                                                    1) +
+                                                                  ' ' +
+                                                                  product.wrapUnitMeasure +
+                                                                  ' ' +
+                                                                  Math.floor(
+                                                                    ((consignment?.quantity /
+                                                                      product.numberOfWrapUnitMeasure) %
+                                                                      1) *
+                                                                      product.numberOfWrapUnitMeasure,
+                                                                  ) +
+                                                                  ' ' +
+                                                                  product.unitMeasure
+                                                                }
+                                                              >
+                                                                <IconButton>
+                                                                  <InfoOutlined />
+                                                                </IconButton>
+                                                              </Tooltip>
+                                                            )}
                                                         </TableCell>
                                                       </TableRow>
                                                     ),
@@ -674,7 +984,7 @@ const ReturnGoods = () => {
                           {errorMessage ? errorMessage : message}
                         </Box>
                       </AlertPopup>
-                      <pre>{JSON.stringify(values, null, 2)}</pre>
+                      {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
                     </Grid>
                   </Form>
                 );

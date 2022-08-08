@@ -260,6 +260,51 @@ const ExportGoods = () => {
     return FormatDataUtils.getRoundFloorNumber(totalQuantity, 2);
   };
 
+  const calculateTotalQuantityOfProduct2 = (product) => {
+    let totalQuantity = 0;
+    if (product.consignments !== undefined && product.consignments?.length > 0) {
+      product?.consignments.forEach((consignment) => {
+        const quantity =
+          product.selectedUnitMeasure !== product.unitMeasure
+            ? FormatDataUtils.getRoundFloorNumber(
+                consignment.quantity * product.numberOfWrapUnitMeasure,
+              )
+            : consignment.quantity;
+        totalQuantity = +totalQuantity + quantity;
+      });
+    }
+    return product.selectedUnitMeasure !== product.unitMeasure
+      ? FormatDataUtils.getRoundFloorNumber(
+          totalQuantity / product.numberOfWrapUnitMeasure,
+          2,
+        )
+      : totalQuantity;
+  };
+
+  const calculateTotalAmountOfProduct = (product) => {
+    let totalAmount = 0;
+
+    if (product !== undefined && product?.consignments?.length > 0) {
+      product?.consignments.forEach((consignment) => {
+        let quantity =
+          product.selectedUnitMeasure !== product.unitMeasure
+            ? FormatDataUtils.getRoundFloorNumber(
+                consignment.quantity * product.numberOfWrapUnitMeasure,
+              )
+            : consignment.quantity;
+        let unitPrice =
+          product.selectedUnitMeasure !== product.unitMeasure
+            ? FormatDataUtils.getRoundFloorNumber(
+                product.unitPrice / product.numberOfWrapUnitMeasure,
+              )
+            : product.unitPrice;
+        // console.log('quantity',quantity,unitPrice)
+        totalAmount = +totalAmount + +quantity * +unitPrice;
+      });
+    }
+    return totalAmount;
+  };
+
   const calculateTotalAmount = () => {
     let totalAmount = 0;
     if (valueFormik.current !== undefined) {
@@ -343,7 +388,13 @@ const ExportGoods = () => {
                     consignment.quantity * product.numberOfWrapUnitMeasure,
                   )
               : consignment.quantity,
-            unitPrice: productList[index].unitPrice,
+            unitPrice: product.selectedUnitMeasure
+            ? product.selectedUnitMeasure === product.unitMeasure
+              ? product.unitPrice
+              : FormatDataUtils.getRoundFloorNumber(
+                product.unitPrice / product.numberOfWrapUnitMeasure,
+                )
+            : product.unitPrice ,
           });
         }
       }
@@ -449,7 +500,7 @@ const ExportGoods = () => {
                     {!!productList && (
                       <Select
                         classNamePrefix="select"
-                        placeholder="Chọn sản phẩm của nhà cung cấp phía trên..."
+                        placeholder="Chọn sản phẩm..."
                         noOptionsMessage={() => <>Không có tìm thấy sản phẩm nào</>}
                         isClearable={true}
                         isSearchable={true}
@@ -676,8 +727,9 @@ const ExportGoods = () => {
                                         </TableCell>
                                         <TableCell align="center">
                                           {FormatDataUtils.getRoundFloorNumber(
-                                            calculateTotalQuantityOfProduct(product),
-                                            2,
+                                            calculateTotalQuantityOfProduct2(product),
+                                            product.selectedUnitMeasure !==
+                                            product.unitMeasure ? 2 : 0,
                                           )}
 
                                           {/* {product?.quantity} */}
@@ -685,16 +737,18 @@ const ExportGoods = () => {
                                             product.unitMeasure && (
                                             <Tooltip
                                               title={
-                                                calculateTotalQuantityOfProduct(product) -
-                                                (calculateTotalQuantityOfProduct(
+                                                calculateTotalQuantityOfProduct2(
+                                                  product,
+                                                ) -
+                                                (calculateTotalQuantityOfProduct2(
                                                   product,
                                                 ) %
                                                   1) +
                                                 ' ' +
                                                 product.wrapUnitMeasure +
                                                 ' ' +
-                                                Math.floor(
-                                                  (calculateTotalQuantityOfProduct(
+                                                Math.round(
+                                                  (calculateTotalQuantityOfProduct2(
                                                     product,
                                                   ) %
                                                     1) *
@@ -716,7 +770,7 @@ const ExportGoods = () => {
                                           )}
                                         </TableCell>
                                         <TableCell align="center">
-                                          {FormatDataUtils.formatCurrency(
+                                          {/* {FormatDataUtils.formatCurrency(
                                             product.selectedUnitMeasure !==
                                               product.unitMeasure
                                               ? FormatDataUtils.getRoundFloorNumber(
@@ -730,6 +784,11 @@ const ExportGoods = () => {
                                                   )
                                               : calculateTotalQuantityOfProduct(product) *
                                                   product?.unitPrice,
+                                          )} */}
+                                          {FormatDataUtils.formatCurrency(
+                                            calculateTotalAmountOfProduct(
+                                              values.productList[index],
+                                            ),
                                           )}
                                         </TableCell>
                                       </TableRow>
@@ -840,6 +899,33 @@ const ExportGoods = () => {
                                                               product.numberOfWrapUnitMeasure,
                                                             2,
                                                           )}
+                                                      {product.selectedUnitMeasure !==
+                                                        product.unitMeasure && (
+                                                        <Tooltip
+                                                          title={
+                                                            consignment?.quantityInstock /
+                                                              product.numberOfWrapUnitMeasure -
+                                                            ((consignment?.quantityInstock /
+                                                              product.numberOfWrapUnitMeasure) %
+                                                              1) +
+                                                            ' ' +
+                                                            product.wrapUnitMeasure +
+                                                            ' ' +
+                                                            Math.floor(
+                                                              ((consignment?.quantityInstock /
+                                                                product.numberOfWrapUnitMeasure) %
+                                                                1) *
+                                                                product.numberOfWrapUnitMeasure,
+                                                            ) +
+                                                            ' ' +
+                                                            product.unitMeasure
+                                                          }
+                                                        >
+                                                          <IconButton>
+                                                            <InfoOutlined />
+                                                          </IconButton>
+                                                        </Tooltip>
+                                                      )}
                                                     </TableCell>
                                                   </TableRow>
                                                 ),

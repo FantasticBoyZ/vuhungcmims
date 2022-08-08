@@ -215,7 +215,7 @@ const ProductDetail = () => {
                                     product?.quantity / product?.numberOfWrapUnitMeasure,
                                     2,
                                   )
-                                : product?.quantity
+                                : product?.quantity || 0
                               : product?.quantity || 0}
                           </Typography>
                         </Grid>

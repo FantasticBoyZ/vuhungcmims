@@ -187,6 +187,7 @@ const AddEditProductForm = () => {
     subCategoryId: '',
     manufactorId: '',
     imageUrl: '',
+    isUseWrapUnitMeasure: false
   };
   const [categoryList, setCategoryList] = useState([]);
   const [subCategoryList, setSubCategoryList] = useState([]);
@@ -207,6 +208,15 @@ const AddEditProductForm = () => {
     unitMeasure: Yup.string().required('Chưa nhập đơn vị'),
     categoryId: Yup.string().required('Chưa chọn danh mục'),
     manufactorId: Yup.string().required('Chưa chọn nhà cung cấp'),
+    isUseWrapUnitMeasure: Yup.boolean(),
+    wrapUnitMeasure: Yup.string().when('isUseWrapUnitMeasure', {
+      is: true,
+      then: Yup.string().required('Chưa nhập đơn vị quy đổi').nullable(),
+    }).nullable(),
+    numberOfWrapUnitMeasure: Yup.number().when('isUseWrapUnitMeasure', {
+      is: true,
+      then: Yup.number().required('Chưa nhập số lượng quy đổi').nullable(),
+    }).nullable(),
   });
 
   const onChangeCategory = (event) => {
@@ -395,7 +405,7 @@ const AddEditProductForm = () => {
         <Box>
           {!!product && (
             <Formik
-              initialValues={{ ...product }}
+              initialValues={{ ...product, isUseWrapUnitMeasure: false }}
               validationSchema={FORM_VALIDATION}
               onSubmit={(values) => handleSubmit(values)}
             >
@@ -522,7 +532,7 @@ const AddEditProductForm = () => {
                                   checked={isUseWrapUnitMeasure}
                                   onClick={() => {
                                     handleOnClickCheckboxWrapUnitMeasure();
-                                    // setFieldValue('wrapUnitMeasure', '');
+                                    setFieldValue('isUseWrapUnitMeasure', !isUseWrapUnitMeasure);
                                     // setFieldValue('numberOfWrapUnitMeasure', '');
                                   }}
                                 />
@@ -810,7 +820,7 @@ const AddEditProductForm = () => {
                         </Grid>
                       </Grid>
                     </Grid>
-                    {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
+                    <pre>{JSON.stringify(values, null, 2)}</pre>
                   </Grid>
                 </Form>
               )}
@@ -949,7 +959,7 @@ const AddEditProductForm = () => {
                               checked={isUseWrapUnitMeasure}
                               onClick={() => {
                                 handleOnClickCheckboxWrapUnitMeasure();
-                                // setFieldValue('wrapUnitMeasure', '');
+                                setFieldValue('isUseWrapUnitMeasure', !isUseWrapUnitMeasure);
                                 // setFieldValue('numberOfWrapUnitMeasure', '');
                               }}
                             />
