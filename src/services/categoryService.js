@@ -11,6 +11,11 @@ const CategoryService = {
     return axiosClient.get(url, { params, headers: authHeader() });
   },
 
+  getAllCategoryList: (params) => {
+    const url = '/category/notPaging';
+    return axiosClient.get(url, { params, headers: authHeader() });
+  },
+
   getSubCategoryByCategoryId: (params) => {
     const url = '/subCategory';
     return axiosClient.get(url, { params, headers: authHeader() });

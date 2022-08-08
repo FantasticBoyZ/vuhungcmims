@@ -16,9 +16,9 @@ const ManufactorService = {
     return axiosClient.get(url, { params, headers: authHeader() });
   },
   
-  getManufacturerById: (id) => {
-    const url = `/manufacturer/${id}`;
-    return axiosClient.get(url, { headers: authHeader() });
+  getManufacturerById: (params) => {
+    const url = `/manufacturer/${params.manufacturerId}`;
+    return axiosClient.get(url, {params ,headers: authHeader() });
   },
   saveManufacturer: (manufacturer) => {
     const url = API_URL + '/manufacturer/add';

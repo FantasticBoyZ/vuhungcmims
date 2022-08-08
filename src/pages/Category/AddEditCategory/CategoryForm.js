@@ -2,6 +2,7 @@ import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import TextfieldWrapper from '@/components/Common/FormsUI/Textfield';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import {
+  getAllCategoryList,
   getCategoryList,
   saveCategory,
   saveSubCategory,
@@ -61,7 +62,8 @@ const CategoryForm = (props) => {
   const { closePopup, category, allCategoryList } = props;
   //   const { categoryId } = useParams();
   const navigate = useNavigate();
-  const [categoryList, setCategoryList] = useState();
+  const [loadingSelect, setLoadingSelect] = useState(true)
+  const [categoryList, setCategoryList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState();
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -86,8 +88,7 @@ const CategoryForm = (props) => {
   });
 
   const getSelectedParent = () => {
-    const categoryList = FormatDataUtils.getOptionWithIdandName(allCategoryList);
-    setSelectedCategory(categoryList.find((item) => item.value == category?.categoryId));
+    setSelectedCategory(category?.categoryId);
   };
 
   const saveCategoryDetail = async (category) => {
@@ -198,8 +199,29 @@ const CategoryForm = (props) => {
     // navigate(isAdd ? '/category' : `/category/detail/${categoryId}`);
   };
 
+  const getAllCategory = async (keyword) => {
+    try {
+      const params = {
+        // pageIndex: page + 1,
+        // pageSize: rowsPerPage,
+        categoryName: keyword,
+      };
+      const actionResult = await dispatch(getAllCategoryList(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        setCategoryList(dataResult.data.category);
+        setLoadingSelect(false)
+      }
+    } catch (error) {
+      console.log('Failed to fetch category list: ', error);
+      setLoadingSelect(false)
+    }
+  };
+
   useEffect(() => {
     getSelectedParent();
+    getAllCategory()
   }, []);
   return (
     <Formik
@@ -245,25 +267,26 @@ const CategoryForm = (props) => {
                     {!!category.categoryId && (
                       <Box className={classes.selectContainer}>
                         <Typography variant="span">Danh mục cha:</Typography>
-                        {!!allCategoryList && (
+                        {!!categoryList && (
                           <Select
                             // classNamePrefix="select"
                             className={classes.selectBox}
                             placeholder="Chọn danh mục cha"
                             noOptionsMessage={() => <>Không có tìm thấy danh mục nào</>}
-                            isClearable={true}
+                            
                             isSearchable={true}
-                            isLoading={loading}
+                            isLoading={loadingSelect}
                             loadingMessage={() => <>Đang tìm kiếm danh mục cha...</>}
                             name="category"
-                            value={selectedCategory}
+                            value={FormatDataUtils.getSelectedOption(categoryList,selectedCategory)}
                             options={FormatDataUtils.getOptionWithIdandName(
-                              allCategoryList,
+                              categoryList,
                             )}
                             menuPortalTarget={document.body}
                             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                             onChange={(e) => {
                               setFieldValue('categoryId', e?.value);
+                              setSelectedCategory(e?.value)
                             }}
                             onInputChange={handleInputChangeCategory}
                           />
@@ -316,7 +339,7 @@ const CategoryForm = (props) => {
                 </Box>
                 <Box className={classes.selectContainer}>
                   <Typography variant="span">Danh mục cha:</Typography>
-                  {!!allCategoryList && (
+                  {!!categoryList && (
                     <Select
                       // classNamePrefix="select"
                       className={classes.selectBox}
@@ -324,10 +347,10 @@ const CategoryForm = (props) => {
                       noOptionsMessage={() => <>Không có tìm thấy danh mục nào</>}
                       isClearable={true}
                       isSearchable={true}
-                      isLoading={loading}
+                      isLoading={loadingSelect}
                       loadingMessage={() => <>Đang tìm kiếm danh mục cha...</>}
                       name="category"
-                      options={FormatDataUtils.getOption(allCategoryList)}
+                      options={FormatDataUtils.getOption(categoryList)}
                       menuPortalTarget={document.body}
                       styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                       onChange={(e) => {
@@ -358,7 +381,7 @@ const CategoryForm = (props) => {
             justifyContent="flex-end"
             padding="20px"
           >
-            <ButtonWrapper variant="contained">Lưu</ButtonWrapper>
+            <ButtonWrapper disabled={loadingSelect} variant="contained">Lưu</ButtonWrapper>
             {/* <Button
             onClick={() => handleOnClickExit()}
             variant="outlined"

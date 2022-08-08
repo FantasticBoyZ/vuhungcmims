@@ -3,7 +3,7 @@ import ProductInformation from '@/pages/Product/ProductList/ProductDetail//Produ
 import SubProductTable from '@/pages/Product/ProductList/ProductDetail//SubProductTable';
 import { getProductDetail } from '@/slices/ProductSlice';
 import FormatDataUtils from '@/utils/formatData';
-import { Box, Card, CardContent, Grid, Typography } from '@mui/material';
+import { Box, Card, CardContent, Grid, Stack, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useEffect, useState } from 'react';
@@ -108,51 +108,39 @@ const ProductDetail = () => {
           >
             {/* <Typography variant='h5'>Danh sách lô hàng </Typography> */}
             <Card className={classes.cardTable}>
-              {!!totalRecord && totalRecord > 0 ? (
+              <CardContent>
+                <Typography variant="h6">Thông tin kho hàng</Typography>
                 <CardContent>
-                  <Typography variant="h6">Thông tin kho hàng</Typography>
-                  <CardContent>
-                    <Grid container>
-                      <Grid
-                        xs={4}
-                        item
-                      >
-                        <Grid container>
-                          <Grid
-                            xs={1}
-                            item
-                          ></Grid>
-                          <Grid
-                            xs={6}
-                            item
-                          >
-                            <Typography className={classes.labelInfo}>
-                              Đơn vị tính
-                            </Typography>
-                          </Grid>
-                          <Grid
-                            xs={5}
-                            item
-                          >
-                            <Box className={classes.contentInfo}>
-                              {product.wrapUnitMeasure == null ? (
-                                product.unitMeasure
-                              ) : (
-                                <Select
-                                  classNamePrefix="select"
-                                  defaultValue={
-                                    FormatDataUtils.getOption([
-                                      {
-                                        number: 1,
-                                        name: product.unitMeasure,
-                                      },
-                                      {
-                                        number: product.numberOfWrapUnitMeasure,
-                                        name: product.wrapUnitMeasure,
-                                      },
-                                    ])[0]
-                                  }
-                                  options={FormatDataUtils.getOption([
+                  <Grid container>
+                    <Grid
+                      xs={4}
+                      item
+                    >
+                      <Grid container>
+                        <Grid
+                          xs={1}
+                          item
+                        ></Grid>
+                        <Grid
+                          xs={6}
+                          item
+                        >
+                          <Typography className={classes.labelInfo}>
+                            Đơn vị tính
+                          </Typography>
+                        </Grid>
+                        <Grid
+                          xs={5}
+                          item
+                        >
+                          <Box className={classes.contentInfo}>
+                            {product?.wrapUnitMeasure == null ? (
+                              product?.unitMeasure
+                            ) : (
+                              <Select
+                                classNamePrefix="select"
+                                defaultValue={
+                                  FormatDataUtils.getOption([
                                     {
                                       number: 1,
                                       name: product.unitMeasure,
@@ -161,78 +149,95 @@ const ProductDetail = () => {
                                       number: product.numberOfWrapUnitMeasure,
                                       name: product.wrapUnitMeasure,
                                     },
-                                  ])}
-                                  menuPortalTarget={document.body}
-                                  styles={{
-                                    menuPortal: (base) => ({
-                                      ...base,
-                                      zIndex: 9999,
-                                    }),
-                                  }}
-                                  onChange={(e) => {
-                                    if (e.label !== selectedUnitMeasure) {
-                                      if (e.label === product.wrapUnitMeasure) {
-                                        setSelectedUnitMeasure(product.wrapUnitMeasure);
-                                        // console.log('wrap', product.wrapUnitMeasure);
-                                      }
-
-                                      if (e.label === product.unitMeasure) {
-                                        setSelectedUnitMeasure(product.unitMeasure);
-                                        // console.log('unit', product.unitMeasure);
-                                      }
+                                  ])[0]
+                                }
+                                options={FormatDataUtils.getOption([
+                                  {
+                                    number: 1,
+                                    name: product.unitMeasure,
+                                  },
+                                  {
+                                    number: product.numberOfWrapUnitMeasure,
+                                    name: product.wrapUnitMeasure,
+                                  },
+                                ])}
+                                menuPortalTarget={document.body}
+                                styles={{
+                                  menuPortal: (base) => ({
+                                    ...base,
+                                    zIndex: 9999,
+                                  }),
+                                }}
+                                onChange={(e) => {
+                                  if (e.label !== selectedUnitMeasure) {
+                                    if (e.label === product.wrapUnitMeasure) {
+                                      setSelectedUnitMeasure(product.wrapUnitMeasure);
+                                      // console.log('wrap', product.wrapUnitMeasure);
                                     }
 
-                                    // console.log('select', selectedUnitMeasure);
-                                  }}
-                                />
-                              )}
-                            </Box>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                      <Grid
-                        xs={4}
-                        item
-                      >
-                        <Grid container>
-                          <Grid
-                            xs={1}
-                            item
-                          ></Grid>
-                          <Grid
-                            xs={6}
-                            item
-                          >
-                            <Typography className={classes.labelInfo}>
-                              Số lượng
-                            </Typography>
-                          </Grid>
-                          <Grid
-                            xs={5}
-                            item
-                          >
-                            <Typography className={classes.contentInfo}>
-                              {selectedUnitMeasure
-                                ? selectedUnitMeasure === product.wrapUnitMeasure
-                                  ? FormatDataUtils.getRoundNumber(
-                                      product.quantity / product.numberOfWrapUnitMeasure,
-                                      1,
-                                    )
-                                  : product.quantity
-                                : product.quantity}
-                            </Typography>
-                          </Grid>
+                                    if (e.label === product.unitMeasure) {
+                                      setSelectedUnitMeasure(product.unitMeasure);
+                                      // console.log('unit', product.unitMeasure);
+                                    }
+                                  }
+
+                                  // console.log('select', selectedUnitMeasure);
+                                }}
+                              />
+                            )}
+                          </Box>
                         </Grid>
                       </Grid>
                     </Grid>
-                  </CardContent>
-
+                    <Grid
+                      xs={4}
+                      item
+                    >
+                      <Grid container>
+                        <Grid
+                          xs={1}
+                          item
+                        ></Grid>
+                        <Grid
+                          xs={6}
+                          item
+                        >
+                          <Typography className={classes.labelInfo}>Số lượng</Typography>
+                        </Grid>
+                        <Grid
+                          xs={5}
+                          item
+                        >
+                          <Typography className={classes.contentInfo}>
+                            {selectedUnitMeasure
+                              ? selectedUnitMeasure === product?.wrapUnitMeasure
+                                ? FormatDataUtils.getRoundFloorNumber(
+                                    product?.quantity / product?.numberOfWrapUnitMeasure,
+                                    2,
+                                  )
+                                : product?.quantity
+                              : product?.quantity || 0}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+                {!!totalRecord && totalRecord > 0 ? (
                   <SubProductTable
                     selectedUnitMeasure={selectedUnitMeasure}
                     product={product}
                     subProductList={subProductList}
                   />
-                  {/* <CustomTablePagination
+                ) : (
+                  <Stack
+                    mt={2}
+                    alignItems="center"
+                  >
+                    <b>Sản phẩm chưa có lô hàng nào</b>
+                  </Stack>
+                )}
+                {/* <CustomTablePagination
                   page={page}
                   pages={pages}
                   rowsPerPage={rowsPerPage}
@@ -240,10 +245,7 @@ const ProductDetail = () => {
                   handleChangePage={handleChangePage}
                   handleChangeRowsPerPage={handleChangeRowsPerPage}
                 /> */}
-                </CardContent>
-              ) : (
-                <CardContent> Sản phẩm chưa có lô hàng nào</CardContent>
-              )}
+              </CardContent>
             </Card>
           </Grid>
         </Grid>

@@ -469,7 +469,7 @@ const InventoryCheckingList = () => {
                               {FormatDataUtils.formatDate(inventoryChecking.createDate)}
                             </TableCell>
                             <TableCell align="center">
-                              Trịnh Bá Minh Ninh({inventoryChecking.userName})
+                              {inventoryChecking.fullName + ' ('+inventoryChecking.userName+')'}
                             </TableCell>
                             <TableCell align="center">
                               {FormatDataUtils.formatCurrency(

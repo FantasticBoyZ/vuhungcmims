@@ -145,10 +145,10 @@ const TempInventoryReturnList = () => {
 
   const handleChangeCheckboxPending = () => {
     setPage(0);
-    setSearchParams({ ...searchParams, status: selectPending === false ? 1 : '' });
+    setSearchParams({ ...searchParams, statusId: selectPending === false ? 1 : '' });
     searchTempInventoryReturn({
       ...searchParams,
-      status: selectPending === false ? 1 : '',
+      statusId: selectPending === false ? 1 : '',
     });
     setSelectPending(!selectPending);
   };

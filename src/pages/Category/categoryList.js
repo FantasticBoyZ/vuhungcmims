@@ -86,7 +86,7 @@ const CategoryList = () => {
 
   const handleOnclickAddNewProduct = () => {
     // navigate('/category/add');
-    getAllCategory();
+    // getAllCategory();
     setOpenPopup(true);
   };
 

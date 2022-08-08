@@ -284,7 +284,10 @@ const AddEditManufacturerForm = () => {
   useEffect(() => {
     const fetchManufacturerDetail = async (manufacturerId) => {
       try {
-        const actionResult = await dispatch(getManufacturerById(manufacturerId));
+        const params = {
+          manufacturerId: manufacturerId
+        }
+        const actionResult = await dispatch(getManufacturerById(params));
         const dataResult = unwrapResult(actionResult);
         if (dataResult.data) {
           setManufacturer(dataResult.data.manufactor);

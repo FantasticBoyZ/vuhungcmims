@@ -1,11 +1,14 @@
 import FormatDataUtils from '@/utils/formatData';
+import { InfoOutlined } from '@mui/icons-material';
 import {
+  IconButton,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { Fragment, useState } from 'react';
@@ -146,11 +149,33 @@ const ExportProductTable = ({ productList }) => {
                   </TableCell>
                   <TableCell align="center">
                     {selectedUnitMeasureList[index] === product.wrapUnitMeasure
-                      ? FormatDataUtils.getRoundNumber(
+                      ? FormatDataUtils.getRoundFloorNumber(
                           product?.quantity / product.numberOfWrapUnitMeasure,
-                          1,
+                          2,
                         )
                       : product?.quantity}
+                    {selectedUnitMeasureList[index] === product.wrapUnitMeasure &&
+                      !!product.wrapUnitMeasure && (
+                        <Tooltip
+                          title={
+                            product.quantity / product.numberOfWrapUnitMeasure -
+                            ((product.quantity / product.numberOfWrapUnitMeasure) % 1) +
+                            ' ' +
+                            product.wrapUnitMeasure +
+                            ' ' +
+                            Math.floor(
+                              ((product.quantity / product.numberOfWrapUnitMeasure) % 1) *
+                                product.numberOfWrapUnitMeasure,
+                            ) +
+                            ' ' +
+                            product.unitMeasure
+                          }
+                        >
+                          <IconButton>
+                            <InfoOutlined />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                   </TableCell>
                   <TableCell align="center">
                     {selectedUnitMeasureList[index] === product.wrapUnitMeasure
@@ -198,12 +223,40 @@ const ExportProductTable = ({ productList }) => {
                             </TableCell>
                             <TableCell align="center">
                               {selectedUnitMeasureList[index] === product.wrapUnitMeasure
-                                ? FormatDataUtils.getRoundNumber(
+                                ? FormatDataUtils.getRoundFloorNumber(
                                     consignment?.quantity /
                                       product.numberOfWrapUnitMeasure,
-                                    1,
+                                    2,
                                   )
                                 : consignment?.quantity}
+                              {selectedUnitMeasureList[index] ===
+                                product.wrapUnitMeasure &&
+                                !!product.wrapUnitMeasure && (
+                                  <Tooltip
+                                    title={
+                                      consignment.quantity /
+                                        product.numberOfWrapUnitMeasure -
+                                      ((consignment.quantity /
+                                        product.numberOfWrapUnitMeasure) %
+                                        1) +
+                                      ' ' +
+                                      product.wrapUnitMeasure +
+                                      ' ' +
+                                      Math.floor(
+                                        ((consignment.quantity /
+                                          product.numberOfWrapUnitMeasure) %
+                                          1) *
+                                          product.numberOfWrapUnitMeasure,
+                                      ) +
+                                      ' ' +
+                                      product.unitMeasure
+                                    }
+                                  >
+                                    <IconButton>
+                                      <InfoOutlined />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
                             </TableCell>
                           </TableRow>
                         ))}

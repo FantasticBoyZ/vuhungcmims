@@ -102,9 +102,9 @@ const SubProductTable = ({ selectedUnitMeasure,product, subProductList }) => {
                       : 'không có'}
                   </TableCell>
                   <TableCell align="center">
-                    {selectedUnitMeasure === product.wrapUnitMeasure
-                      ? FormatDataUtils.getRoundNumber(subProduct.quantity / product.numberOfWrapUnitMeasure, 1)
-                      : subProduct.quantity}
+                    {selectedUnitMeasure ? (selectedUnitMeasure === product.wrapUnitMeasure
+                      ? FormatDataUtils.getRoundFloorNumber(subProduct.quantity / product.numberOfWrapUnitMeasure, 2)
+                      : subProduct.quantity) : subProduct.quantity}
                   </TableCell>
                   <TableCell align="center">{subProduct.wareHouseName}</TableCell>
                   <TableCell align="center">{subProduct.addressWareHouse}</TableCell>

@@ -56,7 +56,7 @@ const ManufacturerDetail = () => {
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.manufacturers }));
   const [selectedUnitMeasureList, setSelectedUnitMeasureList] = useState([]);
-  const pages = [10, 20, 50];
+  const pages = [5, 10, 15];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [totalRecord, setTotalRecord] = useState(0);
@@ -74,21 +74,30 @@ const ManufacturerDetail = () => {
     navigate(`/manufacturer/edit/${manufacturerId}`);
   };
 
-  useEffect(() => {
-    const fetchManufacturerDetail = async () => {
-      try {
-        const actionResult = await dispatch(getManufacturerById(manufacturerId));
-        const dataResult = unwrapResult(actionResult);
-        if (dataResult.data) {
-          setManufacturer(dataResult.data.manufactor);
-          setTotalRecord(dataResult.data.totalRecord);
-        }
-        console.log('dataResult', dataResult);
-      } catch (error) {
-        console.log('Failed to fetch manufacturer detail: ', error);
-      }
+  const fetchManufacturerDetail = async () => {
+    const params = {
+      pageIndex: page + 1,
+      pageSize: rowsPerPage,
+      manufacturerId: manufacturerId
     };
+    try {
+      const actionResult = await dispatch(getManufacturerById(params));
+      const dataResult = unwrapResult(actionResult);
+      if (dataResult.data) {
+        setManufacturer(dataResult.data.manufactor);
+        setTotalRecord(dataResult.data.totalRecord);
+      }
+      console.log('dataResult', dataResult);
+    } catch (error) {
+      console.log('Failed to fetch manufacturer detail: ', error);
+    }
+  };
 
+  useEffect(() => {
+    fetchManufacturerDetail();
+  }, [page, rowsPerPage]);
+
+  useEffect(() => {
     fetchManufacturerDetail();
   }, []);
 
@@ -116,7 +125,7 @@ const ManufacturerDetail = () => {
       </Card>
 
       <Card className={classes.infoContainer}>
-        {loading ? (
+        {loading && !manufacturer ? (
           <ProgressCircleLoading />
         ) : (
           <>
