@@ -25,6 +25,12 @@ export const addWarehouse = createAsyncThunk('warehouse/save', async (params, th
     return response;
 })
 
+export const updateWarehouse = createAsyncThunk('warehouse/save', async (params, thunkAPi) => {
+    // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+    const response = await warehouseService.updateWarehouse(params);
+    return response;
+})
+
 export const deleteWarehouse = createAsyncThunk('warehouse/delete', async (params, thunkAPi) => {
     // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
     const response = await warehouseService.deleteWarehouse(params);

@@ -24,6 +24,11 @@ const WarehouseService = {
     return axios.post(url, params, { headers: authHeader() });
   },
 
+  updateWarehouse: (params) => {
+    const url = API_URL + `/warehouse/update`;
+    return axios.put(url, params, { headers: authHeader() });
+  },
+
   deleteWarehouse: (params) => {
     const url = `/warehouse/delete/${params}`;
     return axiosClient.delete(url, params);
