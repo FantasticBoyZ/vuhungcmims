@@ -74,25 +74,30 @@ const ManufacturerDetail = () => {
     navigate(`/manufacturer/edit/${manufacturerId}`);
   };
 
-  useEffect(() => {
-    const fetchManufacturerDetail = async () => {
-      const params = {
-        pageIndex: page + 1,
-        pageSize: rowsPerPage,
-      };
-      try {
-        const actionResult = await dispatch(getManufacturerById(manufacturerId));
-        const dataResult = unwrapResult(actionResult);
-        if (dataResult.data) {
-          setManufacturer(dataResult.data.manufactor);
-          setTotalRecord(dataResult.data.totalRecord);
-        }
-        console.log('dataResult', dataResult);
-      } catch (error) {
-        console.log('Failed to fetch manufacturer detail: ', error);
-      }
+  const fetchManufacturerDetail = async () => {
+    const params = {
+      pageIndex: page + 1,
+      pageSize: rowsPerPage,
+      manufacturerId: manufacturerId
     };
+    try {
+      const actionResult = await dispatch(getManufacturerById(params));
+      const dataResult = unwrapResult(actionResult);
+      if (dataResult.data) {
+        setManufacturer(dataResult.data.manufactor);
+        setTotalRecord(dataResult.data.totalRecord);
+      }
+      console.log('dataResult', dataResult);
+    } catch (error) {
+      console.log('Failed to fetch manufacturer detail: ', error);
+    }
+  };
 
+  useEffect(() => {
+    fetchManufacturerDetail();
+  }, [page, rowsPerPage]);
+
+  useEffect(() => {
     fetchManufacturerDetail();
   }, []);
 
@@ -120,7 +125,7 @@ const ManufacturerDetail = () => {
       </Card>
 
       <Card className={classes.infoContainer}>
-        {loading ? (
+        {loading && !manufacturer ? (
           <ProgressCircleLoading />
         ) : (
           <>

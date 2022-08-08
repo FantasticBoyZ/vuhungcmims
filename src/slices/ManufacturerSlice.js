@@ -21,9 +21,9 @@ export const getAllManufacturer = createAsyncThunk(
 
 export const getManufacturerById = createAsyncThunk(
   'manufacturer/get-one',
-  async (id, thunkAPi) => {
+  async (params, thunkAPi) => {
     // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
-    const manufacturerList = await manufactorService.getManufacturerById(id);
+    const manufacturerList = await manufactorService.getManufacturerById(params);
     return manufacturerList;
   },
 );
