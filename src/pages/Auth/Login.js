@@ -57,7 +57,7 @@ const Login = () => {
     // e.preventDefault();
     setMessage('');
     setLoading(true);
-    console.log(e);
+    // console.log(e);
     AuthService.login(e.username, e.password).then(
       () => {
         setDisabled(true);
