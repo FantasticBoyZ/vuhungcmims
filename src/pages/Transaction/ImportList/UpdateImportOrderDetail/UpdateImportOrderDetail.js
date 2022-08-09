@@ -41,6 +41,7 @@ import { FieldArray, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import { getWarehouseList } from '@/slices/WarehouseSlice';
+import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -354,8 +355,7 @@ const UpdateImportOrderDetail = () => {
                         >
                           <Box className={classes.billReferenceContainer}>
                             <Typography variant="span">
-                              <strong>Phiếu nhập kho số:</strong>{' '}
-                              {'NHAP' + importOrderId}
+                              <strong>Phiếu nhập kho số:</strong> {'NHAP' + importOrderId}
                             </Typography>{' '}
                             <span>
                               {FormatDataUtils.getStatusLabel(importOrder.statusName)}
@@ -528,7 +528,9 @@ const UpdateImportOrderDetail = () => {
                                                       null ? (
                                                         consignment?.unitMeasure
                                                       ) : (
-                                                        <Box
+                                                        <Stack
+                                                        direction='row'
+                                                        
                                                           className={
                                                             classes.selectBoxUnitMeasure
                                                           }
@@ -671,7 +673,22 @@ const UpdateImportOrderDetail = () => {
                                                               }
                                                             }}
                                                           />
-                                                        </Box>
+                                                          {values.consignments[index].selectedUnitMeasure ===
+                                                            consignment.wrapUnitMeasure && (
+                                                            <TooltipUnitMeasure
+                                                              wrapUnitMeasure={
+                                                                consignment.wrapUnitMeasure
+                                                              }
+                                                              numberOfWrapUnitMeasure={
+                                                                consignment.numberOfWrapUnitMeasure
+                                                              }
+                                                              unitMeasure={
+                                                                consignment.unitMeasure
+                                                              }
+                                                              isConvert={false}
+                                                            />
+                                                          )}
+                                                        </Stack>
                                                       )}
                                                     </TableCell>
                                                     <TableCell>

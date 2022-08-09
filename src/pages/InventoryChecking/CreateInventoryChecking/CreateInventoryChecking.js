@@ -48,6 +48,7 @@ import AuthService from '@/services/authService';
 import AlertPopup from '@/components/Common/AlertPopup';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
 
 const useStyles = makeStyles((theme) => ({
   searchField: {
@@ -489,7 +490,6 @@ const CreateInventoryChecking = () => {
                           </Box>
                         )}
                       </Box>
-               
                     </Stack>
                   </CardContent>
                 </Card>
@@ -698,7 +698,10 @@ const CreateInventoryChecking = () => {
                                           {product?.wrapUnitMeasure == null ? (
                                             product?.unitMeasure
                                           ) : (
-                                            <Box className={classes.selectBoxUnitMeasure}>
+                                            <Stack
+                                              direction="row"
+                                              className={classes.selectBoxUnitMeasure}
+                                            >
                                               <Select
                                                 classNamePrefix="select"
                                                 onChange={(e) => {
@@ -849,7 +852,20 @@ const CreateInventoryChecking = () => {
                                                   }),
                                                 }}
                                               />
-                                            </Box>
+                                              {product.selectedUnitMeasure ===
+                                                product.wrapUnitMeasure && (
+                                                <TooltipUnitMeasure
+                                                  wrapUnitMeasure={
+                                                    product.wrapUnitMeasure
+                                                  }
+                                                  numberOfWrapUnitMeasure={
+                                                    product.numberOfWrapUnitMeasure
+                                                  }
+                                                  unitMeasure={product.unitMeasure}
+                                                  isConvert={false}
+                                                />
+                                              )}
+                                            </Stack>
                                           )}
                                         </TableCell>
                                         <TableCell align="center">
@@ -914,6 +930,25 @@ const CreateInventoryChecking = () => {
                                                               product.numberOfWrapUnitMeasure,
                                                             2,
                                                           )}
+                                                      {product.selectedUnitMeasure ===
+                                                        product.wrapUnitMeasure && (
+                                                        <TooltipUnitMeasure
+                                                          quantity={
+                                                            consignment?.quantity /
+                                                            product.numberOfWrapUnitMeasure
+                                                          }
+                                                          wrapUnitMeasure={
+                                                            product.wrapUnitMeasure
+                                                          }
+                                                          numberOfWrapUnitMeasure={
+                                                            product.numberOfWrapUnitMeasure
+                                                          }
+                                                          unitMeasure={
+                                                            product.unitMeasure
+                                                          }
+                                                          isConvert={true}
+                                                        />
+                                                      )}
                                                     </TableCell>
                                                     <TableCell align="center">
                                                       <TextfieldWrapper

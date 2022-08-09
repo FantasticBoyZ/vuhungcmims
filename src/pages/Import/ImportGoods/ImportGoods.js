@@ -38,6 +38,7 @@ import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import './style.css';
 import LoadingButton from '@mui/lab/LoadingButton';
+import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
 
 const useStyles = makeStyles({
   unitMeasureSelect: {
@@ -97,7 +98,7 @@ const ImportGoods = () => {
   const [openPopup, setOpenPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const currentUser = AuthService.getCurrentUser();
-  const [loadingButton, setLoadingButton] = useState(false)
+  const [loadingButton, setLoadingButton] = useState(false);
   const today = new Date();
   const classes = useStyles();
   const [initialProductList, setInitialProductList] = useState({
@@ -109,9 +110,7 @@ const ImportGoods = () => {
     userId: currentUser.id,
     manufactorId: '',
     wareHouseId: '',
-    consignmentRequests: [
-      
-    ],
+    consignmentRequests: [],
   });
 
   const FORM_VALIDATION = Yup.object().shape({
@@ -183,7 +182,7 @@ const ImportGoods = () => {
 
   const handleOnChangeManufacturer = (e) => {
     console.log(e);
-    setProductList([])
+    setProductList([]);
     setSelectedProduct(null);
     if (e) {
       getProductListByManufacturerId(e);
@@ -262,9 +261,11 @@ const ImportGoods = () => {
       console.log('timezone', new Date().getTimezoneOffset() / 60);
       consignmentRequests.push({
         productId: consignments[index]?.productId,
-        expirationDate: consignments[index]?.expirationDate ? new Date(
-          consignments[index]?.expirationDate + new Date().getTimezoneOffset() / 60,
-        ).toJSON() : null,
+        expirationDate: consignments[index]?.expirationDate
+          ? new Date(
+              consignments[index]?.expirationDate + new Date().getTimezoneOffset() / 60,
+            ).toJSON()
+          : null,
         // expirationDate: new Date(FormatDataUtils.convertUTCDateToLocalDate(consignments[index]?.expirationDate)).toJSON(),
         unitPrice: Math.round(
           consignments[index]?.selectedUnitMeasure ===
@@ -291,17 +292,17 @@ const ImportGoods = () => {
       consignmentRequests: consignmentRequests,
     };
     // console.log('test new', newImportOrder);
-    setLoadingButton(true)
+    setLoadingButton(true);
     importOrderService.createImportOrder(newImportOrder).then(
       (response) => {
         toast.success('Tạo phiếu nhập hàng thành công');
-        setLoadingButton(false)
+        setLoadingButton(false);
         console.log(response.data);
         navigate('/import/list');
       },
       (error) => {
         toast.error('Tạo phiếu nhập hàng thất bại');
-        setLoadingButton(false)
+        setLoadingButton(false);
         console.log(error);
       },
     );
@@ -386,31 +387,31 @@ const ImportGoods = () => {
                 <Card className="card-container">
                   <div className="label">Thông tin nhà cung cấp</div>
                   {/* {manufacturerList && ( */}
-                    <Box>
-                      <Select
-                        classNamePrefix="select"
-                        placeholder="Chọn nhà cung cấp..."
-                        noOptionsMessage={() => <>Không có tìm thấy nhà cung cấp nào</>}
-                        isClearable={true}
-                        isSearchable={true}
-                        isLoading={manufacturerState.loading}
-                        name="manufacturer"
-                        options={FormatDataUtils.getOptionWithIdandName(manufacturerList)}
-                        menuPortalTarget={document.body}
-                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                        onChange={(e) => {
-                          setFieldValue('manufactorId', e?.value);
-                          setFieldValue('consignmentRequests', [], false);
-                          handleOnChangeManufacturer(e?.value);
-                        }}
-                      />
-                      <FormHelperText
-                        error={true}
-                        className="error-text-helper"
-                      >
-                        {errors.manufactorId}
-                      </FormHelperText>
-                    </Box>
+                  <Box>
+                    <Select
+                      classNamePrefix="select"
+                      placeholder="Chọn nhà cung cấp..."
+                      noOptionsMessage={() => <>Không có tìm thấy nhà cung cấp nào</>}
+                      isClearable={true}
+                      isSearchable={true}
+                      isLoading={manufacturerState.loading}
+                      name="manufacturer"
+                      options={FormatDataUtils.getOptionWithIdandName(manufacturerList)}
+                      menuPortalTarget={document.body}
+                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                      onChange={(e) => {
+                        setFieldValue('manufactorId', e?.value);
+                        setFieldValue('consignmentRequests', [], false);
+                        handleOnChangeManufacturer(e?.value);
+                      }}
+                    />
+                    <FormHelperText
+                      error={true}
+                      className="error-text-helper"
+                    >
+                      {errors.manufactorId}
+                    </FormHelperText>
+                  </Box>
                   {/* )} */}
 
                   {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
@@ -418,21 +419,21 @@ const ImportGoods = () => {
                 <Card className="product-list-container">
                   <div className="label">Thông tin các sản phẩm</div>
                   {/* {!!productList && !!values.manufactorId && ( */}
-                    <Select
-                      classNamePrefix="select"
-                      placeholder="Chọn sản phẩm của nhà cung cấp phía trên..."
-                      noOptionsMessage={() => <>Không có tìm thấy sản phẩm nào</>}
-                      isClearable={true}
-                      isSearchable={true}
-                      isLoading={loading}
-                      loadingMessage={() => <>Đang tìm kiếm sản phẩm...</>}
-                      name="product"
-                      value={null}
-                      options={getOption(productList)}
-                      menuPortalTarget={document.body}
-                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                      onChange={(e) => handleOnChangeProduct(e)}
-                    />
+                  <Select
+                    classNamePrefix="select"
+                    placeholder="Chọn sản phẩm của nhà cung cấp phía trên..."
+                    noOptionsMessage={() => <>Không có tìm thấy sản phẩm nào</>}
+                    isClearable={true}
+                    isSearchable={true}
+                    isLoading={loading}
+                    loadingMessage={() => <>Đang tìm kiếm sản phẩm...</>}
+                    name="product"
+                    value={null}
+                    options={getOption(productList)}
+                    menuPortalTarget={document.body}
+                    styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                    onChange={(e) => handleOnChangeProduct(e)}
+                  />
                   {/* )} */}
 
                   <hr />
@@ -515,94 +516,108 @@ const ImportGoods = () => {
                                       {item.wrapUnitMeasure == null ? (
                                         item.unitMeasure
                                       ) : (
-                                        <Select
-                                          className={classes.unitMeasureSelect}
-                                          classNamePrefix="select"
-                                        
-                                          onChange={(e) => {
-                                            setFieldValue(
-                                              `consignmentRequests[${index}].selectedUnitMeasure`,
-                                              e.value.name,
-                                            );
-                                            // change quantity when change unitMeasure
-                                            if (
-                                              values.consignmentRequests[index].quantity >
-                                                0 &&
-                                              e.value.name !==
-                                                values.consignmentRequests[index]
-                                                  .selectedUnitMeasure
-                                            ) {
+                                        <Stack
+                                          direction="row"
+                                          justifyContent="center"
+                                        >
+                                          <Select
+                                            className={classes.unitMeasureSelect}
+                                            classNamePrefix="select"
+                                            onChange={(e) => {
+                                              setFieldValue(
+                                                `consignmentRequests[${index}].selectedUnitMeasure`,
+                                                e.value.name,
+                                              );
+                                              // change quantity when change unitMeasure
                                               if (
-                                                e.value.name ===
                                                 values.consignmentRequests[index]
-                                                  .wrapUnitMeasure
+                                                  .quantity > 0 &&
+                                                e.value.name !==
+                                                  values.consignmentRequests[index]
+                                                    .selectedUnitMeasure
                                               ) {
-                                                setFieldValue(
-                                                  `consignmentRequests[${index}].quantity`,
-                                                  Math.round(
-                                                    values.consignmentRequests[index]
-                                                      .quantity / e.value.number,
-                                                  ),
-                                                );
-                                              }
-
-                                              if (
-                                                e.value.name ===
-                                                values.consignmentRequests[index]
-                                                  .unitMeasure
-                                              ) {
-                                                setFieldValue(
-                                                  `consignmentRequests[${index}].quantity`,
-                                                  Math.round(
-                                                    values.consignmentRequests[index]
-                                                      .quantity *
+                                                if (
+                                                  e.value.name ===
+                                                  values.consignmentRequests[index]
+                                                    .wrapUnitMeasure
+                                                ) {
+                                                  setFieldValue(
+                                                    `consignmentRequests[${index}].quantity`,
+                                                    Math.round(
                                                       values.consignmentRequests[index]
-                                                        .numberOfWrapUnitMeasure,
-                                                  ),
-                                                );
-                                              }
-                                            }
-                                            // change unitPrice when change unitMeasure
-                                            if (
-                                              values.consignmentRequests[index]
-                                                .unitPrice > 0 &&
-                                              e.value.name !==
-                                                values.consignmentRequests[index]
-                                                  .selectedUnitMeasure
-                                            ) {
-                                              if (
-                                                e.value.name ===
-                                                values.consignmentRequests[index]
-                                                  .wrapUnitMeasure
-                                              ) {
-                                                setFieldValue(
-                                                  `consignmentRequests[${index}].unitPrice`,
-                                                  Math.round(
-                                                    values.consignmentRequests[index]
-                                                      .unitPrice * e.value.number,
-                                                  ),
-                                                );
-                                              }
+                                                        .quantity / e.value.number,
+                                                    ),
+                                                  );
+                                                }
 
-                                              if (
-                                                e.value.name ===
-                                                values.consignmentRequests[index]
-                                                  .unitMeasure
-                                              ) {
-                                                setFieldValue(
-                                                  `consignmentRequests[${index}].unitPrice`,
-                                                  Math.round(
-                                                    values.consignmentRequests[index]
-                                                      .unitPrice /
+                                                if (
+                                                  e.value.name ===
+                                                  values.consignmentRequests[index]
+                                                    .unitMeasure
+                                                ) {
+                                                  setFieldValue(
+                                                    `consignmentRequests[${index}].quantity`,
+                                                    Math.round(
                                                       values.consignmentRequests[index]
-                                                        .numberOfWrapUnitMeasure,
-                                                  ),
-                                                );
+                                                        .quantity *
+                                                        values.consignmentRequests[index]
+                                                          .numberOfWrapUnitMeasure,
+                                                    ),
+                                                  );
+                                                }
                                               }
+                                              // change unitPrice when change unitMeasure
+                                              if (
+                                                values.consignmentRequests[index]
+                                                  .unitPrice > 0 &&
+                                                e.value.name !==
+                                                  values.consignmentRequests[index]
+                                                    .selectedUnitMeasure
+                                              ) {
+                                                if (
+                                                  e.value.name ===
+                                                  values.consignmentRequests[index]
+                                                    .wrapUnitMeasure
+                                                ) {
+                                                  setFieldValue(
+                                                    `consignmentRequests[${index}].unitPrice`,
+                                                    Math.round(
+                                                      values.consignmentRequests[index]
+                                                        .unitPrice * e.value.number,
+                                                    ),
+                                                  );
+                                                }
+
+                                                if (
+                                                  e.value.name ===
+                                                  values.consignmentRequests[index]
+                                                    .unitMeasure
+                                                ) {
+                                                  setFieldValue(
+                                                    `consignmentRequests[${index}].unitPrice`,
+                                                    Math.round(
+                                                      values.consignmentRequests[index]
+                                                        .unitPrice /
+                                                        values.consignmentRequests[index]
+                                                          .numberOfWrapUnitMeasure,
+                                                    ),
+                                                  );
+                                                }
+                                              }
+                                            }}
+                                            defaultValue={
+                                              getOption([
+                                                {
+                                                  number: 1,
+                                                  name: item.unitMeasure,
+                                                },
+                                                {
+                                                  number: item.numberOfWrapUnitMeasure,
+                                                  name: item.wrapUnitMeasure,
+                                                },
+                                              ])[0]
                                             }
-                                          }}
-                                          defaultValue={
-                                            getOption([
+                                            options={getOption([
                                               {
                                                 number: 1,
                                                 name: item.unitMeasure,
@@ -611,26 +626,27 @@ const ImportGoods = () => {
                                                 number: item.numberOfWrapUnitMeasure,
                                                 name: item.wrapUnitMeasure,
                                               },
-                                            ])[0]
-                                          }
-                                          options={getOption([
-                                            {
-                                              number: 1,
-                                              name: item.unitMeasure,
-                                            },
-                                            {
-                                              number: item.numberOfWrapUnitMeasure,
-                                              name: item.wrapUnitMeasure,
-                                            },
-                                          ])}
-                                          menuPortalTarget={document.body}
-                                          styles={{
-                                            menuPortal: (base) => ({
-                                              ...base,
-                                              zIndex: 9999,
-                                            }),
-                                          }}
-                                        />
+                                            ])}
+                                            menuPortalTarget={document.body}
+                                            styles={{
+                                              menuPortal: (base) => ({
+                                                ...base,
+                                                zIndex: 9999,
+                                              }),
+                                            }}
+                                          />
+                                          {values.consignmentRequests[index]
+                                            .selectedUnitMeasure === item.wrapUnitMeasure && (
+                                            <TooltipUnitMeasure
+                                              wrapUnitMeasure={item.wrapUnitMeasure}
+                                              numberOfWrapUnitMeasure={
+                                                item.numberOfWrapUnitMeasure
+                                              }
+                                              unitMeasure={item.unitMeasure}
+                                              isConvert={false}
+                                            />
+                                          )}
+                                        </Stack>
                                       )}
                                     </TableCell>
                                     <TableCell>
@@ -741,7 +757,7 @@ const ImportGoods = () => {
                         variant="contained"
                         size="large"
                         loading={loadingButton}
-                        loadingPosition='start'
+                        loadingPosition="start"
                         startIcon={<CheckIcon />}
                         color="success"
                       >

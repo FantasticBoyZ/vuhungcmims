@@ -1,4 +1,5 @@
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
 import ProductInformation from '@/pages/Product/ProductList/ProductDetail//ProductInformation';
 import SubProductTable from '@/pages/Product/ProductList/ProductDetail//SubProductTable';
 import { getProductDetail } from '@/slices/ProductSlice';
@@ -137,10 +138,22 @@ const ProductDetail = () => {
                             {product?.wrapUnitMeasure == null ? (
                               product?.unitMeasure
                             ) : (
-                              <Select
-                                classNamePrefix="select"
-                                defaultValue={
-                                  FormatDataUtils.getOption([
+                              <Stack direction='row' justifyContent='center'>
+                                <Select
+                                  classNamePrefix="select"
+                                  defaultValue={
+                                    FormatDataUtils.getOption([
+                                      {
+                                        number: 1,
+                                        name: product.unitMeasure,
+                                      },
+                                      {
+                                        number: product.numberOfWrapUnitMeasure,
+                                        name: product.wrapUnitMeasure,
+                                      },
+                                    ])[0]
+                                  }
+                                  options={FormatDataUtils.getOption([
                                     {
                                       number: 1,
                                       name: product.unitMeasure,
@@ -149,41 +162,44 @@ const ProductDetail = () => {
                                       number: product.numberOfWrapUnitMeasure,
                                       name: product.wrapUnitMeasure,
                                     },
-                                  ])[0]
-                                }
-                                options={FormatDataUtils.getOption([
-                                  {
-                                    number: 1,
-                                    name: product.unitMeasure,
-                                  },
-                                  {
-                                    number: product.numberOfWrapUnitMeasure,
-                                    name: product.wrapUnitMeasure,
-                                  },
-                                ])}
-                                menuPortalTarget={document.body}
-                                styles={{
-                                  menuPortal: (base) => ({
-                                    ...base,
-                                    zIndex: 9999,
-                                  }),
-                                }}
-                                onChange={(e) => {
-                                  if (e.label !== selectedUnitMeasure) {
-                                    if (e.label === product.wrapUnitMeasure) {
-                                      setSelectedUnitMeasure(product.wrapUnitMeasure);
-                                      // console.log('wrap', product.wrapUnitMeasure);
+                                  ])}
+                                  menuPortalTarget={document.body}
+                                  styles={{
+                                    menuPortal: (base) => ({
+                                      ...base,
+                                      zIndex: 9999,
+                                    }),
+                                  }}
+                                  onChange={(e) => {
+                                    if (e.label !== selectedUnitMeasure) {
+                                      if (e.label === product.wrapUnitMeasure) {
+                                        setSelectedUnitMeasure(product.wrapUnitMeasure);
+                                        // console.log('wrap', product.wrapUnitMeasure);
+                                      }
+
+                                      if (e.label === product.unitMeasure) {
+                                        setSelectedUnitMeasure(product.unitMeasure);
+                                        // console.log('unit', product.unitMeasure);
+                                      }
                                     }
 
-                                    if (e.label === product.unitMeasure) {
-                                      setSelectedUnitMeasure(product.unitMeasure);
-                                      // console.log('unit', product.unitMeasure);
+                                    // console.log('select', selectedUnitMeasure);
+                                  }}
+                                />
+                                {selectedUnitMeasure === product?.wrapUnitMeasure && (
+                                  <TooltipUnitMeasure
+                                    quantity={
+                                      product.quantity / product.numberOfWrapUnitMeasure
                                     }
-                                  }
-
-                                  // console.log('select', selectedUnitMeasure);
-                                }}
-                              />
+                                    wrapUnitMeasure={product.wrapUnitMeasure}
+                                    numberOfWrapUnitMeasure={
+                                      product.numberOfWrapUnitMeasure
+                                    }
+                                    unitMeasure={product.unitMeasure}
+                                    isConvert={false}
+                                  />
+                                )}
+                              </Stack>
                             )}
                           </Box>
                         </Grid>
