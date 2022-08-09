@@ -132,26 +132,26 @@ const categorySlice = createSlice({
     [saveSubCategory.fulfilled] :(state, action) => {
       state.loading = false;
     },
-    [updateCategory.pending] : (state) => {
-      state.loading = true;
-    },
-    [updateCategory.rejected] :(state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-    [updateCategory.fulfilled] :(state, action) => {
-      state.loading = false;
-    },
-    [updateSubCategory.pending] : (state) => {
-      state.loading = true;
-    },
-    [updateSubCategory.rejected] :(state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-    [updateSubCategory.fulfilled] :(state, action) => {
-      state.loading = false;
-    },
+    // [updateCategory.pending] : (state) => {
+    //   state.loading = true;
+    // },
+    // [updateCategory.rejected] :(state, action) => {
+    //   state.loading = false;
+    //   state.error = action.payload;
+    // },
+    // [updateCategory.fulfilled] :(state, action) => {
+    //   state.loading = false;
+    // },
+    // [updateSubCategory.pending] : (state) => {
+    //   state.loading = true;
+    // },
+    // [updateSubCategory.rejected] :(state, action) => {
+    //   state.loading = false;
+    //   state.error = action.payload;
+    // },
+    // [updateSubCategory.fulfilled] :(state, action) => {
+    //   state.loading = false;
+    // },
   }
 });
 

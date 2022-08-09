@@ -33,13 +33,13 @@ const CategoryService = {
       id: category.id,
       name: category.name,
       description: category.description,
-    });
+    }, { headers: authHeader() });
   },
 
   saveSubCategory: (category) => {
     const url = API_URL + '/subCategory/add';
     // const url = process.env.REACT_APP_API_URL + '/category/add'
-    return axios.post(url, category);
+    return axios.post(url, category, { headers: authHeader() });
   },
 
   updateCategory: (category) => {
