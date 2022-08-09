@@ -33,6 +33,7 @@ import { toast } from 'react-toastify';
 import FormatDataUtils from '@/utils/formatData';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
+import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
 
 const useStyles = makeStyles({
   searchField: {
@@ -84,8 +85,8 @@ const useStyles = makeStyles({
   filterTitle: {
     fontSize: '24px',
     padding: '0 24px',
-    marginBottom: '8px'
-  }
+    marginBottom: '8px',
+  },
 });
 
 const customStyles = {
@@ -340,7 +341,7 @@ const ProductList = () => {
         </Stack>
         <Card className={classes.panelFilter}>
           <Box className={classes.filterTitle}>
-          <Typography variant='p'>Tìm kiếm thông tin sản phẩm</Typography>
+            <Typography variant="p">Tìm kiếm thông tin sản phẩm</Typography>
           </Box>
           <Toolbar>
             {/* <Box
@@ -489,11 +490,26 @@ const ProductList = () => {
                               {item.wrapUnitMeasure == null ? (
                                 item.unitMeasure
                               ) : (
-                                <Select
-                                  classNamePrefix="select"
-                                  isSearchable={false}
-                                  defaultValue={
-                                    FormatDataUtils.getOption([
+                                <Stack
+                                  direction="row"
+                                  justifyContent="center"
+                                >
+                                  <Select
+                                    classNamePrefix="select"
+                                    isSearchable={false}
+                                    defaultValue={
+                                      FormatDataUtils.getOption([
+                                        {
+                                          number: 1,
+                                          name: item.unitMeasure,
+                                        },
+                                        {
+                                          number: item.numberOfWrapUnitMeasure,
+                                          name: item.wrapUnitMeasure,
+                                        },
+                                      ])[0]
+                                    }
+                                    options={FormatDataUtils.getOption([
                                       {
                                         number: 1,
                                         name: item.unitMeasure,
@@ -502,59 +518,64 @@ const ProductList = () => {
                                         number: item.numberOfWrapUnitMeasure,
                                         name: item.wrapUnitMeasure,
                                       },
-                                    ])[0]
-                                  }
-                                  options={FormatDataUtils.getOption([
-                                    {
-                                      number: 1,
-                                      name: item.unitMeasure,
-                                    },
-                                    {
-                                      number: item.numberOfWrapUnitMeasure,
-                                      name: item.wrapUnitMeasure,
-                                    },
-                                  ])}
-                                  menuPortalTarget={document.body}
-                                  styles={{
-                                    menuPortal: (base) => ({
-                                      ...base,
-                                      zIndex: 9999,
-                                    }),
-                                  }}
-                                  onChange={(e) => {
-                                    // console.log(e.label);
-                                    if (
-                                      e.label === item.wrapUnitMeasure &&
-                                      newSelectdUnitMeasureList[index] !==
-                                        item.wrapUnitMeasure
-                                    ) {
-                                      newSelectdUnitMeasureList[index] =
-                                        item.wrapUnitMeasure;
-                                      // console.log(
-                                      //   'wrapUnitMeasure',
-                                      //   newSelectdUnitMeasureList[index],
-                                      // );
-                                      setSelectedUnitMeasureList(
-                                        newSelectdUnitMeasureList,
-                                      );
-                                    }
-                                    if (
-                                      e.label === item.unitMeasure &&
-                                      newSelectdUnitMeasureList[index] !==
-                                        item.unitMeasure
-                                    ) {
-                                      newSelectdUnitMeasureList[index] = item.unitMeasure;
-                                      // console.log(
-                                      //   'unitMeasure',
-                                      //   newSelectdUnitMeasureList[index],
-                                      // );
-                                      setSelectedUnitMeasureList(
-                                        newSelectdUnitMeasureList,
-                                      );
-                                    }
-                                    // console.log(selectedUnitMeasureList);
-                                  }}
-                                />
+                                    ])}
+                                    menuPortalTarget={document.body}
+                                    styles={{
+                                      menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                      }),
+                                    }}
+                                    onChange={(e) => {
+                                      // console.log(e.label);
+                                      if (
+                                        e.label === item.wrapUnitMeasure &&
+                                        newSelectdUnitMeasureList[index] !==
+                                          item.wrapUnitMeasure
+                                      ) {
+                                        newSelectdUnitMeasureList[index] =
+                                          item.wrapUnitMeasure;
+                                        // console.log(
+                                        //   'wrapUnitMeasure',
+                                        //   newSelectdUnitMeasureList[index],
+                                        // );
+                                        setSelectedUnitMeasureList(
+                                          newSelectdUnitMeasureList,
+                                        );
+                                      }
+                                      if (
+                                        e.label === item.unitMeasure &&
+                                        newSelectdUnitMeasureList[index] !==
+                                          item.unitMeasure
+                                      ) {
+                                        newSelectdUnitMeasureList[index] =
+                                          item.unitMeasure;
+                                        // console.log(
+                                        //   'unitMeasure',
+                                        //   newSelectdUnitMeasureList[index],
+                                        // );
+                                        setSelectedUnitMeasureList(
+                                          newSelectdUnitMeasureList,
+                                        );
+                                      }
+                                      // console.log(selectedUnitMeasureList);
+                                    }}
+                                  />
+                                  {selectedUnitMeasureList[index] ===
+                                    item.wrapUnitMeasure && (
+                                    <TooltipUnitMeasure
+                                      quantity={
+                                        item.quantity / item.numberOfWrapUnitMeasure
+                                      }
+                                      wrapUnitMeasure={item.wrapUnitMeasure}
+                                      numberOfWrapUnitMeasure={
+                                        item.numberOfWrapUnitMeasure
+                                      }
+                                      unitMeasure={item.unitMeasure}
+                                      isConvert={false}
+                                    />
+                                  )}
+                                </Stack>
                               )}
                             </TableCell>
                             <TableCell align="center">

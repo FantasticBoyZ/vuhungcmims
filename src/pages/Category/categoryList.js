@@ -222,7 +222,7 @@ const CategoryList = () => {
       </Box>
       <Box>
         <Card className={classes.cardTable}>
-          {loading ? (
+          {loading && !openPopup ? (
             <ProgressCircleLoading />
           ) : (
             <Box>

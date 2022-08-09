@@ -62,7 +62,7 @@ const CategoryForm = (props) => {
   const { closePopup, category, allCategoryList } = props;
   //   const { categoryId } = useParams();
   const navigate = useNavigate();
-  const [loadingSelect, setLoadingSelect] = useState(true)
+  const [loadingSelect, setLoadingSelect] = useState(true);
   const [categoryList, setCategoryList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState();
   const classes = useStyles();
@@ -111,9 +111,8 @@ const CategoryForm = (props) => {
         } else {
           toast.success('Sửa danh mục thành công!');
           navigate('/category');
-          
         }
-        closePopup()
+        closePopup();
       }
     } catch (error) {
       console.log('Failed to save category: ', error);
@@ -140,7 +139,7 @@ const CategoryForm = (props) => {
         const actionResult = await dispatch(updateSubCategory(category));
         const dataResult = unwrapResult(actionResult);
         console.log('dataResult', dataResult);
-        if (dataResult) {
+        if (dataResult.status === 200) {
           if (dataResult.data.message) {
             toast.success(dataResult.data.message);
           } else {
@@ -153,7 +152,7 @@ const CategoryForm = (props) => {
         const actionResult = await dispatch(updateCategory(category));
         const dataResult = unwrapResult(actionResult);
         console.log('dataResult', dataResult);
-        if (dataResult) {
+        if (dataResult.status === 200) {
           if (dataResult.data.message) {
             toast.success(dataResult.data.message);
           } else {
@@ -211,17 +210,17 @@ const CategoryForm = (props) => {
       console.log('dataResult', dataResult);
       if (dataResult.data) {
         setCategoryList(dataResult.data.category);
-        setLoadingSelect(false)
+        setLoadingSelect(false);
       }
     } catch (error) {
       console.log('Failed to fetch category list: ', error);
-      setLoadingSelect(false)
+      setLoadingSelect(false);
     }
   };
 
   useEffect(() => {
     getSelectedParent();
-    getAllCategory()
+    getAllCategory();
   }, []);
   return (
     <Formik
@@ -273,20 +272,20 @@ const CategoryForm = (props) => {
                             className={classes.selectBox}
                             placeholder="Chọn danh mục cha"
                             noOptionsMessage={() => <>Không có tìm thấy danh mục nào</>}
-                            
                             isSearchable={true}
                             isLoading={loadingSelect}
                             loadingMessage={() => <>Đang tìm kiếm danh mục cha...</>}
                             name="category"
-                            value={FormatDataUtils.getSelectedOption(categoryList,selectedCategory)}
-                            options={FormatDataUtils.getOptionWithIdandName(
+                            value={FormatDataUtils.getSelectedOption(
                               categoryList,
+                              selectedCategory,
                             )}
+                            options={FormatDataUtils.getOptionWithIdandName(categoryList)}
                             menuPortalTarget={document.body}
                             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                             onChange={(e) => {
                               setFieldValue('categoryId', e?.value);
-                              setSelectedCategory(e?.value)
+                              setSelectedCategory(e?.value);
                             }}
                             onInputChange={handleInputChangeCategory}
                           />
@@ -381,7 +380,12 @@ const CategoryForm = (props) => {
             justifyContent="flex-end"
             padding="20px"
           >
-            <ButtonWrapper disabled={loadingSelect} variant="contained">Lưu</ButtonWrapper>
+            <ButtonWrapper
+              disabled={loadingSelect}
+              variant="contained"
+            >
+              Lưu
+            </ButtonWrapper>
             {/* <Button
             onClick={() => handleOnClickExit()}
             variant="outlined"

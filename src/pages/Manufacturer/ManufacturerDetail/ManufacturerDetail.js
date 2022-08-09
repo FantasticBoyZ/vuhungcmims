@@ -27,6 +27,7 @@ import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import Select from 'react-select';
 import FormatDataUtils from '@/utils/formatData';
 import CustomTablePagination from '@/components/Common/TablePagination';
+import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
 const useStyles = makeStyles({
   cardHeader: {
     display: 'flex',
@@ -78,7 +79,7 @@ const ManufacturerDetail = () => {
     const params = {
       pageIndex: page + 1,
       pageSize: rowsPerPage,
-      manufacturerId: manufacturerId
+      manufacturerId: manufacturerId,
     };
     try {
       const actionResult = await dispatch(getManufacturerById(params));
@@ -252,11 +253,27 @@ const ManufacturerDetail = () => {
                               {productByManufacturer?.wrapUnitMeasure == null ? (
                                 productByManufacturer?.unitMeasure
                               ) : (
-                                <Select
-                                  classNamePrefix="select"
-                                  isSearchable={false}
-                                  defaultValue={
-                                    FormatDataUtils.getOption([
+                                <Stack
+                                  direction="row"
+                                  justifyContent="center"
+                                >
+                                  <Select
+                                    classNamePrefix="select"
+                                    isSearchable={false}
+                                    defaultValue={
+                                      FormatDataUtils.getOption([
+                                        {
+                                          number: 1,
+                                          name: productByManufacturer.unitMeasure,
+                                        },
+                                        {
+                                          number:
+                                            productByManufacturer.numberOfWrapUnitMeasure,
+                                          name: productByManufacturer.wrapUnitMeasure,
+                                        },
+                                      ])[0]
+                                    }
+                                    options={FormatDataUtils.getOption([
                                       {
                                         number: 1,
                                         name: productByManufacturer.unitMeasure,
@@ -266,27 +283,60 @@ const ManufacturerDetail = () => {
                                           productByManufacturer.numberOfWrapUnitMeasure,
                                         name: productByManufacturer.wrapUnitMeasure,
                                       },
-                                    ])[0]
-                                  }
-                                  options={FormatDataUtils.getOption([
-                                    {
-                                      number: 1,
-                                      name: productByManufacturer.unitMeasure,
-                                    },
-                                    {
-                                      number:
-                                        productByManufacturer.numberOfWrapUnitMeasure,
-                                      name: productByManufacturer.wrapUnitMeasure,
-                                    },
-                                  ])}
-                                  menuPortalTarget={document.body}
-                                  styles={{
-                                    menuPortal: (base) => ({
-                                      ...base,
-                                      zIndex: 9999,
-                                    }),
-                                  }}
-                                />
+                                    ])}
+                                    menuPortalTarget={document.body}
+                                    styles={{
+                                      menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                      }),
+                                    }}
+                                    onChange={(e) => {
+                                      if (
+                                        e.label ===
+                                          productByManufacturer.wrapUnitMeasure &&
+                                        newSelectdUnitMeasureList[index] !==
+                                          productByManufacturer.wrapUnitMeasure
+                                      ) {
+                                        newSelectdUnitMeasureList[index] =
+                                          productByManufacturer.wrapUnitMeasure;
+
+                                        setSelectedUnitMeasureList(
+                                          newSelectdUnitMeasureList,
+                                        );
+                                      }
+                                      if (
+                                        e.label === productByManufacturer.unitMeasure &&
+                                        newSelectdUnitMeasureList[index] !==
+                                          productByManufacturer.unitMeasure
+                                      ) {
+                                        newSelectdUnitMeasureList[index] =
+                                          productByManufacturer.unitMeasure;
+
+                                        setSelectedUnitMeasureList(
+                                          newSelectdUnitMeasureList,
+                                        );
+                                      }
+                                    }}
+                                  />
+                                  {selectedUnitMeasureList[index] ===
+                                    productByManufacturer.wrapUnitMeasure && (
+                                    <TooltipUnitMeasure
+                                      quantity={
+                                        productByManufacturer.quantity /
+                                        productByManufacturer.numberOfWrapUnitMeasure
+                                      }
+                                      wrapUnitMeasure={
+                                        productByManufacturer.wrapUnitMeasure
+                                      }
+                                      numberOfWrapUnitMeasure={
+                                        productByManufacturer.numberOfWrapUnitMeasure
+                                      }
+                                      unitMeasure={productByManufacturer.unitMeasure}
+                                      isConvert={false}
+                                    />
+                                  )}
+                                </Stack>
                               )}
                             </TableCell>
                             <TableCell align="center">
@@ -296,7 +346,13 @@ const ManufacturerDetail = () => {
                                 gutterBottom
                                 noWrap
                               >
-                                {productByManufacturer.quantity}
+                                {selectedUnitMeasureList[index] === productByManufacturer.wrapUnitMeasure
+                                  ? FormatDataUtils.getRoundFloorNumber(
+                                      productByManufacturer.quantity /
+                                        productByManufacturer.numberOfWrapUnitMeasure,
+                                      2,
+                                    )
+                                  : productByManufacturer.quantity}
                               </Typography>
                             </TableCell>
                           </TableRow>

@@ -72,7 +72,6 @@ const CategoryRow = (props) => {
     // navigate(`/category/edit/${categoryId}`);
     setEditCategory(item);
     setOpenPopup(true);
-    console.log(category);
   };
 
   const renderCategoryRow = (category, childOption) => {

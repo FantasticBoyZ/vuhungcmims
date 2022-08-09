@@ -1,5 +1,7 @@
+import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
 import FormatDataUtils from '@/utils/formatData';
 import {
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -79,10 +81,25 @@ const ConsignmentsTable = ({ listConsignments }) => {
                   {consignment.wrapUnitMeasure == null ? (
                     consignment.unitMeasure
                   ) : (
-                    <Select
-                      classNamePrefix="select"
-                      defaultValue={
-                        FormatDataUtils.getOption([
+                    <Stack
+                      direction="row"
+                      justifyContent="left"
+                    >
+                      <Select
+                        classNamePrefix="select"
+                        defaultValue={
+                          FormatDataUtils.getOption([
+                            {
+                              number: 1,
+                              name: consignment.unitMeasure,
+                            },
+                            {
+                              number: consignment.numberOfWrapUnitMeasure,
+                              name: consignment.wrapUnitMeasure,
+                            },
+                          ])[0]
+                        }
+                        options={FormatDataUtils.getOption([
                           {
                             number: 1,
                             name: consignment.unitMeasure,
@@ -91,52 +108,52 @@ const ConsignmentsTable = ({ listConsignments }) => {
                             number: consignment.numberOfWrapUnitMeasure,
                             name: consignment.wrapUnitMeasure,
                           },
-                        ])[0]
-                      }
-                      options={FormatDataUtils.getOption([
-                        {
-                          number: 1,
-                          name: consignment.unitMeasure,
-                        },
-                        {
-                          number: consignment.numberOfWrapUnitMeasure,
-                          name: consignment.wrapUnitMeasure,
-                        },
-                      ])}
-                      menuPortalTarget={document.body}
-                      styles={{
-                        menuPortal: (base) => ({
-                          ...base,
-                          zIndex: 9999,
-                        }),
-                      }}
-                      onChange={(e) => {
-                        // console.log(e.label);
-                        if (
-                          e.label === consignment.wrapUnitMeasure &&
-                          newSelectdUnitMeasureList[index] !== consignment.wrapUnitMeasure
-                        ) {
-                          newSelectdUnitMeasureList[index] = consignment.wrapUnitMeasure;
-                          // console.log(
-                          //   'wrapUnitMeasure',
-                          //   newSelectdUnitMeasureList[index],
-                          // );
-                          setSelectedUnitMeasureList(newSelectdUnitMeasureList);
-                        }
-                        if (
-                          e.label === consignment.unitMeasure &&
-                          newSelectdUnitMeasureList[index] !== consignment.unitMeasure
-                        ) {
-                          newSelectdUnitMeasureList[index] = consignment.unitMeasure;
-                          // console.log(
-                          //   'unitMeasure',
-                          //   newSelectdUnitMeasureList[index],
-                          // );
-                          setSelectedUnitMeasureList(newSelectdUnitMeasureList);
-                        }
-                        // console.log(selectedUnitMeasureList);
-                      }}
-                    />
+                        ])}
+                        menuPortalTarget={document.body}
+                        styles={{
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999,
+                          }),
+                        }}
+                        onChange={(e) => {
+                          // console.log(e.label);
+                          if (
+                            e.label === consignment.wrapUnitMeasure &&
+                            newSelectdUnitMeasureList[index] !==
+                              consignment.wrapUnitMeasure
+                          ) {
+                            newSelectdUnitMeasureList[index] =
+                              consignment.wrapUnitMeasure;
+                            // console.log(
+                            //   'wrapUnitMeasure',
+                            //   newSelectdUnitMeasureList[index],
+                            // );
+                            setSelectedUnitMeasureList(newSelectdUnitMeasureList);
+                          }
+                          if (
+                            e.label === consignment.unitMeasure &&
+                            newSelectdUnitMeasureList[index] !== consignment.unitMeasure
+                          ) {
+                            newSelectdUnitMeasureList[index] = consignment.unitMeasure;
+                            // console.log(
+                            //   'unitMeasure',
+                            //   newSelectdUnitMeasureList[index],
+                            // );
+                            setSelectedUnitMeasureList(newSelectdUnitMeasureList);
+                          }
+                          // console.log(selectedUnitMeasureList);
+                        }}
+                      />
+                      {selectedUnitMeasureList[index] === consignment.wrapUnitMeasure && (
+                        <TooltipUnitMeasure
+                          wrapUnitMeasure={consignment.wrapUnitMeasure}
+                          numberOfWrapUnitMeasure={consignment.numberOfWrapUnitMeasure}
+                          unitMeasure={consignment.unitMeasure}
+                          isConvert={false}
+                        />
+                      )}
+                    </Stack>
                   )}
                 </TableCell>
                 <TableCell>

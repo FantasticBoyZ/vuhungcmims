@@ -446,6 +446,8 @@ const AddEditManufacturerForm = () => {
                                 onFocus={() => setTouchedProvinceId(true)}
                                 onChange={(e) => {
                                   setFieldValue('provinceId', e?.value);
+                                  setFieldValue('districtId', '',false);
+                                  setFieldValue('wardId','',false)
                                   onChangeProvince(e);
                                 }}
                               />
@@ -499,6 +501,7 @@ const AddEditManufacturerForm = () => {
                                 onFocus={() => setTouchedDistrictId(true)}
                                 onChange={(e) => {
                                   setFieldValue('districtId', e?.value);
+                                  setFieldValue('wardId','',false)
                                   onChangeDistrict(e);
                                 }}
                               />
@@ -595,6 +598,11 @@ const AddEditManufacturerForm = () => {
                             type="submit"
                             loadingPosition="start"
                             startIcon={<CheckIcon />}
+                            onClick={() => {
+                              setTouchedProvinceId(true)
+                              setTouchedDistrictId(true)
+                              setTouchedWardId(true)
+                            }}
                           >
                             Lưu chỉnh sửa
                           </LoadingButton>
