@@ -347,7 +347,11 @@ const ImportGoods = () => {
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
       if (dataResult.data) {
-        setProductList(dataResult.data.product);
+        if (dataResult.data.product === null) {
+          setProductList([]);
+        } else {
+          setProductList(dataResult.data.product);
+        }
       }
     } catch (error) {
       console.log('Failed to fetch product list: ', error);
@@ -636,7 +640,8 @@ const ImportGoods = () => {
                                             }}
                                           />
                                           {values.consignmentRequests[index]
-                                            .selectedUnitMeasure === item.wrapUnitMeasure && (
+                                            .selectedUnitMeasure ===
+                                            item.wrapUnitMeasure && (
                                             <TooltipUnitMeasure
                                               wrapUnitMeasure={item.wrapUnitMeasure}
                                               numberOfWrapUnitMeasure={
@@ -700,7 +705,7 @@ const ImportGoods = () => {
                     {/* chỗ này là createdDate */}
                     {FormatDataUtils.formatDate(today)}
                   </div>
-                  <div className="label-field">Vị trí lưu kho</div>
+                  <div className="label-field">Vị trí nhập hàng</div>
                   {warehouseList && (
                     <Box className="selectbox-warehouse">
                       <Select

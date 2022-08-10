@@ -259,7 +259,8 @@ const InventoryCheckingList = () => {
       const params = {
         pageIndex: page + 1,
         pageSize: rowsPerPage,
-        order: 'asc',
+        orderBy: 'createDate',
+        order: 'desc',
         ...searchParams,
       };
       const actionResult = await dispatch(getListInventoryChecking(params));
@@ -469,7 +470,10 @@ const InventoryCheckingList = () => {
                               {FormatDataUtils.formatDate(inventoryChecking.createDate)}
                             </TableCell>
                             <TableCell align="center">
-                              {inventoryChecking.fullName + ' ('+inventoryChecking.userName+')'}
+                              {inventoryChecking.fullName +
+                                ' (' +
+                                inventoryChecking.userName +
+                                ')'}
                             </TableCell>
                             <TableCell align="center">
                               {FormatDataUtils.formatCurrency(

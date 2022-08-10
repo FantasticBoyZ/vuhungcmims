@@ -178,21 +178,30 @@ const AddStaff = () => {
     addressDetail: '',
   };
 
-  const regexPhone = /^(0[3|5|7|8|9])+([0-9]{8})$/
+  const regexPhone = /^(0[3|5|7|8|9])+([0-9]{8})$/;
   const FORM_VALIDATION = Yup.object().shape({
-    username: Yup.string().required('Chưa nhập mã nhân viên'),
-    fullName: Yup.string().required('Chưa nhập Họ và tên nhân viên'),
+    username: Yup.string()
+      .required('Chưa nhập mã nhân viên')
+      .test('username', 'Vui lòng xoá các khoảng trắng', function (value) {
+        if (value) {
+          return !value.includes(' ');
+        }
+      }),
+    fullName: Yup.string().trim().required('Chưa nhập Họ và tên nhân viên'),
     identityCard: Yup.string()
       .required('Chưa nhập Số CCCD/CMND')
       .matches(/^(\d{9}|\d{12})$/, 'Số CCCD/CMND của bạn không hợp lệ'),
     phone: Yup.string()
       .required('Chưa nhập Số điện thoại')
       .test('phone', 'Vui lòng xoá các khoảng trắng', function (value) {
-        if(value) {
+        if (value) {
           return !value.includes(' ');
         }
       })
-      .matches(/^([\+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})$/, 'Số điện thoại của bạn không hợp lệ'),
+      .matches(
+        /^([\+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8,9})$/,
+        'Số điện thoại của bạn không hợp lệ',
+      ),
     email: Yup.string()
       .email('Vui lòng nhập đúng định dạng email. VD abc@xyz.com')
       .required('Chưa nhập Email'),
@@ -205,7 +214,7 @@ const AddStaff = () => {
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố').nullable(),
     districtId: Yup.number().required('Chưa chọn quận/huyện').nullable(),
     wardId: Yup.number().required('Chưa chọn xã/phường').nullable(),
-    addressDetail: Yup.string().required('Chưa nhập Địa chỉ chi tiết'),
+    addressDetail: Yup.string().trim().required('Chưa nhập Địa chỉ chi tiết'),
   });
 
   const [gender, setGender] = useState(1);

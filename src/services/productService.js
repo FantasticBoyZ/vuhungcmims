@@ -52,7 +52,7 @@ const productService = {
     const url = API_URL + '/product/add/image';
     // const url = process.env.REACT_APP_API_URL + '/product/add/image';
 
-    axios.post(url, formData).then(
+    axios.post(url, formData, { headers: authHeader() }).then(
       (response) => {
         return response;
       },
@@ -66,11 +66,7 @@ const productService = {
     const url = API_URL + `/product/update/image/${productId}`;
     // const url = process.env.REACT_APP_API_URL + `/product/update/image/${productId}`;
 
-    return axios.put(url, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    return axios.put(url, formData, { headers: authHeader() });
   },
 };
 

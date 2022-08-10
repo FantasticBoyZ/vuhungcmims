@@ -111,7 +111,7 @@ const AddEditManufacturerForm = () => {
   };
 
   const FORM_VALIDATION = Yup.object().shape({
-    name: Yup.string()
+    name: Yup.string().trim()
       .max(200, 'Tên nhà sản xuất không thể dài quá 200 kí tự')
       .required('Chưa nhập tên nhà sản xuất'),
     email: Yup.string()
@@ -126,13 +126,13 @@ const AddEditManufacturerForm = () => {
         }
       })
       .matches(
-        /^[\+84|84|0]+([0-9]{10})$/,
+        /^[\+84|84|0]+([0-9]{9,10})$/,
         'Số điện thoại của nhà cung cấp không hợp lệ',
       ),
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố'),
     districtId: Yup.number().required('Chưa chọn quận/huyện/thành phố'),
     wardId: Yup.number().required('Chưa chọn phường/xã'),
-    // .matches(phoneRegExp, 'Số điện thoại không hợp lệ')
+    addressDetail:Yup.string().trim().required('Chưa nhập địa chỉ chi tiết')
   });
 
   const onChangeProvince = (e) => {
