@@ -187,7 +187,7 @@ const AddEditProductForm = () => {
     subCategoryId: '',
     manufactorId: '',
     imageUrl: '',
-    isUseWrapUnitMeasure: false
+    isUseWrapUnitMeasure: false,
   };
   const [categoryList, setCategoryList] = useState([]);
   const [subCategoryList, setSubCategoryList] = useState([]);
@@ -203,20 +203,33 @@ const AddEditProductForm = () => {
   const { loading, uploadImage } = useSelector((state) => ({ ...state.products }));
 
   const FORM_VALIDATION = Yup.object().shape({
-    productCode: Yup.string().required('Chưa nhập mã sản phẩm'),
-    name: Yup.string().required('Chưa nhập tên sản phẩm'),
-    unitMeasure: Yup.string().required('Chưa nhập đơn vị'),
+    productCode: Yup.string()
+      .trim()
+      .required('Chưa nhập mã sản phẩm')
+      .test('productCode', 'Vui lòng xoá các khoảng trắng', function (value) {
+        if (value) {
+          return !value.includes(' ');
+        }
+      }),
+    name: Yup.string().trim().required('Chưa nhập tên sản phẩm'),
+    unitMeasure: Yup.string().trim().required('Chưa nhập đơn vị'),
+    color: Yup.string().max(50, 'Màu sắc không thể dài quá 50 kí tự'),
+    description: Yup.string().max(255, 'Mô tả không thể dài quá 255 kí tự'),
     categoryId: Yup.string().required('Chưa chọn danh mục'),
     manufactorId: Yup.string().required('Chưa chọn nhà cung cấp'),
     isUseWrapUnitMeasure: Yup.boolean(),
-    wrapUnitMeasure: Yup.string().when('isUseWrapUnitMeasure', {
-      is: true,
-      then: Yup.string().required('Chưa nhập đơn vị quy đổi').nullable(),
-    }).nullable(),
-    numberOfWrapUnitMeasure: Yup.number().when('isUseWrapUnitMeasure', {
-      is: true,
-      then: Yup.number().required('Chưa nhập số lượng quy đổi').nullable(),
-    }).nullable(),
+    wrapUnitMeasure: Yup.string()
+      .when('isUseWrapUnitMeasure', {
+        is: true,
+        then: Yup.string().trim().required('Chưa nhập đơn vị quy đổi').nullable(),
+      })
+      .nullable(),
+    numberOfWrapUnitMeasure: Yup.number()
+      .when('isUseWrapUnitMeasure', {
+        is: true,
+        then: Yup.number().required('Chưa nhập số lượng quy đổi').nullable(),
+      })
+      .nullable(),
   });
 
   const onChangeCategory = (event) => {
@@ -511,7 +524,7 @@ const AddEditProductForm = () => {
                                     name="description"
                                     fullWidth
                                     multiline
-                                    minRows={5}
+                                    minRows={4}
                                     id="description"
                                     autoComplete="description"
                                   />
@@ -532,7 +545,10 @@ const AddEditProductForm = () => {
                                   checked={isUseWrapUnitMeasure}
                                   onClick={() => {
                                     handleOnClickCheckboxWrapUnitMeasure();
-                                    setFieldValue('isUseWrapUnitMeasure', !isUseWrapUnitMeasure);
+                                    setFieldValue(
+                                      'isUseWrapUnitMeasure',
+                                      !isUseWrapUnitMeasure,
+                                    );
                                     // setFieldValue('numberOfWrapUnitMeasure', '');
                                   }}
                                 />
@@ -938,7 +954,7 @@ const AddEditProductForm = () => {
                                 name="description"
                                 fullWidth
                                 multiline
-                                minRows={5}
+                                minRows={4}
                                 id="description"
                                 autoComplete="description"
                               />
@@ -959,7 +975,10 @@ const AddEditProductForm = () => {
                               checked={isUseWrapUnitMeasure}
                               onClick={() => {
                                 handleOnClickCheckboxWrapUnitMeasure();
-                                setFieldValue('isUseWrapUnitMeasure', !isUseWrapUnitMeasure);
+                                setFieldValue(
+                                  'isUseWrapUnitMeasure',
+                                  !isUseWrapUnitMeasure,
+                                );
                                 // setFieldValue('numberOfWrapUnitMeasure', '');
                               }}
                             />
