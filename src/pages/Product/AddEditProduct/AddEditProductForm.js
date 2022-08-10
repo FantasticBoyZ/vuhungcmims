@@ -293,15 +293,15 @@ const AddEditProductForm = () => {
     setLoadingButton(true);
     const newProduct = {
       id: productId,
-      name: values.name,
-      productCode: values.productCode,
-      unitMeasure: values.unitMeasure,
-      wrapUnitMeasure: isUseWrapUnitMeasure ? values.wrapUnitMeasure : null,
+      name: FormatDataUtils.removeExtraSpace(values.name),
+      productCode: FormatDataUtils.removeExtraSpace(values.productCode),
+      unitMeasure: FormatDataUtils.removeExtraSpace(values.unitMeasure),
+      wrapUnitMeasure: isUseWrapUnitMeasure ? FormatDataUtils.removeExtraSpace(values.wrapUnitMeasure) : null,
       numberOfWrapUnitMeasure: isUseWrapUnitMeasure
         ? values.numberOfWrapUnitMeasure
         : null,
-      color: values.color,
-      description: values.description,
+      color: FormatDataUtils.removeExtraSpace(values.color),
+      description: FormatDataUtils.removeExtraSpace(values.description),
       categoryId: values.categoryId,
       manufactorId: values.manufactorId,
       subCategoryId: values.subCategoryId,

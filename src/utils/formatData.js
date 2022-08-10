@@ -97,6 +97,9 @@ const getStatusLabel = (exportOrderStatus) => {
 
   return <Label color={color}>{text}</Label>;
 };
+
+const removeExtraSpace = (s) => s.trim().split(/ +/).join(' ');
+
 const FormatDataUtils = {
   formatCurrency,
   formatDateTime,
@@ -110,5 +113,6 @@ const FormatDataUtils = {
   getRoundNumber,
   getRoundFloorNumber,
   getSelectedOptionWithId,
+  removeExtraSpace,
 };
 export default FormatDataUtils;
