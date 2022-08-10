@@ -200,13 +200,13 @@ const AddEditManufacturerForm = () => {
   const handleSubmit = (values) => {
     const newManufacturer = {
       id: isAdd ? '' : manufacturerId,
-      name: values.name,
+      name: FormatDataUtils.removeExtraSpace(values.name),
       email: values.email,
       phone: values.phone,
       provinceId: values.provinceId,
       districtId: values.districtId,
       wardId: values.wardId,
-      addressDetail: values.addressDetail,
+      addressDetail: FormatDataUtils.removeExtraSpace(values.addressDetail),
     };
     // setOpenPopup(true);
     // setTitle(

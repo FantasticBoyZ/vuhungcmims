@@ -253,7 +253,7 @@ const AddStaff = () => {
     console.log(values);
     const staff = {
       username: values.username,
-      fullName: values.fullName,
+      fullName: FormatDataUtils.removeExtraSpace(values.fullName),
       identityCard: values.identityCard,
       dateOfBirth: new Date(
         new Date(values.dateOfBirth) + new Date().getTimezoneOffset() / 60,
@@ -265,7 +265,7 @@ const AddStaff = () => {
       provinceId: values.provinceId,
       districtId: values.districtId,
       wardId: values.wardId,
-      addressDetail: values.addressDetail,
+      addressDetail: FormatDataUtils.removeExtraSpace(values.addressDetail),
     };
     try {
       const response = await dispatch(signUpStaff(staff));
