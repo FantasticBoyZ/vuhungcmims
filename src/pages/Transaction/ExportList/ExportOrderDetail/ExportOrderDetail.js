@@ -249,9 +249,13 @@ const ExportOrderDetail = () => {
       // };
       const actionResult = await dispatch(getExportOrderById(exportOrderId));
       const dataResult = unwrapResult(actionResult);
-      if (dataResult.data) {
+      if (
+        dataResult.data &&
+        !FormatDataUtils.isEmptyObject(dataResult.data.inforExportDetail)
+      ) {
         setExportOrder(dataResult.data.inforExportDetail);
-        
+      } else {
+        navigate('/404');
       }
       console.log('Export Order Detail', dataResult);
     } catch (error) {
@@ -280,8 +284,12 @@ const ExportOrderDetail = () => {
   };
 
   useEffect(() => {
-    fetchExportOrderDetail();
-    fetchConsignmentsByExportOrderId();
+    if (isNaN(exportOrderId)) {
+      navigate('/404');
+    } else {
+      fetchExportOrderDetail();
+      fetchConsignmentsByExportOrderId();
+    }
   }, []);
 
   return (

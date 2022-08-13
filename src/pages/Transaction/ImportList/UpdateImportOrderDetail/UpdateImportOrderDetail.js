@@ -271,9 +271,11 @@ const UpdateImportOrderDetail = () => {
       // };
       const actionResult = await dispatch(getImportOrderById(importOrderId));
       const dataResult = unwrapResult(actionResult);
-      if (dataResult.data) {
+      if (dataResult.data && !FormatDataUtils.isEmptyObject(dataResult.data.inforDetail)) {
         setImportOrder(dataResult.data.inforDetail);
         setSelectedWarehouse(dataResult.data.inforDetail.wareHouseId);
+      }else {
+        navigate('/404')
       }
       console.log('Import Order Detail', dataResult);
     } catch (error) {
@@ -319,9 +321,13 @@ const UpdateImportOrderDetail = () => {
   };
 
   useEffect(() => {
-    getAllWarehouse();
-    fetchImportOrderDetail();
-    fetchProductListByImportOrderId();
+    if (isNaN(importOrderId)) {
+      navigate('/404');
+    } else {
+      getAllWarehouse();
+      fetchImportOrderDetail();
+      fetchProductListByImportOrderId();
+    }
   }, [page, rowsPerPage]);
 
   return (
@@ -529,8 +535,7 @@ const UpdateImportOrderDetail = () => {
                                                         consignment?.unitMeasure
                                                       ) : (
                                                         <Stack
-                                                        direction='row'
-                                                        
+                                                          direction="row"
                                                           className={
                                                             classes.selectBoxUnitMeasure
                                                           }
@@ -673,7 +678,8 @@ const UpdateImportOrderDetail = () => {
                                                               }
                                                             }}
                                                           />
-                                                          {values.consignments[index].selectedUnitMeasure ===
+                                                          {values.consignments[index]
+                                                            .selectedUnitMeasure ===
                                                             consignment.wrapUnitMeasure && (
                                                             <TooltipUnitMeasure
                                                               wrapUnitMeasure={

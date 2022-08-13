@@ -87,6 +87,8 @@ const ManufacturerDetail = () => {
       if (dataResult.data) {
         setManufacturer(dataResult.data.manufactor);
         setTotalRecord(dataResult.data.totalRecord);
+      } else {
+        navigate('/404');
       }
       console.log('dataResult', dataResult);
     } catch (error) {
@@ -99,7 +101,12 @@ const ManufacturerDetail = () => {
   }, [page, rowsPerPage]);
 
   useEffect(() => {
-    fetchManufacturerDetail();
+    console.log(!isNaN(manufacturerId))
+    if (isNaN(manufacturerId)) {
+      navigate('/404');
+    } else {
+      fetchManufacturerDetail();
+    }
   }, []);
 
   console.log(manufacturer?.listProducts);
@@ -346,7 +353,8 @@ const ManufacturerDetail = () => {
                                 gutterBottom
                                 noWrap
                               >
-                                {selectedUnitMeasureList[index] === productByManufacturer.wrapUnitMeasure
+                                {selectedUnitMeasureList[index] ===
+                                productByManufacturer.wrapUnitMeasure
                                   ? FormatDataUtils.getRoundFloorNumber(
                                       productByManufacturer.quantity /
                                         productByManufacturer.numberOfWrapUnitMeasure,

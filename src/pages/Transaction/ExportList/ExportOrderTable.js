@@ -103,6 +103,7 @@ const ExportOrderTable = ({ exportOrders }) => {
                 <TableCell>Mã tham chiếu</TableCell>
                 <TableCell>Ngày tạo</TableCell>
                 <TableCell>Ngày xuất</TableCell>
+                <TableCell align="center">Người tạo đơn</TableCell>
                 <TableCell align="center">Trạng thái</TableCell>
                 <TableCell align="center">Giá trị đơn hàng</TableCell>
               </TableRow>
@@ -162,6 +163,11 @@ const ExportOrderTable = ({ exportOrders }) => {
                         {exportOrder.confirmDate &&
                           FormatDataUtils.formatDate(exportOrder.confirmDate)}
                         {/* {exportOrder.createDate} */}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography className={classes.completed}>
+                        {exportOrder.fullName + '(' + exportOrder?.userName + ')'}
                       </Typography>
                     </TableCell>
                     <TableCell align="center">

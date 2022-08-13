@@ -299,11 +299,13 @@ const StaffDetail = () => {
       const actionResult = await dispatch(getStaffDetail(staffId));
       const dataResult = unwrapResult(actionResult);
       console.log('dataResult', dataResult);
-      if (dataResult) {
+      if (dataResult && !FormatDataUtils.isEmptyObject(dataResult)) {
         setStaff(dataResult.data);
         if (dataResult.data.imageUrl) {
           fetchImage(API_URL_IMAGE + '/' + dataResult.data.imageUrl);
         }
+      } else {
+        navigate('/404');
       }
     } catch (error) {
       console.log('Failed to fetch staff detail: ', error);
@@ -318,7 +320,11 @@ const StaffDetail = () => {
   };
 
   useEffect(() => {
-    fetchStaffDetail();
+    if (isNaN(staffId)) {
+      navigate('/404');
+    } else {
+      fetchStaffDetail();
+    }
   }, []);
 
   return (

@@ -204,8 +204,10 @@ const ImportOrderDetail = () => {
       // };
       const actionResult = await dispatch(getImportOrderById(importOrderId));
       const dataResult = unwrapResult(actionResult);
-      if (dataResult.data) {
+      if (dataResult.data.inforDetail && !FormatDataUtils.isEmptyObject(dataResult.data.inforDetail)) {
         setImportOrder(dataResult.data.inforDetail);
+      }else {
+        navigate('/404')
       }
       console.log('Import Order Detail', dataResult);
     } catch (error) {
@@ -216,8 +218,8 @@ const ImportOrderDetail = () => {
   const fetchProductListByImportOrderId = async () => {
     try {
       const params = {
-        pageIndex: page,
-        pageSize: rowsPerPage,
+        // pageIndex: page,
+        // pageSize: rowsPerPage,
         orderId: importOrderId,
       };
       const actionResult = await dispatch(getProductByImportOrderId(params));
@@ -234,8 +236,12 @@ const ImportOrderDetail = () => {
   };
 
   useEffect(() => {
-    fetchImportOrderDetail();
-    fetchProductListByImportOrderId();
+    if (isNaN(importOrderId)) {
+      navigate('/404')
+    } else {
+      fetchImportOrderDetail();
+      fetchProductListByImportOrderId();
+    }
   }, [page, rowsPerPage]);
 
   return (
@@ -434,7 +440,6 @@ const ImportOrderDetail = () => {
                     item
                   >
                     <Card>
-  
                       <CardContent className={classes.orderNote}>
                         <Typography variant="h6">Ghi chú</Typography>
                         <Typography>{importOrder.description}</Typography>
@@ -447,7 +452,6 @@ const ImportOrderDetail = () => {
                   >
                     <Card>
                       <CardContent className={classes.totalAmount}>
-
                         <Typography variant="h6">Tổng giá trị đơn hàng</Typography>
                         <br />
                         <Typography align="right">
@@ -474,7 +478,6 @@ const ImportOrderDetail = () => {
                 </Box>
               </AlertPopup>
             </Grid>
-            
           )}
         </>
       )}

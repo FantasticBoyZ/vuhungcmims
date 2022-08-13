@@ -295,10 +295,17 @@ const ImportGoods = () => {
     setLoadingButton(true);
     importOrderService.createImportOrder(newImportOrder).then(
       (response) => {
-        toast.success('Tạo phiếu nhập hàng thành công');
-        setLoadingButton(false);
         console.log(response.data);
-        navigate('/import/list');
+        if (response.data.status === 200) {
+          toast.success('Tạo phiếu nhập hàng thành công');
+          setLoadingButton(false);
+          console.log(response.data);
+          navigate('/import/list');
+        } else if (response.data.status === 500) {
+          toast.error(response.data.message)
+        } else {
+          toast.error(response.data.message)
+        }
       },
       (error) => {
         toast.error('Tạo phiếu nhập hàng thất bại');

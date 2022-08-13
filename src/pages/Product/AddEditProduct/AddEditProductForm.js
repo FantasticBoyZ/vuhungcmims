@@ -296,7 +296,9 @@ const AddEditProductForm = () => {
       name: FormatDataUtils.removeExtraSpace(values.name),
       productCode: FormatDataUtils.removeExtraSpace(values.productCode),
       unitMeasure: FormatDataUtils.removeExtraSpace(values.unitMeasure),
-      wrapUnitMeasure: isUseWrapUnitMeasure ? FormatDataUtils.removeExtraSpace(values.wrapUnitMeasure) : null,
+      wrapUnitMeasure: isUseWrapUnitMeasure
+        ? FormatDataUtils.removeExtraSpace(values.wrapUnitMeasure)
+        : null,
       numberOfWrapUnitMeasure: isUseWrapUnitMeasure
         ? values.numberOfWrapUnitMeasure
         : null,
@@ -394,6 +396,8 @@ const AddEditProductForm = () => {
           if (dataResult.data.product.image) {
             setImageUrl(API_URL_IMAGE + '/' + dataResult.data.product.image);
           }
+        } else {
+          navigate('/404');
         }
         console.log('dataResult', dataResult);
       } catch (error) {
@@ -405,7 +409,11 @@ const AddEditProductForm = () => {
     if (!!productId) {
       setIsAdd(false);
       if (!!categoryList && !!manufacturerList) {
-        fetchProductDetail();
+        if (isNaN(productId)) {
+          navigate('/404');
+        } else {
+          fetchProductDetail();
+        }
       }
     }
   }, [productId]);

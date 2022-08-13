@@ -98,6 +98,10 @@ const getStatusLabel = (exportOrderStatus) => {
   return <Label color={color}>{text}</Label>;
 };
 
+const isEmptyObject = (obj) => {
+  return Object.keys(obj).length === 0
+}
+
 const removeExtraSpace = (s) => s.trim().split(/ +/).join(' ');
 
 const FormatDataUtils = {
@@ -114,5 +118,6 @@ const FormatDataUtils = {
   getRoundFloorNumber,
   getSelectedOptionWithId,
   removeExtraSpace,
+  isEmptyObject,
 };
 export default FormatDataUtils;
