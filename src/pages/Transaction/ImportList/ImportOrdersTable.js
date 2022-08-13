@@ -125,6 +125,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                 <TableCell align="center">Ngày tạo</TableCell>
                 <TableCell align="center">Ngày nhập</TableCell>
                 <TableCell align="center">Nhà cung cấp</TableCell>
+                <TableCell align="center">Người tạo đơn</TableCell>
                 <TableCell align="center">Trạng thái</TableCell>
                 <TableCell align="center">Giá trị đơn hàng</TableCell>
               </TableRow>
@@ -213,6 +214,17 @@ const ImportOrdersTable = ({ importOrders }) => {
                         align="center"
                       >
                         {importOrder.manufactorName}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="body1"
+                        color="text.primary"
+                        gutterBottom
+                        noWrap
+                        align="center"
+                      >
+                        {importOrder.fullName + '(' + importOrder.userName +')'}
                       </Typography>
                     </TableCell>
                     <TableCell align="center">

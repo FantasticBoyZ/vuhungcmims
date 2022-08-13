@@ -9,7 +9,7 @@ const LayoutLogin = ({ children }) => {
         <Box className="flexContainer">
           <Box
             className="flexItem"
-            sx={{ display: { xs: 'none', md: 'block' } }}
+            sx={{ display: {  md: 'block' } }}
           >{children}
           </Box>
 

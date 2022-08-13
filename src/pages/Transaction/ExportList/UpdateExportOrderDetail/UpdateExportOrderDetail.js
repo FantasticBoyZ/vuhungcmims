@@ -212,9 +212,7 @@ const UpdateExportOrderDetail = () => {
                 consignment.quantity * product.numberOfWrapUnitMeasure,
               )
             : consignment.quantity
-          : FormatDataUtils.getRoundFloorNumber(
-              consignment.quantity
-            );
+          : FormatDataUtils.getRoundFloorNumber(consignment.quantity);
         totalQuantity = +totalQuantity + quantity;
       });
     }
@@ -331,7 +329,7 @@ const UpdateExportOrderDetail = () => {
         consignmentExports: consignmentExports,
       };
       if (consignmentExports.length > 0) {
-        console.log(editedExportOrder)
+        console.log(editedExportOrder);
         try {
           const response = await dispatch(updateExportOrder(editedExportOrder));
           const resultResponse = unwrapResult(response);
@@ -367,12 +365,17 @@ const UpdateExportOrderDetail = () => {
       // };
       const actionResult = await dispatch(getExportOrderById(exportOrderId));
       const dataResult = unwrapResult(actionResult);
-      if (dataResult.data) {
+      if (
+        dataResult.data &&
+        !FormatDataUtils.isEmptyObject(dataResult.data.inforExportDetail)
+      ) {
         setExportOrder(dataResult.data.inforExportDetail);
 
         if (dataResult.data.inforExportDetail?.statusName !== 'pending') {
           navigate(`/export/detail/${exportOrderId}`);
         }
+      } else {
+        navigate('/404');
       }
       console.log('Export Order Detail', dataResult);
     } catch (error) {
@@ -401,8 +404,12 @@ const UpdateExportOrderDetail = () => {
   };
 
   useEffect(() => {
-    fetchExportOrderDetail();
-    fetchConsignmentsByExportOrderId();
+    if (isNaN(exportOrderId)) {
+      navigate('/404');
+    } else {
+      fetchExportOrderDetail();
+      fetchConsignmentsByExportOrderId();
+    }
   }, []);
   return (
     <>
@@ -644,15 +651,20 @@ const UpdateExportOrderDetail = () => {
                                                 !!product.wrapUnitMeasure && (
                                                   <Tooltip
                                                     title={
-                                                      ((calculateTotalQuantityOfProduct2(values.productList[index],) ) -
-                                                      (calculateTotalQuantityOfProduct2(values.productList[index],)  % 1)) +
+                                                      calculateTotalQuantityOfProduct2(
+                                                        values.productList[index],
+                                                      ) -
+                                                      (calculateTotalQuantityOfProduct2(
+                                                        values.productList[index],
+                                                      ) %
+                                                        1) +
                                                       ' ' +
                                                       product.wrapUnitMeasure +
                                                       ' ' +
                                                       Math.round(
-                                                        ((calculateTotalQuantityOfProduct2(
+                                                        (calculateTotalQuantityOfProduct2(
                                                           values.productList[index],
-                                                        ) ) %
+                                                        ) %
                                                           1) *
                                                           product.numberOfWrapUnitMeasure,
                                                       ) +

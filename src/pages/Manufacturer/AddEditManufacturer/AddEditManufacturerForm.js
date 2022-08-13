@@ -111,7 +111,8 @@ const AddEditManufacturerForm = () => {
   };
 
   const FORM_VALIDATION = Yup.object().shape({
-    name: Yup.string().trim()
+    name: Yup.string()
+      .trim()
       .max(200, 'Tên nhà sản xuất không thể dài quá 200 kí tự')
       .required('Chưa nhập tên nhà sản xuất'),
     email: Yup.string()
@@ -132,7 +133,7 @@ const AddEditManufacturerForm = () => {
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố'),
     districtId: Yup.number().required('Chưa chọn quận/huyện/thành phố'),
     wardId: Yup.number().required('Chưa chọn phường/xã'),
-    addressDetail:Yup.string().trim().required('Chưa nhập địa chỉ chi tiết')
+    addressDetail: Yup.string().trim().required('Chưa nhập địa chỉ chi tiết'),
   });
 
   const onChangeProvince = (e) => {
@@ -200,13 +201,13 @@ const AddEditManufacturerForm = () => {
   const handleSubmit = (values) => {
     const newManufacturer = {
       id: isAdd ? '' : manufacturerId,
-      name: values.name,
+      name: FormatDataUtils.removeExtraSpace(values.name),
       email: values.email,
       phone: values.phone,
       provinceId: values.provinceId,
       districtId: values.districtId,
       wardId: values.wardId,
-      addressDetail: values.addressDetail,
+      addressDetail: FormatDataUtils.removeExtraSpace(values.addressDetail),
     };
     // setOpenPopup(true);
     // setTitle(
@@ -285,8 +286,8 @@ const AddEditManufacturerForm = () => {
     const fetchManufacturerDetail = async (manufacturerId) => {
       try {
         const params = {
-          manufacturerId: manufacturerId
-        }
+          manufacturerId: manufacturerId,
+        };
         const actionResult = await dispatch(getManufacturerById(params));
         const dataResult = unwrapResult(actionResult);
         if (dataResult.data) {
@@ -294,6 +295,8 @@ const AddEditManufacturerForm = () => {
           setSelectedProvince(dataResult.data.manufactor.provinceId);
           setSelectedDistrict(dataResult.data.manufactor.districtId);
           setSelectedWard(dataResult.data.manufactor.wardId);
+        } else {
+          navigate('/404');
         }
         console.log(dataResult.data.manufactor);
         console.log('dataResult', dataResult);
@@ -303,7 +306,11 @@ const AddEditManufacturerForm = () => {
     };
     // console.log('subProductList', subProductList);
     if (!isAdd) {
-      fetchManufacturerDetail(manufacturerId);
+      if (isNaN(manufacturerId)) {
+        navigate('/404');
+      } else {
+        fetchManufacturerDetail(manufacturerId);
+      }
     }
   }, [manufacturerId]);
 
@@ -446,8 +453,8 @@ const AddEditManufacturerForm = () => {
                                 onFocus={() => setTouchedProvinceId(true)}
                                 onChange={(e) => {
                                   setFieldValue('provinceId', e?.value);
-                                  setFieldValue('districtId', '',false);
-                                  setFieldValue('wardId','',false)
+                                  setFieldValue('districtId', '', false);
+                                  setFieldValue('wardId', '', false);
                                   onChangeProvince(e);
                                 }}
                               />
@@ -501,7 +508,7 @@ const AddEditManufacturerForm = () => {
                                 onFocus={() => setTouchedDistrictId(true)}
                                 onChange={(e) => {
                                   setFieldValue('districtId', e?.value);
-                                  setFieldValue('wardId','',false)
+                                  setFieldValue('wardId', '', false);
                                   onChangeDistrict(e);
                                 }}
                               />
@@ -599,9 +606,9 @@ const AddEditManufacturerForm = () => {
                             loadingPosition="start"
                             startIcon={<CheckIcon />}
                             onClick={() => {
-                              setTouchedProvinceId(true)
-                              setTouchedDistrictId(true)
-                              setTouchedWardId(true)
+                              setTouchedProvinceId(true);
+                              setTouchedDistrictId(true);
+                              setTouchedWardId(true);
                             }}
                           >
                             Lưu chỉnh sửa

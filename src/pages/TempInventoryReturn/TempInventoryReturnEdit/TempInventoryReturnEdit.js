@@ -283,12 +283,16 @@ const TempInventoryReturnEdit = () => {
           warehouseId: dataResult.data.returnToManufacturerDetail.wareHouseId,
         });
         setExpectedReturnDate(
-          new Date(dataResult.data.returnToManufacturerDetail.expectedReturnDate),
+          dataResult.data.returnToManufacturerDetail.expectedReturnDate
+            ? new Date(dataResult.data.returnToManufacturerDetail.expectedReturnDate)
+            : dataResult.data.returnToManufacturerDetail.expectedReturnDate,
         );
         setListConsignments(
           dataResult.data.returnToManufacturerDetail.listReturnToManufacturerDetail,
         );
         setSelectedWarehouse(dataResult.data.returnToManufacturerDetail.wareHouseId);
+      }else {
+        navigate('/404')
       }
       console.log('tempInventoryReturn Order Detail', dataResult);
     } catch (error) {
@@ -310,8 +314,12 @@ const TempInventoryReturnEdit = () => {
   };
 
   useEffect(() => {
-    getAllWarehouse();
-    fetchTempInventoryReturnDetail();
+    if (isNaN(tempInventoryReturnId)) {
+      navigate('/404');
+    } else {
+      getAllWarehouse();
+      fetchTempInventoryReturnDetail();
+    }
   }, [page, rowsPerPage]);
 
   return (
@@ -757,7 +765,13 @@ const TempInventoryReturnEdit = () => {
                               <Typography variant="h6">Thông tin xác nhận</Typography>
                               <br />
                               <Typography>
-                                Người tạo đơn: <i>{tempInventoryReturn.createBy}</i>
+                                Người tạo đơn:{' '}
+                                <i>
+                                  {tempInventoryReturn.fullNameCreate +
+                                    '(' +
+                                    tempInventoryReturn.userCreateName +
+                                    ')'}
+                                </i>
                               </Typography>
                               <Typography>Ngày tạo đơn:</Typography>
                               <Typography>

@@ -151,7 +151,7 @@ const UpdateProfile = () => {
   const handleSubmit = async (values) => {
     const staff = {
       id: staffId,
-      fullName: values.fullName,
+      fullName: FormatDataUtils.removeExtraSpace(values.fullName),
       identityCard: values.identityCard,
       dateOfBirth: new Date(
         new Date(values.dateOfBirth) + new Date().getTimezoneOffset() / 60,
@@ -163,7 +163,7 @@ const UpdateProfile = () => {
       provinceId: values.provinceId,
       districtId: values.districtId,
       wardId: values.wardId,
-      detailAddress: values.detailAddress,
+      detailAddress: FormatDataUtils.removeExtraSpace(values.detailAddress),
     };
 
     try {

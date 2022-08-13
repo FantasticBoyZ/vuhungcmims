@@ -2,7 +2,11 @@ import AlertPopup from '@/components/Common/AlertPopup';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
 import AuthService from '@/services/authService';
-import { cancelTempInventoryReturn, confirmTempInventoryReturn, getTempInventoryReturnById } from '@/slices/TempInventoryReturnSlice';
+import {
+  cancelTempInventoryReturn,
+  confirmTempInventoryReturn,
+  getTempInventoryReturnById,
+} from '@/slices/TempInventoryReturnSlice';
 import FormatDataUtils from '@/utils/formatData';
 import { Close, Done, Edit } from '@mui/icons-material';
 import {
@@ -199,7 +203,11 @@ const TempInventoryReturnDetail = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setTempInventoryReturn(dataResult.data.returnToManufacturerDetail);
-        setListConsignments(dataResult.data.returnToManufacturerDetail.listReturnToManufacturerDetail)
+        setListConsignments(
+          dataResult.data.returnToManufacturerDetail.listReturnToManufacturerDetail,
+        );
+      } else {
+        navigate('/404');
       }
       console.log('tempInventory Detail', dataResult);
     } catch (error) {
@@ -208,7 +216,11 @@ const TempInventoryReturnDetail = () => {
   };
 
   useEffect(() => {
-    fetchTempInventoryReturnDetail();
+    if (isNaN(tempInventoryReturnId)) {
+      navigate('/404');
+    } else {
+      fetchTempInventoryReturnDetail();
+    }
   }, [page, rowsPerPage]);
 
   return (
@@ -339,21 +351,27 @@ const TempInventoryReturnDetail = () => {
                               <Typography>Ngày dự kiến trả:</Typography>
                             </Stack>
                             <Stack flex={8}>
-                              <Typography>{FormatDataUtils.formatDate(tempInventoryReturn.expectedReturnDate)}</Typography>
+                              <Typography>
+                                {tempInventoryReturn.expectedReturnDate
+                                  ? FormatDataUtils.formatDate(
+                                      tempInventoryReturn.expectedReturnDate,
+                                    )
+                                  : tempInventoryReturn.expectedReturnDate}
+                              </Typography>
                             </Stack>
                           </Stack>
                         </Stack>
-                      
+
                         <Divider />
-                        
+
                         <Stack py={1}>
-                        <Typography variant="h6">Thông tin lưu kho</Typography>
-                        <Typography>
-                          Vị trí: {tempInventoryReturn.wareHouseName}
-                        </Typography>
-                        <Typography>
-                          Địa chỉ: {tempInventoryReturn.wareHouseAddress}
-                        </Typography>
+                          <Typography variant="h6">Thông tin lưu kho</Typography>
+                          <Typography>
+                            Vị trí: {tempInventoryReturn.wareHouseName}
+                          </Typography>
+                          <Typography>
+                            Địa chỉ: {tempInventoryReturn.wareHouseAddress}
+                          </Typography>
                         </Stack>
                       </CardContent>
                     </Card>
@@ -401,7 +419,13 @@ const TempInventoryReturnDetail = () => {
                         <Typography variant="h6">Thông tin xác nhận</Typography>
                         {/* <br /> */}
                         <Typography>
-                          Người tạo đơn: <i>{tempInventoryReturn.userCreateName}</i>
+                          Người tạo đơn:{' '}
+                          <i>
+                            {tempInventoryReturn.fullNameCreate +
+                              '(' +
+                              tempInventoryReturn.userCreateName +
+                              ')'}
+                          </i>
                         </Typography>
                         <Typography>Ngày tạo đơn:</Typography>
                         <Typography>
@@ -412,7 +436,8 @@ const TempInventoryReturnDetail = () => {
                           <Box>
                             <br />
                             <Typography>
-                              Người xác nhận: <i>{tempInventoryReturn.userConfirmedName}</i>
+                              Người xác nhận:{' '}
+                              <i>{tempInventoryReturn.userConfirmedName}</i>
                             </Typography>
                             <Typography>Ngày xác nhận:</Typography>
                             <Typography>

@@ -9,7 +9,7 @@ import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Select from 'react-select';
 
 const useStyles = makeStyles({
@@ -35,6 +35,7 @@ const ProductDetail = () => {
   const [totalRecord, setTotalRecord] = useState(0);
   const [selectedUnitMeasure, setSelectedUnitMeasure] = useState(null);
   const classes = useStyles();
+  const navigate = useNavigate()
 
   const dispatch = useDispatch();
   const { loading, products } = useSelector((state) => ({ ...state.products }));
@@ -74,6 +75,8 @@ const ProductDetail = () => {
           setTotalRecord(dataResult.data.totalRecord);
           setSubProductList(dataResult.data.consignment);
           setProduct(dataResult.data.product);
+        }else {
+          navigate('/404')
         }
         console.log('dataResult', dataResult);
         console.log('product', dataResult.data.product);
@@ -85,7 +88,12 @@ const ProductDetail = () => {
     };
     // console.log('subProductList', subProductList);
     console.log('product', product);
-    fetchProductDetail();
+    if(isNaN(productId)) {
+      navigate('/404')
+    } else {
+      fetchProductDetail();
+    }
+    
   }, [page, rowsPerPage]);
 
   return (

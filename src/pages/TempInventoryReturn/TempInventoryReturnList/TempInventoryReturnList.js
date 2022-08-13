@@ -500,7 +500,7 @@ const TempInventoryReturnList = () => {
                                     gutterBottom
                                     noWrap
                                   >
-                                    {tempInventoryReturn.userCreateFullName}
+                                    {tempInventoryReturn.userCreateFullName + '(' + tempInventoryReturn.userCreateName + ')'}
                                   </Typography>
                                 </TableCell>
                                 <TableCell align="center">

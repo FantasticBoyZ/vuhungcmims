@@ -19,7 +19,7 @@ import FormatDataUtils from '@/utils/formatData';
 import { getInventoryCheckingHistoryDetail } from '@/slices/InventoryCheckingSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import Select from 'react-select';
 
@@ -135,6 +135,7 @@ const InventoryCheckingDetail = () => {
   const [inventoryChecking, setInventoryChecking] = useState();
   const [selectedUnitMeasureList, setSelectedUnitMeasureList] = useState([]);
   const dispatch = useDispatch();
+  const navigate = useNavigate()
   const { loading } = useSelector((state) => ({ ...state.inventoryChecking }));
 
   const fetchInventoryCheckingDetail = async () => {
@@ -158,7 +159,11 @@ const InventoryCheckingDetail = () => {
   };
 
   useEffect(() => {
-    fetchInventoryCheckingDetail();
+    if(isNaN(inventoryCheckingId)) {
+      navigate('/404')
+    }else {
+      fetchInventoryCheckingDetail();
+    }
   }, []);
 
   return (
