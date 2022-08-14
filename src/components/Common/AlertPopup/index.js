@@ -1,5 +1,5 @@
 import { Close } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
+import { IconButton, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -8,7 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 const AlertPopup = (props) => {
-  const { maxWidth, title, children, openPopup, setOpenPopup, isConfirm, handleConfirm } = props;
+  const { maxWidth, title, children, openPopup, setOpenPopup, isConfirm, handleConfirm,textfieldEmail } = props;
 
   return (
     <div>
@@ -21,6 +21,7 @@ const AlertPopup = (props) => {
       >
         <DialogTitle id="alert-dialog-title">
           {title}
+          {textfieldEmail}
           {openPopup ? (
             <IconButton
               aria-label="close"

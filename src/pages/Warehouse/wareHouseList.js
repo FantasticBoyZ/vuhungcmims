@@ -14,6 +14,7 @@ import {
   TableHead,
   TableContainer,
   Typography,
+  Table,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
@@ -90,7 +91,11 @@ const WarehouseList = () => {
       }, 2000);
     } catch (error) {
       console.log('Failed to delete warehouse: ', error);
-      toast.error('Xóa kho thất bại!');
+      if (error.message) {
+        toast.error(error.message);
+      } else {
+        toast.error('Xóa kho thất bại!');
+      }
     }
   };
 
@@ -146,46 +151,48 @@ const WarehouseList = () => {
         ) : (
           <Box className={classes.table}>
             <TableContainer sx={{ display: 'table' }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Nhà kho</TableCell>
-                  <TableCell>Địa chỉ</TableCell>
-                  {currentUserRole === 'ROLE_OWNER' && (
-                    <TableCell align="left">Hành động</TableCell>
-                  )}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {warehouseList.map((item) => (
-                  <TableRow key={item?.id}>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.addressWareHouse}</TableCell>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Nhà kho</TableCell>
+                    <TableCell>Địa chỉ</TableCell>
                     {currentUserRole === 'ROLE_OWNER' && (
-                      <TableCell>
-                        <Tooltip
-                          title="Chỉnh sửa"
-                          arrow
-                        >
-                          <ModeEditIcon
-                            onClick={() => handleOnClickEdit(item?.id)}
-                            color="warning"
-                          />
-                        </Tooltip>
-                        {/* <Tooltip
-                          title="Xóa"
-                          arrow
-                        >
-                          <DeleteForeverIcon
-                            color="error"
-                            onClick={() => handleOnClickDelete(item?.id)}
-                            sx={{ marginLeft: '15%' }}
-                          />
-                        </Tooltip> */}
-                      </TableCell>
+                      <TableCell align="left">Hành động</TableCell>
                     )}
                   </TableRow>
-                ))}
-              </TableBody>
+                </TableHead>
+                <TableBody>
+                  {warehouseList.map((item) => (
+                    <TableRow key={item?.id}>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>{item.addressWareHouse}</TableCell>
+                      {currentUserRole === 'ROLE_OWNER' && (
+                        <TableCell>
+                          <Tooltip
+                            title="Chỉnh sửa"
+                            arrow
+                          >
+                            <ModeEditIcon
+                              onClick={() => handleOnClickEdit(item?.id)}
+                              color="warning"
+                            />
+                          </Tooltip>
+                          <Tooltip
+                            title="Xóa"
+                            arrow
+                          >
+                            <DeleteForeverIcon
+                              color="error"
+                              onClick={() => handleOnClickDelete(item?.id)}
+                              sx={{ marginLeft: '15%' }}
+                            />
+                          </Tooltip>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </TableContainer>
           </Box>
         )}

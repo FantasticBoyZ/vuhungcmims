@@ -3,6 +3,7 @@ import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
 import CategoryTable from '@/pages/Category/CategoryTable/CategoryTable';
 import { getCategoryList } from '@/slices/CategorySlice';
+import FormatDataUtils from '@/utils/formatData';
 import { Add, Search } from '@mui/icons-material';
 import {
   Box,
@@ -79,7 +80,7 @@ const CategoryList = () => {
       let target = e.target;
       console.log(e.target.value);
       setPage(0);
-      searchCategory({ ...searchParams, categoryName: target.value });
+      searchCategory({ ...searchParams, categoryName: FormatDataUtils.removeExtraSpace(target.value) });
       // fetchProductList();
     }
   };
@@ -215,7 +216,7 @@ const CategoryList = () => {
               className={classes.buttonAdd}
               onClick={() => handleOnclickAddNewProduct()}
             >
-              Thêm mới danh mục mới
+              Thêm danh mục mới
             </Button>
           </Stack>
         </Card>
