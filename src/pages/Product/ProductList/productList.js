@@ -268,7 +268,7 @@ const ProductList = () => {
       const params = {
         pageIndex: page + 1,
         pageSize: rowsPerPage,
-        productName: searchParams.productName,
+        productName: FormatDataUtils.removeExtraSpace(searchParams.productName),
         productCode: searchParams.productCode,
         manufactorId: searchParams.manufactorId,
         categoryId: searchParams.categoryId,

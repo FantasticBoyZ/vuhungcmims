@@ -26,6 +26,7 @@ import ManufacturerTable from './ManufacturerTable';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import Select from 'react-select';
 import SearchIcon from '@mui/icons-material/Search';
+import FormatDataUtils from '@/utils/formatData';
 const useStyles = makeStyles({
   searchField: {
     width: '60%',
@@ -65,10 +66,10 @@ const optionSelect = [
     value: 'manufactorName',
     label: 'Tên',
   },
-  {
-    value: 'provinceName',
-    label: 'Khu vực',
-  },
+  // {
+  //   value: 'provinceName',
+  //   label: 'Khu vực',
+  // },
 ];
 
 const ManufacturerList = () => {
@@ -102,8 +103,8 @@ const ManufacturerList = () => {
 
   const handleSearch = (e) => {
     setPage(0);
-    searchManufacurer({ ...searchParams, manufactorName: keyword, searchBy: searchBy });
-    setSearchParams({ ...searchParams, manufactorName: keyword, searchBy: searchBy });
+    searchManufacurer({ ...searchParams, manufactorName: FormatDataUtils.removeExtraSpace(keyword), searchBy: searchBy });
+    setSearchParams({ ...searchParams, manufactorName: FormatDataUtils.removeExtraSpace(keyword), searchBy: searchBy });
   };
 
   const handleOnclickAddNewManufacturer = () => {
