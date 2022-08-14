@@ -25,14 +25,17 @@ import {
   CardHeader,
   Grid,
   Stack,
+  TextField,
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { Form, Formik } from 'formik';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import * as Yup from 'yup';
 
 const useStyles = makeStyles((theme) => ({
   imgContainer: {
@@ -129,11 +132,19 @@ const StaffDetail = () => {
   const [errorMessage, setErrorMessage] = useState();
   const [confirmTask, setConfirmTask] = useState();
   const [image, setImage] = useState();
+  const [staffEmail, setStaffEmail] = useState('');
+  const [validEmail, setValidEmail] = useState(true);
   const hiddenFileInput = useRef(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.staff }));
+
+  const emailValidation = Yup.object().shape({
+    email: Yup.string()
+      .email('Vui lòng nhập đúng định dạng email. VD abc@xyz.com')
+      .required('Chưa nhập Email'),
+  });
 
   const { initialFormValue, setInitialFormValue } = useState({
     // name: category?.name || '',
@@ -190,12 +201,9 @@ const StaffDetail = () => {
 
   const handleResetPasswordStaff = () => {
     console.log('reset mật khẩu nhân viên');
-    setTitle(
-      'Thao tác này sẽ cài lại mật khẩu và gửi mật khẩu cài lại về email “' +
-        staff.email +
-        '”.',
-    );
+    setTitle('Thao tác này sẽ cài lại mật khẩu và gửi mật khẩu cài lại về email ');
     setConfirmTask('resetPassword');
+    setStaffEmail(staff.email);
     setMessage('');
     setErrorMessage(null);
     setOpenPopup(true);
@@ -236,20 +244,25 @@ const StaffDetail = () => {
   const handleConfirm = async () => {
     switch (confirmTask) {
       case 'resetPassword':
-        try {
-          const params = {
-            id: staffId,
-          };
-          const actionResult = await dispatch(resetPassword(params));
-          const dataResult = unwrapResult(actionResult);
-          console.log('dataResult', dataResult);
-          if (dataResult) {
-            toast.success(dataResult.data.message);
-            setOpenPopup(false);
+        if (validEmail) {
+          console.log(staffEmail);
+          try {
+            const params = {
+              id: staffId,
+              email: staffEmail,
+            };
+            const actionResult = await dispatch(resetPassword(params));
+            const dataResult = unwrapResult(actionResult);
+            console.log('dataResult', dataResult);
+            if (dataResult) {
+              toast.success(dataResult.data.message);
+              setOpenPopup(false);
+            }
+          } catch (error) {
+            console.log('Failed to set active staff: ', error);
           }
-        } catch (error) {
-          console.log('Failed to set active staff: ', error);
         }
+
         break;
       case 'setActive':
         if (!!staff) {
@@ -301,6 +314,7 @@ const StaffDetail = () => {
       console.log('dataResult', dataResult);
       if (dataResult && !FormatDataUtils.isEmptyObject(dataResult)) {
         setStaff(dataResult.data);
+        setStaffEmail(dataResult.data.email);
         if (dataResult.data.imageUrl) {
           fetchImage(API_URL_IMAGE + '/' + dataResult.data.imageUrl);
         }
@@ -568,6 +582,30 @@ const StaffDetail = () => {
               <AlertPopup
                 maxWidth="sm"
                 title={errorMessage ? 'Chú ý' : title}
+                textfieldEmail={
+                  confirmTask === 'resetPassword' ? (
+                    <Formik
+                      initialValues={{ email: staffEmail }}
+                      validationSchema={emailValidation}
+                    >
+                      {({ values, errors, setFieldValue }) => (
+                        <Form>
+                          <TextField
+                            error={!!errors.email}
+                            helperText={errors.email}
+                            value={staffEmail}
+                            onChange={(e) => {
+                              setFieldValue('email', e.target.value);
+                              setStaffEmail(e.target.value);
+                              setValidEmail(!!errors.email ? false : true);
+                            }}
+                            InputProps={{ sx: { height: 30 } }}
+                          />
+                        </Form>
+                      )}
+                    </Formik>
+                  ) : null
+                }
                 openPopup={openPopup}
                 setOpenPopup={setOpenPopup}
                 isConfirm={!errorMessage}
