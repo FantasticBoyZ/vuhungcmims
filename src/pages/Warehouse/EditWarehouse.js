@@ -207,11 +207,11 @@ const EditWareHouseForm = (props) => {
   };
 
   const initialFormValue = {
-    name: warehouse?.name,
-    addressDetail: warehouse?.addressDetail,
-    provinceId: warehouse?.provinceId,
-    districtId: warehouse?.districtId,
-    wardId: warehouse?.wardId,
+    name: warehouse?.name || '',
+    addressDetail: warehouse?.addressDetail || '',
+    provinceId: warehouse?.provinceId || '',
+    districtId: warehouse?.districtId || '',
+    wardId: warehouse?.wardId || '',
   };
 
   useEffect(() => {

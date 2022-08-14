@@ -16,7 +16,7 @@ const WarehouseService = {
 
   getWarehouseDetail: (params) => {
     const url = `/warehouse/${params}`;
-    return axiosClient.get(url, params, { headers: authHeader() });
+    return axiosClient.get(url, { params, headers: authHeader() });
   },
 
   addWarehouse: (params) => {
@@ -30,8 +30,8 @@ const WarehouseService = {
   },
 
   deleteWarehouse: (params) => {
-    const url = `/warehouse/delete/${params}`;
-    return axiosClient.delete(url, params);
+    const url = API_URL + `/warehouse/delete/${params}`;
+    return axios.delete(url, { params, headers: authHeader() });
   },
 
   getProvince: (params) => {
