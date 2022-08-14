@@ -39,6 +39,7 @@ import * as Yup from 'yup';
 import './style.css';
 import LoadingButton from '@mui/lab/LoadingButton';
 import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
+import IconRequired from '@/components/Common/IconRequired';
 
 const useStyles = makeStyles({
   unitMeasureSelect: {
@@ -107,7 +108,7 @@ const ImportGoods = () => {
       today.getTime() - today.getTimezoneOffset() * 60 * 1000,
     ).toJSON(),
     description: '',
-    userId: currentUser.id,
+    userId: currentUser?.id,
     manufactorId: '',
     wareHouseId: '',
     consignmentRequests: [],
@@ -301,14 +302,20 @@ const ImportGoods = () => {
           setLoadingButton(false);
           console.log(response.data);
           navigate('/import/list');
-        } else if (response.data.status === 500) {
-          toast.error(response.data.message)
         } else {
-          toast.error(response.data.message)
+          toast.error(response.data.message);
         }
       },
       (error) => {
-        toast.error('Tạo phiếu nhập hàng thất bại');
+        if (error.response.data.message) {
+          toast.error(error.response.data.message);
+          if (error.response.data.status === 405) {
+            localStorage.clear();
+            navigate('/');
+          }
+        } else {
+          toast.error('Tạo phiếu nhập hàng thất bại');
+        }
         setLoadingButton(false);
         console.log(error);
       },
@@ -396,7 +403,10 @@ const ImportGoods = () => {
             <div className="container">
               <div className="left-container">
                 <Card className="card-container">
-                  <div className="label">Thông tin nhà cung cấp</div>
+                  <div className="label">
+                    Thông tin nhà cung cấp
+                    <IconRequired />
+                  </div>
                   {/* {manufacturerList && ( */}
                   <Box>
                     <Select
@@ -712,7 +722,10 @@ const ImportGoods = () => {
                     {/* chỗ này là createdDate */}
                     {FormatDataUtils.formatDate(today)}
                   </div>
-                  <div className="label-field">Vị trí nhập hàng</div>
+                  <div className="label-field">
+                    Vị trí nhập hàng
+                    <IconRequired />
+                  </div>
                   {warehouseList && (
                     <Box className="selectbox-warehouse">
                       <Select
