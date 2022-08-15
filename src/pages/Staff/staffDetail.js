@@ -588,21 +588,25 @@ const StaffDetail = () => {
                       initialValues={{ email: staffEmail }}
                       validationSchema={emailValidation}
                     >
-                      {({ values, errors, setFieldValue }) => (
+                      {({ values, errors, setFieldValue}) => {
+                        return (
                         <Form>
                           <TextField
                             error={!!errors.email}
                             helperText={errors.email}
+                            autoComplete='email'
+                            id='email'
+                            name='email'
                             value={staffEmail}
                             onChange={(e) => {
-                              setFieldValue('email', e.target.value);
+                              setFieldValue('email', e.target.value, true);
                               setStaffEmail(e.target.value);
-                              setValidEmail(!!errors.email ? false : true);
                             }}
+                            onBlur={(e) => {setValidEmail(!!errors.email ? false : true);}}
                             InputProps={{ sx: { height: 30 } }}
                           />
                         </Form>
-                      )}
+                      )}}
                     </Formik>
                   ) : null
                 }

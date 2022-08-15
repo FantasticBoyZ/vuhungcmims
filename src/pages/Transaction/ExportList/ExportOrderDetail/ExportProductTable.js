@@ -1,7 +1,9 @@
+import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
 import FormatDataUtils from '@/utils/formatData';
 import { InfoOutlined } from '@mui/icons-material';
 import {
   IconButton,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -87,10 +89,22 @@ const ExportProductTable = ({ productList }) => {
                     {product.wrapUnitMeasure == null ? (
                       product.unitMeasure
                     ) : (
-                      <Select
-                        classNamePrefix="select"
-                        defaultValue={
-                          FormatDataUtils.getOption([
+                      <Stack direction="row">
+                        <Select
+                          classNamePrefix="select"
+                          defaultValue={
+                            FormatDataUtils.getOption([
+                              {
+                                number: 1,
+                                name: product.unitMeasure,
+                              },
+                              {
+                                number: product.numberOfWrapUnitMeasure,
+                                name: product.wrapUnitMeasure,
+                              },
+                            ])[0]
+                          }
+                          options={FormatDataUtils.getOption([
                             {
                               number: 1,
                               name: product.unitMeasure,
@@ -99,62 +113,69 @@ const ExportProductTable = ({ productList }) => {
                               number: product.numberOfWrapUnitMeasure,
                               name: product.wrapUnitMeasure,
                             },
-                          ])[0]
-                        }
-                        options={FormatDataUtils.getOption([
-                          {
-                            number: 1,
-                            name: product.unitMeasure,
-                          },
-                          {
-                            number: product.numberOfWrapUnitMeasure,
-                            name: product.wrapUnitMeasure,
-                          },
-                        ])}
-                        menuPortalTarget={document.body}
-                        styles={{
-                          menuPortal: (base) => ({
-                            ...base,
-                            zIndex: 9999,
-                          }),
-                        }}
-                        onChange={(e) => {
-                          // console.log(e.label);
-                          if (
-                            e.label === product.wrapUnitMeasure &&
-                            newSelectdUnitMeasureList[index] !== product.wrapUnitMeasure
-                          ) {
-                            newSelectdUnitMeasureList[index] = product.wrapUnitMeasure;
-                            // console.log(
-                            //   'wrapUnitMeasure',
-                            //   newSelectdUnitMeasureList[index],
-                            // );
-                            setSelectedUnitMeasureList(newSelectdUnitMeasureList);
-                          }
-                          if (
-                            e.label === product.unitMeasure &&
-                            newSelectdUnitMeasureList[index] !== product.unitMeasure
-                          ) {
-                            newSelectdUnitMeasureList[index] = product.unitMeasure;
-                            // console.log(
-                            //   'unitMeasure',
-                            //   newSelectdUnitMeasureList[index],
-                            // );
-                            setSelectedUnitMeasureList(newSelectdUnitMeasureList);
-                          }
-                          // console.log(selectedUnitMeasureList);
-                        }}
-                      />
+                          ])}
+                          menuPortalTarget={document.body}
+                          styles={{
+                            menuPortal: (base) => ({
+                              ...base,
+                              zIndex: 9999,
+                            }),
+                          }}
+                          onChange={(e) => {
+                            // console.log(e.label);
+                            if (
+                              e.label === product.wrapUnitMeasure &&
+                              newSelectdUnitMeasureList[index] !== product.wrapUnitMeasure
+                            ) {
+                              newSelectdUnitMeasureList[index] = product.wrapUnitMeasure;
+                              // console.log(
+                              //   'wrapUnitMeasure',
+                              //   newSelectdUnitMeasureList[index],
+                              // );
+                              setSelectedUnitMeasureList(newSelectdUnitMeasureList);
+                            }
+                            if (
+                              e.label === product.unitMeasure &&
+                              newSelectdUnitMeasureList[index] !== product.unitMeasure
+                            ) {
+                              newSelectdUnitMeasureList[index] = product.unitMeasure;
+                              // console.log(
+                              //   'unitMeasure',
+                              //   newSelectdUnitMeasureList[index],
+                              // );
+                              setSelectedUnitMeasureList(newSelectdUnitMeasureList);
+                            }
+                            // console.log(selectedUnitMeasureList);
+                          }}
+                        />
+                        {selectedUnitMeasureList[index] === product.wrapUnitMeasure && (
+                          <TooltipUnitMeasure
+                            wrapUnitMeasure={product.wrapUnitMeasure}
+                            numberOfWrapUnitMeasure={product.numberOfWrapUnitMeasure}
+                            unitMeasure={product.unitMeasure}
+                            isConvert={false}
+                          />
+                        )}
+                      </Stack>
                     )}
                   </TableCell>
                   <TableCell align="center">
-                    {selectedUnitMeasureList[index] === product.wrapUnitMeasure
-                      ? FormatDataUtils.getRoundFloorNumber(
+                    {selectedUnitMeasureList[index] === product.wrapUnitMeasure ? (
+                      <TooltipUnitMeasure
+                        quantity={product?.quantity / product.numberOfWrapUnitMeasure}
+                        wrapUnitMeasure={product.wrapUnitMeasure}
+                        numberOfWrapUnitMeasure={product.numberOfWrapUnitMeasure}
+                        unitMeasure={product.unitMeasure}
+                        isConvert={true}
+                        value={FormatDataUtils.getRoundFloorNumber(
                           product?.quantity / product.numberOfWrapUnitMeasure,
                           2,
-                        )
-                      : product?.quantity}
-                    {selectedUnitMeasureList[index] === product.wrapUnitMeasure &&
+                        )}
+                      />
+                    ) : (
+                      product?.quantity
+                    )}
+                    {/* {selectedUnitMeasureList[index] === product.wrapUnitMeasure &&
                       !!product.wrapUnitMeasure && (
                         <Tooltip
                           title={
@@ -175,7 +196,7 @@ const ExportProductTable = ({ productList }) => {
                             <InfoOutlined />
                           </IconButton>
                         </Tooltip>
-                      )}
+                      )} */}
                   </TableCell>
                   <TableCell align="center">
                     {selectedUnitMeasureList[index] === product.wrapUnitMeasure
@@ -222,14 +243,29 @@ const ExportProductTable = ({ productList }) => {
                                 : 'Không có'}
                             </TableCell>
                             <TableCell align="center">
-                              {selectedUnitMeasureList[index] === product.wrapUnitMeasure
-                                ? FormatDataUtils.getRoundFloorNumber(
+                              {selectedUnitMeasureList[index] ===
+                              product.wrapUnitMeasure ? (
+                                <TooltipUnitMeasure
+                                  quantity={
+                                    consignment?.quantity /
+                                    product.numberOfWrapUnitMeasure
+                                  }
+                                  wrapUnitMeasure={product.wrapUnitMeasure}
+                                  numberOfWrapUnitMeasure={
+                                    product.numberOfWrapUnitMeasure
+                                  }
+                                  unitMeasure={product.unitMeasure}
+                                  isConvert={true}
+                                  value={FormatDataUtils.getRoundFloorNumber(
                                     consignment?.quantity /
                                       product.numberOfWrapUnitMeasure,
                                     2,
-                                  )
-                                : consignment?.quantity}
-                              {selectedUnitMeasureList[index] ===
+                                  )}
+                                />
+                              ) : (
+                                consignment?.quantity
+                              )}
+                              {/* {selectedUnitMeasureList[index] ===
                                 product.wrapUnitMeasure &&
                                 !!product.wrapUnitMeasure && (
                                   <Tooltip
@@ -256,7 +292,7 @@ const ExportProductTable = ({ productList }) => {
                                       <InfoOutlined />
                                     </IconButton>
                                   </Tooltip>
-                                )}
+                                )} */}
                             </TableCell>
                           </TableRow>
                         ))}

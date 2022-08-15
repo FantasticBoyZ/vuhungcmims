@@ -262,7 +262,7 @@ const HomePage = () => {
             >
               <Autocomplete
                 id="functionSearch"
-                className={classes.searchField}
+                // className={classes.searchField}
                 name="functionSearch"
                 options={functionListFiltered}
                 noOptionsText="Không tìm thấy chức năng"

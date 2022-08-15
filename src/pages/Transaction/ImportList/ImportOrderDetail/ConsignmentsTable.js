@@ -157,12 +157,23 @@ const ConsignmentsTable = ({ listConsignments }) => {
                   )}
                 </TableCell>
                 <TableCell>
-                  {selectedUnitMeasureList[index] === consignment.wrapUnitMeasure
-                    ? FormatDataUtils.getRoundNumber(
+                  {selectedUnitMeasureList[index] === consignment.wrapUnitMeasure ? (
+                    <TooltipUnitMeasure
+                      quantity={
+                        consignment?.quantity / consignment.numberOfWrapUnitMeasure
+                      }
+                      wrapUnitMeasure={consignment.wrapUnitMeasure}
+                      numberOfWrapUnitMeasure={consignment.numberOfWrapUnitMeasure}
+                      unitMeasure={consignment.unitMeasure}
+                      isConvert={true}
+                      value={FormatDataUtils.getRoundFloorNumber(
                         consignment?.quantity / consignment.numberOfWrapUnitMeasure,
-                        1,
-                      )
-                    : consignment?.quantity}
+                        2,
+                      )}
+                    />
+                  ) : (
+                    consignment?.quantity
+                  )}
                 </TableCell>
                 <TableCell>
                   {selectedUnitMeasureList[index] === consignment.wrapUnitMeasure

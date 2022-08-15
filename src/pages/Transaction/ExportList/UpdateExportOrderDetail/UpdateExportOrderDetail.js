@@ -42,6 +42,7 @@ import AlertPopup from '@/components/Common/AlertPopup';
 import { toast } from 'react-toastify';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import Select from 'react-select';
+import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -525,8 +526,8 @@ const UpdateExportOrderDetail = () => {
                                               {product?.wrapUnitMeasure == null ? (
                                                 product?.unitMeasure
                                               ) : (
-                                                <Box
-                                                  className={classes.selectBoxUnitMeasure}
+                                                <Stack
+                                                  direction='row'
                                                 >
                                                   <Select
                                                     classNamePrefix="select"
@@ -637,7 +638,21 @@ const UpdateExportOrderDetail = () => {
                                                       }
                                                     }}
                                                   />
-                                                </Box>
+                                                  {values.productList[index]
+                                                    .selectedUnitMeasure ===
+                                                    product.wrapUnitMeasure && (
+                                                    <TooltipUnitMeasure
+                                                      wrapUnitMeasure={
+                                                        product.wrapUnitMeasure
+                                                      }
+                                                      numberOfWrapUnitMeasure={
+                                                        product.numberOfWrapUnitMeasure
+                                                      }
+                                                      unitMeasure={product.unitMeasure}
+                                                      isConvert={false}
+                                                    />
+                                                  )}
+                                                </Stack>
                                               )}
                                             </TableCell>
                                             <TableCell align="center">
@@ -988,7 +1003,7 @@ const UpdateExportOrderDetail = () => {
                           {errorMessage ? errorMessage : message}
                         </Box>
                       </AlertPopup>
-                      <pre>{JSON.stringify(values, null, 2)}</pre>
+                      {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
                     </Grid>
                   </Form>
                 );

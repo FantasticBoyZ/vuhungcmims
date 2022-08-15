@@ -923,31 +923,35 @@ const CreateInventoryChecking = () => {
                                                     </TableCell>
                                                     <TableCell align="center">
                                                       {product.selectedUnitMeasure ===
-                                                      product.unitMeasure
-                                                        ? consignment?.quantity
-                                                        : FormatDataUtils.getRoundFloorNumber(
+                                                      product.unitMeasure ? (
+                                                        consignment?.quantity
+                                                      ) : (
+                                                        <Stack direction="row" justifyContent='center'>
+                                                          {FormatDataUtils.getRoundFloorNumber(
                                                             consignment?.quantity /
                                                               product.numberOfWrapUnitMeasure,
                                                             2,
                                                           )}
-                                                      {product.selectedUnitMeasure ===
-                                                        product.wrapUnitMeasure && (
-                                                        <TooltipUnitMeasure
-                                                          quantity={
-                                                            consignment?.quantity /
-                                                            product.numberOfWrapUnitMeasure
-                                                          }
-                                                          wrapUnitMeasure={
-                                                            product.wrapUnitMeasure
-                                                          }
-                                                          numberOfWrapUnitMeasure={
-                                                            product.numberOfWrapUnitMeasure
-                                                          }
-                                                          unitMeasure={
-                                                            product.unitMeasure
-                                                          }
-                                                          isConvert={true}
-                                                        />
+                                                          {product.selectedUnitMeasure ===
+                                                            product.wrapUnitMeasure && (
+                                                            <TooltipUnitMeasure
+                                                              quantity={
+                                                                consignment?.quantity /
+                                                                product.numberOfWrapUnitMeasure
+                                                              }
+                                                              wrapUnitMeasure={
+                                                                product.wrapUnitMeasure
+                                                              }
+                                                              numberOfWrapUnitMeasure={
+                                                                product.numberOfWrapUnitMeasure
+                                                              }
+                                                              unitMeasure={
+                                                                product.unitMeasure
+                                                              }
+                                                              isConvert={true}
+                                                            />
+                                                          )}
+                                                        </Stack>
                                                       )}
                                                     </TableCell>
                                                     <TableCell align="center">
