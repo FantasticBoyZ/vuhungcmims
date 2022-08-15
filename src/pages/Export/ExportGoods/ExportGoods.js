@@ -208,6 +208,7 @@ const ExportGoods = () => {
 
   const FORM_VALIDATION = Yup.object().shape({
     // billReferenceNumber: Yup.string().required('Bạn chưa nhập mã phiếu tham chiếu'),
+    description: Yup.string().max(255, 'Mô tả không thể dài quá 255 kí tự'),
   });
 
   const arrayHelpersRef = useRef(null);

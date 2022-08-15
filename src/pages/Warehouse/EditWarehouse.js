@@ -96,9 +96,11 @@ const EditWareHouseForm = (props) => {
 
   const FORM_VALIDATION = Yup.object().shape({
     name: Yup.string()
-      .max(200, 'Tên kho không thể dài quá 200 kí tự')
+      .max(255, 'Tên kho không thể dài quá 255 kí tự')
       .required('Chưa nhập tên kho'),
-    addressDetail: Yup.string().required('Chưa nhập địa chỉ'),
+    addressDetail: Yup.string()
+      .max(255, 'Địa chỉ chi tiết không thể dài quá 255 kí tự')
+      .required('Chưa nhập địa chỉ'),
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố'),
     districtId: Yup.number().required('Chưa chọn quận/huyện'),
     wardId: Yup.number().required('Chưa chọn xã/phường'),

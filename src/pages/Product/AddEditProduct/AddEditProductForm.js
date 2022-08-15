@@ -205,26 +205,35 @@ const AddEditProductForm = () => {
   const FORM_VALIDATION = Yup.object().shape({
     productCode: Yup.string()
       .trim()
+      .max(255, 'Mã sản phẩm không thể dài quá 255 kí tự')
       .required('Chưa nhập mã sản phẩm')
       .test('productCode', 'Vui lòng xoá các khoảng trắng', function (value) {
         if (value) {
           return !value.includes(' ');
         }
       }),
-    name: Yup.string().trim().required('Chưa nhập tên sản phẩm'),
-    unitMeasure: Yup.string().trim().required('Chưa nhập đơn vị'),
+    name: Yup.string()
+      .trim()
+      .max(255, 'Tên sản phẩm không thể dài quá 255 kí tự')
+      .required('Chưa nhập tên sản phẩm'),
+    unitMeasure: Yup.string()
+      .trim()
+      .max(255, 'Đơn vị không thể dài quá 255 kí tự')
+      .required('Chưa nhập đơn vị'),
     color: Yup.string().max(50, 'Màu sắc không thể dài quá 50 kí tự'),
     description: Yup.string().max(255, 'Mô tả không thể dài quá 255 kí tự'),
     categoryId: Yup.string().required('Chưa chọn danh mục'),
     manufactorId: Yup.string().required('Chưa chọn nhà cung cấp'),
     isUseWrapUnitMeasure: Yup.boolean(),
     wrapUnitMeasure: Yup.string()
+      .max(255, 'Đơn vị không thể dài quá 255 kí tự')
       .when('isUseWrapUnitMeasure', {
         is: true,
         then: Yup.string().trim().required('Chưa nhập đơn vị quy đổi').nullable(),
       })
       .nullable(),
     numberOfWrapUnitMeasure: Yup.number()
+      .max(1000, 'Số lượng đơn vị quy đổi không thể lớn hơn 1000')
       .when('isUseWrapUnitMeasure', {
         is: true,
         then: Yup.number().required('Chưa nhập số lượng quy đổi').nullable(),
@@ -962,7 +971,7 @@ const AddEditProductForm = () => {
                                 name="description"
                                 fullWidth
                                 multiline
-                                minRows={4}
+                                rows={4}
                                 id="description"
                                 autoComplete="description"
                               />

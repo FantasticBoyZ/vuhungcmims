@@ -83,8 +83,10 @@ const CategoryForm = (props) => {
 
   const FORM_VALIDATION = Yup.object().shape({
     name: Yup.string()
-      .max(200, 'Tên danh mục không thể dài quá 200 kí tự')
+      .max(255, 'Tên danh mục không thể dài quá 255 kí tự')
       .required('Chưa nhập tên danh mục'),
+    description: Yup.string()
+    .max(255, 'Mô tả không thể dài quá 255 kí tự')
   });
 
   const getSelectedParent = () => {
