@@ -22,6 +22,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import Select from 'react-select';
+import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
 
 const useStyles = makeStyles({
   labelInfo: {
@@ -135,7 +136,7 @@ const InventoryCheckingDetail = () => {
   const [inventoryChecking, setInventoryChecking] = useState();
   const [selectedUnitMeasureList, setSelectedUnitMeasureList] = useState([]);
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { loading } = useSelector((state) => ({ ...state.inventoryChecking }));
 
   const fetchInventoryCheckingDetail = async () => {
@@ -159,9 +160,9 @@ const InventoryCheckingDetail = () => {
   };
 
   useEffect(() => {
-    if(isNaN(inventoryCheckingId)) {
-      navigate('/404')
-    }else {
+    if (isNaN(inventoryCheckingId)) {
+      navigate('/404');
+    } else {
       fetchInventoryCheckingDetail();
     }
   }, []);
@@ -293,12 +294,24 @@ const InventoryCheckingDetail = () => {
                                       {product.wrapUnitMeasure == null ? (
                                         product.unitMeasure
                                       ) : (
-                                        <Select
-                                          classNamePrefix="select"
-                                          isSearchable={false}
-                                          className={classes.unitMeasureSelectBox}
-                                          defaultValue={
-                                            FormatDataUtils.getOption([
+                                        <Stack direction="row">
+                                          <Select
+                                            classNamePrefix="select"
+                                            isSearchable={false}
+                                            className={classes.unitMeasureSelectBox}
+                                            defaultValue={
+                                              FormatDataUtils.getOption([
+                                                {
+                                                  number: 1,
+                                                  name: product.unitMeasure,
+                                                },
+                                                {
+                                                  number: product.numberOfWrapUnitMeasure,
+                                                  name: product.wrapUnitMeasure,
+                                                },
+                                              ])[0]
+                                            }
+                                            options={FormatDataUtils.getOption([
                                               {
                                                 number: 1,
                                                 name: product.unitMeasure,
@@ -307,54 +320,55 @@ const InventoryCheckingDetail = () => {
                                                 number: product.numberOfWrapUnitMeasure,
                                                 name: product.wrapUnitMeasure,
                                               },
-                                            ])[0]
-                                          }
-                                          options={FormatDataUtils.getOption([
-                                            {
-                                              number: 1,
-                                              name: product.unitMeasure,
-                                            },
-                                            {
-                                              number: product.numberOfWrapUnitMeasure,
-                                              name: product.wrapUnitMeasure,
-                                            },
-                                          ])}
-                                          menuPortalTarget={document.body}
-                                          styles={{
-                                            menuPortal: (base) => ({
-                                              ...base,
-                                              zIndex: 9999,
-                                            }),
-                                          }}
-                                          onChange={(e) => {
-                                            // console.log(e.label);
-                                            if (
-                                              e.label === product.wrapUnitMeasure &&
-                                              newSelectdUnitMeasureList[index] !==
-                                                product.wrapUnitMeasure
-                                            ) {
-                                              newSelectdUnitMeasureList[index] =
-                                                product.wrapUnitMeasure;
+                                            ])}
+                                            menuPortalTarget={document.body}
+                                            styles={{
+                                              menuPortal: (base) => ({
+                                                ...base,
+                                                zIndex: 9999,
+                                              }),
+                                            }}
+                                            onChange={(e) => {
+                                              // console.log(e.label);
+                                              if (
+                                                e.label === product.wrapUnitMeasure &&
+                                                newSelectdUnitMeasureList[index] !==
+                                                  product.wrapUnitMeasure
+                                              ) {
+                                                newSelectdUnitMeasureList[index] =
+                                                  product.wrapUnitMeasure;
 
-                                              setSelectedUnitMeasureList(
-                                                newSelectdUnitMeasureList,
-                                              );
-                                            }
-                                            if (
-                                              e.label === product.unitMeasure &&
-                                              newSelectdUnitMeasureList[index] !==
-                                                product.unitMeasure
-                                            ) {
-                                              newSelectdUnitMeasureList[index] =
-                                                product.unitMeasure;
+                                                setSelectedUnitMeasureList(
+                                                  newSelectdUnitMeasureList,
+                                                );
+                                              }
+                                              if (
+                                                e.label === product.unitMeasure &&
+                                                newSelectdUnitMeasureList[index] !==
+                                                  product.unitMeasure
+                                              ) {
+                                                newSelectdUnitMeasureList[index] =
+                                                  product.unitMeasure;
 
-                                              setSelectedUnitMeasureList(
-                                                newSelectdUnitMeasureList,
-                                              );
-                                            }
-                                            // console.log(selectedUnitMeasureList);
-                                          }}
-                                        />
+                                                setSelectedUnitMeasureList(
+                                                  newSelectdUnitMeasureList,
+                                                );
+                                              }
+                                              // console.log(selectedUnitMeasureList);
+                                            }}
+                                          />
+                                          {selectedUnitMeasureList[index] ===
+                                            product.wrapUnitMeasure && (
+                                            <TooltipUnitMeasure
+                                              wrapUnitMeasure={product.wrapUnitMeasure}
+                                              numberOfWrapUnitMeasure={
+                                                product.numberOfWrapUnitMeasure
+                                              }
+                                              unitMeasure={product.unitMeasure}
+                                              isConvert={false}
+                                            />
+                                          )}
+                                        </Stack>
                                       )}
                                     </TableCell>
                                     {/* <TableCell align="center">{product?.quantity}</TableCell> */}
@@ -425,23 +439,55 @@ const InventoryCheckingDetail = () => {
                                                 </TableCell>
                                                 <TableCell align="center">
                                                   {selectedUnitMeasureList[index] ===
-                                                  product.wrapUnitMeasure
-                                                    ? FormatDataUtils.getRoundFloorNumber(
+                                                  product.wrapUnitMeasure ? (
+                                                    <TooltipUnitMeasure
+                                                      quantity={
+                                                        consignment?.instockQuantity /
+                                                        product.numberOfWrapUnitMeasure
+                                                      }
+                                                      wrapUnitMeasure={
+                                                        product.wrapUnitMeasure
+                                                      }
+                                                      numberOfWrapUnitMeasure={
+                                                        product.numberOfWrapUnitMeasure
+                                                      }
+                                                      unitMeasure={product.unitMeasure}
+                                                      isConvert={true}
+                                                      value={FormatDataUtils.getRoundFloorNumber(
                                                         consignment?.instockQuantity /
                                                           product.numberOfWrapUnitMeasure,
                                                         2,
-                                                      )
-                                                    : consignment?.instockQuantity}
+                                                      )}
+                                                    />
+                                                  ) : (
+                                                    consignment?.instockQuantity
+                                                  )}
                                                 </TableCell>
                                                 <TableCell align="center">
                                                   {selectedUnitMeasureList[index] ===
-                                                  product.wrapUnitMeasure
-                                                    ? FormatDataUtils.getRoundFloorNumber(
+                                                  product.wrapUnitMeasure ? (
+                                                    <TooltipUnitMeasure
+                                                      quantity={
+                                                        consignment?.realityQuantity /
+                                                        product.numberOfWrapUnitMeasure
+                                                      }
+                                                      wrapUnitMeasure={
+                                                        product.wrapUnitMeasure
+                                                      }
+                                                      numberOfWrapUnitMeasure={
+                                                        product.numberOfWrapUnitMeasure
+                                                      }
+                                                      unitMeasure={product.unitMeasure}
+                                                      isConvert={true}
+                                                      value={FormatDataUtils.getRoundFloorNumber(
                                                         consignment?.realityQuantity /
                                                           product.numberOfWrapUnitMeasure,
                                                         2,
-                                                      )
-                                                    : consignment?.realityQuantity}
+                                                      )}
+                                                    />
+                                                  ) : (
+                                                    consignment?.realityQuantity
+                                                  )}
                                                 </TableCell>
                                                 <TableCell align="center">
                                                   {consignment?.differentAmout &&
@@ -476,7 +522,11 @@ const InventoryCheckingDetail = () => {
                           Tổng chênh lệch:
                         </Typography>
                         <Typography className={classes.totalDifferent}>
-                          <b>{FormatDataUtils.formatCurrency(inventoryChecking.totalDifferentAmout)}</b>
+                          <b>
+                            {FormatDataUtils.formatCurrency(
+                              inventoryChecking.totalDifferentAmout,
+                            )}
+                          </b>
                         </Typography>
                       </Stack>
                     </Box>
