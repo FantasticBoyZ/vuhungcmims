@@ -210,7 +210,8 @@ const AddStaff = () => {
       .max(255, 'Email không thể dài quá 255 kí tự')
       .email('Vui lòng nhập đúng định dạng email. VD abc@xyz.com')
       .required('Chưa nhập Email'),
-    dateOfBirth: Yup.string()
+    dateOfBirth: Yup.date()
+      .typeError('Ngày sinh không hợp lệ')
       .required('Chưa nhập ngày sinh')
       .nullable()
       .test('dateOfBirth', 'Nhân viên phải ít nhất 18 tuổi', function (value) {
