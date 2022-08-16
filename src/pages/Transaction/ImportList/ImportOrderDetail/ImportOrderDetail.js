@@ -204,10 +204,13 @@ const ImportOrderDetail = () => {
       // };
       const actionResult = await dispatch(getImportOrderById(importOrderId));
       const dataResult = unwrapResult(actionResult);
-      if (dataResult.data.inforDetail && !FormatDataUtils.isEmptyObject(dataResult.data.inforDetail)) {
+      if (
+        dataResult.data.inforDetail &&
+        !FormatDataUtils.isEmptyObject(dataResult.data.inforDetail)
+      ) {
         setImportOrder(dataResult.data.inforDetail);
-      }else {
-        navigate('/404')
+      } else {
+        navigate('/404');
       }
       console.log('Import Order Detail', dataResult);
     } catch (error) {
@@ -237,7 +240,7 @@ const ImportOrderDetail = () => {
 
   useEffect(() => {
     if (isNaN(importOrderId)) {
-      navigate('/404')
+      navigate('/404');
     } else {
       fetchImportOrderDetail();
       fetchProductListByImportOrderId();
@@ -409,7 +412,13 @@ const ImportOrderDetail = () => {
                         <Typography variant="h6">Thông tin xác nhận</Typography>
                         {/* <br /> */}
                         <Typography>
-                          Người tạo đơn: <i>{importOrder.createBy}</i>
+                          Người tạo đơn:{' '}
+                          <i>
+                            {importOrder.createdFullName +
+                              '(' +
+                              importOrder.createBy +
+                              ')'}
+                          </i>
                         </Typography>
                         <Typography>Ngày tạo đơn:</Typography>
                         <Typography>
@@ -420,7 +429,13 @@ const ImportOrderDetail = () => {
                           <Box>
                             <br />
                             <Typography>
-                              Người xác nhận: <i>{importOrder.confirmBy}</i>
+                              Người xác nhận:{' '}
+                              <i>
+                                {importOrder.confirmByFullName +
+                                  '(' +
+                                  importOrder.confirmBy +
+                                  ')'}
+                              </i>
                             </Typography>
                             <Typography>Ngày xác nhận:</Typography>
                             <Typography>

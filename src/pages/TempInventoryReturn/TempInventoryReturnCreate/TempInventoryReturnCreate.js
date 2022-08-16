@@ -113,7 +113,7 @@ const TempInventoryReturnCreate = () => {
   const [loadingButton, setLoadingButton] = useState(false);
   const today = new Date();
   const classes = useStyles();
-  const [expectedReturnDate, setExpectedReturnDate] = useState(today);
+  const [expectedReturnDate, setExpectedReturnDate] = useState(null);
   const [initialProductList, setInitialProductList] = useState({
     expectedReturnDate: '',
     totalAmout: '',
@@ -125,7 +125,7 @@ const TempInventoryReturnCreate = () => {
   });
 
   const FORM_VALIDATION = Yup.object().shape({
-    warehouseId: Yup.number().required('Bạn chưa chọn kho để nhập hàng'),
+    warehouseId: Yup.number().required('Bạn chưa chọn kho để lưu kho'),
     manufacturerId: Yup.number().required('Bạn chưa chọn nhà cung cấp'),
     expectedReturnDate: Yup.date()
       .typeError('Ngày trả hàng không hợp lệ')
@@ -133,7 +133,9 @@ const TempInventoryReturnCreate = () => {
         new Date(Date.now() - 86400000),
         'Bạn không thể chọn ngày trả hàng trong quá khứ',
       )
-      .required('Bạn chưa nhập ngày trả hàng dự kiến').nullable(),
+      .required('Bạn chưa nhập ngày trả hàng dự kiến')
+      .nullable(),
+    description: Yup.string().max(255, 'Mô tả không thể dài quá 255 kí tự'),
   });
 
   const arrayHelpersRef = useRef(null);
@@ -734,7 +736,8 @@ const TempInventoryReturnCreate = () => {
                     </Box>
                     <Box>
                       <Typography variant="p">
-                        <strong>Ngày trả hàng dự kiến</strong><IconRequired/>
+                        <strong>Ngày trả hàng dự kiến</strong>
+                        <IconRequired />
                       </Typography>
                       <LocalizationProvider
                         // locale={vi}

@@ -42,6 +42,7 @@ import * as Yup from 'yup';
 import ButtonWrapper from '@/components/Common/FormsUI/Button';
 import { getWarehouseList } from '@/slices/WarehouseSlice';
 import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
+import IconRequired from '@/components/Common/IconRequired';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -114,10 +115,12 @@ const UpdateImportOrderDetail = () => {
   const today = new Date();
   const arrayHelpersRef = useRef(null);
   const valueFormik = useRef();
+  const errorFormik = useRef();
 
   const FORM_VALIDATION = Yup.object().shape({
     // manufactorId: Yup.string().required('Bạn chưa chọn nhà cung cấp'),
     wareHouseId: Yup.number().required('Bạn chưa chọn kho để nhập hàng'),
+    description: Yup.string().max(255, 'Mô tả không thể dài quá 255 kí tự'),
   });
 
   const dispatch = useDispatch();
@@ -155,7 +158,9 @@ const UpdateImportOrderDetail = () => {
     setTitle('Bạn có chắc chắn muốn lưu lại chỉnh sửa không?');
     setMessage('Hãy kiểm tra kỹ thông tin trước khi xác nhận.');
     setIsConfirm(true);
-    setOpenPopup(true);
+    if (FormatDataUtils.isEmptyObject(errorFormik.current)) {
+      setOpenPopup(true);
+    }
   };
 
   const handleOnClickCancel = () => {
@@ -271,11 +276,14 @@ const UpdateImportOrderDetail = () => {
       // };
       const actionResult = await dispatch(getImportOrderById(importOrderId));
       const dataResult = unwrapResult(actionResult);
-      if (dataResult.data && !FormatDataUtils.isEmptyObject(dataResult.data.inforDetail)) {
+      if (
+        dataResult.data &&
+        !FormatDataUtils.isEmptyObject(dataResult.data.inforDetail)
+      ) {
         setImportOrder(dataResult.data.inforDetail);
         setSelectedWarehouse(dataResult.data.inforDetail.wareHouseId);
-      }else {
-        navigate('/404')
+      } else {
+        navigate('/404');
       }
       console.log('Import Order Detail', dataResult);
     } catch (error) {
@@ -416,7 +424,10 @@ const UpdateImportOrderDetail = () => {
                               <br />
                               <Divider />
                               <br />
-                              <Typography variant="h6">Thông tin lưu kho</Typography>
+                              <Typography variant="h6">
+                                Thông tin lưu kho
+                                <IconRequired />
+                              </Typography>
                               <br />
                               {!!warehouseData && (
                                 <Box className="selectbox-warehouse">
@@ -483,6 +494,7 @@ const UpdateImportOrderDetail = () => {
                                         render={(arrayHelpers) => {
                                           arrayHelpersRef.current = arrayHelpers;
                                           valueFormik.current = values;
+                                          errorFormik.current = errors;
                                           return (
                                             <>
                                               {values.consignments.map(
@@ -767,7 +779,13 @@ const UpdateImportOrderDetail = () => {
                               <Typography variant="h6">Thông tin xác nhận</Typography>
                               <br />
                               <Typography>
-                                Người tạo đơn: <i>{importOrder.createBy}</i>
+                                Người tạo đơn:{' '}
+                                <i>
+                                  {importOrder.createdFullName +
+                                    '(' +
+                                    importOrder.createBy +
+                                    ')'}
+                                </i>
                               </Typography>
                               <Typography>Ngày tạo đơn:</Typography>
                               <Typography>
@@ -777,7 +795,13 @@ const UpdateImportOrderDetail = () => {
                               {importOrder.confirmDate && (
                                 <Box>
                                   <Typography>
-                                    Người xác nhận: <i>{importOrder.confirmBy}</i>
+                                    Người xác nhận:{' '}
+                                    <i>
+                                      {importOrder.confirmByFullName +
+                                        '(' +
+                                        importOrder.confirmBy +
+                                        ')'}
+                                    </i>
                                   </Typography>
                                   <Typography>Ngày xác nhận:</Typography>
                                   <Typography>

@@ -149,7 +149,10 @@ const ExportOrderTable = ({ exportOrders }) => {
                         gutterBottom
                         noWrap
                       >
-                        {FormatDataUtils.formatDate(exportOrder.createDate)}
+                        {FormatDataUtils.formatDateByFormat(
+                          exportOrder.createDate,
+                          'dd/MM/yyyy',
+                        )}
                         {/* {exportOrder.createDate} */}
                       </Typography>
                     </TableCell>
@@ -161,7 +164,10 @@ const ExportOrderTable = ({ exportOrders }) => {
                         noWrap
                       >
                         {exportOrder.confirmDate &&
-                          FormatDataUtils.formatDate(exportOrder.confirmDate)}
+                          FormatDataUtils.formatDateByFormat(
+                            exportOrder.confirmDate,
+                            'dd/MM/yyyy',
+                          )}
                         {/* {exportOrder.createDate} */}
                       </Typography>
                     </TableCell>

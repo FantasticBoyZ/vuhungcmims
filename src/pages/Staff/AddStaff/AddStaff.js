@@ -181,13 +181,17 @@ const AddStaff = () => {
   const regexPhone = /^(0[3|5|7|8|9])+([0-9]{8})$/;
   const FORM_VALIDATION = Yup.object().shape({
     username: Yup.string()
+      .max(255, 'Mã nhân viên không thể dài quá 255 kí tự')
       .required('Chưa nhập mã nhân viên')
       .test('username', 'Vui lòng xoá các khoảng trắng', function (value) {
         if (value) {
           return !value.includes(' ');
         }
       }),
-    fullName: Yup.string().trim().required('Chưa nhập Họ và tên nhân viên'),
+    fullName: Yup.string()
+      .trim()
+      .max(255, 'Họ và tên nhân viên không thể dài quá 255 kí tự')
+      .required('Chưa nhập Họ và tên nhân viên'),
     identityCard: Yup.string()
       .required('Chưa nhập Số CCCD/CMND')
       .matches(/^(\d{9}|\d{12})$/, 'Số CCCD/CMND của bạn không hợp lệ'),
@@ -203,9 +207,11 @@ const AddStaff = () => {
         'Số điện thoại của bạn không hợp lệ',
       ),
     email: Yup.string()
+      .max(255, 'Email không thể dài quá 255 kí tự')
       .email('Vui lòng nhập đúng định dạng email. VD abc@xyz.com')
       .required('Chưa nhập Email'),
-    dateOfBirth: Yup.string()
+    dateOfBirth: Yup.date()
+      .typeError('Ngày sinh không hợp lệ')
       .required('Chưa nhập ngày sinh')
       .nullable()
       .test('dateOfBirth', 'Nhân viên phải ít nhất 18 tuổi', function (value) {
@@ -214,7 +220,10 @@ const AddStaff = () => {
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố').nullable(),
     districtId: Yup.number().required('Chưa chọn quận/huyện').nullable(),
     wardId: Yup.number().required('Chưa chọn xã/phường').nullable(),
-    addressDetail: Yup.string().trim().required('Chưa nhập Địa chỉ chi tiết'),
+    addressDetail: Yup.string()
+      .trim()
+      .max(255, 'Địa chỉ chi tiết không thể dài quá 255 kí tự')
+      .required('Chưa nhập Địa chỉ chi tiết'),
   });
 
   const [gender, setGender] = useState(1);

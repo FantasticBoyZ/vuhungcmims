@@ -165,7 +165,7 @@ const ImportOrdersTable = ({ importOrders }) => {
                         noWrap
                         align="center"
                       >
-                        {"NHAP"+importOrder.orderId}
+                        {'NHAP' + importOrder.orderId}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -187,7 +187,10 @@ const ImportOrdersTable = ({ importOrders }) => {
                         noWrap
                         align="center"
                       >
-                        {formatDate(importOrder.createDate)}
+                        {FormatDataUtils.formatDateByFormat(
+                          importOrder.createDate,
+                          'dd/MM/yyyy',
+                        )}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -199,8 +202,9 @@ const ImportOrdersTable = ({ importOrders }) => {
                           noWrap
                           align="center"
                         >
-                          {FormatDataUtils.formatDate(
+                          {FormatDataUtils.formatDateByFormat(
                             importOrder?.importDate,
+                            'dd/MM/yyyy',
                           )}
                         </Typography>
                       )}
@@ -224,14 +228,16 @@ const ImportOrdersTable = ({ importOrders }) => {
                         noWrap
                         align="center"
                       >
-                        {importOrder.fullName + '(' + importOrder.userName +')'}
+                        {importOrder.fullName + '(' + importOrder.userName + ')'}
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
                       <Typography>{getStatusLabel(importOrder.statusName)}</Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <Typography>{FormatDataUtils.formatCurrency(importOrder.totalPrice)}</Typography>
+                      <Typography>
+                        {FormatDataUtils.formatCurrency(importOrder.totalPrice)}
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 );

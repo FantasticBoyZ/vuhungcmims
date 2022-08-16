@@ -7,6 +7,11 @@ const formatCurrency = (value) =>
 const formatDateTime = (date) => {
   return format(new Date(date), 'dd/MM/yyyy HH:mm');
 };
+
+const formatDateByFormat = (date, formatString) => {
+  return format(new Date(date), formatString);
+};
+
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString('en-GB', {
     year: 'numeric',
@@ -119,5 +124,6 @@ const FormatDataUtils = {
   getSelectedOptionWithId,
   removeExtraSpace,
   isEmptyObject,
+  formatDateByFormat,
 };
 export default FormatDataUtils;

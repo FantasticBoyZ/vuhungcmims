@@ -113,10 +113,11 @@ const AddEditManufacturerForm = () => {
   const FORM_VALIDATION = Yup.object().shape({
     name: Yup.string()
       .trim()
-      .max(200, 'Tên nhà sản xuất không thể dài quá 200 kí tự')
+      .max(255, 'Tên nhà sản xuất không thể dài quá 255 kí tự')
       .required('Chưa nhập tên nhà sản xuất'),
     email: Yup.string()
       .email('Email không hợp lệ')
+      .max(255, 'Email không thể dài quá 255 kí tự')
       .required('Chưa nhập email nhà sản xuất'),
 
     phone: Yup.string()
@@ -133,7 +134,10 @@ const AddEditManufacturerForm = () => {
     provinceId: Yup.string().required('Chưa chọn tỉnh/thành phố'),
     districtId: Yup.number().required('Chưa chọn quận/huyện/thành phố'),
     wardId: Yup.number().required('Chưa chọn phường/xã'),
-    addressDetail: Yup.string().trim().required('Chưa nhập địa chỉ chi tiết'),
+    addressDetail: Yup.string()
+      .trim()
+      .max(255, 'Địa chỉ chi tiết không thể dài quá 255 kí tự')
+      .required('Chưa nhập địa chỉ chi tiết'),
   });
 
   const onChangeProvince = (e) => {

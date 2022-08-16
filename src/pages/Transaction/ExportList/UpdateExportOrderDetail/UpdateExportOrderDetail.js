@@ -43,6 +43,7 @@ import { toast } from 'react-toastify';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import Select from 'react-select';
 import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
+import * as Yup from 'yup';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -189,6 +190,11 @@ const UpdateExportOrderDetail = () => {
   const [errorMessage, setErrorMessage] = useState();
   const [isConfirm, setIsConfirm] = useState(false);
   const valueFormik = useRef();
+  const errorFormik = useRef();
+
+  const FORM_VALIDATION = Yup.object().shape({
+    description: Yup.string().max(255, 'Mô tả không thể dài quá 255 kí tự'),
+  });
 
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.exportOrders }));
@@ -252,7 +258,9 @@ const UpdateExportOrderDetail = () => {
     setMessage('Hãy kiểm tra kỹ thông tin trước khi xác nhận.');
     setErrorMessage(null);
     setIsConfirm(true);
-    setOpenPopup(true);
+    if (FormatDataUtils.isEmptyObject(errorFormik.current)) {
+      setOpenPopup(true);
+    }
   };
 
   const handleOnClickCancel = () => {
@@ -421,11 +429,12 @@ const UpdateExportOrderDetail = () => {
           {!!exportOrder && productList.length > 0 && (
             <Formik
               initialValues={{ ...exportOrder, productList: [...productList] }}
-              // validationSchema={FORM_VALIDATION}
+              validationSchema={FORM_VALIDATION}
               onSubmit={(values) => handleConfirm(values)}
             >
               {({ values, errors, setFieldValue }) => {
                 valueFormik.current = values;
+                errorFormik.current = errors;
                 return (
                   <Form>
                     <Grid
@@ -526,9 +535,7 @@ const UpdateExportOrderDetail = () => {
                                               {product?.wrapUnitMeasure == null ? (
                                                 product?.unitMeasure
                                               ) : (
-                                                <Stack
-                                                  direction='row'
-                                                >
+                                                <Stack direction="row">
                                                   <Select
                                                     classNamePrefix="select"
                                                     defaultValue={
@@ -908,7 +915,13 @@ const UpdateExportOrderDetail = () => {
                               <CardContent className={classes.confirmInfo}>
                                 <Typography variant="h6">Thông tin xác nhận</Typography>
                                 <Typography>
-                                  Người tạo đơn: <i>{exportOrder.createBy}</i>
+                                  Người tạo đơn:{' '}
+                                  <i>
+                                    {exportOrder.createdFullName +
+                                      '(' +
+                                      exportOrder.createBy +
+                                      ')'}
+                                  </i>
                                 </Typography>
                                 <Typography>Ngày tạo đơn:</Typography>
                                 <Typography>

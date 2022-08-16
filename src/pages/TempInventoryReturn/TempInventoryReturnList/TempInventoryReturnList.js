@@ -464,8 +464,9 @@ const TempInventoryReturnList = () => {
                                     gutterBottom
                                     noWrap
                                   >
-                                    {FormatDataUtils.formatDate(
+                                    {FormatDataUtils.formatDateByFormat(
                                       tempInventoryReturn.createDate,
+                                      'dd/MM/yyyy',
                                     )}
                                   </Typography>
                                 </TableCell>
@@ -477,8 +478,9 @@ const TempInventoryReturnList = () => {
                                     gutterBottom
                                     noWrap
                                   >
-                                    {FormatDataUtils.formatDate(
+                                    {FormatDataUtils.formatDateByFormat(
                                       tempInventoryReturn.expectedReturnDate,
+                                      'dd/MM/yyyy',
                                     )}
                                     {/* {tempInventoryReturn.createDate} */}
                                   </Typography>
@@ -500,7 +502,10 @@ const TempInventoryReturnList = () => {
                                     gutterBottom
                                     noWrap
                                   >
-                                    {tempInventoryReturn.userCreateFullName + '(' + tempInventoryReturn.userCreateName + ')'}
+                                    {tempInventoryReturn.userCreateFullName +
+                                      '(' +
+                                      tempInventoryReturn.userCreateName +
+                                      ')'}
                                   </Typography>
                                 </TableCell>
                                 <TableCell align="center">

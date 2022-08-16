@@ -46,6 +46,7 @@ import {
   getTempInventoryReturnById,
   updateTempInventoryReturn,
 } from '@/slices/TempInventoryReturnSlice';
+import IconRequired from '@/components/Common/IconRequired';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -118,11 +119,21 @@ const TempInventoryReturnEdit = () => {
   const today = new Date();
   const arrayHelpersRef = useRef(null);
   const valueFormik = useRef();
+  const errorFormik = useRef();
   const [expectedReturnDate, setExpectedReturnDate] = useState();
 
   const FORM_VALIDATION = Yup.object().shape({
     // manufactorId: Yup.string().required('Bạn chưa chọn nhà cung cấp'),
-    warehouseId: Yup.number().required('Bạn chưa chọn kho để trả hàng'),
+    warehouseId: Yup.number().required('Bạn chưa chọn kho để lưu kho'),
+    expectedReturnDate: Yup.date()
+      .typeError('Ngày trả hàng không hợp lệ')
+      .min(
+        new Date(Date.now() - 86400000),
+        'Bạn không thể chọn ngày trả hàng trong quá khứ',
+      )
+      .required('Bạn chưa nhập ngày trả hàng dự kiến')
+      .nullable(),
+    description: Yup.string().max(255, 'Mô tả không thể dài quá 255 kí tự'),
   });
 
   const dispatch = useDispatch();
@@ -160,11 +171,14 @@ const TempInventoryReturnEdit = () => {
     setTitle('Bạn có chắc chắn muốn lưu lại chỉnh sửa không?');
     setMessage('Hãy kiểm tra kỹ thông tin trước khi xác nhận.');
     setIsConfirm(true);
-    setOpenPopup(true);
+    if (FormatDataUtils.isEmptyObject(errorFormik.current)) {
+      setOpenPopup(true);
+    }
   };
 
   const handleOnClickCancel = () => {
     setTitle('Bạn có chắc chắn muốn hủy tất cả những chỉnh sửa không?');
+    setErrorMessage('');
     setMessage('');
     setIsConfirm(false);
     setOpenPopup(true);
@@ -291,8 +305,8 @@ const TempInventoryReturnEdit = () => {
           dataResult.data.returnToManufacturerDetail.listReturnToManufacturerDetail,
         );
         setSelectedWarehouse(dataResult.data.returnToManufacturerDetail.wareHouseId);
-      }else {
-        navigate('/404')
+      } else {
+        navigate('/404');
       }
       console.log('tempInventoryReturn Order Detail', dataResult);
     } catch (error) {
@@ -430,7 +444,10 @@ const TempInventoryReturnEdit = () => {
                                   spacing={2}
                                 >
                                   <Stack flex={2}>
-                                    <Typography>Ngày dự kiến trả:</Typography>
+                                    <Typography>
+                                      Ngày dự kiến trả:
+                                      <IconRequired />
+                                    </Typography>
                                   </Stack>
                                   <Stack flex={8}>
                                     <Box>
@@ -450,8 +467,14 @@ const TempInventoryReturnEdit = () => {
                                           renderInput={(params) => (
                                             <TextField
                                               variant="standard"
+                                              error={!!errors.expectedReturnDate}
+                                              helperText={errors.expectedReturnDate}
+                                              FormHelperTextProps={{
+                                                sx: {
+                                                  color: '#d32f2f',
+                                                },
+                                              }}
                                               {...params}
-                                              helperText={null}
                                             />
                                           )}
                                         />
@@ -464,7 +487,10 @@ const TempInventoryReturnEdit = () => {
                               <Divider />
 
                               <Stack py={1}>
-                                <Typography variant="h6">Thông tin lưu kho</Typography>
+                                <Typography variant="h6">
+                                  Thông tin lưu kho
+                                  <IconRequired />
+                                </Typography>
                                 <Stack
                                   pt={2}
                                   className={classes.comboboxWarehouse}
@@ -490,6 +516,7 @@ const TempInventoryReturnEdit = () => {
                                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                                     }}
                                     onChange={(e) => {
+                                      setSelectedWarehouse(e?.value);
                                       setFieldValue('warehouseId', e?.value);
                                     }}
                                   />
@@ -529,6 +556,7 @@ const TempInventoryReturnEdit = () => {
                                         render={(arrayHelpers) => {
                                           arrayHelpersRef.current = arrayHelpers;
                                           valueFormik.current = values;
+                                          errorFormik.current = errors;
                                           return (
                                             <>
                                               {values.consignments.map(
@@ -744,7 +772,7 @@ const TempInventoryReturnEdit = () => {
                               <Box> Phiếu nhập chưa có lô hàng nào </Box>
                             )}
                           </Card>
-                          <pre>{JSON.stringify(values, null, 2)}</pre>
+                          {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
                         </Grid>
                       </Grid>
                     </Grid>
@@ -809,7 +837,6 @@ const TempInventoryReturnEdit = () => {
                                 name="description"
                                 variant="outlined"
                                 rows={6}
-                                // maxRows={6}
                                 multiline
                               />
                             </CardContent>

@@ -35,6 +35,7 @@ import AlertPopup from '@/components/Common/AlertPopup';
 import { toast } from 'react-toastify';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import Select from 'react-select';
+import * as Yup from 'yup';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -182,7 +183,11 @@ const ReturnGoods = () => {
   const [errorMessage, setErrorMessage] = useState();
   const [isConfirm, setIsConfirm] = useState(false);
   const valueFormik = useRef();
+  const errorFormik = useRef();
   // const productList = exportOrder.productList;
+  const FORM_VALIDATION = Yup.object().shape({
+    description: Yup.string().max(255, 'Mô tả không thể dài quá 255 kí tự'),
+  });
 
   const { loading } = useSelector((state) => ({ ...state.exportOrders }));
 
@@ -260,12 +265,15 @@ const ReturnGoods = () => {
     setMessage('');
     setErrorMessage(null);
     setIsConfirm(true);
-    setOpenPopup(true);
+    if (FormatDataUtils.isEmptyObject(errorFormik.current)) {
+      setOpenPopup(true);
+    }
   };
 
   const handleOnClickCancel = () => {
     setTitle('Bạn có chắc chắn muốn hủy trả hàng không?');
     setMessage('');
+    setErrorMessage(null);
     setIsConfirm(false);
     setOpenPopup(true);
   };
@@ -420,11 +428,12 @@ const ReturnGoods = () => {
                 ...exportOrder,
                 productList: [...productList],
               }}
-              // validationSchema={FORM_VALIDATION}
+              validationSchema={FORM_VALIDATION}
               // onSubmit={(values) => handleSubmit(values)}
             >
               {({ values, errors, setFieldValue }) => {
                 valueFormik.current = values;
+                errorFormik.current = errors;
                 return (
                   <Form>
                     <Grid

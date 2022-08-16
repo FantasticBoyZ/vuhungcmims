@@ -117,6 +117,7 @@ const ImportGoods = () => {
   const FORM_VALIDATION = Yup.object().shape({
     wareHouseId: Yup.number().required('Bạn chưa chọn kho để nhập hàng'),
     manufactorId: Yup.number().required('Bạn chưa chọn nhà cung cấp'),
+    description: Yup.string().max(255, 'Mô tả không thể dài quá 255 kí tự')
   });
 
   const arrayHelpersRef = useRef(null);
