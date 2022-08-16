@@ -325,7 +325,7 @@ const StaffList = () => {
                             <TableCell align="center">Tên nhân viên</TableCell>
                             <TableCell align="center">Số điện thoại</TableCell>
                             <TableCell align="center">Chức vụ</TableCell>
-                            <TableCell align="center">Trạng thái động</TableCell>
+                            <TableCell align="center">Trạng thái hoạt động</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>

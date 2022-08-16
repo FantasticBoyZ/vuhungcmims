@@ -603,7 +603,7 @@ const StaffDetail = () => {
                               setStaffEmail(e.target.value);
                             }}
                             onBlur={(e) => {setValidEmail(!!errors.email ? false : true);}}
-                            InputProps={{ sx: { height: 30 } }}
+                            // InputProps={{ sx: { height: 30 } }}
                           />
                         </Form>
                       )}}
