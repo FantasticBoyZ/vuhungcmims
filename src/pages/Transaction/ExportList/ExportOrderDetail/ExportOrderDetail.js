@@ -436,7 +436,13 @@ const ExportOrderDetail = () => {
                           <Box>
                             <Typography variant="h6">Thông tin xác nhận</Typography>
                             <Typography>
-                              Người tạo đơn: <i>{exportOrder.createBy}</i>
+                              Người tạo đơn:{' '}
+                              <i>
+                                {exportOrder.createdFullName +
+                                  '(' +
+                                  exportOrder.createBy +
+                                  ')'}
+                              </i>
                             </Typography>
                             <Typography>Ngày tạo đơn:</Typography>
                             <Typography>
@@ -450,7 +456,13 @@ const ExportOrderDetail = () => {
                           {exportOrder.statusName === 'completed' && (
                             <Box>
                               <Typography>
-                                Người xác nhận: <i>{exportOrder.confirmBy}</i>
+                                Người xác nhận:{' '}
+                                <i>
+                                  {exportOrder.confirmByFullName +
+                                    '(' +
+                                    exportOrder.confirmBy +
+                                    ')'}
+                                </i>
                               </Typography>
                               <Typography>Ngày xác nhận:</Typography>
                               <Typography>

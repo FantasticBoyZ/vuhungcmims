@@ -779,7 +779,13 @@ const UpdateImportOrderDetail = () => {
                               <Typography variant="h6">Thông tin xác nhận</Typography>
                               <br />
                               <Typography>
-                                Người tạo đơn: <i>{importOrder.createBy}</i>
+                                Người tạo đơn:{' '}
+                                <i>
+                                  {importOrder.createdFullName +
+                                    '(' +
+                                    importOrder.createBy +
+                                    ')'}
+                                </i>
                               </Typography>
                               <Typography>Ngày tạo đơn:</Typography>
                               <Typography>
@@ -789,7 +795,13 @@ const UpdateImportOrderDetail = () => {
                               {importOrder.confirmDate && (
                                 <Box>
                                   <Typography>
-                                    Người xác nhận: <i>{importOrder.confirmBy}</i>
+                                    Người xác nhận:{' '}
+                                    <i>
+                                      {importOrder.confirmByFullName +
+                                        '(' +
+                                        importOrder.confirmBy +
+                                        ')'}
+                                    </i>
                                   </Typography>
                                   <Typography>Ngày xác nhận:</Typography>
                                   <Typography>

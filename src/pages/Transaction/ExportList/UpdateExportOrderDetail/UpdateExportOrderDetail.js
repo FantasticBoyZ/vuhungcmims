@@ -915,7 +915,13 @@ const UpdateExportOrderDetail = () => {
                               <CardContent className={classes.confirmInfo}>
                                 <Typography variant="h6">Thông tin xác nhận</Typography>
                                 <Typography>
-                                  Người tạo đơn: <i>{exportOrder.createBy}</i>
+                                  Người tạo đơn:{' '}
+                                  <i>
+                                    {exportOrder.createdFullName +
+                                      '(' +
+                                      exportOrder.createBy +
+                                      ')'}
+                                  </i>
                                 </Typography>
                                 <Typography>Ngày tạo đơn:</Typography>
                                 <Typography>
