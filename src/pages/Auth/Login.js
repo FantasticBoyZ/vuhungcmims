@@ -130,10 +130,10 @@ const Login = () => {
                 />
                 <Stack
                   direction="row"
-                  justifyContent="space-between"
+                  justifyContent="flex-end"
                   alignItems="center"
                 >
-                  <FormControlLabel
+                  {/* <FormControlLabel
                     control={
                       <Checkbox
                         value="remember"
@@ -141,7 +141,7 @@ const Login = () => {
                       />
                     }
                     label="Lưu đăng nhập"
-                  />
+                  /> */}
 
                   <Link
                     href="/forgotPassword"

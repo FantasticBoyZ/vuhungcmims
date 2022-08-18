@@ -40,6 +40,7 @@ import Select from 'react-select';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import LoadingButton from '@mui/lab/LoadingButton';
+import TooltipUnitMeasure from '@/components/Common/TooltipUnitMeasure';
 
 const useStyles = makeStyles({
   cardInfo: { minHeight: '69vh' },
@@ -80,11 +81,14 @@ const useStyles = makeStyles({
     padding: '15px 0 !important',
   },
   selectBoxUnitMeasure: {
-    maxWidth: '90px',
+    maxWidth: '150px',
   },
   buttonCreate: {
     display: 'flex',
     justifyContent: 'center',
+  },
+  unitMeasureSelect: {
+    width: '100px',
   },
 });
 
@@ -390,12 +394,12 @@ const ExportGoods = () => {
                   )
               : consignment.quantity,
             unitPrice: product.selectedUnitMeasure
-            ? product.selectedUnitMeasure === product.unitMeasure
-              ? product.unitPrice
-              : FormatDataUtils.getRoundFloorNumber(
-                product.unitPrice / product.numberOfWrapUnitMeasure,
-                )
-            : product.unitPrice ,
+              ? product.selectedUnitMeasure === product.unitMeasure
+                ? product.unitPrice
+                : FormatDataUtils.getRoundFloorNumber(
+                    product.unitPrice / product.numberOfWrapUnitMeasure,
+                  )
+              : product.unitPrice,
           });
         }
       }
@@ -572,8 +576,12 @@ const ExportGoods = () => {
                                           {product?.wrapUnitMeasure == null ? (
                                             product?.unitMeasure
                                           ) : (
-                                            <Box className={classes.selectBoxUnitMeasure}>
+                                            <Stack
+                                              direction="row"
+                                              className={classes.selectBoxUnitMeasure}
+                                            >
                                               <Select
+                                                className={classes.unitMeasureSelect}
                                                 classNamePrefix="select"
                                                 onChange={(e) => {
                                                   setFieldValue(
@@ -723,14 +731,29 @@ const ExportGoods = () => {
                                                   }),
                                                 }}
                                               />
-                                            </Box>
+                                              {product.selectedUnitMeasure ===
+                                                product.wrapUnitMeasure && (
+                                                <TooltipUnitMeasure
+                                                  wrapUnitMeasure={
+                                                    product.wrapUnitMeasure
+                                                  }
+                                                  numberOfWrapUnitMeasure={
+                                                    product.numberOfWrapUnitMeasure
+                                                  }
+                                                  unitMeasure={product.unitMeasure}
+                                                  isConvert={false}
+                                                />
+                                              )}
+                                            </Stack>
                                           )}
                                         </TableCell>
                                         <TableCell align="center">
                                           {FormatDataUtils.getRoundFloorNumber(
                                             calculateTotalQuantityOfProduct2(product),
                                             product.selectedUnitMeasure !==
-                                            product.unitMeasure ? 2 : 0,
+                                              product.unitMeasure
+                                              ? 2
+                                              : 0,
                                           )}
 
                                           {/* {product?.quantity} */}
@@ -837,59 +860,61 @@ const ExportGoods = () => {
                                                         : 'Không có'}
                                                     </TableCell>
                                                     <TableCell align="center">
-                                                      <TextfieldWrapper
-                                                        name={`productList[${index}].consignments[${indexConsignment}].quantity`}
-                                                        variant="standard"
-                                                        className="text-field-quantity"
-                                                        type={'number'}
-                                                        InputProps={{
-                                                          inputProps: {
-                                                            min: 0,
-                                                            max:
-                                                              product.selectedUnitMeasure ===
+                                                      <Stack direction="row" justifyContent='center'>
+                                                        <TextfieldWrapper
+                                                          name={`productList[${index}].consignments[${indexConsignment}].quantity`}
+                                                          variant="standard"
+                                                          className="text-field-quantity"
+                                                          type={'number'}
+                                                          InputProps={{
+                                                            inputProps: {
+                                                              min: 0,
+                                                              max:
+                                                                product.selectedUnitMeasure ===
+                                                                product.unitMeasure
+                                                                  ? consignment?.quantityInstock
+                                                                  : FormatDataUtils.getRoundFloorNumber(
+                                                                      consignment?.quantityInstock /
+                                                                        product.numberOfWrapUnitMeasure,
+                                                                      2,
+                                                                    ),
+                                                              step:
+                                                                product.selectedUnitMeasure ===
+                                                                product.unitMeasure
+                                                                  ? 1
+                                                                  : 0.01,
+                                                            },
+                                                          }}
+                                                          // onChange={(e) => {
+                                                          //   setFieldValue(
+                                                          //     `productList[${index}].consignments[${indexConsignment}].quantity`,
+                                                          //     e?.target.value,
+                                                          //   );
+                                                          // }}
+                                                        />
+                                                        {product.selectedUnitMeasure !==
+                                                          product.unitMeasure && (
+                                                          <TooltipUnitMeasure
+                                                            quantity={
+                                                              FormatDataUtils.getRoundFloorNumber(
+                                                                consignment.quantity *
+                                                                  product.numberOfWrapUnitMeasure,
+                                                              ) /
+                                                              product.numberOfWrapUnitMeasure
+                                                            }
+                                                            wrapUnitMeasure={
+                                                              product.wrapUnitMeasure
+                                                            }
+                                                            numberOfWrapUnitMeasure={
+                                                              product.numberOfWrapUnitMeasure
+                                                            }
+                                                            unitMeasure={
                                                               product.unitMeasure
-                                                                ? consignment?.quantityInstock
-                                                                : FormatDataUtils.getRoundFloorNumber(
-                                                                    consignment?.quantityInstock /
-                                                                      product.numberOfWrapUnitMeasure,
-                                                                    2,
-                                                                  ),
-                                                            step:
-                                                              product.selectedUnitMeasure ===
-                                                              product.unitMeasure
-                                                                ? 1
-                                                                : 0.01,
-                                                          },
-                                                        }}
-                                                        // onChange={(e) => {
-                                                        //   setFieldValue(
-                                                        //     `productList[${index}].consignments[${indexConsignment}].quantity`,
-                                                        //     e?.target.value,
-                                                        //   );
-                                                        // }}
-                                                      />
-                                                      {product.selectedUnitMeasure !==
-                                                        product.unitMeasure && (
-                                                        <Tooltip
-                                                          title={
-                                                            consignment.quantity -
-                                                            (consignment.quantity % 1) +
-                                                            ' ' +
-                                                            product.wrapUnitMeasure +
-                                                            ' ' +
-                                                            Math.floor(
-                                                              (consignment.quantity % 1) *
-                                                                product.numberOfWrapUnitMeasure,
-                                                            ) +
-                                                            ' ' +
-                                                            product.unitMeasure
-                                                          }
-                                                        >
-                                                          <IconButton>
-                                                            <InfoOutlined />
-                                                          </IconButton>
-                                                        </Tooltip>
-                                                      )}
+                                                            }
+                                                            isConvert={true}
+                                                          />
+                                                        )}
+                                                      </Stack>
                                                     </TableCell>
                                                     <TableCell align="center">
                                                       {product.selectedUnitMeasure ===

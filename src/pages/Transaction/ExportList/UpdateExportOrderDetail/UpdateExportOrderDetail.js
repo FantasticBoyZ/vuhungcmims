@@ -217,6 +217,7 @@ const UpdateExportOrderDetail = () => {
           ? product.selectedUnitMeasure !== product.unitMeasure
             ? FormatDataUtils.getRoundFloorNumber(
                 consignment.quantity * product.numberOfWrapUnitMeasure,
+                1,
               )
             : consignment.quantity
           : FormatDataUtils.getRoundFloorNumber(consignment.quantity);
@@ -614,7 +615,7 @@ const UpdateExportOrderDetail = () => {
                                                         if (
                                                           e.value.name ===
                                                           values.productList[index]
-                                                            .unitMeasure
+                                                            .unitMeasure && !!values.productList[index].selectedUnitMeasure
                                                         ) {
                                                           const consignments =
                                                             values.productList[index]
@@ -775,70 +776,76 @@ const UpdateExportOrderDetail = () => {
                                                             : 'Không có'}
                                                         </TableCell>
                                                         <TableCell align="center">
-                                                          <TextfieldWrapper
-                                                            name={`productList[${index}].consignmentList[${indexConsignment}].quantity`}
-                                                            variant="standard"
-                                                            className="text-field-quantity"
-                                                            type={'number'}
-                                                            InputProps={{
-                                                              inputProps: {
-                                                                min: 0,
-                                                                max: consignment?.quantityInstock,
-                                                                step:
-                                                                  values.productList[
-                                                                    index
-                                                                  ]
-                                                                    .selectedUnitMeasure !==
-                                                                  product.wrapUnitMeasure
-                                                                    ? 1
-                                                                    : 0.01,
-                                                              },
-                                                            }}
-                                                            // onChange={(e) => {
-                                                            //   setFieldValue(
-                                                            //     `productList[${index}].consignments[${indexConsignment}].quantityReturn`,
-                                                            //     e?.target.value,
-                                                            //   );
-                                                            // }}
-                                                          />
-                                                          {values.productList[index]
-                                                            .selectedUnitMeasure ===
-                                                            product.wrapUnitMeasure &&
-                                                            !!product.wrapUnitMeasure && (
-                                                              <Tooltip
-                                                                title={
-                                                                  values.productList[
-                                                                    index
-                                                                  ].consignmentList[
-                                                                    indexConsignment
-                                                                  ].quantity -
-                                                                  (values.productList[
-                                                                    index
-                                                                  ].consignmentList[
-                                                                    indexConsignment
-                                                                  ].quantity %
-                                                                    1) +
-                                                                  ' ' +
-                                                                  product.wrapUnitMeasure +
-                                                                  ' ' +
-                                                                  Math.floor(
-                                                                    (values.productList[
+                                                          <Stack
+                                                            direction="row"
+                                                            justifyContent="center"
+                                                          >
+                                                            <TextfieldWrapper
+                                                              name={`productList[${index}].consignmentList[${indexConsignment}].quantity`}
+                                                              variant="standard"
+                                                              className="text-field-quantity"
+                                                              type={'number'}
+                                                              InputProps={{
+                                                                inputProps: {
+                                                                  min: 0,
+                                                                  max:
+                                                                    values.productList[
                                                                       index
-                                                                    ].consignmentList[
-                                                                      indexConsignment
-                                                                    ].quantity %
-                                                                      1) *
-                                                                      product.numberOfWrapUnitMeasure,
-                                                                  ) +
-                                                                  ' ' +
-                                                                  product.unitMeasure
-                                                                }
-                                                              >
-                                                                <IconButton>
-                                                                  <InfoOutlined />
-                                                                </IconButton>
-                                                              </Tooltip>
-                                                            )}
+                                                                    ]
+                                                                      .selectedUnitMeasure !==
+                                                                    product.wrapUnitMeasure
+                                                                      ? consignment?.quantityInstock
+                                                                      : FormatDataUtils.getRoundFloorNumber(
+                                                                          consignment?.quantityInstock /
+                                                                            product.numberOfWrapUnitMeasure,
+                                                                          2,
+                                                                        ),
+                                                                  step:
+                                                                    values.productList[
+                                                                      index
+                                                                    ]
+                                                                      .selectedUnitMeasure !==
+                                                                    product.wrapUnitMeasure
+                                                                      ? 1
+                                                                      : 0.01,
+                                                                },
+                                                              }}
+                                                              // onChange={(e) => {
+                                                              //   setFieldValue(
+                                                              //     `productList[${index}].consignments[${indexConsignment}].quantityReturn`,
+                                                              //     e?.target.value,
+                                                              //   );
+                                                              // }}
+                                                            />
+                                                            {values.productList[index]
+                                                              .selectedUnitMeasure ===
+                                                              product.wrapUnitMeasure &&
+                                                              !!product.wrapUnitMeasure && (
+                                                                <TooltipUnitMeasure
+                                                                  quantity={
+                                                                    FormatDataUtils.getRoundFloorNumber(
+                                                                      values.productList[
+                                                                        index
+                                                                      ].consignmentList[
+                                                                        indexConsignment
+                                                                      ].quantity *
+                                                                        product.numberOfWrapUnitMeasure,
+                                                                    ) /
+                                                                    product.numberOfWrapUnitMeasure
+                                                                  }
+                                                                  wrapUnitMeasure={
+                                                                    product.wrapUnitMeasure
+                                                                  }
+                                                                  numberOfWrapUnitMeasure={
+                                                                    product.numberOfWrapUnitMeasure
+                                                                  }
+                                                                  unitMeasure={
+                                                                    product.unitMeasure
+                                                                  }
+                                                                  isConvert={true}
+                                                                />
+                                                              )}
+                                                          </Stack>
                                                         </TableCell>
                                                         <TableCell align="center">
                                                           {values.productList[index]
