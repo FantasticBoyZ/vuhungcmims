@@ -182,8 +182,8 @@ const UpdateImportOrderDetail = () => {
             setOpenPopup(true);
             return;
           }
-          if (consignment.quantity === 0) {
-            setErrorMessage('Bạn không thể nhập sản phẩm với số lượng bằng 0');
+          if (consignment.quantity < 0) {
+            setErrorMessage('Vui lòng nhập sản phẩm với số lượng lớn hơn 0');
             setOpenPopup(true);
             return;
           }
@@ -196,6 +196,12 @@ const UpdateImportOrderDetail = () => {
 
           if (!Number.isInteger(consignment.unitPrice)) {
             setErrorMessage('Vui lòng nhập đơn giá của sản phẩm là số nguyên');
+            setOpenPopup(true);
+            return;
+          }
+
+          if (consignment.unitPrice < 0) {
+            setErrorMessage('Vui lòng nhập đơn giá lớn hơn hoặc bằng 0');
             setOpenPopup(true);
             return;
           }
