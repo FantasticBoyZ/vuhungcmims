@@ -24,6 +24,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CategoryForm from '@/pages/Category/AddEditCategory/CategoryForm';
 import AlertPopup from '@/components/Common/AlertPopup';
+import FormatDataUtils from '@/utils/formatData';
 
 const useStyles = makeStyles({
   tableCellChild: {
@@ -112,7 +113,7 @@ const CategoryRow = (props) => {
               gutterBottom
               noWrap
             >
-              {description}
+              {FormatDataUtils.truncate(description,25)}
             </Typography>
           </TableCell>
           <TableCell align="center">
@@ -175,8 +176,8 @@ const CategoryRow = (props) => {
                           {subCategory.map((item, index) => {
                             return (
                               <TableRow key={index}>
-                                <TableCell width="30%"><Stack ml={2}>{item?.name}</Stack></TableCell>
-                                <TableCell width="50%"><Stack ml={2}>{item?.description}</Stack></TableCell>
+                                <TableCell width="40%"><Stack ml={2}>{item?.name}</Stack></TableCell>
+                                <TableCell width="40%"><Stack ml={2}>{FormatDataUtils.truncate(item?.description,25)}</Stack></TableCell>
                                 <TableCell width="20%">
                                   <Stack
                                     direction="row"
