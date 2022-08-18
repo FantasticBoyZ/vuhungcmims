@@ -968,12 +968,12 @@ const AddEditProductForm = () => {
                                 {/* <Info className={classes.iconStyle} /> */}
                               </Typography>
                               <TextfieldWrapper
-                                name="description"
-                                fullWidth
-                                multiline
-                                rows={4}
                                 id="description"
-                                autoComplete="description"
+                                className="text-area-note"
+                                name="description"
+                                variant="outlined"
+                                rows={4}
+                                multiline
                               />
                             </Grid>
                           </Grid>

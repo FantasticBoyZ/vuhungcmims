@@ -24,12 +24,17 @@ const useStyles = makeStyles({
     color: '#000000',
     fontWeight: '400 !important',
   },
+  descriptionField: {
+    color: '#000000',
+    fontWeight: '400 !important',
+    wordBreak: 'break-word',
+  },
   imageStyle: {
     height: '250px',
     objectFit: 'cover',
     borderRadius: '15px',
     border: '1px solid black',
-    aspectRatio: '1/1'
+    aspectRatio: '1/1',
   },
 });
 
@@ -272,7 +277,7 @@ const ProductInformation = ({ product }) => {
                   </Grid>
                 </Grid>
                 <Grid
-                  xs={5}
+                  xs={4}
                   item
                 >
                   <Grid
@@ -291,32 +296,28 @@ const ProductInformation = ({ product }) => {
                       xs={12}
                       item
                     >
-                      <Typography className={classes.contentInfo}>
+                      <Typography className={classes.descriptionField}>
                         {product.description}
                       </Typography>
                     </Grid>
                   </Grid>
                 </Grid>
                 <Grid
-                  xs={3}
+                  xs={4}
                   item
                 >
-                  {/* TODO: đổi sang api deploy khi push code lên nhánh master */}
-
-                  <img
-                    // component="img"
-                    // height="250"
-                    // sx={{ width: 250 }}
-                    className={classes.imageStyle}
-                    alt="Ảnh sản phẩm"
-                    // src={image}
-                    loading="lazy"
-                    src={
-                      image
-                        ? image
-                        : require('@/assets/images/no-image-found.png')
-                    }
-                  />
+                  <Stack alignItems="center">
+                    <img
+                      // component="img"
+                      // height="250"
+                      // sx={{ width: 250 }}
+                      className={classes.imageStyle}
+                      alt="Ảnh sản phẩm"
+                      // src={image}
+                      loading="lazy"
+                      src={image ? image : require('@/assets/images/no-image-found.png')}
+                    />
+                  </Stack>
                 </Grid>
               </Grid>
             </CardContent>
