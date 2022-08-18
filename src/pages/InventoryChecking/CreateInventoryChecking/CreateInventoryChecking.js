@@ -165,6 +165,7 @@ const CreateInventoryChecking = () => {
   const [openPopup, setOpenPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [fileUploadName, setFileUploadName] = useState('');
+  const [loadingButton, setIsLoadingButton] = useState(false);
   const classes = useStyles();
   const hiddenFileInput = useRef(null);
   const dispatch = useDispatch();
@@ -231,6 +232,7 @@ const CreateInventoryChecking = () => {
   };
 
   const handleSubmit = async (values, setSubmitting) => {
+    setSubmitting(true);
     let listCheckingHistory = [];
     if (!!values.productList) {
       for (let index = 0; index < values.productList.length; index++) {
@@ -242,32 +244,35 @@ const CreateInventoryChecking = () => {
           indexConsignment++
         ) {
           const consignment = consignments[indexConsignment];
-
-          if (!consignment.realityQuantity) {
+          const realityQuantity =
+            product.selectedUnitMeasure === product.unitMeasure
+              ? consignment.realityQuantity
+              : FormatDataUtils.getRoundFloorNumber(
+                  consignment.realityQuantity * product.numberOfWrapUnitMeasure,
+                );
+          console.log(consignment.realityQuantity);
+          if (realityQuantity === '') {
             setErrorMessage('Bạn có sản phẩm chưa nhập số lượng thực tế');
+            setSubmitting(false);
             setOpenPopup(true);
             return;
           }
 
-          if (
-            FormatDataUtils.getRoundFloorNumber(consignment.realityQuantity, 1) !==
-            consignment.realityQuantity
-          ) {
-            setErrorMessage(
-              'Vui lòng nhập số lượng thực tế với chỉ 1 chữ số sau số thập phân',
-            );
-            setOpenPopup(true);
-            return;
-          }
+          // if (
+          //   FormatDataUtils.getRoundFloorNumber(consignment.realityQuantity, 1) !==
+          //   consignment.realityQuantity
+          // ) {
+          //   setErrorMessage(
+          //     'Vui lòng nhập số lượng thực tế với chỉ 1 chữ số sau số thập phân',
+          //   );
+          //   setSubmitting(false)
+          //   setOpenPopup(true);
+          //   return;
+          // }
           listCheckingHistory.push({
             consignmentId: consignment.id,
             instockQuantity: consignment.quantity,
-            realityQuantity:
-              product.selectedUnitMeasure === product.unitMeasure
-                ? consignment.realityQuantity
-                : FormatDataUtils.getRoundFloorNumber(
-                    consignment.realityQuantity * product.numberOfWrapUnitMeasure,
-                  ),
+            realityQuantity: realityQuantity,
             differentAmout: calculateTotalDifferentAmountOfConsignment(
               product,
               indexConsignment,
@@ -289,6 +294,7 @@ const CreateInventoryChecking = () => {
         const resultResponse = unwrapResult(response);
         console.log('resultResponse', resultResponse);
         if (resultResponse) {
+          setSubmitting(false);
           toast.success(resultResponse.data.message);
           navigate('/inventory-checking/list');
         }
@@ -316,9 +322,15 @@ const CreateInventoryChecking = () => {
                 product.numberOfWrapUnitMeasure,
               2,
             );
-      totalDifferent = Math.round(
-        (product.listConsignment[indexConsignment].realityQuantity - quantity) *
-          product.unitPrice,
+      const realityQuantity =
+        product.selectedUnitMeasure === product.unitMeasure
+          ? product.listConsignment[indexConsignment].realityQuantity
+          : FormatDataUtils.getRoundFloorNumber(
+              product.listConsignment[indexConsignment].realityQuantity *
+                product.numberOfWrapUnitMeasure,
+            ) / product.numberOfWrapUnitMeasure;
+      totalDifferent = FormatDataUtils.getRoundNumber(
+        (realityQuantity - quantity) * product.unitPrice,
       );
     }
     return totalDifferent;
@@ -926,7 +938,10 @@ const CreateInventoryChecking = () => {
                                                       product.unitMeasure ? (
                                                         consignment?.quantity
                                                       ) : (
-                                                        <Stack direction="row" justifyContent='center'>
+                                                        <Stack
+                                                          direction="row"
+                                                          justifyContent="center"
+                                                        >
                                                           {FormatDataUtils.getRoundFloorNumber(
                                                             consignment?.quantity /
                                                               product.numberOfWrapUnitMeasure,
@@ -955,6 +970,7 @@ const CreateInventoryChecking = () => {
                                                       )}
                                                     </TableCell>
                                                     <TableCell align="center">
+                                                      <Stack direction='row'>
                                                       <TextfieldWrapper
                                                         name={`productList[${index}].listConsignment[${indexConsignment}].realityQuantity`}
                                                         variant="standard"
@@ -980,28 +996,26 @@ const CreateInventoryChecking = () => {
                                                       />
                                                       {product.selectedUnitMeasure !==
                                                         product.unitMeasure && (
-                                                        <Tooltip
-                                                          title={
-                                                            consignment.realityQuantity -
-                                                            (consignment.realityQuantity %
-                                                              1) +
-                                                            ' ' +
-                                                            product.wrapUnitMeasure +
-                                                            ' ' +
-                                                            Math.floor(
-                                                              (consignment.realityQuantity %
-                                                                1) *
+                                                        <TooltipUnitMeasure
+                                                          quantity={
+                                                            FormatDataUtils.getRoundFloorNumber(
+                                                              consignment.realityQuantity *
                                                                 product.numberOfWrapUnitMeasure,
-                                                            ) +
-                                                            ' ' +
+                                                            ) /
+                                                            product.numberOfWrapUnitMeasure
+                                                          }
+                                                          wrapUnitMeasure={
+                                                            product.wrapUnitMeasure
+                                                          }
+                                                          numberOfWrapUnitMeasure={
+                                                            product.numberOfWrapUnitMeasure
+                                                          }
+                                                          unitMeasure={
                                                             product.unitMeasure
                                                           }
-                                                        >
-                                                          <IconButton>
-                                                            <InfoOutlined />
-                                                          </IconButton>
-                                                        </Tooltip>
-                                                      )}
+                                                          isConvert={true}
+                                                        />
+                                                      )}</Stack>
                                                     </TableCell>
                                                     <TableCell align="center">
                                                       {FormatDataUtils.formatCurrency(

@@ -40,7 +40,9 @@ const useStyles = makeStyles((theme) => ({
   confirmInfo: {},
   warehourseInfo: {},
   orderNote: {
+    maxWidth: '25vw',
     minHeight: '20vh',
+    wordBreak: 'break-word'
   },
   warehouseContainer: {
     backgroundColor: 'rgba(220, 244, 252,0.5)',

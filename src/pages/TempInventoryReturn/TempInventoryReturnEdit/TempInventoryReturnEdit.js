@@ -196,8 +196,14 @@ const TempInventoryReturnEdit = () => {
             setOpenPopup(true);
             return;
           }
-          if (consignment.quantity === 0) {
-            setErrorMessage('Bạn không thể nhập sản phẩm với số lượng bằng 0');
+          if (consignment.quantity <= 0) {
+            setErrorMessage('Vui lòng nhập sản phẩm với số lượng lớn hơn 0');
+            setOpenPopup(true);
+            return;
+          }
+
+          if (consignment.unitPrice < 0) {
+            setErrorMessage('Vui lòng nhập đơn giá lớn hơn hoặc bằng 0');
             setOpenPopup(true);
             return;
           }
@@ -217,6 +223,7 @@ const TempInventoryReturnEdit = () => {
             consignmentRequests.push({
               id: consignment.id,
               productName: consignment.productName,
+              unitMeasure: consignment.unitMeasure,
               unitPrice: consignment.selectedUnitMeasure
                 ? Math.round(
                     consignment.selectedUnitMeasure === consignment.wrapUnitMeasure
