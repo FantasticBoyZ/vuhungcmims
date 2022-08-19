@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
   orderNote: {
     maxWidth: '25vw',
     minHeight: '20vh',
-    wordBreak: 'break-word'
+    wordBreak: 'break-word',
   },
   totalAmount: {},
   popupMessageContainer: {
@@ -53,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
 
 const TempInventoryReturnDetail = () => {
   const classes = useStyles();
+  const today = new Date();
   const { tempInventoryReturnId } = useParams();
   const [tempInventoryReturn, setTempInventoryReturn] = useState();
   const [listConsignments, setListConsignments] = useState([]);
@@ -352,7 +353,11 @@ const TempInventoryReturnDetail = () => {
                             <Stack flex={2}>
                               <Typography>Ngày dự kiến trả:</Typography>
                             </Stack>
-                            <Stack flex={8}>
+                            <Stack
+                              direction="row"
+                              spacing={2}
+                              flex={8}
+                            >
                               <Typography>
                                 {tempInventoryReturn.expectedReturnDate
                                   ? FormatDataUtils.formatDate(
@@ -360,6 +365,12 @@ const TempInventoryReturnDetail = () => {
                                     )
                                   : tempInventoryReturn.expectedReturnDate}
                               </Typography>
+                              {new Date(tempInventoryReturn.expectedReturnDate) < today &&
+                              tempInventoryReturn.statusName === 'pending' ? (
+                                <Typography color="#d32f2f">
+                                  (Đơn lưu kho đã quá hạn ngày trả dự kiến)
+                                </Typography>
+                              ) : null}
                             </Stack>
                           </Stack>
                         </Stack>
