@@ -284,10 +284,14 @@ const AddEditProductForm = () => {
       }
     } catch (error) {
       console.log('Failed to save product: ', error);
-      if (isAdd) {
-        toast.error(error);
+      if (error.message) {
+        toast.error(error.message);
       } else {
-        toast.error(error);
+        if (isAdd) {
+          toast.error('Thêm sản phẩm thất bại');
+        } else {
+          toast.error('Sửa sản phẩm thất bại');
+        }
       }
     } finally {
       setLoadingButton(false);
