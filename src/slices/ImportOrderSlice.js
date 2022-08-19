@@ -1,32 +1,52 @@
 import importOrderService from '@/services/importOrderService';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-export const getImportOrderList = createAsyncThunk('importOrder/list', async (params, thunkAPi) => {
-  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
-  const importOrder = await importOrderService.getImportOrderList(params);
-  return importOrder;
-})
+export const getImportOrderList = createAsyncThunk(
+  'importOrder/list',
+  async (params, thunkAPi) => {
+    // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+    const importOrder = await importOrderService.getImportOrderList(params);
+    return importOrder;
+  },
+);
 
-export const getImportOrderById = createAsyncThunk('importOrder/detail', async (id, thunkAPi) => {
-  // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
-  const importOrder = await importOrderService.getImportOrderById(id);
-  return importOrder;
-})
+export const getImportOrderById = createAsyncThunk(
+  'importOrder/detail',
+  async (id, thunkAPi) => {
+    // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
+    const importOrder = await importOrderService.getImportOrderById(id);
+    return importOrder;
+  },
+);
 
-export const confirmImportOrder = createAsyncThunk('importOrder/confirm', async (params, thunkAPi) => {
+export const confirmImportOrder = createAsyncThunk(
+  'importOrder/confirm',
+  async (params, thunkAPi) => {
+    return await importOrderService.confirmImportOrder(params);
+  },
+);
 
-  return await importOrderService.confirmImportOrder(params);
-})
+export const cancelImportOrder = createAsyncThunk(
+  'importOrder/cancel',
+  async (params, thunkAPi) => {
+    return await importOrderService.cancelImportOrder(params);
+  },
+);
 
-export const cancelImportOrder = createAsyncThunk('importOrder/cancel', async (params, thunkAPi) => {
+export const updateImportOrder = createAsyncThunk(
+  'importOrder/update',
+  async (importOrder, { rejectWithValue }) => {
+    try {
+      return await importOrderService.updateImportOrder(importOrder);
+    } catch (err) {
+      if (!err.response) {
+        throw err;
+      }
 
-  return await importOrderService.cancelImportOrder(params);
-})
-
-export const updateImportOrder = createAsyncThunk('importOrder/update', async (importOrder, thunkAPi) => {
-
-  return await importOrderService.updateImportOrder(importOrder);
-})
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
 
 const importOrderSlice = createSlice({
   name: 'importOrders',
@@ -34,7 +54,7 @@ const importOrderSlice = createSlice({
     importOrderList: [],
     loading: false,
     error: null,
-    edit: false
+    edit: false,
   },
   reducers: {
     addProduct: (state, action) => {
@@ -95,7 +115,7 @@ const importOrderSlice = createSlice({
     [cancelImportOrder.fulfilled]: (state, action) => {
       state.loading = false;
     },
-  }
+  },
 });
 
 const { reducer: importOrderReducer } = importOrderSlice;
