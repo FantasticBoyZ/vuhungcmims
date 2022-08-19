@@ -219,6 +219,12 @@ const TempInventoryReturnEdit = () => {
             setOpenPopup(true);
             return;
           }
+
+          if (new Date(values.expectedReturnDate) < new Date() && !!values.expectedReturnDate) {
+            setErrorMessage('Vui lòng nhập ngày trả dự kiến trong tương lai');
+            setOpenPopup(true);
+            return;
+          }
           if (consignment.quantity > 0) {
             consignmentRequests.push({
               id: consignment.id,

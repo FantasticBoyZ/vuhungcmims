@@ -24,6 +24,7 @@ import DashboardService from '@/services/dashboardService';
 import { toast } from 'react-toastify';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import useAuth from '@/utils/useAuth';
+import FormatDataUtils from '@/utils/formatData';
 
 const useStyles = makeStyles((theme) => ({
   cardInfo: {
@@ -154,7 +155,9 @@ const HomePage = () => {
       acceptRole: ['ROLE_OWNER'],
     },
   ];
-  const functionListFiltered = functionList.filter((func) => func.acceptRole.includes(role));
+  const functionListFiltered = functionList.filter((func) =>
+    func.acceptRole.includes(role),
+  );
   const getDashboardData = () => {
     try {
       setLoading(true);
@@ -177,7 +180,6 @@ const HomePage = () => {
     }
   };
   useEffect(() => {
-    
     getDashboardData();
   }, []);
   return (
@@ -197,10 +199,18 @@ const HomePage = () => {
               <Card className={classes.cardInfo}>
                 <CardContent className={classes.contentContainer}>
                   <Box className={classes.widget}>
-                    <p className={classes.title}>{role === 'ROLE_OWNER' ? 'Số nhân viên hiện tại' : 'Số mặt hàng đang có trong kho'}</p>
+                    <p className={classes.title}>
+                      {role === 'ROLE_OWNER'
+                        ? 'Số nhân viên hiện tại'
+                        : 'Số mặt hàng đang có trong kho'}
+                    </p>
                   </Box>
                   <Box className={classes.widget}>
-                    <p className={classes.number}>{role === 'ROLE_OWNER' ? dashBoardData?.numberUser : dashBoardData?.numberProduct}</p>
+                    <p className={classes.number}>
+                      {role === 'ROLE_OWNER'
+                        ? dashBoardData?.numberUser
+                        : dashBoardData?.numberProduct}
+                    </p>
                   </Box>
                 </CardContent>
               </Card>
@@ -260,31 +270,33 @@ const HomePage = () => {
               xs={12}
               item
             >
-              <Autocomplete
-                id="functionSearch"
-                // className={classes.searchField}
-                name="functionSearch"
-                options={functionListFiltered}
-                noOptionsText="Không tìm thấy chức năng"
-                onChange={(event, newValue) => {
-                  navigate(newValue.path);
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Tìm kiếm chức năng..."
-                    InputProps={{
-                      ...params.InputProps,
+              <Card>
+                <Autocomplete
+                  id="functionSearch"
+                  // className={classes.searchField}
+                  name="functionSearch"
+                  options={functionListFiltered}
+                  noOptionsText="Không tìm thấy chức năng"
+                  onChange={(event, newValue) => {
+                    navigate(newValue.path);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder="Tìm kiếm chức năng..."
+                      InputProps={{
+                        ...params.InputProps,
 
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Search />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                )}
-              />
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Search />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+              </Card>
               {/* <TextField
                 id="outlined-basic"
                 className={classes.searchField}
@@ -310,7 +322,18 @@ const HomePage = () => {
                 <CardHeader title="Lượng tồn kho theo tháng" />
                 <CardContent>
                   <Box className={classes.chart}>
-                    <InventoryChart chartData={dashBoardData.chart} />
+                    <InventoryChart
+                      chartData={[
+                        ...dashBoardData.chart,
+                        {
+                          saveDate: FormatDataUtils.formatDateByFormat(
+                            dashBoardData.lastDay,
+                            'dd-MM-yyyy',
+                          ),
+                          amout: dashBoardData.latestInventoryAmount,
+                        },
+                      ]}
+                    />
                   </Box>
                 </CardContent>
               </Card>

@@ -594,6 +594,7 @@ const StaffDetail = () => {
                           <TextField
                             error={!!errors.email}
                             helperText={errors.email}
+                            fullWidth
                             autoComplete='email'
                             id='email'
                             name='email'

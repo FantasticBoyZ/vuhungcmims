@@ -17,6 +17,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -87,6 +88,9 @@ const useStyles = makeStyles((theme) => ({
       cursor: 'pointer',
     },
   },
+  outDateRecord: {
+    backgroundColor: theme.colors.error.lighter,
+  },
 }));
 
 const getStatusLabel = (exportOrderStatus) => {
@@ -96,11 +100,11 @@ const getStatusLabel = (exportOrderStatus) => {
       color: 'error',
     },
     completed: {
-      text: 'Đã nhập kho',
+      text: 'Đã trả hàng',
       color: 'success',
     },
     pending: {
-      text: 'Đang chờ xử lý',
+      text: 'Chờ trả hàng',
       color: 'warning',
     },
   };
@@ -112,6 +116,7 @@ const getStatusLabel = (exportOrderStatus) => {
 
 const TempInventoryReturnList = () => {
   const classes = useStyles();
+  const today = new Date();
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [creatorId, setCreatorId] = useState('');
@@ -437,95 +442,112 @@ const TempInventoryReturnList = () => {
                         {tempInventoryReturnList &&
                           tempInventoryReturnList.map((tempInventoryReturn) => {
                             return (
-                              <TableRow
-                                hover
-                                key={tempInventoryReturn.id}
-                                className={classes.tableRow}
-                                //   selected={istempInventoryReturnSelected}
-                                selected={false}
-                                onClick={() =>
-                                  handleOnClickTableRow(tempInventoryReturn.id)
+                              <Tooltip
+                                arrow
+                                title={
+                                  new Date(tempInventoryReturn.expectedReturnDate) <
+                                    today && tempInventoryReturn.statusName === 'pending'
+                                    ? 'Đơn lưu kho đã quá ngày trả dự kiến'
+                                    : ''
                                 }
+                                interactive
                               >
-                                <TableCell>
-                                  <Typography
-                                    variant="body1"
-                                    color="text.primary"
-                                    gutterBottom
-                                    noWrap
-                                  >
-                                    {'LUUKHO' + tempInventoryReturn.id}
-                                  </Typography>
-                                </TableCell>
-                                <TableCell align="center">
-                                  <Typography
-                                    variant="body1"
-                                    color="text.primary"
-                                    gutterBottom
-                                    noWrap
-                                  >
-                                    {FormatDataUtils.formatDateByFormat(
-                                      tempInventoryReturn.createDate,
-                                      'dd/MM/yyyy',
-                                    )}
-                                  </Typography>
-                                </TableCell>
+                                <TableRow
+                                  hover
+                                  key={tempInventoryReturn.id}
+                                  className={
+                                    new Date(tempInventoryReturn.expectedReturnDate) <
+                                      today &&
+                                    tempInventoryReturn.statusName === 'pending'
+                                      ? classes.outDateRecord
+                                      : null
+                                  }
+                                  //   selected={istempInventoryReturnSelected}
+                                  selected={false}
+                                  onClick={() =>
+                                    handleOnClickTableRow(tempInventoryReturn.id)
+                                  }
+                                >
+                                  <TableCell>
+                                    <Typography
+                                      variant="body1"
+                                      color="text.primary"
+                                      gutterBottom
+                                      noWrap
+                                    >
+                                      {'LUUKHO' + tempInventoryReturn.id}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    <Typography
+                                      variant="body1"
+                                      color="text.primary"
+                                      gutterBottom
+                                      noWrap
+                                    >
+                                      {FormatDataUtils.formatDateByFormat(
+                                        tempInventoryReturn.createDate,
+                                        'dd/MM/yyyy',
+                                      )}
+                                    </Typography>
+                                  </TableCell>
 
-                                <TableCell align="center">
-                                  <Typography
-                                    variant="body1"
-                                    color="text.primary"
-                                    gutterBottom
-                                    noWrap
-                                  >
-                                    {FormatDataUtils.formatDateByFormat(
-                                      tempInventoryReturn.expectedReturnDate,
-                                      'dd/MM/yyyy',
-                                    )}
-                                    {/* {tempInventoryReturn.createDate} */}
-                                  </Typography>
-                                </TableCell>
-                                <TableCell align="center">
-                                  <Typography
-                                    variant="body1"
-                                    color="text.primary"
-                                    gutterBottom
-                                    noWrap
-                                  >
-                                    {tempInventoryReturn.manufacturerName}
-                                  </Typography>
-                                </TableCell>
-                                <TableCell align="center">
-                                  <Typography
-                                    variant="body1"
-                                    color="text.primary"
-                                    gutterBottom
-                                    noWrap
-                                  >
-                                    {tempInventoryReturn.userCreateFullName +
-                                      '(' +
-                                      tempInventoryReturn.userCreateName +
-                                      ')'}
-                                  </Typography>
-                                </TableCell>
-                                <TableCell align="center">
-                                  <Typography className={classes.completed}>
-                                    {getStatusLabel(tempInventoryReturn.statusName)}
-                                  </Typography>
-                                </TableCell>
-                                <TableCell align="center">
-                                  <Typography
-                                    variant="body1"
-                                    color="text.primary"
-                                    gutterBottom
-                                    noWrap
-                                  >
-                                    {FormatDataUtils.formatCurrency(
-                                      tempInventoryReturn.totalAmout || 0,
-                                    )}
-                                  </Typography>
-                                </TableCell>
-                              </TableRow>
+                                  <TableCell align="center">
+                                    <Typography
+                                      variant="body1"
+                                      color="text.primary"
+                                      gutterBottom
+                                      noWrap
+                                    >
+                                      {FormatDataUtils.formatDateByFormat(
+                                        tempInventoryReturn.expectedReturnDate,
+                                        'dd/MM/yyyy',
+                                      )}
+                                      {/* {tempInventoryReturn.createDate} */}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    <Typography
+                                      variant="body1"
+                                      color="text.primary"
+                                      gutterBottom
+                                      noWrap
+                                    >
+                                      {tempInventoryReturn.manufacturerName}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    <Typography
+                                      variant="body1"
+                                      color="text.primary"
+                                      gutterBottom
+                                      noWrap
+                                    >
+                                      {tempInventoryReturn.userCreateFullName +
+                                        '(' +
+                                        tempInventoryReturn.userCreateName +
+                                        ')'}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    <Typography className={classes.completed}>
+                                      {getStatusLabel(tempInventoryReturn.statusName)}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    <Typography
+                                      variant="body1"
+                                      color="text.primary"
+                                      gutterBottom
+                                      noWrap
+                                    >
+                                      {FormatDataUtils.formatCurrency(
+                                        tempInventoryReturn.totalAmout || 0,
+                                      )}
+                                    </Typography>
+                                  </TableCell>
+                                </TableRow>
+                              </Tooltip>
                             );
                           })}
                       </TableBody>
