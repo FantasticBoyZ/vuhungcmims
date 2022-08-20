@@ -922,14 +922,14 @@ const CreateInventoryChecking = () => {
                                                       {indexConsignment + 1}
                                                     </TableCell>
                                                     <TableCell>
-                                                      {FormatDataUtils.formatDate(
-                                                        consignment?.importDate,
+                                                      {FormatDataUtils.formatDateByFormat(
+                                                        consignment?.importDate,'dd/MM/yyyy'
                                                       )}
                                                     </TableCell>
                                                     <TableCell>
                                                       {consignment?.expirationDate
-                                                        ? FormatDataUtils.formatDateTime(
-                                                            consignment?.expirationDate,
+                                                        ? FormatDataUtils.formatDateByFormat(
+                                                            consignment?.expirationDate,'dd/MM/yyyy'
                                                           )
                                                         : 'Không có'}
                                                     </TableCell>
