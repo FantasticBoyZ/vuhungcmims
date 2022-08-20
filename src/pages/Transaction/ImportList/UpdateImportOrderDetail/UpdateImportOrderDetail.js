@@ -182,7 +182,7 @@ const UpdateImportOrderDetail = () => {
             setOpenPopup(true);
             return;
           }
-          if (consignment.quantity < 0) {
+          if (consignment.quantity <= 0) {
             setErrorMessage('Vui lòng nhập sản phẩm với số lượng lớn hơn 0');
             setOpenPopup(true);
             return;
