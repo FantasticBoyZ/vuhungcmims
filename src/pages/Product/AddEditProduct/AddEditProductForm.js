@@ -5,7 +5,7 @@ import { API_URL_IMAGE } from '@/constants/apiUrl';
 import CategoryService from '@/services/categoryService';
 import productService from '@/services/productService';
 import { getSubCategoryByCategoryId } from '@/slices/CategorySlice';
-import { getManufacturerList } from '@/slices/ManufacturerSlice';
+import { getAllManufacturer, getManufacturerList } from '@/slices/ManufacturerSlice';
 import {
   getProductDetail,
   saveProduct,
@@ -352,7 +352,7 @@ const AddEditProductForm = () => {
         const params = {
           categoryName: '',
         };
-        const response = await CategoryService.getCategoryList(params);
+        const response = await CategoryService.getAllCategoryList(params);
         // console.log('response', response.data.category);
         const rawList = response.data.category;
         const result = rawList.reduce((obj, item) => {
@@ -376,7 +376,7 @@ const AddEditProductForm = () => {
           // pageSize: rowsPerPage,
           // ...searchParams,
         };
-        const actionResult = await dispatch(getManufacturerList(params));
+        const actionResult = await dispatch(getAllManufacturer(params));
         const dataResult = unwrapResult(actionResult);
         console.log('dataResult', dataResult);
         if (dataResult.data) {

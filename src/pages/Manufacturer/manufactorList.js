@@ -190,7 +190,7 @@ const ManufacturerList = () => {
             <TextField
               id="outlined-basic"
               name="keyword"
-              placeholder="Tìm kiếm theo..."
+              placeholder="Tìm kiếm theo tên nhà cung cấp..."
               fullWidth
               label={null}
               variant="outlined"
@@ -203,7 +203,7 @@ const ManufacturerList = () => {
               }}
               onChange={handleSearchChange}
             />
-            <Select
+            {/* <Select
               classNamePrefix="select"
               className={classes.btnSearch}
               value={optionSelect.filter((option) => option.value === searchBy)}
@@ -220,7 +220,7 @@ const ManufacturerList = () => {
                 }),
               }}
               onChange={(e) => setSearchBy(e.value)}
-            />
+            /> */}
             <Button
               variant="contained"
               startIcon={<SearchIcon />}

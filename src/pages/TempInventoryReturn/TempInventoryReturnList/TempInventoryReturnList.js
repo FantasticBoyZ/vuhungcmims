@@ -48,6 +48,7 @@ import { getCreaterList } from '@/slices/StaffSlice';
 import { getTempInventoryReturnList } from '@/slices/TempInventoryReturnSlice';
 import Label from '@/components/Common/Label';
 import FormatDataUtils from '@/utils/formatData';
+import { getAllManufacturer } from '@/slices/ManufacturerSlice';
 
 const useStyles = makeStyles((theme) => ({
   searchField: {
@@ -120,7 +121,9 @@ const TempInventoryReturnList = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [creatorId, setCreatorId] = useState('');
+  const [manufacturerId, setManufacturerId] = useState('');
   const [staffList, setStaffList] = useState([]);
+  const [manufacturerList, setManufacturerList] = useState([]);
   const pages = [10, 20, 50];
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -179,6 +182,19 @@ const TempInventoryReturnList = () => {
     searchTempInventoryReturn({
       ...searchParams,
       userId: event.target.value > 0 ? event.target.value : '',
+    });
+  };
+
+  const handleChangeManufacturer = (event) => {
+    setManufacturerId(event.target.value);
+    setPage(0);
+    setSearchParams({
+      ...searchParams,
+      manufacturerId: event.target.value > 0 ? event.target.value : '',
+    });
+    searchTempInventoryReturn({
+      ...searchParams,
+      manufacturerId: event.target.value > 0 ? event.target.value : '',
     });
   };
 
@@ -255,6 +271,24 @@ const TempInventoryReturnList = () => {
     }
   };
 
+  const fetchManufacturerList = async () => {
+    try {
+      const params = {
+        // pageIndex: page + 1,
+        // pageSize: rowsPerPage,
+        // ...searchParams,
+      };
+      const actionResult = await dispatch(getAllManufacturer(params));
+      const dataResult = unwrapResult(actionResult);
+      console.log('dataResult', dataResult);
+      if (dataResult.data) {
+        setManufacturerList([{ id: 0, name: 'Tất cả' }, ...dataResult.data.manufacturer]);
+      }
+    } catch (error) {
+      console.log('Failed to fetch category list: ', error);
+    }
+  };
+
   const fetchTempInventoryReturnList = async () => {
     try {
       const params = {
@@ -280,6 +314,7 @@ const TempInventoryReturnList = () => {
   useEffect(() => {
     fetchTempInventoryReturnList();
     getAllStaff();
+    fetchManufacturerList();
   }, []);
 
   return (
@@ -316,7 +351,7 @@ const TempInventoryReturnList = () => {
       <Card className={classes.panelFilter}>
         <div className={classes.labelPanelFilter}>Tìm kiếm theo thông tin</div>
         <Toolbar className={classes.toolbar}>
-          <TextField
+          {/* <TextField
             id="outlined-basic"
             placeholder="Tìm kiếm phiếu lưu kho"
             label={null}
@@ -333,7 +368,27 @@ const TempInventoryReturnList = () => {
             onChange={(e) => {
               setSearchParams({ ...searchParams, billReferenceNumber: e.target.value });
             }}
-          />
+          /> */}
+          <Box className={classes.searchField}>
+            <FormControl fullWidth>
+              <InputLabel id="select-creator">Nhà cung cấp</InputLabel>
+              <Select
+                id="creator"
+                value={manufacturerId}
+                label="Nhà cung cấp"
+                onChange={handleChangeManufacturer}
+              >
+                {manufacturerList.map((item) => (
+                  <MenuItem
+                    key={item.id}
+                    value={item.id}
+                  >
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
           <Box className={classes.selectBox}>
             {staffList && (
               <FormControl fullWidth>

@@ -202,16 +202,16 @@ const ProductList = () => {
   const handleChangeCategory = (value) => {
     setSelectedCategory(value);
     setPage(0);
-    setSearchParams({ ...searchParams, categoryId: value?.value });
-    searchProduct({ ...searchParams, categoryId: value?.value });
+    setSearchParams({ ...searchParams, categoryId: value ? value?.value : value});
+    searchProduct({ ...searchParams, categoryId: value ? value?.value : value});
     console.log('changeCategory', value);
   };
   // TODO: searchParam không thay đổi ngay sau khi setSearchParam
   const handleChangeManufactor = (value) => {
     setSelectedManufactor(value);
     setPage(0);
-    setSearchParams({ ...searchParams, manufactorId: value?.value });
-    searchProduct({ ...searchParams, manufactorId: value?.value });
+    setSearchParams({ ...searchParams, manufactorId: value ? value?.value : value});
+    searchProduct({ ...searchParams, manufactorId: value ? value?.value : value});
     console.log('changeManufactor', value);
   };
 
@@ -220,7 +220,7 @@ const ProductList = () => {
       const params = {
         categoryName: '',
       };
-      await CategoryService.getCategoryList(params).then(
+      await CategoryService.getAllCategoryList(params).then(
         (response) => {
           setCategoryList(response.data.category);
           console.log('response category', response.data.category);
@@ -245,7 +245,7 @@ const ProductList = () => {
       const params = {
         manufacturerName: '',
       };
-      await ManufactorService.getManufactorList(params).then(
+      await ManufactorService.getAllManufacturer(params).then(
         (response) => {
           setManufacturerList(response.data.manufacturer);
           console.log('response manufactor', response.data.manufacturer);
@@ -268,7 +268,7 @@ const ProductList = () => {
       const params = {
         pageIndex: page + 1,
         pageSize: rowsPerPage,
-        productName: FormatDataUtils.removeExtraSpace(searchParams.productName),
+        productName: searchParams.productName ? FormatDataUtils.removeExtraSpace(searchParams.productName) : '',
         productCode: searchParams.productCode,
         manufactorId: searchParams.manufactorId,
         categoryId: searchParams.categoryId,
