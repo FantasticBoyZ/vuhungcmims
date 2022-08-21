@@ -38,43 +38,44 @@ const UserBox = styled(Box)(({ theme }) => ({
 }));
 
 const titles = [
-  { url: '/dashboard', title: 'Hệ thống quản lý kho vật liệu xây dựng' },
-  { url: '/product', title: 'Danh sách sản phẩm' },
-  { url: '/product/detail', title: 'Thông tin sản phẩm' },
-  { url: '/product/add', title: 'Thêm mới sản phẩm' },
-  { url: '/product/edit', title: 'Sửa sản phẩm' },
-  { url: '/category', title: 'Danh sách danh mục' },
-  { url: '/category/detail', title: 'Thông tin danh mục' },
-  { url: '/category/add', title: 'Thêm mới danh mục' },
-  { url: '/category/edit', title: 'Sửa danh mục' },
-  { url: '/manufacturer', title: 'Danh sách nhà sản xuất' },
-  { url: '/manufacturer/detail', title: 'Chi tiết nhà sản xuất' },
-  { url: '/manufacturer/add', title: 'Thêm mới nhà sản xuất' },
-  { url: '/manufacturer/edit', title: 'Chỉnh sửa thông tin nhà sản xuất' },
-  { url: '/import', title: 'Danh sách phiếu nhập kho' },
-  { url: '/import/detail', title: 'Thông tin phiếu nhập kho' },
-  { url: '/import/create-order', title: 'Nhập kho' },
-  { url: '/import/edit', title: 'Thông tin phiếu nhập kho' },
-  { url: '/export/list', title: 'Danh sách phiếu xuất kho' },
-  { url: '/export/detail', title: 'Thông tin phiếu xuất kho' },
-  { url: '/export/create-order', title: 'Xuất kho' },
-  { url: '/export/edit', title: 'Thông tin phiếu xuất kho' },
-  { url: '/export/return', title: 'Trả hàng' },
-  { url: '/export/return/list', title: 'Phiếu trả hàng' },
-  { url: '/export/return/detail', title: 'Thông tin phiếu trả hàng' },
-  { url: '/term-inventory/return/create', title: 'Tạo phiếu lưu kho' },
-  { url: '/term-inventory/return/list', title: 'Danh sách lưu kho' },
-  { url: '/term-inventory/return/detail', title: 'Thông tin phiếu lưu kho' },
-  { url: '/inventory-checking/create', title: 'Kiểm kho' },
-  { url: '/inventory-checking/list', title: 'Lịch sử kiểm kho' },
-  { url: '/inventory-checking/detail', title: 'Chi tiết kiểm kho' },
-  { url: '/staff/list', title: 'Danh sách nhân viên' },
-  { url: '/staff/detail', title: 'Thông tin nhân viên' },
-  { url: '/staff/register', title: 'Đăng ký nhân viên mới' },
-  { url: '/warehouse', title: 'Quản lý nhà kho' },
-  { url: '/profile', title: 'Hồ sơ cá nhân' },
-  { url: '/reset-password', title: 'Đổi mật khẩu' },
-  { url: '/profile/edit', title: 'Thay đổi hồ sơ cá nhân' },
+  { url: '/dashboard', title: 'Hệ thống quản lý kho vật liệu xây dựng', backUrl: null },
+  { url: '/product', title: 'Danh sách sản phẩm', backUrl: null },
+  { url: '/product/detail', title: 'Thông tin sản phẩm', backUrl: '/product' },
+  { url: '/product/add', title: 'Thêm mới sản phẩm', backUrl: null },
+  { url: '/product/edit', title: 'Sửa sản phẩm', backUrl: null },
+  { url: '/category', title: 'Danh sách danh mục', backUrl: null },
+  { url: '/category/detail', title: 'Thông tin danh mục', backUrl: '/category' },
+  { url: '/category/add', title: 'Thêm mới danh mục', backUrl: '/category' },
+  { url: '/category/edit', title: 'Sửa danh mục', backUrl: null },
+  { url: '/manufacturer', title: 'Danh sách nhà sản xuất', backUrl: null },
+  { url: '/manufacturer/detail', title: 'Chi tiết nhà sản xuất', backUrl: '/manufacturer' },
+  { url: '/manufacturer/add', title: 'Thêm mới nhà sản xuất', backUrl: null },
+  { url: '/manufacturer/edit', title: 'Chỉnh sửa thông tin nhà sản xuất', backUrl: null },
+  { url: '/import/list', title: 'Danh sách phiếu nhập kho', backUrl: null },
+  { url: '/import/detail', title: 'Thông tin phiếu nhập kho', backUrl: '/import/list' },
+  { url: '/import/create-order', title: 'Nhập kho', backUrl: null },
+  { url: '/import/edit', title: 'Thông tin phiếu nhập kho', backUrl: null },
+  { url: '/export/list', title: 'Danh sách phiếu xuất kho', backUrl: null },
+  { url: '/export/detail', title: 'Thông tin phiếu xuất kho', backUrl: '/export/list' },
+  { url: '/export/create-order', title: 'Xuất kho', backUrl: null },
+  { url: '/export/edit', title: 'Thông tin phiếu xuất kho', backUrl: null },
+  { url: '/export/return', title: 'Trả hàng', backUrl: null },
+  { url: '/export/return/list', title: 'Phiếu trả hàng', backUrl: null },
+  { url: '/export/return/detail', title: 'Thông tin phiếu trả hàng', backUrl: null },
+  { url: '/term-inventory/return/create', title: 'Tạo phiếu lưu kho', backUrl: null },
+  { url: '/term-inventory/return/list', title: 'Danh sách lưu kho', backUrl: null },
+  { url: '/term-inventory/return/detail', title: 'Thông tin phiếu lưu kho', backUrl: '/term-inventory/return/list' },
+  { url: '/term-inventory/return/edit', title: 'Thông tin phiếu lưu kho', backUrl: null },
+  { url: '/inventory-checking/create', title: 'Kiểm kho', backUrl: null },
+  { url: '/inventory-checking/list', title: 'Lịch sử kiểm kho', backUrl: null },
+  { url: '/inventory-checking/detail', title: 'Chi tiết kiểm kho', backUrl: null },
+  { url: '/staff/list', title: 'Danh sách nhân viên', backUrl: null },
+  { url: '/staff/detail', title: 'Thông tin nhân viên', backUrl: null },
+  { url: '/staff/register', title: 'Đăng ký nhân viên mới', backUrl: null },
+  { url: '/warehouse', title: 'Quản lý nhà kho' , backUrl: null},
+  { url: '/profile', title: 'Hồ sơ cá nhân', backUrl: null },
+  { url: '/reset-password', title: 'Đổi mật khẩu', backUrl: null },
+  { url: '/profile/edit', title: 'Thay đổi hồ sơ cá nhân', backUrl: null },
 ];
 
 const getRoleLabel = (exportOrderStatus) => {
@@ -116,6 +117,7 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [fullname, setFullname] = useState('');
+  const [backUrl, setBackUrl] = useState(null)
   const [image, setImage] = useState();
   const [role, setRole] = useState('');
   const navigate = useNavigate();
@@ -144,6 +146,7 @@ const Header = () => {
     titles.forEach((item) => {
       if (location.pathname.includes(item.url)) {
         setTitle(item.title);
+        setBackUrl(item.backUrl)
       }
     });
 
@@ -163,7 +166,7 @@ const Header = () => {
           <IconButton
             variant="text"
             color="inherit"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(!backUrl ? -1 : backUrl)}
           >
             <ArrowBackIosNew />
           </IconButton>
