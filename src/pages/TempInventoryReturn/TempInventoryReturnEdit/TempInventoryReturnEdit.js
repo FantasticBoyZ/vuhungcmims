@@ -47,6 +47,7 @@ import {
   updateTempInventoryReturn,
 } from '@/slices/TempInventoryReturnSlice';
 import IconRequired from '@/components/Common/IconRequired';
+import Label from '@/components/Common/Label';
 
 const useStyles = makeStyles((theme) => ({
   billReferenceContainer: {
@@ -96,6 +97,27 @@ const warehouseData = [
     name: 'Kho 4',
   },
 ];
+
+const getStatusLabel = (exportOrderStatus) => {
+  const map = {
+    canceled: {
+      text: 'Đã huỷ',
+      color: 'error',
+    },
+    completed: {
+      text: 'Đã trả hàng',
+      color: 'success',
+    },
+    pending: {
+      text: 'Chờ trả hàng',
+      color: 'warning',
+    },
+  };
+
+  const { text, color } = map[exportOrderStatus];
+
+  return <Label color={color}>{text}</Label>;
+};
 
 const TempInventoryReturnEdit = () => {
   const classes = useStyles();
@@ -387,7 +409,7 @@ const TempInventoryReturnEdit = () => {
                               {tempInventoryReturn.billRefernce}
                             </Typography>{' '}
                             <span>
-                              {FormatDataUtils.getStatusLabel(
+                              {getStatusLabel(
                                 tempInventoryReturn.statusName,
                               )}
                             </span>

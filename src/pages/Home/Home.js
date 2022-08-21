@@ -76,6 +76,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [dashBoardData, setDashBoardData] = useState({});
   const [loading, setLoading] = useState(true);
+  const [chartData, setChartData] = useState([]);
   const { auth, role } = useAuth();
 
   const functionList = [
@@ -165,6 +166,19 @@ const HomePage = () => {
         (res) => {
           // console.log(res.data.data);
           setDashBoardData(res.data.data);
+          const chartDataRaw = res.data.data.chart;
+          let chartDataList = [];
+          for (let index = 0; index < chartDataRaw.length; index++) {
+            const element = chartDataRaw[index];
+            chartDataList.push({
+              saveDate: FormatDataUtils.formatDateByFormat(
+                element.saveDate,
+                'dd-MM-yyyy',
+              ),
+              amout: element.amout,
+            });
+          }
+          setChartData(chartDataList);
           setLoading(false);
         },
         (error) => {
@@ -324,7 +338,7 @@ const HomePage = () => {
                   <Box className={classes.chart}>
                     <InventoryChart
                       chartData={[
-                        ...dashBoardData.chart,
+                        ...chartData,
                         {
                           saveDate: FormatDataUtils.formatDateByFormat(
                             dashBoardData.lastDay,

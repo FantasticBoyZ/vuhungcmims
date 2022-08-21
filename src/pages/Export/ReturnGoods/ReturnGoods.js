@@ -332,7 +332,7 @@ const ReturnGoods = () => {
         }
       }
       const returnOrder = {
-        billReferenceNumber: 'PX' + exportOrderId,
+        billReferenceNumber: 'XUAT' + exportOrderId,
         createdDate: new Date().toJSON(),
         description: values.description,
         userId: values.userId,
@@ -452,7 +452,7 @@ const ReturnGoods = () => {
                           >
                             <Box className={classes.billReferenceContainer}>
                               <Typography variant="span">
-                                <strong>Phiếu xuất kho số:</strong> {'PX' + exportOrderId}
+                                <strong>Phiếu xuất kho số:</strong> {'XUAT' + exportOrderId}
                               </Typography>
                             </Box>
                             {exportOrder.statusName === 'completed' && (
