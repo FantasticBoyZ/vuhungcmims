@@ -75,6 +75,7 @@ const ProductDetail = () => {
           setTotalRecord(dataResult.data.totalRecord);
           setSubProductList(dataResult.data.consignment);
           setProduct(dataResult.data.product);
+          setSelectedUnitMeasure(dataResult.data.product.unitMeasure)
         }else {
           navigate('/404')
         }
@@ -109,7 +110,7 @@ const ProductDetail = () => {
             xs={12}
             item
           >
-            {!!product && <ProductInformation product={product} />}
+            {!!product && <ProductInformation product={product} selectedUnitMeasure={selectedUnitMeasure} />}
           </Grid>
           <Grid
             item

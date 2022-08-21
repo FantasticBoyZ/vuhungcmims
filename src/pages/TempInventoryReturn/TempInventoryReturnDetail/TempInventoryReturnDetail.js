@@ -291,7 +291,7 @@ const TempInventoryReturnDetail = () => {
                             variant="contained"
                             startIcon={<Done />}
                             color="success"
-                            disabled={new Date(tempInventoryReturn.expectedReturnDate) < today}
+                            // disabled={new Date(tempInventoryReturn.expectedReturnDate) < today}
                             onClick={() => handleOnClickConfirm()}
                           >
                             Xác nhận trả hàng

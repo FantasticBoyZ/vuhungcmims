@@ -41,7 +41,7 @@ const useStyles = makeStyles({
 const localhost = 'http://localhost:8080';
 const deployUrl = 'http://ec2-52-221-240-240.ap-southeast-1.compute.amazonaws.com:8080';
 
-const ProductInformation = ({ product }) => {
+const ProductInformation = ({ product, selectedUnitMeasure }) => {
   const classes = useStyles();
   const [image, setImage] = useState();
   const navigate = useNavigate();
@@ -269,7 +269,12 @@ const ProductInformation = ({ product }) => {
                           item
                         >
                           <Typography className={classes.contentInfo}>
-                            {FormatDataUtils.formatCurrency(product.unitPrice || 0)}
+                            {FormatDataUtils.formatCurrency(
+                              selectedUnitMeasure === product.unitMeasure
+                                ? product.unitPrice
+                                : product.unitPrice * product.numberOfWrapUnitMeasure ||
+                                    0,
+                            )}
                           </Typography>
                         </Grid>
                       </Grid>
