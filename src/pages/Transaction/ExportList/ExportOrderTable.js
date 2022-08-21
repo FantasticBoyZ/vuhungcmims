@@ -128,7 +128,7 @@ const ExportOrderTable = ({ exportOrders }) => {
                         gutterBottom
                         noWrap
                       >
-                        {'PX' + exportOrder.orderId}
+                        {'XUAT' + exportOrder.orderId}
                       </Typography>
                     </TableCell>
                     <TableCell>

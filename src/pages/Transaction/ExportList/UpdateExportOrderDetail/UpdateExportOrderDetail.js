@@ -455,7 +455,7 @@ const UpdateExportOrderDetail = () => {
                             <Box className={classes.billReferenceContainer}>
                               <Typography variant="span">
                                 <strong>Phiếu xuất kho số:</strong>{' '}
-                                {exportOrder.billRefernce}
+                                {'XUAT' + exportOrderId}
                               </Typography>
                             </Box>
                             {exportOrder.statusName === 'pending' && (

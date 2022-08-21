@@ -1,4 +1,5 @@
 import AlertPopup from '@/components/Common/AlertPopup';
+import Label from '@/components/Common/Label';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
 import CustomTablePagination from '@/components/Common/TablePagination';
 import AuthService from '@/services/authService';
@@ -50,6 +51,27 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
   },
 }));
+
+const getStatusLabel = (exportOrderStatus) => {
+  const map = {
+    canceled: {
+      text: 'Đã huỷ',
+      color: 'error',
+    },
+    completed: {
+      text: 'Đã trả hàng',
+      color: 'success',
+    },
+    pending: {
+      text: 'Chờ trả hàng',
+      color: 'warning',
+    },
+  };
+
+  const { text, color } = map[exportOrderStatus];
+
+  return <Label color={color}>{text}</Label>;
+};
 
 const TempInventoryReturnDetail = () => {
   const classes = useStyles();
@@ -253,7 +275,7 @@ const TempInventoryReturnDetail = () => {
                         {'LUUKHO' + tempInventoryReturnId}
                       </Typography>{' '}
                       <span>
-                        {FormatDataUtils.getStatusLabel(tempInventoryReturn.statusName)}
+                        {getStatusLabel(tempInventoryReturn.statusName)}
                       </span>
                     </Box>
                     {tempInventoryReturn.statusName === 'pending' && (
@@ -269,6 +291,7 @@ const TempInventoryReturnDetail = () => {
                             variant="contained"
                             startIcon={<Done />}
                             color="success"
+                            disabled={new Date(tempInventoryReturn.expectedReturnDate) < today}
                             onClick={() => handleOnClickConfirm()}
                           >
                             Xác nhận trả hàng
