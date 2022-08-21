@@ -38,7 +38,7 @@ const UserBox = styled(Box)(({ theme }) => ({
 }));
 
 const titles = [
-  { url: '/dashboard', title: 'Hệ thống quản lý kho vật liệu xây dựng', backUrl: null },
+  { url: '/dashboard', title: 'Hệ thống quản lý kho vật liệu xây dựng', backUrl: '' },
   { url: '/product', title: 'Danh sách sản phẩm', backUrl: null },
   { url: '/product/detail', title: 'Thông tin sản phẩm', backUrl: '/product' },
   { url: '/product/add', title: 'Thêm mới sản phẩm', backUrl: null },
@@ -48,7 +48,11 @@ const titles = [
   { url: '/category/add', title: 'Thêm mới danh mục', backUrl: '/category' },
   { url: '/category/edit', title: 'Sửa danh mục', backUrl: null },
   { url: '/manufacturer', title: 'Danh sách nhà sản xuất', backUrl: null },
-  { url: '/manufacturer/detail', title: 'Chi tiết nhà sản xuất', backUrl: '/manufacturer' },
+  {
+    url: '/manufacturer/detail',
+    title: 'Chi tiết nhà sản xuất',
+    backUrl: '/manufacturer',
+  },
   { url: '/manufacturer/add', title: 'Thêm mới nhà sản xuất', backUrl: null },
   { url: '/manufacturer/edit', title: 'Chỉnh sửa thông tin nhà sản xuất', backUrl: null },
   { url: '/import/list', title: 'Danh sách phiếu nhập kho', backUrl: null },
@@ -64,15 +68,19 @@ const titles = [
   { url: '/export/return/detail', title: 'Thông tin phiếu trả hàng', backUrl: null },
   { url: '/term-inventory/return/create', title: 'Tạo phiếu lưu kho', backUrl: null },
   { url: '/term-inventory/return/list', title: 'Danh sách lưu kho', backUrl: null },
-  { url: '/term-inventory/return/detail', title: 'Thông tin phiếu lưu kho', backUrl: '/term-inventory/return/list' },
+  {
+    url: '/term-inventory/return/detail',
+    title: 'Thông tin phiếu lưu kho',
+    backUrl: '/term-inventory/return/list',
+  },
   { url: '/term-inventory/return/edit', title: 'Thông tin phiếu lưu kho', backUrl: null },
-  { url: '/inventory-checking/create', title: 'Kiểm kho', backUrl: null },
+  { url: '/inventory-checking/create', title: 'Kiểm kho', backUrl: '' },
   { url: '/inventory-checking/list', title: 'Lịch sử kiểm kho', backUrl: null },
   { url: '/inventory-checking/detail', title: 'Chi tiết kiểm kho', backUrl: null },
   { url: '/staff/list', title: 'Danh sách nhân viên', backUrl: null },
   { url: '/staff/detail', title: 'Thông tin nhân viên', backUrl: null },
-  { url: '/staff/register', title: 'Đăng ký nhân viên mới', backUrl: null },
-  { url: '/warehouse', title: 'Quản lý nhà kho' , backUrl: null},
+  { url: '/staff/register', title: 'Đăng ký nhân viên mới', backUrl: '' },
+  { url: '/warehouse', title: 'Quản lý nhà kho', backUrl: null },
   { url: '/profile', title: 'Hồ sơ cá nhân', backUrl: null },
   { url: '/reset-password', title: 'Đổi mật khẩu', backUrl: null },
   { url: '/profile/edit', title: 'Thay đổi hồ sơ cá nhân', backUrl: null },
@@ -117,7 +125,7 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [fullname, setFullname] = useState('');
-  const [backUrl, setBackUrl] = useState(null)
+  const [backUrl, setBackUrl] = useState(null);
   const [image, setImage] = useState();
   const [role, setRole] = useState('');
   const navigate = useNavigate();
@@ -146,7 +154,7 @@ const Header = () => {
     titles.forEach((item) => {
       if (location.pathname.includes(item.url)) {
         setTitle(item.title);
-        setBackUrl(item.backUrl)
+        setBackUrl(item.backUrl);
       }
     });
 
@@ -163,13 +171,15 @@ const Header = () => {
           variant="h6"
           sx={{ display: { xs: 'none', sm: 'block' } }}
         >
-          <IconButton
-            variant="text"
-            color="inherit"
-            onClick={() => navigate(!backUrl ? -1 : backUrl)}
-          >
-            <ArrowBackIosNew />
-          </IconButton>
+          {backUrl !== '' && (
+            <IconButton
+              variant="text"
+              color="inherit"
+              onClick={() => navigate(!backUrl ? -1 : backUrl)}
+            >
+              <ArrowBackIosNew />
+            </IconButton>
+          )}
           {title}
         </Typography>
         <Warehouse sx={{ display: { xs: 'block', sm: 'none' } }} />
