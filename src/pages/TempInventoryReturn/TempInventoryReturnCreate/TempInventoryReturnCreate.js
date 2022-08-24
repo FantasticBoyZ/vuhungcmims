@@ -521,123 +521,124 @@ const TempInventoryReturnCreate = () => {
                                           {item.wrapUnitMeasure == null ? (
                                             item.unitMeasure
                                           ) : (
-                                            <Select
-                                              className={classes.unitMeasureSelect}
-                                              classNamePrefix="select"
-                                              onChange={(e) => {
-                                                setFieldValue(
-                                                  `consignmentRequests[${index}].selectedUnitMeasure`,
-                                                  e.value.name,
-                                                );
-                                                // change quantity when change unitMeasure
-                                                if (
-                                                  values.consignmentRequests[index]
-                                                    .quantity > 0 &&
-                                                  e.value.name !==
-                                                    values.consignmentRequests[index]
-                                                      .selectedUnitMeasure
-                                                ) {
-                                                  if (
-                                                    e.value.name ===
-                                                    values.consignmentRequests[index]
-                                                      .wrapUnitMeasure
-                                                  ) {
-                                                    setFieldValue(
-                                                      `consignmentRequests[${index}].quantity`,
-                                                      Math.round(
-                                                        values.consignmentRequests[index]
-                                                          .quantity / e.value.number,
-                                                      ),
-                                                    );
-                                                  }
+                                            item.unitMeasure
+                                            // <Select
+                                            //   className={classes.unitMeasureSelect}
+                                            //   classNamePrefix="select"
+                                            //   onChange={(e) => {
+                                            //     setFieldValue(
+                                            //       `consignmentRequests[${index}].selectedUnitMeasure`,
+                                            //       e.value.name,
+                                            //     );
+                                            //     // change quantity when change unitMeasure
+                                            //     if (
+                                            //       values.consignmentRequests[index]
+                                            //         .quantity > 0 &&
+                                            //       e.value.name !==
+                                            //         values.consignmentRequests[index]
+                                            //           .selectedUnitMeasure
+                                            //     ) {
+                                            //       if (
+                                            //         e.value.name ===
+                                            //         values.consignmentRequests[index]
+                                            //           .wrapUnitMeasure
+                                            //       ) {
+                                            //         setFieldValue(
+                                            //           `consignmentRequests[${index}].quantity`,
+                                            //           Math.round(
+                                            //             values.consignmentRequests[index]
+                                            //               .quantity / e.value.number,
+                                            //           ),
+                                            //         );
+                                            //       }
 
-                                                  if (
-                                                    e.value.name ===
-                                                    values.consignmentRequests[index]
-                                                      .unitMeasure
-                                                  ) {
-                                                    setFieldValue(
-                                                      `consignmentRequests[${index}].quantity`,
-                                                      Math.round(
-                                                        values.consignmentRequests[index]
-                                                          .quantity *
-                                                          values.consignmentRequests[
-                                                            index
-                                                          ].numberOfWrapUnitMeasure,
-                                                      ),
-                                                    );
-                                                  }
-                                                }
-                                                // change unitPrice when change unitMeasure
-                                                if (
-                                                  values.consignmentRequests[index]
-                                                    .unitPrice > 0 &&
-                                                  e.value.name !==
-                                                    values.consignmentRequests[index]
-                                                      .selectedUnitMeasure
-                                                ) {
-                                                  if (
-                                                    e.value.name ===
-                                                    values.consignmentRequests[index]
-                                                      .wrapUnitMeasure
-                                                  ) {
-                                                    setFieldValue(
-                                                      `consignmentRequests[${index}].unitPrice`,
-                                                      Math.round(
-                                                        values.consignmentRequests[index]
-                                                          .unitPrice * e.value.number,
-                                                      ),
-                                                    );
-                                                  }
+                                            //       if (
+                                            //         e.value.name ===
+                                            //         values.consignmentRequests[index]
+                                            //           .unitMeasure
+                                            //       ) {
+                                            //         setFieldValue(
+                                            //           `consignmentRequests[${index}].quantity`,
+                                            //           Math.round(
+                                            //             values.consignmentRequests[index]
+                                            //               .quantity *
+                                            //               values.consignmentRequests[
+                                            //                 index
+                                            //               ].numberOfWrapUnitMeasure,
+                                            //           ),
+                                            //         );
+                                            //       }
+                                            //     }
+                                            //     // change unitPrice when change unitMeasure
+                                            //     if (
+                                            //       values.consignmentRequests[index]
+                                            //         .unitPrice > 0 &&
+                                            //       e.value.name !==
+                                            //         values.consignmentRequests[index]
+                                            //           .selectedUnitMeasure
+                                            //     ) {
+                                            //       if (
+                                            //         e.value.name ===
+                                            //         values.consignmentRequests[index]
+                                            //           .wrapUnitMeasure
+                                            //       ) {
+                                            //         setFieldValue(
+                                            //           `consignmentRequests[${index}].unitPrice`,
+                                            //           Math.round(
+                                            //             values.consignmentRequests[index]
+                                            //               .unitPrice * e.value.number,
+                                            //           ),
+                                            //         );
+                                            //       }
 
-                                                  if (
-                                                    e.value.name ===
-                                                    values.consignmentRequests[index]
-                                                      .unitMeasure
-                                                  ) {
-                                                    setFieldValue(
-                                                      `consignmentRequests[${index}].unitPrice`,
-                                                      Math.round(
-                                                        values.consignmentRequests[index]
-                                                          .unitPrice /
-                                                          values.consignmentRequests[
-                                                            index
-                                                          ].numberOfWrapUnitMeasure,
-                                                      ),
-                                                    );
-                                                  }
-                                                }
-                                              }}
-                                              defaultValue={
-                                                FormatDataUtils.getOption([
-                                                  {
-                                                    number: 1,
-                                                    name: item.unitMeasure,
-                                                  },
-                                                  {
-                                                    number: item.numberOfWrapUnitMeasure,
-                                                    name: item.wrapUnitMeasure,
-                                                  },
-                                                ])[0]
-                                              }
-                                              options={FormatDataUtils.getOption([
-                                                {
-                                                  number: 1,
-                                                  name: item.unitMeasure,
-                                                },
-                                                {
-                                                  number: item.numberOfWrapUnitMeasure,
-                                                  name: item.wrapUnitMeasure,
-                                                },
-                                              ])}
-                                              menuPortalTarget={document.body}
-                                              styles={{
-                                                menuPortal: (base) => ({
-                                                  ...base,
-                                                  zIndex: 9999,
-                                                }),
-                                              }}
-                                            />
+                                            //       if (
+                                            //         e.value.name ===
+                                            //         values.consignmentRequests[index]
+                                            //           .unitMeasure
+                                            //       ) {
+                                            //         setFieldValue(
+                                            //           `consignmentRequests[${index}].unitPrice`,
+                                            //           Math.round(
+                                            //             values.consignmentRequests[index]
+                                            //               .unitPrice /
+                                            //               values.consignmentRequests[
+                                            //                 index
+                                            //               ].numberOfWrapUnitMeasure,
+                                            //           ),
+                                            //         );
+                                            //       }
+                                            //     }
+                                            //   }}
+                                            //   defaultValue={
+                                            //     FormatDataUtils.getOption([
+                                            //       {
+                                            //         number: 1,
+                                            //         name: item.unitMeasure,
+                                            //       },
+                                            //       {
+                                            //         number: item.numberOfWrapUnitMeasure,
+                                            //         name: item.wrapUnitMeasure,
+                                            //       },
+                                            //     ])[0]
+                                            //   }
+                                            //   options={FormatDataUtils.getOption([
+                                            //     {
+                                            //       number: 1,
+                                            //       name: item.unitMeasure,
+                                            //     },
+                                            //     {
+                                            //       number: item.numberOfWrapUnitMeasure,
+                                            //       name: item.wrapUnitMeasure,
+                                            //     },
+                                            //   ])}
+                                            //   menuPortalTarget={document.body}
+                                            //   styles={{
+                                            //     menuPortal: (base) => ({
+                                            //       ...base,
+                                            //       zIndex: 9999,
+                                            //     }),
+                                            //   }}
+                                            // />
                                           )}
                                         </TableCell>
                                         <TableCell>

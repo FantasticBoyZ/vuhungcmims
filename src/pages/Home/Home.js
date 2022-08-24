@@ -171,10 +171,10 @@ const HomePage = () => {
           for (let index = 0; index < chartDataRaw.length; index++) {
             const element = chartDataRaw[index];
             chartDataList.push({
-              saveDate: FormatDataUtils.formatDateByFormat(
+              saveDate: element.saveDate ? FormatDataUtils.formatDateByFormat(
                 element.saveDate,
                 'dd-MM-yyyy',
-              ),
+              ) : null,
               amout: element.amout,
             });
           }

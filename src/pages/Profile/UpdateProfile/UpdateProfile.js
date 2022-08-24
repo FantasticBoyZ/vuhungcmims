@@ -612,7 +612,7 @@ const UpdateProfile = () => {
                           variant="contained"
                           startIcon={<Close />}
                           color="error"
-                          onClick={() => navigate('/staff/list')}
+                          onClick={() => navigate('/profile')}
                         >
                           Huỷ
                         </Button>

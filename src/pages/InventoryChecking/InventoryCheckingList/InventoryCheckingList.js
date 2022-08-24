@@ -280,7 +280,8 @@ const InventoryCheckingList = () => {
       const params = {
         pageIndex: page + 1,
         pageSize: rowsPerPage,
-        order: 'asc',
+        order: 'desc',
+        orderBy: 'createDate',
       };
       const actionResult = await dispatch(getListInventoryChecking(params));
       const dataResult = unwrapResult(actionResult);
