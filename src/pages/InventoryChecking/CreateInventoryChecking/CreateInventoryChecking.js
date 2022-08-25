@@ -970,7 +970,7 @@ const CreateInventoryChecking = () => {
                                                       )}
                                                     </TableCell>
                                                     <TableCell align="center">
-                                                      <Stack direction='row'>
+                                                      <Stack direction='row' justifyContent='center'>
                                                       <TextfieldWrapper
                                                         name={`productList[${index}].listConsignment[${indexConsignment}].realityQuantity`}
                                                         variant="standard"

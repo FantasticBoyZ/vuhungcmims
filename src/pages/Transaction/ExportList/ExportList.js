@@ -6,6 +6,7 @@ import { getExportOrderList } from '@/slices/ExportOrderSlice';
 import { getCreaterList, getStaffList } from '@/slices/StaffSlice';
 import { Add, Search } from '@mui/icons-material';
 import {
+  Autocomplete,
   Box,
   Button,
   Card,
@@ -146,11 +147,24 @@ const ExportList = () => {
     }
   };
 
-  const handleChangeCreator = (event) => {
+  // const handleChangeCreator = (event) => {
+  //   setPage(0);
+  //   setCreatorId(event.target.value);
+  //   setSearchParams({ ...searchParams, userId: event.target.value > 0 ? event.target.value : '' });
+  //   searchExportOrder({ ...searchParams, userId: event.target.value > 0 ? event.target.value : '' });
+  // };
+
+  const handleChangeCreator = (staff) => {
     setPage(0);
-    setCreatorId(event.target.value);
-    setSearchParams({ ...searchParams, userId: event.target.value > 0 ? event.target.value : '' });
-    searchExportOrder({ ...searchParams, userId: event.target.value > 0 ? event.target.value : '' });
+    setCreatorId(staff ? staff.id : '');
+    setSearchParams({
+      ...searchParams,
+      userId: staff?.id > 0 ? staff.id : '',
+    });
+    searchExportOrder({
+      ...searchParams,
+      userId: staff?.id > 0 ? staff.id : '',
+    });
   };
 
   const handleChangeStartDate = (value) => {
@@ -299,7 +313,7 @@ const ExportList = () => {
             }}
           />
           <Box className={classes.selectBox}>
-            <FormControl fullWidth>
+            {/* <FormControl fullWidth>
               <InputLabel id="select-creator">Người tạo đơn</InputLabel>
               {staffList && (
                 <Select
@@ -308,7 +322,6 @@ const ExportList = () => {
                   label="Người tạo đơn"
                   onChange={handleChangeCreator}
                 >
-                  {/* TODO: call api trả về list creator */}
                   {staffList.map((item) => (
                     <MenuItem
                       key={item.id}
@@ -319,7 +332,22 @@ const ExportList = () => {
                   ))}
                 </Select>
               )}
-            </FormControl>
+            </FormControl> */}
+            <Autocomplete  
+              id="combo-box-demo"
+              options={staffList}
+              getOptionLabel={(staff) => staff.name || ''}
+              noOptionsText="Không tìm thấy người tạo đơn"
+              onChange={(event, newInputValue) => {
+                handleChangeCreator(newInputValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Người tạo đơn"
+                />
+              )}
+            />
           </Box>
         </Toolbar>
         <div>
@@ -385,7 +413,7 @@ const ExportList = () => {
         >
           <Card className={classes.cardStyle}>
             {loading ? (
-              <ProgressCircleLoading/>
+              <ProgressCircleLoading />
             ) : (
               <Box>
                 {totalRecord > 0 ? (
@@ -393,7 +421,7 @@ const ExportList = () => {
                 ) : (
                   <>Không tìm thấy phiếu xuất kho phù hợp</>
                 )}
-                {totalRecord && (
+                {!!totalRecord && (
                   <CustomTablePagination
                     page={page}
                     pages={pages}

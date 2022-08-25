@@ -3,6 +3,7 @@ import ImportOrders from '@/pages/Transaction/ImportList/ImportOrders';
 import { Search } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import {
+  Autocomplete,
   Card,
   Checkbox,
   FormControl,
@@ -128,16 +129,29 @@ const ImportList = () => {
     }
   };
 
-  const handleChangeCreator = (event) => {
-    setCreatorId(event.target.value);
+  // const handleChangeCreator = (event) => {
+  //   setCreatorId(event.target.value);
+  //   setPage(0);
+  //   setSearchParams({
+  //     ...searchParams,
+  //     userId: event.target.value > 0 ? event.target.value : '',
+  //   });
+  //   searchImportOrder({
+  //     ...searchParams,
+  //     userId: event.target.value > 0 ? event.target.value : '',
+  //   });
+  // };
+
+  const handleChangeCreator = (staff) => {
     setPage(0);
+    setCreatorId(staff ? staff.id : '');
     setSearchParams({
       ...searchParams,
-      userId: event.target.value > 0 ? event.target.value : '',
+      userId: staff?.id > 0 ? staff.id : '',
     });
     searchImportOrder({
       ...searchParams,
-      userId: event.target.value > 0 ? event.target.value : '',
+      userId: staff?.id > 0 ? staff.id : '',
     });
   };
 
@@ -291,24 +305,39 @@ const ImportList = () => {
           />
           <Box className={classes.selectBox}>
             {staffList && (
-              <FormControl fullWidth>
-                <InputLabel id="select-creator">Người tạo đơn</InputLabel>
-                <Select
-                  id="creator"
-                  value={creatorId}
-                  label="Người tạo đơn"
-                  onChange={handleChangeCreator}
-                >
-                  {staffList.map((item) => (
-                    <MenuItem
-                      key={item.id}
-                      value={item.id}
-                    >
-                      {item.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              // <FormControl fullWidth>
+              //   <InputLabel id="select-creator">Người tạo đơn</InputLabel>
+              //   <Select
+              //     id="creator"
+              //     value={creatorId}
+              //     label="Người tạo đơn"
+              //     onChange={handleChangeCreator}
+              //   >
+              //     {staffList.map((item) => (
+              //       <MenuItem
+              //         key={item.id}
+              //         value={item.id}
+              //       >
+              //         {item.name}
+              //       </MenuItem>
+              //     ))}
+              //   </Select>
+              // </FormControl>
+              <Autocomplete
+                id="combo-box-demo"
+                options={staffList}
+                getOptionLabel={(staff) => staff.name || ''}
+                noOptionsText="Không tìm thấy người tạo đơn"
+                onChange={(event, newInputValue) => {
+                  handleChangeCreator(newInputValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Người tạo đơn"
+                  />
+                )}
+              />
             )}
           </Box>
         </Toolbar>
@@ -384,7 +413,7 @@ const ImportList = () => {
                 ) : (
                   <>Không tìm thấy phiếu nhập kho phù hợp</>
                 )}
-                {totalRecord && (
+                {!!totalRecord && (
                   <CustomTablePagination
                     page={page}
                     pages={pages}
