@@ -505,7 +505,8 @@ const TempInventoryReturnList = () => {
                                     ? 'Đơn lưu kho đã quá ngày trả dự kiến'
                                     : ''
                                 }
-                                interactive
+                                key={tempInventoryReturn.id}
+                                // interactive
                               >
                                 <TableRow
                                   hover
@@ -518,7 +519,7 @@ const TempInventoryReturnList = () => {
                                       : null
                                   }
                                   //   selected={istempInventoryReturnSelected}
-                                  selected={false}
+                                  // selected={false}
                                   onClick={() =>
                                     handleOnClickTableRow(tempInventoryReturn.id)
                                   }

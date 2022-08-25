@@ -5,6 +5,7 @@ import { getCreaterList, getStaffList } from '@/slices/StaffSlice';
 import { getWarehouseList } from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
 import {
+  Autocomplete,
   Box,
   Card,
   CardContent,
@@ -112,17 +113,17 @@ const InventoryCheckingList = () => {
     setPage(0);
   };
 
-  const handleChangeCreator = (event) => {
-    setPage(0);
-    setCreatorId(event.target.value);
-    setSearchParams({
-      ...searchParams,
-      userId: event.target.value > 0 ? event.target.value : '',
-    });
-    searchInventoryChecking({
-      ...searchParams,
-      userId: event.target.value > 0 ? event.target.value : '',
-    });
+  const handleChangeCreator = (staff) => {
+      setPage(0);
+      setCreatorId(staff ? staff.id : '');
+      setSearchParams({
+        ...searchParams,
+        userId: staff?.id > 0 ? staff.id : '',
+      });
+      searchInventoryChecking({
+        ...searchParams,
+        userId: staff?.id > 0 ? staff.id : '',
+      });
   };
 
   const handleChangeWarehouse = (event) => {
@@ -345,24 +346,22 @@ const InventoryCheckingList = () => {
               </Box>
               <Box className={classes.selectBox}>
                 {staffList && (
-                  <FormControl fullWidth>
-                    <InputLabel id="select-creator">Người tạo đơn</InputLabel>
-                    <Select
-                      id="creator"
-                      value={creatorId}
-                      label="Người tạo đơn"
-                      onChange={handleChangeCreator}
-                    >
-                      {staffList.map((item) => (
-                        <MenuItem
-                          key={item.id}
-                          value={item.id}
-                        >
-                          {item.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                  <Autocomplete
+                    disablePortal
+                    id="combo-box-demo"
+                    options={staffList}
+                    getOptionLabel={(staff) => staff.name || ''}
+                    noOptionsText="Không tìm thấy người tạo đơn"
+                    onChange={(event, newInputValue) => {
+                      handleChangeCreator(newInputValue);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Người tạo đơn"
+                      />
+                    )}
+                  />
                 )}
               </Box>
             </Stack>
