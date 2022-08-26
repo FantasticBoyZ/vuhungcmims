@@ -359,7 +359,11 @@ const ReturnGoods = () => {
           }
         } catch (error) {
           console.log('Failed to save return order: ', error);
-          toast.error('Tạo phiếu trả hàng thất bại');
+          if (error.message) {
+            toast.error(error.message);
+          } else {
+            toast.error('Lỗi! Trả hàng thất bại!');
+          }
         }
       } else {
         setErrorMessage('Bạn không thể trả hàng nếu không có bất kì số lượng trả về nào');
@@ -381,7 +385,7 @@ const ReturnGoods = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setExportOrder(dataResult.data.inforExportDetail);
-        if (dataResult.data.inforExportDetail?.statusName !== 'completed') {
+        if (dataResult.data.inforExportDetail?.isReturn !== false) {
           navigate(`/export/detail/${exportOrderId}`);
         }
       }
