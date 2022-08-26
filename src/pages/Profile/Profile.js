@@ -1,6 +1,7 @@
 import AlertPopup from '@/components/Common/AlertPopup';
 import Label from '@/components/Common/Label';
 import ProgressCircleLoading from '@/components/Common/ProgressCircleLoading';
+import { API_URL_IMAGE } from '@/constants/apiUrl';
 import AuthService from '@/services/authService';
 import {
   getStaffDetail,
@@ -253,7 +254,7 @@ const Profile = () => {
       if (dataResult) {
         setStaff(dataResult.data);
         if( dataResult.data.imageUrl ) {
-            fetchImage(localhost + '/' + dataResult.data.imageUrl);
+            fetchImage(API_URL_IMAGE + '/' + dataResult.data.imageUrl);
         }
       }
     } catch (error) {
