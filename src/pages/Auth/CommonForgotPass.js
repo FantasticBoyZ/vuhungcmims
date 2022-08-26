@@ -63,6 +63,27 @@ export default function CommonForgotPass() {
     ),
   });
 
+  const sendMailForgotPassword = (values) => {
+    const username = { userName: values.userName };
+    AuthService.forgotPassword(username).then(
+      (response) => {
+        console.log(response);
+        if (response.status1 === 200) {
+          toast.success(response.message);
+          // setLoading(false);
+          // setActiveStep(activeStep + 1);
+        } else {
+          // setLoading(false);
+          toast.error(response.message);
+        }
+      },
+      (error) => {
+        toast.error(error.response.data.message);
+        // setLoading(false);
+      },
+    );
+  };
+
   const handleNext = (values) => {
     // if (activeStep < 2) {
     //   setActiveStep(activeStep + 1);
@@ -75,9 +96,14 @@ export default function CommonForgotPass() {
         AuthService.forgotPassword(username).then(
           (response) => {
             console.log(response);
-            toast.success(response.message);
-            setLoading(false);
-            setActiveStep(activeStep + 1);
+            if (response.status1 === 200) {
+              toast.success(response.message);
+              setLoading(false);
+              setActiveStep(activeStep + 1);
+            } else {
+              setLoading(false);
+              toast.error(response.message);
+            }
           },
           (error) => {
             toast.error(error.response.data.message);
@@ -181,6 +207,11 @@ export default function CommonForgotPass() {
                       <Link
                         href="#"
                         variant="body2"
+                        onClick={() => {
+                          if (activeStep < 2) {
+                            sendMailForgotPassword(values);
+                          }
+                        }}
                       >
                         {' bấm vào đây '}
                       </Link>
