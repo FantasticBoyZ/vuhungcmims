@@ -206,21 +206,24 @@ const UpdateImportOrderDetail = () => {
             return;
           }
 
-          if (new Date(consignment.expirationDate) < new Date() && !!consignment.expirationDate) {
+          if (
+            new Date(consignment.expirationDate) < new Date() &&
+            !!consignment.expirationDate
+          ) {
             setErrorMessage('Vui lòng nhập hạn lưu kho trong tương lai');
             setOpenPopup(true);
             return;
           }
 
           if (consignment.quantity > 0) {
-            const expirationDate = new Date(consignment.expirationDate)
+            const expirationDate = new Date(consignment.expirationDate);
             consignmentRequests.push({
               consignmentId: consignment.consignmentId,
               productId: consignment.productId,
               expirationDate: !!consignment.expirationDate
                 ? new Date(
-                  expirationDate.getTime() -
-                  expirationDate.getTimezoneOffset() * 60 * 1000,
+                    expirationDate.getTime() -
+                      expirationDate.getTimezoneOffset() * 60 * 1000,
                   ).toJSON()
                 : null,
               importDate: new Date(consignment.importDate).toJSON(),
@@ -267,12 +270,11 @@ const UpdateImportOrderDetail = () => {
           }
         } catch (error) {
           console.log('Failed to update importOder: ', error);
-          if(error.message) {
+          if (error.message) {
             toast.error(error.message);
-          }else {
-            toast.error('Sửa phiếu nhập kho thất bại')
+          } else {
+            toast.error('Sửa phiếu nhập kho thất bại');
           }
-          
         }
       } else {
         // TODO: in ra lỗi vì không có sản phẩm hợp lệ
@@ -298,6 +300,9 @@ const UpdateImportOrderDetail = () => {
         dataResult.data &&
         !FormatDataUtils.isEmptyObject(dataResult.data.inforDetail)
       ) {
+        if (dataResult.data.inforDetail.statusName !== 'pending') {
+          navigate(`/import/detail/${importOrderId}`);
+        }
         setImportOrder(dataResult.data.inforDetail);
         setSelectedWarehouse(dataResult.data.inforDetail.wareHouseId);
       } else {

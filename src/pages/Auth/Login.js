@@ -46,7 +46,9 @@ const Login = () => {
   };
 
   const FORM_VALIDATION = Yup.object().shape({
-    username: Yup.string().required('Vui lòng nhập tên đăng nhập'),
+    username: Yup.string()
+      .max(50, 'Vui lòng nhập không vượt quá 50 kí tự')
+      .required('Vui lòng nhập tên đăng nhập'),
     password: Yup.string()
       // .min(8, "Vui lòng nhập ít nhất 8 kí tự")
       .max(50, 'Vui lòng nhập không vượt quá 50 kí tự')
@@ -153,7 +155,7 @@ const Login = () => {
 
                 <LoadingButton
                   fullWidth
-                  type='submit'
+                  type="submit"
                   variant="contained"
                   loading={loading}
                   disabled={disabled}

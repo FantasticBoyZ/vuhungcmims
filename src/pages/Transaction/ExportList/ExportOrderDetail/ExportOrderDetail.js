@@ -206,8 +206,8 @@ const ExportOrderDetail = () => {
         const result = unwrapResult(actionResult);
         console.log(result);
         if (!!result) {
-          if (!!result.body.message) {
-            toast.success(result.body.message);
+          if (!!result.message) {
+            toast.success(result.message);
           } else {
             toast.success('Xác nhận xuất kho thành công!');
           }
@@ -217,7 +217,12 @@ const ExportOrderDetail = () => {
         }
       } catch (error) {
         console.log('Failed to confirm importOder: ', error);
-        toast.error('Lỗi! Xác nhận xuất kho thất bại!');
+        if (error.message) {
+          toast.error(error.message)
+        }else {
+          toast.error('Lỗi! Xác nhận xuất kho thất bại!');
+        }
+        
       }
     } else {
       console.log('Huỷ');
@@ -228,8 +233,8 @@ const ExportOrderDetail = () => {
         const result = unwrapResult(actionResult);
         console.log(result);
         if (!!result) {
-          if (!!result.body.message) {
-            toast.success(result.body.message);
+          if (!!result.message) {
+            toast.success(result.message);
           } else {
             toast.success('Huỷ xuất kho thành công!');
           }
@@ -239,7 +244,11 @@ const ExportOrderDetail = () => {
         }
       } catch (error) {
         console.log('Failed to cancel importOder: ', error);
-        toast.error('Lỗi! Huỷ xuất kho thất bại!');
+        if (error.message) {
+          toast.error(error.message)
+        }else {
+          toast.error('Lỗi! Huỷ xuất kho thất bại!');
+        }
       }
     }
   };

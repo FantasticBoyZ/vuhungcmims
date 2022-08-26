@@ -67,15 +67,31 @@ export const createExportOrder = createAsyncThunk(
 
 export const confirmExportOrder = createAsyncThunk(
   'exportOrder/confirm',
-  async (params, thunkAPi) => {
-    return await exportOrderService.confirmExportOrder(params);
+  async (params, { rejectWithValue }) => {
+    try {
+      return await exportOrderService.confirmExportOrder(params);
+    } catch (err) {
+      if (!err.response) {
+        throw err;
+      }
+      console.log(err);
+      return rejectWithValue(err.response.data);
+    }
   },
 );
 
 export const cancelExportOrder = createAsyncThunk(
   'exportOrder/cancel',
-  async (params, thunkAPi) => {
-    return await exportOrderService.cancelExportOrder(params);
+  async (params, { rejectWithValue }) => {
+    try {
+      return await exportOrderService.cancelExportOrder(params);
+    } catch (err) {
+      if (!err.response) {
+        throw err;
+      }
+      console.log(err);
+      return rejectWithValue(err.response.data);
+    }
   },
 );
 
