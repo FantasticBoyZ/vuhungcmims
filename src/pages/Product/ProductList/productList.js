@@ -584,7 +584,7 @@ const ProductList = () => {
                                     item.quantity / item.numberOfWrapUnitMeasure,
                                     2,
                                   )
-                                : item.quantity}
+                                : (item.quantity || 0)}
                             </TableCell>
                           </TableRow>
                         );
