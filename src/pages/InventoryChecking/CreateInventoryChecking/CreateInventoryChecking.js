@@ -251,7 +251,7 @@ const CreateInventoryChecking = () => {
                   consignment.realityQuantity * product.numberOfWrapUnitMeasure,
                 );
           console.log(consignment.realityQuantity);
-          if (realityQuantity === '') {
+          if (realityQuantity === '' || isNaN(realityQuantity)) {
             setErrorMessage('Bạn có sản phẩm chưa nhập số lượng thực tế');
             setSubmitting(false);
             setOpenPopup(true);
@@ -325,6 +325,8 @@ const CreateInventoryChecking = () => {
       const realityQuantity =
         product.selectedUnitMeasure === product.unitMeasure
           ? product.listConsignment[indexConsignment].realityQuantity
+            ? product.listConsignment[indexConsignment].realityQuantity
+            : 0
           : FormatDataUtils.getRoundFloorNumber(
               product.listConsignment[indexConsignment].realityQuantity *
                 product.numberOfWrapUnitMeasure,
@@ -923,13 +925,15 @@ const CreateInventoryChecking = () => {
                                                     </TableCell>
                                                     <TableCell>
                                                       {FormatDataUtils.formatDateByFormat(
-                                                        consignment?.importDate,'dd/MM/yyyy'
+                                                        consignment?.importDate,
+                                                        'dd/MM/yyyy',
                                                       )}
                                                     </TableCell>
                                                     <TableCell>
                                                       {consignment?.expirationDate
                                                         ? FormatDataUtils.formatDateByFormat(
-                                                            consignment?.expirationDate,'dd/MM/yyyy'
+                                                            consignment?.expirationDate,
+                                                            'dd/MM/yyyy',
                                                           )
                                                         : 'Không có'}
                                                     </TableCell>
@@ -970,52 +974,56 @@ const CreateInventoryChecking = () => {
                                                       )}
                                                     </TableCell>
                                                     <TableCell align="center">
-                                                      <Stack direction='row' justifyContent='center'>
-                                                      <TextfieldWrapper
-                                                        name={`productList[${index}].listConsignment[${indexConsignment}].realityQuantity`}
-                                                        variant="standard"
-                                                        className="text-field-quantity"
-                                                        type="number"
-                                                        InputProps={{
-                                                          inputProps: {
-                                                            min: 0,
-                                                            step:
-                                                              product.selectedUnitMeasure ===
-                                                              product.unitMeasure
-                                                                ? 1
-                                                                : 0.01,
-                                                            // max: consignment?.quantity,
-                                                          },
-                                                        }}
-                                                        // onChange={(e) => {
-                                                        //   setFieldValue(
-                                                        //     `productList[${index}].consignments[${indexConsignment}].quantity`,
-                                                        //     e?.target.value,
-                                                        //   );
-                                                        // }}
-                                                      />
-                                                      {product.selectedUnitMeasure !==
-                                                        product.unitMeasure && (
-                                                        <TooltipUnitMeasure
-                                                          quantity={
-                                                            FormatDataUtils.getRoundFloorNumber(
-                                                              consignment.realityQuantity *
-                                                                product.numberOfWrapUnitMeasure,
-                                                            ) /
-                                                            product.numberOfWrapUnitMeasure
-                                                          }
-                                                          wrapUnitMeasure={
-                                                            product.wrapUnitMeasure
-                                                          }
-                                                          numberOfWrapUnitMeasure={
-                                                            product.numberOfWrapUnitMeasure
-                                                          }
-                                                          unitMeasure={
-                                                            product.unitMeasure
-                                                          }
-                                                          isConvert={true}
+                                                      <Stack
+                                                        direction="row"
+                                                        justifyContent="center"
+                                                      >
+                                                        <TextfieldWrapper
+                                                          name={`productList[${index}].listConsignment[${indexConsignment}].realityQuantity`}
+                                                          variant="standard"
+                                                          className="text-field-quantity"
+                                                          type="number"
+                                                          InputProps={{
+                                                            inputProps: {
+                                                              min: 0,
+                                                              step:
+                                                                product.selectedUnitMeasure ===
+                                                                product.unitMeasure
+                                                                  ? 1
+                                                                  : 0.01,
+                                                              // max: consignment?.quantity,
+                                                            },
+                                                          }}
+                                                          // onChange={(e) => {
+                                                          //   setFieldValue(
+                                                          //     `productList[${index}].consignments[${indexConsignment}].quantity`,
+                                                          //     e?.target.value,
+                                                          //   );
+                                                          // }}
                                                         />
-                                                      )}</Stack>
+                                                        {product.selectedUnitMeasure !==
+                                                          product.unitMeasure && (
+                                                          <TooltipUnitMeasure
+                                                            quantity={
+                                                              FormatDataUtils.getRoundFloorNumber(
+                                                                consignment.realityQuantity *
+                                                                  product.numberOfWrapUnitMeasure,
+                                                              ) /
+                                                              product.numberOfWrapUnitMeasure
+                                                            }
+                                                            wrapUnitMeasure={
+                                                              product.wrapUnitMeasure
+                                                            }
+                                                            numberOfWrapUnitMeasure={
+                                                              product.numberOfWrapUnitMeasure
+                                                            }
+                                                            unitMeasure={
+                                                              product.unitMeasure
+                                                            }
+                                                            isConvert={true}
+                                                          />
+                                                        )}
+                                                      </Stack>
                                                     </TableCell>
                                                     <TableCell align="center">
                                                       {FormatDataUtils.formatCurrency(
