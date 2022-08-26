@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
   orderNote: {
     maxWidth: '25vw',
     minHeight: '20vh',
-    wordBreak: 'break-word'
+    wordBreak: 'break-word',
   },
   totalAmount: {},
   popupMessageContainer: {
@@ -175,6 +175,11 @@ const ImportOrderDetail = () => {
         }
       } catch (error) {
         console.log('Failed to confirm importOder: ', error);
+        if (error.message) {
+          toast.error(error.message);
+        } else {
+          toast.error('Lỗi! Xác nhận nhập kho thất bại!');
+        }
       }
     } else {
       console.log('Huỷ');
@@ -195,6 +200,11 @@ const ImportOrderDetail = () => {
         }
       } catch (error) {
         console.log('Failed to cancel importOder: ', error);
+        if (error.message) {
+          toast.error(error.message);
+        } else {
+          toast.error('Lỗi! Huỷ nhập kho thất bại!');
+        }
       }
     }
   };

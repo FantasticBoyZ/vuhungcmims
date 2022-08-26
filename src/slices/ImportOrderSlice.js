@@ -21,15 +21,31 @@ export const getImportOrderById = createAsyncThunk(
 
 export const confirmImportOrder = createAsyncThunk(
   'importOrder/confirm',
-  async (params, thunkAPi) => {
-    return await importOrderService.confirmImportOrder(params);
+  async (params, { rejectWithValue }) => {
+    try {
+      return await importOrderService.confirmImportOrder(params);
+    } catch (err) {
+      if (!err.response) {
+        throw err;
+      }
+
+      return rejectWithValue(err.response.data);
+    }
   },
 );
 
 export const cancelImportOrder = createAsyncThunk(
   'importOrder/cancel',
-  async (params, thunkAPi) => {
-    return await importOrderService.cancelImportOrder(params);
+  async (params, { rejectWithValue }) => {
+    try {
+      return await importOrderService.cancelImportOrder(params);
+    } catch (err) {
+      if (!err.response) {
+        throw err;
+      }
+
+      return rejectWithValue(err.response.data);
+    }
   },
 );
 
