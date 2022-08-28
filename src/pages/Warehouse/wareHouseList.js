@@ -85,10 +85,8 @@ const WarehouseList = () => {
       const dataResult = unwrapResult(actionResult);
       toast.success('Xóa kho thành công!', { autoClose: 2000 });
       closePopupDelete();
-      setTimeout(() => {
-        window.location.reload(true);
-        window.close();
-      }, 2000);
+      window.location.reload(true);
+      window.close();
     } catch (error) {
       console.log('Failed to delete warehouse: ', error);
       if (error.message) {

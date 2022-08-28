@@ -93,6 +93,11 @@ const EditWareHouseForm = (props) => {
   const { loading } = useSelector((state) => ({ ...state.warehouse }));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [warehouse, setWarehouse] = useState();
+  const [selectedProvince, setSelectedProvince] = useState();
+  const [selectedDistrict, setSelectedDistrict] = useState();
+  const [selectedWard, setSelectedWard] = useState();
+  const [districtList, setDistrictList] = useState([]);
+  const [wardList, setWardList] = useState([]);
 
   const FORM_VALIDATION = Yup.object().shape({
     name: Yup.string()
@@ -108,6 +113,28 @@ const EditWareHouseForm = (props) => {
 
   const handleOnClickExit = () => {
     closePopup();
+  };
+
+  const onChangeProvince = (e) => {
+    setDistrictList([]);
+    setWardList([]);
+    setSelectedDistrict(null);
+    setSelectedWard(null);
+    if (e !== null) {
+      setSelectedProvince(e.value);
+    } else {
+      setSelectedProvince(e);
+    }
+  };
+
+  const onChangeDistrict = (e) => {
+    setWardList([]);
+    setSelectedWard(null);
+    if (e !== null) {
+      setSelectedDistrict(e.value);
+    } else {
+      setSelectedDistrict(e);
+    }
   };
 
   const handleSubmit = async (values) => {
@@ -159,12 +186,6 @@ const EditWareHouseForm = (props) => {
       console.log('Failed to fetch warehouse detail: ', error);
     }
   };
-
-  const [selectedProvince, setSelectedProvince] = useState();
-  const [selectedDistrict, setSelectedDistrict] = useState();
-  const [selectedWard, setSelectedWard] = useState();
-  const [districtList, setDistrictList] = useState([]);
-  const [wardList, setWardList] = useState([]);
 
   const getProvince = async (keyword) => {
     try {
@@ -299,6 +320,9 @@ const EditWareHouseForm = (props) => {
                               e?.value,
                               setSelectedProvince(e?.value),
                             );
+                            setFieldValue('districtId', '', false);
+                            setFieldValue('wardId', '', false);
+                            onChangeProvince(e);
                           }}
                         />
                         {!selectedProvince ? (
@@ -334,11 +358,9 @@ const EditWareHouseForm = (props) => {
                             return option.value === selectedDistrict;
                           })}
                           onChange={(e) => {
-                            setFieldValue(
-                              'districtId',
-                              e?.value,
-                              setSelectedDistrict(e?.value),
-                            );
+                            setFieldValue('districtId', e?.value);
+                            setFieldValue('wardId', '', false);
+                            onChangeDistrict(e);
                           }}
                         />
                         {!selectedDistrict ? (
