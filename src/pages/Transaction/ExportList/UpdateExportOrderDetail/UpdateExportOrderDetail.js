@@ -614,8 +614,10 @@ const UpdateExportOrderDetail = () => {
 
                                                         if (
                                                           e.value.name ===
-                                                          values.productList[index]
-                                                            .unitMeasure && !!values.productList[index].selectedUnitMeasure
+                                                            values.productList[index]
+                                                              .unitMeasure &&
+                                                          !!values.productList[index]
+                                                            .selectedUnitMeasure
                                                         ) {
                                                           const consignments =
                                                             values.productList[index]
@@ -921,19 +923,28 @@ const UpdateExportOrderDetail = () => {
                             <Card>
                               <CardContent className={classes.confirmInfo}>
                                 <Typography variant="h6">Thông tin xác nhận</Typography>
-                                <Typography>
-                                  Người tạo đơn:{' '}
-                                  <i>
-                                    {exportOrder.createdFullName +
-                                      '(' +
-                                      exportOrder.createBy +
-                                      ')'}
-                                  </i>
-                                </Typography>
-                                <Typography>Ngày tạo đơn:</Typography>
-                                <Typography>
-                                  {FormatDataUtils.formatDateTime(exportOrder.createDate)}
-                                </Typography>
+                                <Stack spacing={2}>
+                                  <Box>
+                                    <Typography>
+                                      Người tạo đơn:{' '}
+                                      <i>
+                                        {exportOrder.createdFullName +
+                                          '(' +
+                                          exportOrder.createBy +
+                                          ')'}
+                                      </i>
+                                    </Typography>
+                                    <Typography>Ngày tạo đơn:</Typography>
+                                    <Typography>
+                                      {FormatDataUtils.formatDateTime(
+                                        exportOrder.createDate,
+                                      )}
+                                    </Typography>
+                                  </Box>
+                                  <Typography>
+                                    Tham chiếu: <i>{exportOrder.billRefernce}</i>
+                                  </Typography>
+                                </Stack>
                               </CardContent>
                             </Card>
                           </Grid>

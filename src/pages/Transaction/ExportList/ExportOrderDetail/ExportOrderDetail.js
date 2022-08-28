@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
   orderNote: {
     maxWidth: '25vw',
     minHeight: '20vh',
-    wordBreak: 'break-word'
+    wordBreak: 'break-word',
   },
   warehouseContainer: {
     backgroundColor: 'rgba(220, 244, 252,0.5)',
@@ -218,11 +218,10 @@ const ExportOrderDetail = () => {
       } catch (error) {
         console.log('Failed to confirm importOder: ', error);
         if (error.message) {
-          toast.error(error.message)
-        }else {
+          toast.error(error.message);
+        } else {
           toast.error('Lỗi! Xác nhận xuất kho thất bại!');
         }
-        
       }
     } else {
       console.log('Huỷ');
@@ -245,8 +244,8 @@ const ExportOrderDetail = () => {
       } catch (error) {
         console.log('Failed to cancel importOder: ', error);
         if (error.message) {
-          toast.error(error.message)
-        }else {
+          toast.error(error.message);
+        } else {
           toast.error('Lỗi! Huỷ xuất kho thất bại!');
         }
       }
@@ -487,6 +486,9 @@ const ExportOrderDetail = () => {
                               </Typography>
                             </Box>
                           )}
+                          <Typography>
+                            Tham chiếu: <i>{exportOrder.billRefernce}</i>
+                          </Typography>
                         </Stack>
                       </CardContent>
                     </Card>

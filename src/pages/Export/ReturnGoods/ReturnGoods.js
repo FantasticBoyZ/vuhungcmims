@@ -385,7 +385,7 @@ const ReturnGoods = () => {
       const dataResult = unwrapResult(actionResult);
       if (dataResult.data) {
         setExportOrder(dataResult.data.inforExportDetail);
-        if (dataResult.data.inforExportDetail?.isReturn !== false) {
+        if (dataResult.data.inforExportDetail?.isReturn === true) {
           navigate(`/export/detail/${exportOrderId}`);
         }
       }
@@ -456,7 +456,8 @@ const ReturnGoods = () => {
                           >
                             <Box className={classes.billReferenceContainer}>
                               <Typography variant="span">
-                                <strong>Phiếu xuất kho số:</strong> {'XUAT' + exportOrderId}
+                                <strong>Phiếu xuất kho số:</strong>{' '}
+                                {'XUAT' + exportOrderId}
                               </Typography>
                             </Box>
                             {exportOrder.statusName === 'completed' && (
@@ -901,13 +902,22 @@ const ReturnGoods = () => {
                             <Card>
                               <CardContent className={classes.confirmInfo}>
                                 <Typography variant="h6">Thông tin xác nhận</Typography>
-                                <Typography>
-                                  Người tạo đơn: <i>{exportOrder.createBy}</i>
-                                </Typography>
-                                <Typography>Ngày tạo đơn:</Typography>
-                                <Typography>
-                                  {FormatDataUtils.formatDateTime(exportOrder.createDate)}
-                                </Typography>
+                                <Stack spacing={2}>
+                                  <Box>
+                                    <Typography>
+                                      Người tạo đơn: <i>{exportOrder.createBy}</i>
+                                    </Typography>
+                                    <Typography>Ngày tạo đơn:</Typography>
+                                    <Typography>
+                                      {FormatDataUtils.formatDateTime(
+                                        exportOrder.createDate,
+                                      )}
+                                    </Typography>
+                                  </Box>
+                                  <Typography>
+                                    Tham chiếu: <i>{exportOrder.billRefernce}</i>
+                                  </Typography>
+                                </Stack>
                               </CardContent>
                             </Card>
                           </Grid>

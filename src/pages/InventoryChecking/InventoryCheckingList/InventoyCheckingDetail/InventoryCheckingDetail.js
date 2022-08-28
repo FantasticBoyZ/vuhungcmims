@@ -82,6 +82,9 @@ const useStyles = makeStyles({
   unitMeasureSelectBox: {
     width: '100px',
   },
+  tableContainer: {
+    marginBottom: '60px'
+  }
 });
 
 const productList = [
@@ -153,6 +156,8 @@ const InventoryCheckingDetail = () => {
       if (dataResult.data) {
         // setTotalRecord(dataResult.data.totalRecord);
         setInventoryChecking(dataResult.data.inventoryCheckingHistoryDetail);
+      } else {
+        navigate('/404');
       }
     } catch (error) {
       console.log('Failed to fetch inventoryChecking detail: ', error);
@@ -255,7 +260,7 @@ const InventoryCheckingDetail = () => {
                 <Card>
                   <CardContent className={classes.cardTable}>
                     <Typography variant="h6">Các sản phẩm kiểm kho</Typography>
-                    <TableContainer>
+                    <TableContainer className={classes.tableContainer}>
                       {inventoryChecking?.listProduct && (
                         <Table className={classes.table}>
                           <TableHead>

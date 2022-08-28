@@ -6,7 +6,6 @@ import { API_URL } from '@/constants/apiUrl';
 // const API_URL = 'http://localhost:8080/api'
 // const API_URL = process.env.REACT_APP_API_URL
 const inventoryCheckingService = {
-  
   getListInventoryChecking: (params) => {
     const url = `/inventoryCheckingHistory`;
     return axiosClient.get(url, { params, headers: authHeader() });
@@ -14,12 +13,13 @@ const inventoryCheckingService = {
 
   getProductByWarehouseId: (wareHouseId) => {
     const url = `/product/wareHouse/${wareHouseId}`;
-    return axiosClient.get(url, {  headers: authHeader() });
+    return axiosClient.get(url, { headers: authHeader() });
   },
 
-  getConsignmentByProductId: (productId) => {
+  getConsignmentByProductId: (params) => {
+    const { productId, warehouseId } = params;
     const url = `/product/consignment/${productId}`;
-    return axiosClient.get(url, { headers: authHeader() });
+    return axiosClient.get(url, { params, headers: authHeader() });
   },
 
   getInventoryCheckingHistoryDetail: (inventoryCheckingHistoryId) => {

@@ -23,10 +23,10 @@ export const getProductByWarehouseId = createAsyncThunk(
 
 export const getConsignmentByProductId = createAsyncThunk(
   'get-consignment-by-product/list',
-  async (productId, thunkAPi) => {
+  async (params, thunkAPi) => {
     // nếu muốn dispatch 1 action khác thì dùng thunkApi.dispatch(..)
     const consignmentList = await inventoryCheckingService.getConsignmentByProductId(
-      productId,
+      params,
     );
     return consignmentList;
   },

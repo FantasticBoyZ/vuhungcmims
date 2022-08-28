@@ -200,6 +200,7 @@ const CreateInventoryChecking = () => {
   const handleChangeWarehouse = (event) => {
     setProductList([]);
     if (event !== null) {
+      setWarehouseId(event.value.id)
       fetchProductByWarehouseId(event.value.id);
       setSelectedProduct(null);
     }
@@ -422,8 +423,9 @@ const CreateInventoryChecking = () => {
         // pageIndex: page + 1,
         // pageSize: rowsPerPage,
         productId: productId,
+        warehouseId: warehouseId
       };
-      const actionResult = await dispatch(getConsignmentByProductId(productId));
+      const actionResult = await dispatch(getConsignmentByProductId(params));
       const dataResult = unwrapResult(actionResult);
       console.log('consignment', dataResult);
       if (dataResult) {

@@ -28,6 +28,7 @@ import {
 } from '@/slices/WarehouseSlice';
 import FormatDataUtils from '@/utils/formatData';
 import IconRequired from '@/components/Common/IconRequired';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
@@ -87,6 +88,13 @@ const WareHouseForm = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => ({ ...state.warehouse }));
+  const [selectedProvince, setSelectedProvince] = useState();
+  const [selectedDistrict, setSelectedDistrict] = useState();
+  const [selectedWard, setSelectedWard] = useState();
+  const [provinceList, setProvinceList] = useState([]);
+  const [districtList, setDistrictList] = useState([]);
+  const [wardList, setWardList] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const initialFormValue = {
     name: '',
     addressDetail: '',
@@ -112,6 +120,7 @@ const WareHouseForm = (props) => {
   };
 
   const handleSubmit = async (values) => {
+    setIsSubmitting(true);
     const newWarehouse = {
       name: values.name,
       provinceId: selectedProvince,
@@ -127,23 +136,38 @@ const WareHouseForm = (props) => {
       console.log('dataResult', dataResult);
       if (dataResult.data) {
         toast.success('Thêm kho thành công!', { autoClose: 2000 });
-        setTimeout(() => {
-          window.location.reload(true);
-          window.close();
-        }, 2000);
+        window.location.reload(true);
+        window.close();
+        setIsSubmitting(false);
       }
     } catch (error) {
+      setIsSubmitting(false);
       console.log('Failed to save warehouse: ', error);
       toast.error('Thêm kho thất bại!');
     }
   };
 
-  const [selectedProvince, setSelectedProvince] = useState();
-  const [selectedDistrict, setSelectedDistrict] = useState();
-  const [selectedWard, setSelectedWard] = useState();
-  const [provinceList, setProvinceList] = useState([]);
-  const [districtList, setDistrictList] = useState([]);
-  const [wardList, setWardList] = useState([]);
+  const onChangeProvince = (e) => {
+    setDistrictList([]);
+    setWardList([]);
+    setSelectedDistrict(null);
+    setSelectedWard(null);
+    if (e !== null) {
+      setSelectedProvince(e.value);
+    } else {
+      setSelectedProvince(e);
+    }
+  };
+
+  const onChangeDistrict = (e) => {
+    setWardList([]);
+    setSelectedWard(null);
+    if (e !== null) {
+      setSelectedDistrict(e.value);
+    } else {
+      setSelectedDistrict(e);
+    }
+  };
 
   const getProvince = async (keyword) => {
     try {
@@ -257,15 +281,20 @@ const WareHouseForm = (props) => {
                           name="provinceId"
                           menuPortalTarget={document.body}
                           styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                          value={provinceList.find(
-                            (obj) => obj.value === selectedProvince,
-                          )} // set selected value
+                          value={FormatDataUtils.getOptionWithIdandName(
+                            provinceList,
+                          )?.filter(function (option) {
+                            return option.value === selectedProvince;
+                          })} // set selected value
                           onChange={(e) => {
                             setFieldValue(
                               'provinceId',
                               e?.value,
                               setSelectedProvince(e?.value),
                             );
+                            setFieldValue('districtId', '', false);
+                            setFieldValue('wardId', '', false);
+                            onChangeProvince(e);
                           }}
                         />
                         {!selectedProvince ? (
@@ -297,15 +326,19 @@ const WareHouseForm = (props) => {
                           name="districtId"
                           menuPortalTarget={document.body}
                           styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                          value={districtList.find(
-                            (obj) => obj.value === selectedDistrict,
-                          )} // set selected value
+                          value={FormatDataUtils.getOptionWithIdandName(
+                            districtList,
+                          )?.filter(function (option) {
+                            return option.value === selectedDistrict;
+                          })} // set selected value
                           onChange={(e) => {
                             setFieldValue(
                               'districtId',
                               e?.value,
                               setSelectedDistrict(e?.value),
                             );
+                            setFieldValue('wardId', '', false);
+                            onChangeDistrict(e);
                           }}
                         />
                         {!selectedDistrict ? (
@@ -334,7 +367,11 @@ const WareHouseForm = (props) => {
                           name="wardId"
                           menuPortalTarget={document.body}
                           styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                          value={wardList.find((obj) => obj.value === selectedWard)} // set selected value
+                          value={FormatDataUtils.getOptionWithIdandName(wardList)?.filter(
+                            function (option) {
+                              return option.value === selectedWard;
+                            },
+                          )} // set selected value
                           onChange={(e) => {
                             setFieldValue('wardId', e?.value, setSelectedWard(e?.value));
                           }}
@@ -373,17 +410,21 @@ const WareHouseForm = (props) => {
                 justifyContent="flex-end"
                 padding="20px"
               >
-                <ButtonWrapper
+                <LoadingButton
                   color="success"
+                  type="submit"
+                  loading={isSubmitting}
+                  loadingPosition="start"
                   variant="contained"
                   startIcon={<CheckIcon />}
                 >
                   Thêm nhà kho
-                </ButtonWrapper>
+                </LoadingButton>
                 <Button
                   color="error"
                   onClick={() => handleOnClickExit()}
                   variant="contained"
+                  disabled={isSubmitting}
                   startIcon={<ClearIcon />}
                 >
                   Hủy
