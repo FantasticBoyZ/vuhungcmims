@@ -274,9 +274,7 @@ const TempInventoryReturnDetail = () => {
                         <strong>Phiếu lưu kho số:</strong>{' '}
                         {'LUUKHO' + tempInventoryReturnId}
                       </Typography>{' '}
-                      <span>
-                        {getStatusLabel(tempInventoryReturn.statusName)}
-                      </span>
+                      <span>{getStatusLabel(tempInventoryReturn.statusName)}</span>
                     </Box>
                     {tempInventoryReturn.statusName === 'pending' && (
                       <Stack
@@ -473,7 +471,12 @@ const TempInventoryReturnDetail = () => {
                             <br />
                             <Typography>
                               Người xác nhận:{' '}
-                              <i>{tempInventoryReturn.userConfirmedName}</i>
+                              <i>
+                                {tempInventoryReturn.fullNameConfirmed +
+                                  '(' +
+                                  tempInventoryReturn.userConfirmedName +
+                                  ')'}
+                              </i>
                             </Typography>
                             <Typography>Ngày xác nhận:</Typography>
                             <Typography>

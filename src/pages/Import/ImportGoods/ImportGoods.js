@@ -756,6 +756,7 @@ const ImportGoods = () => {
                     <TextfieldWrapper
                       id="referenceNumber"
                       name="billReferenceNumber"
+                      placeholder='Số mã phiếu...'
                       variant="standard"
                       fullWidth
                     />
