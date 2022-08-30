@@ -333,7 +333,7 @@ const HomePage = () => {
               item
             >
               <Card>
-                <CardHeader title="Lượng tồn kho theo tháng" />
+                <CardHeader title="Lượng tồn kho theo quý" />
                 <CardContent>
                   <Box className={classes.chart}>
                     <InventoryChart
